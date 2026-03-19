@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: infusionsensei
+    runtime: static
+    buildCommand: pnpm install --node-linker=hoisted; pnpm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
