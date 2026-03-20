@@ -347,6 +347,59 @@ const infusionRecipes: InfusionRecipe[] = [
     ],
     bestUses: ["Sublingual", "Coffee", "Smoothies", "Quick absorption"],
     compatibleCategories: ["drinks"]
+  },
+
+  // CREAM RECIPES
+  {
+    id: "heavy-cream-infusion",
+    name: "Cannabis Heavy Cream",
+    baseType: "liquid",
+    temperature: "160-175°F (71-79°C)",
+    time: "2-3 hours",
+    thcRetention: 85,
+    terpeneRetention: 65,
+    ingredients: [
+      "1 cup (240ml) heavy cream (36% fat)",
+      "7-10g decarboxylated cannabis",
+      "Double boiler or slow cooker"
+    ],
+    steps: [
+      "Decarboxylate cannabis at 240°F for 40 minutes",
+      "Pour heavy cream into double boiler over simmering water",
+      "Add decarboxylated cannabis to the cream",
+      "Maintain temperature at 160-175°F — do NOT boil (cream will scald)",
+      "Infuse for 2-3 hours, stirring every 20 minutes",
+      "Strain through fine cheesecloth into airtight container",
+      "Refrigerate immediately — use within 5-7 days",
+      "Can be whipped, used in ice cream bases, sauces, or ganache"
+    ],
+    bestUses: ["Ice cream base", "Whipped cream", "Ganache", "Pasta sauces", "Soups", "Coffee creamer"],
+    compatibleCategories: ["drinks", "cookies", "savory"]
+  },
+  {
+    id: "light-cream-infusion",
+    name: "Cannabis Light Cream",
+    baseType: "liquid",
+    temperature: "155-170°F (68-77°C)",
+    time: "2-3 hours",
+    thcRetention: 78,
+    terpeneRetention: 60,
+    ingredients: [
+      "1 cup (240ml) light cream or half-and-half (18-30% fat)",
+      "5-7g decarboxylated cannabis",
+      "Double boiler"
+    ],
+    steps: [
+      "Decarboxylate cannabis at 240°F for 40 minutes",
+      "Heat light cream in double boiler to 155-170°F",
+      "Add decarboxylated cannabis",
+      "Maintain low heat — light cream scorches more easily than heavy cream",
+      "Infuse for 2-3 hours, stirring frequently",
+      "Strain through fine cheesecloth",
+      "Store refrigerated and use within 5 days"
+    ],
+    bestUses: ["Coffee creamer", "Lighter sauces", "Soups", "Ice cream (lighter)", "Baking"],
+    compatibleCategories: ["drinks", "cookies", "savory"]
   }
 ];
 
@@ -366,7 +419,7 @@ export function InfusionBases() {
   const [customThc, setCustomThc] = useState(20);
   const [customCbd, setCustomCbd] = useState(0);
   
-  const [selectedBaseType, setSelectedBaseType] = useState<"butter" | "oil" | "syrup" | "liquid" | "premade" | "none">("none");
+  const [selectedBaseType, setSelectedBaseType] = useState<"butter" | "oil" | "syrup" | "liquid" | "cream" | "premade" | "none">("none");
   const [selectedProduct, setSelectedProduct] = useState<PreMadeProduct | null>(null);
   const [productDoses, setProductDoses] = useState<number>(1);
   const [selectedRecipe, setSelectedRecipe] = useState<InfusionRecipe | null>(null);
@@ -517,8 +570,8 @@ export function InfusionBases() {
     }
   };
 
-  const filteredRecipes = selectedBaseType !== "none" 
-    ? infusionRecipes.filter(r => r.baseType === selectedBaseType)
+  const filteredRecipes = selectedBaseType !== "none" && selectedBaseType !== "premade"
+    ? infusionRecipes.filter(r => selectedBaseType === "cream" ? r.baseType === "liquid" && r.id.includes("cream") : r.baseType === selectedBaseType)
     : [];
 
   // Calculate dynamic THC and Terpene retention based on temperature and time
@@ -613,7 +666,7 @@ export function InfusionBases() {
       {/* Header */}
       <div>
         <h1 className="text-4xl font-bold text-white mb-2">🧪 My Infusions</h1>
-        <p className="text-gray-200">
+        <p className="text-gray-400">
           "Take it slow. That's the secret." — Create perfectly dosed infusion bases
         </p>
       </div>
@@ -627,7 +680,7 @@ export function InfusionBases() {
                 <FlaskConical className="w-6 h-6 text-purple-400" />
                 🌿 My Cannabis Strains
               </CardTitle>
-              <CardDescription className="text-gray-300">
+              <CardDescription className="text-gray-400">
                 {customStrains.length} custom strains saved
               </CardDescription>
             </div>
@@ -652,12 +705,12 @@ export function InfusionBases() {
                   </Badge>
                   {strain.cannabinoids && (
                     <div className="mt-2 text-xs space-y-0.5">
-                      <div className="flex justify-between text-gray-200">
+                      <div className="flex justify-between text-gray-400">
                         <span>THC:</span>
                         <span className="text-green-400 font-semibold">{strain.cannabinoids.thc}%</span>
                       </div>
                       {strain.cannabinoids.cbd > 0 && (
-                        <div className="flex justify-between text-gray-200">
+                        <div className="flex justify-between text-gray-400">
                           <span>CBD:</span>
                           <span className="text-blue-400 font-semibold">{strain.cannabinoids.cbd}%</span>
                         </div>
@@ -675,7 +728,7 @@ export function InfusionBases() {
       <Card className="bg-gray-800/50 border-green-700/30">
         <CardHeader>
           <CardTitle className="text-white text-2xl">Create New Infusion</CardTitle>
-          <CardDescription className="text-gray-300">
+          <CardDescription className="text-gray-400">
             Follow the steps below to create your perfect infusion base
           </CardDescription>
         </CardHeader>
@@ -688,13 +741,14 @@ export function InfusionBases() {
             </Label>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label className="text-gray-100 text-sm mb-2 block">Select Strain</Label>
+                <Label className="text-gray-300 text-sm mb-2 block">Select Strain</Label>
                 <Select value={selectedStrain} onValueChange={handleStrainChange}>
                   <SelectTrigger className="bg-gray-900 border-green-700/30 text-white">
                     <SelectValue placeholder="Choose a strain..." />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-900 border-green-700/30 text-white">
                     <SelectItem value="none">-- Select Strain --</SelectItem>
+                    <SelectItem value="custom">🌟 Custom Strain (Fill Info Below)</SelectItem>
                     {allStrains.filter(s => s.type !== "custom").map((strain) => (
                       <SelectItem key={strain.name} value={strain.name}>
                         {strain.name} ({strain.type})
@@ -750,6 +804,7 @@ export function InfusionBases() {
                 { value: "oil", label: "Oil", emoji: "🫒", color: "green" },
                 { value: "syrup", label: "Syrup", emoji: "🍯", color: "orange" },
                 { value: "liquid", label: "Liquid", emoji: "💧", color: "blue" },
+                { value: "cream", label: "Cream", emoji: "🍦", color: "pink" },
                 { value: "premade", label: "Pre-Made Product", emoji: "🛒", color: "pink" },
               ].map((base) => (
                 <button
@@ -786,7 +841,7 @@ export function InfusionBases() {
                     }`}
                   >
                     <h3 className="text-white font-semibold mb-2">{recipe.name}</h3>
-                    <div className="space-y-1 text-sm text-gray-200">
+                    <div className="space-y-1 text-sm text-gray-400">
                       <div className="flex items-center gap-2">
                         <Thermometer className="w-4 h-4 text-orange-400" />
                         {recipe.temperature}
@@ -826,14 +881,14 @@ export function InfusionBases() {
                     <div className="flex items-start gap-3">
                       <span className="text-3xl">{product.emoji}</span>
                       <div className="flex-1">
-                        <div className="text-xs text-gray-300 mb-0.5">{product.brand}</div>
+                        <div className="text-xs text-gray-400 mb-0.5">{product.brand}</div>
                         <h3 className="text-white font-semibold">{product.name}</h3>
                         <div className="flex flex-wrap gap-1 mt-1">
                           <Badge className="bg-pink-700 text-xs">{product.type}</Badge>
                           <Badge className="bg-green-700 text-xs">{product.thcPerDose}mg/{product.doseUnit}</Badge>
                           <Badge className="bg-blue-700 text-xs">⏱ {product.onsetTime}</Badge>
                         </div>
-                        <p className="text-xs text-gray-200 mt-2 line-clamp-2">{product.description}</p>
+                        <p className="text-xs text-gray-400 mt-2 line-clamp-2">{product.description}</p>
                       </div>
                     </div>
                   </button>
@@ -844,10 +899,10 @@ export function InfusionBases() {
                 <div className="bg-gray-900/50 border border-pink-700/30 rounded-xl p-6 space-y-6">
                   <h3 className="text-white text-xl font-semibold">
                     {selectedProduct.emoji} {selectedProduct.name}
-                    <span className="text-gray-300 text-sm font-normal ml-2">by {selectedProduct.brand}</span>
+                    <span className="text-gray-400 text-sm font-normal ml-2">by {selectedProduct.brand}</span>
                   </h3>
 
-                  <p className="text-gray-100 text-sm">{selectedProduct.description}</p>
+                  <p className="text-gray-300 text-sm">{selectedProduct.description}</p>
 
                   {selectedProduct.flavors && (
                     <div>
@@ -871,7 +926,7 @@ export function InfusionBases() {
 
                   <div className="bg-yellow-900/20 border border-yellow-600/40 rounded-lg p-4">
                     <h4 className="text-yellow-400 font-semibold text-sm mb-1">📏 Dosage Guide</h4>
-                    <p className="text-gray-100 text-sm">{selectedProduct.dosageNote}</p>
+                    <p className="text-gray-300 text-sm">{selectedProduct.dosageNote}</p>
                   </div>
 
                   {/* Dose Calculator */}
@@ -879,7 +934,7 @@ export function InfusionBases() {
                     <h4 className="text-green-400 font-semibold mb-3">💚 Dose Calculator</h4>
                     <div className="grid md:grid-cols-2 gap-4 items-center">
                       <div>
-                        <Label className="text-gray-100 text-sm mb-2 block">
+                        <Label className="text-gray-300 text-sm mb-2 block">
                           How many {selectedProduct.doseUnit}s are you using?
                         </Label>
                         <Input
@@ -892,15 +947,15 @@ export function InfusionBases() {
                       </div>
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-200">THC per {selectedProduct.doseUnit}:</span>
+                          <span className="text-gray-400">THC per {selectedProduct.doseUnit}:</span>
                           <span className="text-green-400 font-bold">{selectedProduct.thcPerDose}mg</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-200">Total THC:</span>
+                          <span className="text-gray-400">Total THC:</span>
                           <span className="text-green-400 font-bold text-lg">{(selectedProduct.thcPerDose * productDoses).toFixed(1)}mg</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-200">Technology:</span>
+                          <span className="text-gray-400">Technology:</span>
                           <span className="text-white">{selectedProduct.technology}</span>
                         </div>
                       </div>
@@ -929,7 +984,7 @@ export function InfusionBases() {
                 {/* Amounts */}
                 <div className="grid md:grid-cols-2 gap-4 mb-6">
                   <div>
-                    <Label className="text-gray-100 text-sm mb-2 block">Cannabis Amount (grams)</Label>
+                    <Label className="text-gray-300 text-sm mb-2 block">Cannabis Amount (grams)</Label>
                     <Input
                       type="number"
                       value={cannabisAmount}
@@ -938,7 +993,7 @@ export function InfusionBases() {
                     />
                   </div>
                   <div>
-                    <Label className="text-gray-100 text-sm mb-2 block">Base Amount (grams)</Label>
+                    <Label className="text-gray-300 text-sm mb-2 block">Base Amount (grams)</Label>
                     <Input
                       type="number"
                       value={baseAmount}
@@ -959,7 +1014,7 @@ export function InfusionBases() {
                     {/* Temperature Slider */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <Label className="text-gray-100 text-sm">Infusion Temperature (°F)</Label>
+                        <Label className="text-gray-300 text-sm">Infusion Temperature (°F)</Label>
                         <span className="text-white font-bold text-lg">{customTemp}°F</span>
                       </div>
                       <input
@@ -981,7 +1036,7 @@ export function InfusionBases() {
                     {/* Time Slider */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <Label className="text-gray-100 text-sm">Infusion Time (hours)</Label>
+                        <Label className="text-gray-300 text-sm">Infusion Time (hours)</Label>
                         <span className="text-white font-bold text-lg">{customTime}h</span>
                       </div>
                       <input
@@ -1010,7 +1065,7 @@ export function InfusionBases() {
                     retention.warningColor === "cyan" ? "bg-cyan-900/30 border-cyan-500" :
                     "bg-blue-900/30 border-blue-500"
                   } mb-4`}>
-                    <p className="text-white font-semibold whitespace-pre-line">{retention.warning}</p>
+                    <p className="text-white font-medium whitespace-pre-line">{retention.warning}</p>
                   </div>
 
                   {/* Retention Display */}
@@ -1050,11 +1105,11 @@ export function InfusionBases() {
                   <h4 className="text-green-400 font-semibold mb-2">💚 Calculated THC</h4>
                   <div className="grid md:grid-cols-2 gap-4 text-white">
                     <div>
-                      <div className="text-sm text-gray-200">Total THC</div>
+                      <div className="text-sm text-gray-400">Total THC</div>
                       <div className="text-2xl font-bold">{totalTHC.toFixed(2)} mg</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-200">THC per gram</div>
+                      <div className="text-sm text-gray-400">THC per gram</div>
                       <div className="text-2xl font-bold">{thcPerGram.toFixed(2)} mg/g</div>
                     </div>
                   </div>
@@ -1063,7 +1118,7 @@ export function InfusionBases() {
                 {/* Ingredients */}
                 <div className="mb-6">
                   <h4 className="text-white font-semibold mb-2">🥄 Ingredients</h4>
-                  <ul className="space-y-1 text-gray-100">
+                  <ul className="space-y-1 text-gray-300">
                     {selectedRecipe.ingredients.map((ing, i) => (
                       <li key={i}>• {ing}</li>
                     ))}
@@ -1073,7 +1128,7 @@ export function InfusionBases() {
                 {/* Steps */}
                 <div className="mb-6">
                   <h4 className="text-white font-semibold mb-2">👨‍🍳 Steps</h4>
-                  <ol className="space-y-2 text-gray-100">
+                  <ol className="space-y-2 text-gray-300">
                     {selectedRecipe.steps.map((step, i) => (
                       <li key={i}>{i + 1}. {step}</li>
                     ))}
@@ -1127,7 +1182,7 @@ export function InfusionBases() {
         <Card className="bg-gray-800/50 border-green-700/30">
           <CardHeader>
             <CardTitle className="text-white">💾 My Saved Infusions</CardTitle>
-            <CardDescription className="text-gray-300">
+            <CardDescription className="text-gray-400">
               {infusionBases.length} infusion{infusionBases.length !== 1 ? 's' : ''} saved
             </CardDescription>
           </CardHeader>
@@ -1156,19 +1211,19 @@ export function InfusionBases() {
                   </div>
                   
                   <div className="space-y-2 text-sm">
-                    <div className="flex justify-between text-gray-200">
+                    <div className="flex justify-between text-gray-400">
                       <span>Total THC:</span>
                       <span className="text-green-400 font-semibold">{base.totalTHC} mg</span>
                     </div>
-                    <div className="flex justify-between text-gray-200">
+                    <div className="flex justify-between text-gray-400">
                       <span>THC per {base.baseUnit}:</span>
                       <span className="text-green-400 font-semibold">{base.thcPerUnit} mg</span>
                     </div>
-                    <div className="flex justify-between text-gray-200">
+                    <div className="flex justify-between text-gray-400">
                       <span>Cannabis:</span>
                       <span className="text-white">{base.cannabisAmount}{base.cannabisUnit}</span>
                     </div>
-                    <div className="flex justify-between text-gray-200">
+                    <div className="flex justify-between text-gray-400">
                       <span>THC %:</span>
                       <span className="text-white">{base.thcPercentage}%</span>
                     </div>

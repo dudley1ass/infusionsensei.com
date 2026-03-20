@@ -33,16 +33,20 @@ export function Layout() {
         <Link
           key={item.path}
           to={item.path}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+          className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors font-medium ${
             isActive(item.path)
               ? "bg-green-600 text-white shadow-md"
-              : "text-gray-700 hover:bg-green-100 hover:text-green-700"
-          } ${mobile ? "w-full" : ""}`}
+              : mobile
+              ? "text-gray-900 bg-gray-50 hover:bg-green-100 hover:text-green-800 border border-gray-200"
+              : "text-gray-800 hover:bg-green-100 hover:text-green-700"
+          } ${mobile ? "w-full text-base" : ""}`}
         >
-          <item.icon className="w-5 h-5" />
+          <item.icon className={`w-5 h-5 ${isActive(item.path) ? "text-white" : mobile ? "text-green-700" : "text-green-600"}`} />
           <span>{item.label}</span>
         </Link>
       ))}
+    </>
+  );
     </>
   );
 
