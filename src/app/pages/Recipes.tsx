@@ -5,14 +5,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Clock, ChefHat, Search } from "lucide-react";
+import { Clock, ChefHat, Search, Sparkles } from "lucide-react";
 import { Input } from "../components/ui/input";
 
 export function Recipes() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  const filteredRecipes = recipes.filter((recipe) => {
+  // Sort: new recipes first, then rest
+  const sortedRecipes = [...recipes].sort((a, b) => {
+    if (a.isNew && !b.isNew) return -1;
+    if (!a.isNew && b.isNew) return 1;
+    return 0;
+  });
+
+  const filteredRecipes = sortedRecipes.filter((recipe) => {
     const matchesSearch =
       recipe.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       recipe.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -21,51 +28,41 @@ export function Recipes() {
     return matchesSearch && matchesCategory;
   });
 
+  const newCount = recipes.filter((r) => r.isNew).length;
+
   const categories = [
     { value: "all", label: "All Recipes", count: recipes.length },
-    {
-      value: "basics",
-      label: "Basics",
-      count: recipes.filter((r) => r.category === "basics").length,
-    },
-    {
-      value: "edibles",
-      label: "Edibles",
-      count: recipes.filter((r) => r.category === "edibles").length,
-    },
-    {
-      value: "drinks",
-      label: "Drinks",
-      count: recipes.filter((r) => r.category === "drinks").length,
-    },
-    {
-      value: "infusions",
-      label: "Infusions",
-      count: recipes.filter((r) => r.category === "infusions").length,
-    },
+    { value: "basics", label: "Basics", count: recipes.filter((r) => r.category === "basics").length },
+    { value: "edibles", label: "Edibles", count: recipes.filter((r) => r.category === "edibles").length },
+    { value: "drinks", label: "Drinks", count: recipes.filter((r) => r.category === "drinks").length },
+    { value: "infusions", label: "Infusions", count: recipes.filter((r) => r.category === "infusions").length },
   ];
 
   const getDifficultyColor = (difficulty: Recipe["difficulty"]) => {
     switch (difficulty) {
-      case "beginner":
-        return "bg-green-600";
-      case "intermediate":
-        return "bg-yellow-600";
-      case "advanced":
-        return "bg-red-600";
-      default:
-        return "bg-gray-600";
+      case "beginner": return "bg-green-600";
+      case "intermediate": return "bg-yellow-600";
+      case "advanced": return "bg-red-600";
+      default: return "bg-gray-600";
     }
   };
 
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Recipe Library</h1>
-        <p className="text-gray-800">
-          Explore our collection of cannabis-infused recipes, from basics to advanced creations
-        </p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Recipe Library</h1>
+          <p className="text-gray-700">
+            Cannabis-infused recipes from basics to advanced creations — new recipes added every week
+          </p>
+        </div>
+        {newCount > 0 && (
+          <div className="flex items-center gap-2 bg-green-50 border-2 border-green-400 rounded-xl px-4 py-2 flex-shrink-0">
+            <Sparkles className="w-5 h-5 text-green-600" />
+            <span className="text-green-800 font-bold">{newCount} New Recipes Added!</span>
+          </div>
+        )}
       </div>
 
       {/* Search */}
@@ -82,7 +79,7 @@ export function Recipes() {
 
       {/* Category Tabs */}
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-        <TabsList className="bg-white border-2 border-green-200 shadow-sm">
+        <TabsList className="bg-white border-2 border-green-200 shadow-sm flex-wrap h-auto gap-1 p-1">
           {categories.map((cat) => (
             <TabsTrigger
               key={cat.value}
@@ -90,7 +87,7 @@ export function Recipes() {
               className="data-[state=active]:bg-green-600 data-[state=active]:text-white"
             >
               {cat.label}
-              <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800 group-data-[state=active]:bg-white group-data-[state=active]:text-green-700">
+              <Badge variant="secondary" className="ml-2 bg-green-100 text-green-700">
                 {cat.count}
               </Badge>
             </TabsTrigger>
@@ -103,32 +100,40 @@ export function Recipes() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredRecipes.map((recipe) => (
             <Link key={recipe.id} to={`/recipes/${recipe.id}`}>
-              <Card className="bg-white border-green-200 hover:border-green-400 transition-all hover:scale-105 overflow-hidden group h-full shadow-md hover:shadow-xl">
+              <Card className={`bg-white hover:border-green-400 transition-all hover:scale-105 overflow-hidden group h-full shadow-md hover:shadow-xl ${recipe.isNew ? "border-2 border-green-400" : "border-green-200"}`}>
                 <div className="relative h-48 overflow-hidden">
                   <img
                     src={recipe.image}
                     alt={recipe.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
+                  {/* NEW badge */}
+                  {recipe.isNew && (
+                    <div className="absolute top-3 left-3">
+                      <span className="flex items-center gap-1 bg-green-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-lg uppercase tracking-wide">
+                        <Sparkles className="w-3 h-3" /> New
+                      </span>
+                    </div>
+                  )}
+                  <div className={`absolute top-3 ${recipe.isNew ? "left-16" : "left-3"}`}>
+                    <Badge className="bg-green-600 text-white border-0 capitalize shadow-lg">
+                      {recipe.category}
+                    </Badge>
+                  </div>
                   <div className="absolute top-3 right-3">
                     <Badge className={`${getDifficultyColor(recipe.difficulty)} text-white border-0 shadow-lg`}>
                       {recipe.difficulty}
                     </Badge>
                   </div>
-                  <div className="absolute top-3 left-3">
-                    <Badge className="bg-green-600 text-white border-0 capitalize shadow-lg">
-                      {recipe.category}
-                    </Badge>
-                  </div>
                 </div>
                 <CardHeader>
                   <CardTitle className="text-gray-900">{recipe.name}</CardTitle>
-                  <CardDescription className="text-gray-700 line-clamp-2">
+                  <CardDescription className="text-gray-500 line-clamp-2">
                     {recipe.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between text-sm text-gray-700 mb-3">
+                  <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
                     <div className="flex items-center gap-1">
                       <Clock className="w-4 h-4 text-green-600" />
                       <span>{recipe.prepTime + recipe.cookTime} min</span>
@@ -140,10 +145,8 @@ export function Recipes() {
                   </div>
                   <div className="pt-3 border-t border-green-200">
                     <div className="text-sm">
-                      <span className="text-gray-700 font-medium">THC per serving: </span>
-                      <span className="text-green-700 font-bold">
-                        {recipe.thcPerServing}
-                      </span>
+                      <span className="text-gray-600">THC per serving: </span>
+                      <span className="text-green-700 font-bold">{recipe.thcPerServing}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -153,14 +156,9 @@ export function Recipes() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-gray-600 text-lg">
-            No recipes found matching your search.
-          </p>
+          <p className="text-gray-400 text-lg">No recipes found matching your search.</p>
           <Button
-            onClick={() => {
-              setSearchQuery("");
-              setSelectedCategory("all");
-            }}
+            onClick={() => { setSearchQuery(""); setSelectedCategory("all"); }}
             className="mt-4 bg-green-600 hover:bg-green-700"
           >
             Clear Filters
