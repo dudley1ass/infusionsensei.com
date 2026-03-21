@@ -493,7 +493,9 @@ export const recipes: Recipe[] = [
     ],
     strainRecommendation: "Indica for a cozy, relaxing evening",
   },
-]; = (id: string): Recipe | undefined => {
+];
+
+export const getRecipeById = (id: string): Recipe | undefined => {
   return recipes.find((recipe) => recipe.id === id);
 };
 
