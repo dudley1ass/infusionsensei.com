@@ -347,7 +347,7 @@ export const recipes: Recipe[] = [
     cookTime: 0,
     servings: 6,
     thcPerServing: "~8–15mg",
-    image: "https://images.unsplash.com/photo-1567206563114-c179706b0e1c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     description: "THC binds to fat — infused heavy cream is the ideal base for ice cream. Rich, smooth, and accurately dosed with a refreshing mint kick.",
     isNew: true,
     ingredients: [

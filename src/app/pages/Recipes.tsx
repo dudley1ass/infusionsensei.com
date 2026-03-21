@@ -107,7 +107,7 @@ export function Recipes() {
                     alt={recipe.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  {/* NEW badge */}
+                  {/* NEW badge — top left */}
                   {recipe.isNew && (
                     <div className="absolute top-3 left-3">
                       <span className="flex items-center gap-1 bg-green-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-lg uppercase tracking-wide">
@@ -115,11 +115,13 @@ export function Recipes() {
                       </span>
                     </div>
                   )}
-                  <div className={`absolute top-3 ${recipe.isNew ? "left-16" : "left-3"}`}>
+                  {/* Category badge — bottom left */}
+                  <div className="absolute bottom-3 left-3">
                     <Badge className="bg-green-600 text-white border-0 capitalize shadow-lg">
                       {recipe.category}
                     </Badge>
                   </div>
+                  {/* Difficulty badge — top right */}
                   <div className="absolute top-3 right-3">
                     <Badge className={`${getDifficultyColor(recipe.difficulty)} text-white border-0 shadow-lg`}>
                       {recipe.difficulty}
