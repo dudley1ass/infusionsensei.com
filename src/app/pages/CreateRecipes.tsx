@@ -18,6 +18,7 @@ import {
   FlaskConical, 
   Lightbulb,
   ArrowLeft,
+  ArrowRight,
   Calculator,
   ArrowLeftRight,
   Printer,
@@ -1492,69 +1493,94 @@ export function CreateRecipes() {
     const categoryRecipes = standardRecipes[selectedCategory] || [];
 
     return (
-      <div className="max-w-4xl mx-auto space-y-6">
-        <Button onClick={resetToCategories} variant="ghost" className="text-gray-700 hover:text-gray-900">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Categories
-        </Button>
+      <div className="max-w-4xl mx-auto space-y-5">
 
-        <div className="text-center bg-white p-6 rounded-xl shadow-sm border-2 border-green-200">
-          <div className="text-6xl mb-3">{category?.emoji}</div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-1">{category?.name}</h1>
-          <p className="text-gray-700">{category?.description}</p>
+        {/* Compact breadcrumb header */}
+        <div className="flex items-center gap-3">
+          <Button onClick={resetToCategories} variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900 -ml-2">
+            <ArrowLeft className="w-4 h-4 mr-1" /> All Categories
+          </Button>
+          <span className="text-gray-300">/</span>
+          <span className="text-gray-700 font-semibold flex items-center gap-1.5">
+            <span>{category?.emoji}</span> {category?.name}
+          </span>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <Card className="bg-white border-2 border-green-300 shadow-md">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-green-100">
-              <CardTitle className="text-gray-900 flex items-center gap-2">
-                <ChefHat className="w-5 h-5 text-green-700" />
-                Standard Recipes
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              {categoryRecipes.length > 0 ? (
-                <div className="space-y-2">
-                  {categoryRecipes.map((recipe) => (
-                    <Button
-                      key={recipe.id}
-                      onClick={() => {
-                        setRecipeType("standard");
-                        setSelectedStandardRecipe(recipe.id);
-                      }}
-                      className="w-full bg-white hover:bg-green-50 text-gray-900 border-2 border-green-200 h-auto py-3 justify-start"
-                    >
-                      <div className="text-left">
-                        <div className="font-bold">{recipe.name}</div>
-                        <div className="text-xs text-gray-600">{recipe.servings} servings</div>
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-600 text-center py-4 text-sm">No recipes yet</p>
-              )}
-            </CardContent>
-          </Card>
+        {/* Step indicator */}
+        <div className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-1.5 text-green-700 font-semibold">
+            <div className="w-5 h-5 rounded-full bg-green-600 text-white flex items-center justify-center text-xs font-bold">✓</div>
+            Category
+          </div>
+          <div className="flex-1 h-0.5 bg-green-200 rounded" />
+          <div className="flex items-center gap-1.5 text-green-700 font-bold">
+            <div className="w-5 h-5 rounded-full bg-green-600 text-white flex items-center justify-center text-xs font-bold">2</div>
+            Pick a Recipe
+          </div>
+          <div className="flex-1 h-0.5 bg-gray-200 rounded" />
+          <div className="flex items-center gap-1.5 text-gray-400">
+            <div className="w-5 h-5 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold">3</div>
+            Customize & Dose
+          </div>
+        </div>
 
-          <Card className="bg-white border-2 border-purple-300 shadow-md">
-            <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100">
-              <CardTitle className="text-gray-900 flex items-center gap-2">
-                <Plus className="w-5 h-5 text-purple-700" />
-                Create Custom
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <Button
-                onClick={startCustomRecipe}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white h-auto py-6"
+        {/* Main question */}
+        <div>
+          <h1 className="text-2xl font-black text-gray-900">Choose a starting recipe</h1>
+          <p className="text-gray-500 text-sm mt-1">Pick one to load — you can customize every ingredient and serving size after.</p>
+        </div>
+
+        {/* Recipe cards — horizontal list */}
+        {categoryRecipes.length > 0 && (
+          <div className="space-y-3">
+            {categoryRecipes.map((recipe) => (
+              <button
+                key={recipe.id}
+                onClick={() => { setRecipeType("standard"); setSelectedStandardRecipe(recipe.id); }}
+                className="w-full bg-white border-2 border-gray-200 hover:border-green-500 hover:shadow-md rounded-2xl p-4 text-left transition-all group flex items-center gap-4"
               >
-                <Plus className="w-5 h-5 mr-2" />
-                Start Custom Recipe
-              </Button>
-            </CardContent>
-          </Card>
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 group-hover:bg-green-200 transition-colors">
+                  {category?.emoji}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-black text-gray-900 text-base">{recipe.name}</div>
+                  <div className="text-gray-500 text-sm mt-0.5">
+                    {recipe.servings} servings · {recipe.ingredients.length} ingredients
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="text-xs bg-green-100 text-green-700 font-semibold px-2.5 py-1 rounded-full">
+                    Load Recipe
+                  </span>
+                  <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-green-600 group-hover:translate-x-0.5 transition-all" />
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Divider */}
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px bg-gray-200" />
+          <span className="text-gray-400 text-sm font-medium">or</span>
+          <div className="flex-1 h-px bg-gray-200" />
         </div>
+
+        {/* Start from scratch */}
+        <button
+          onClick={startCustomRecipe}
+          className="w-full bg-white border-2 border-dashed border-gray-300 hover:border-purple-400 hover:bg-purple-50/30 rounded-2xl p-4 text-left transition-all group flex items-center gap-4"
+        >
+          <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-purple-100 transition-colors">
+            <Plus className="w-6 h-6 text-gray-400 group-hover:text-purple-600 transition-colors" />
+          </div>
+          <div className="flex-1">
+            <div className="font-black text-gray-700 group-hover:text-purple-700 transition-colors">Start from scratch</div>
+            <div className="text-gray-400 text-sm mt-0.5">Build your own recipe with any ingredients</div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-purple-500 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+        </button>
+
       </div>
     );
   }
