@@ -32,7 +32,7 @@ import { NutritionFactsLabel } from "../components/NutritionFactsLabel";
 // Common ingredient library
 const INGREDIENT_LIBRARY = [
   // ── INFUSED (Cannabis) ──────────────────────────────────────────
-  { name: "Cannabutter",                          category: "infused",    defaultAmount: 113, defaultUnit: "g",       thcPerUnit: 10,  calories: 717, carbs: 0,   protein: 1,   fat: 81,  type: "fat" },
+  { name: "Cannabutter",                          category: "infused",    defaultAmount: 113, defaultUnit: "g",       thcPerUnit: 1,   calories: 717, carbs: 0,   protein: 1,   fat: 81,  type: "fat" },
   { name: "Cannabis Coconut Oil",                 category: "infused",    defaultAmount: 60,  defaultUnit: "ml",      thcPerUnit: 15,  calories: 862, carbs: 0,   protein: 0,   fat: 100, type: "liquid" },
   { name: "Cannabis Olive Oil",                   category: "infused",    defaultAmount: 60,  defaultUnit: "ml",      thcPerUnit: 12,  calories: 884, carbs: 0,   protein: 0,   fat: 100, type: "liquid" },
   { name: "THC Tincture",                         category: "infused",    defaultAmount: 1,   defaultUnit: "ml",      thcPerUnit: 25,  calories: 7,   carbs: 0,   protein: 0,   fat: 0,   type: "liquid" },
@@ -91,14 +91,14 @@ const INGREDIENT_LIBRARY = [
   { name: "Cream Cheese",           category: "fat",        defaultAmount: 200, defaultUnit: "g",     calories: 342, carbs: 2.9,  protein: 6.2,  fat: 34.2, type: "semi-solid" },
 
   // ── EGGS ────────────────────────────────────────────────────────
-  { name: "Whole Egg (large)",      category: "egg",        defaultAmount: 50,  defaultUnit: "g",     calories: 143, carbs: 0.7,  protein: 12.6, fat: 9.5,  type: "count" },
-  { name: "Egg Yolk",               category: "egg",        defaultAmount: 40,  defaultUnit: "g",     calories: 322, carbs: 3.6,  protein: 15.9, fat: 26.5, type: "count" },
-  { name: "Egg White",              category: "egg",        defaultAmount: 60,  defaultUnit: "g",     calories: 52,  carbs: 0.7,  protein: 10.9, fat: 0.2,  type: "count" },
+  { name: "Whole Egg (large)",      category: "egg",        defaultAmount: 1,   defaultUnit: "large", calories: 143, carbs: 0.7,  protein: 12.6, fat: 9.5,  type: "count" },
+  { name: "Egg Yolk",               category: "egg",        defaultAmount: 1,   defaultUnit: "large", calories: 322, carbs: 3.6,  protein: 15.9, fat: 26.5, type: "count" },
+  { name: "Egg White",              category: "egg",        defaultAmount: 1,   defaultUnit: "large", calories: 52,  carbs: 0.7,  protein: 10.9, fat: 0.2,  type: "count" },
   { name: "Flax Egg",               category: "egg",        defaultAmount: 45,  defaultUnit: "g",     calories: 37,  carbs: 2.8,  protein: 2.0,  fat: 2.5,  type: "semi-solid" },
 
   // ── LEAVENING ───────────────────────────────────────────────────
-  { name: "Baking Powder",          category: "leavening",  defaultAmount: 8,   defaultUnit: "g",     calories: 53,  carbs: 27.7, protein: 0.0,  fat: 0.0,  type: "powder" },
-  { name: "Baking Soda",            category: "leavening",  defaultAmount: 4,   defaultUnit: "g",     calories: 0,   carbs: 0.0,  protein: 0.0,  fat: 0.0,  type: "powder" },
+  { name: "Baking Powder",          category: "leavening",  defaultAmount: 1,   defaultUnit: "tsp",   calories: 53,  carbs: 27.7, protein: 0.0,  fat: 0.0,  type: "powder" },
+  { name: "Baking Soda",            category: "leavening",  defaultAmount: 0.5, defaultUnit: "tsp",   calories: 0,   carbs: 0.0,  protein: 0.0,  fat: 0.0,  type: "powder" },
   { name: "Cream of Tartar",        category: "leavening",  defaultAmount: 3,   defaultUnit: "g",     calories: 218, carbs: 54.3, protein: 0.0,  fat: 0.0,  type: "powder" },
   { name: "Instant Yeast",          category: "leavening",  defaultAmount: 7,   defaultUnit: "g",     calories: 325, carbs: 40.7, protein: 40.4, fat: 7.6,  type: "powder" },
   { name: "Gelatin (unflavored)",   category: "leavening",  defaultAmount: 7,   defaultUnit: "g",     calories: 335, carbs: 0.0,  protein: 85.0, fat: 0.0,  type: "powder" },
@@ -405,7 +405,7 @@ const standardRecipes: Record<string, any[]> = {
       name: "Cannabis Banana Bread",
       servings: 12,
       ingredients: ["Cannabutter", "Banana (mashed)", "Granulated Sugar", "All-Purpose Flour", "Whole Egg (large)", "Baking Soda"],
-      amounts: [113, 360, 200, 280, 2, 5],
+      amounts: [113, 360, 200, 280, 2, 1],
       instructions: [
         "Preheat oven to 350°F (175°C).",
         "Mash bananas in a large bowl.",
@@ -420,7 +420,7 @@ const standardRecipes: Record<string, any[]> = {
       name: "Infused Pancakes",
       servings: 4,
       ingredients: ["All-Purpose Flour", "Granulated Sugar", "Baking Powder", "Whole Milk", "Whole Egg (large)", "Cannabutter"],
-      amounts: [140, 15, 10, 180, 1, 30],
+      amounts: [140, 15, 2, 180, 1, 30],
       instructions: [
         "Mix flour, sugar, and baking powder in a bowl.",
         "In another bowl, whisk milk and egg together.",
@@ -1133,7 +1133,7 @@ export function CreateRecipes() {
       if (ing.isInfused) return ing;
 
       // Skip items that don't use g or ml (count, squeeze, packet, dropper, etc.)
-      const skipUnits = ["large", "medium", "small", "whole", "pieces", "cloves", "squeeze", "packet", "dropper", "0.1ml"];
+      const skipUnits = ["large", "medium", "small", "whole", "pieces", "cloves", "squeeze", "packet", "dropper", "0.1ml", "tsp", "tbsp", "cups"];
       if (skipUnits.includes(ing.unit)) return ing;
 
       if (newSystem === "imperial") {
