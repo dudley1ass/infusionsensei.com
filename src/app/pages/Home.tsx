@@ -1,5 +1,6 @@
 import { Link } from "react-router";
-import { BookOpen, FlaskConical, Package, ChefHat, Clock, ArrowRight, CheckCircle, Calculator, Leaf, Shield, Beaker, TrendingUp } from "lucide-react";
+import { Helmet } from "react-helmet-async";
+import { ChefHat, Clock, ArrowRight, Calculator, Shield, Beaker, TrendingUp, Zap, Star } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -9,175 +10,173 @@ export function Home() {
   const featuredRecipes = recipes.filter(r => r.isNew).slice(0, 3);
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-16">
+      <Helmet>
+        <title>Infusion Sensei | THC Dosage Calculator & Cannabis Edible Recipe Builder</title>
+        <meta name="description" content="Free THC dosage calculator for cannabis edibles. Calculate exact mg per serving for cannabutter, infused oils, and recipes. Stop guessing — know your dose." />
+        <link rel="canonical" href="https://infusionsensei.com/" />
+      </Helmet>
 
       {/* ── HERO ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-700 via-green-600 to-green-800 px-8 py-16 md:py-20 mb-12">
-        {/* Background decoration */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-4 right-8 text-white text-9xl">🌿</div>
-          <div className="absolute bottom-4 left-8 text-white text-7xl">🌿</div>
-        </div>
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-800 via-green-700 to-green-900 px-6 py-14 md:py-20 shadow-2xl">
+        {/* Decorative blobs */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-green-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-green-900/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
 
-        <div className="relative z-10 text-center max-w-3xl mx-auto">
-          <Badge className="bg-green-900/60 text-green-200 border-green-600 mb-6 text-sm px-4 py-1.5">
-            Free Cannabis Cooking Tool
-          </Badge>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-5 leading-tight">
-            Create Infused Recipes with<br />
-            <span className="text-green-200">Exact THC Per Serving</span>
-          </h1>
-          <p className="text-xl text-green-100 mb-8 leading-relaxed">
-            Stop guessing potency. Build cannabutter, oils, and recipes with real-time THC calculations — so every edible hits exactly how you want.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/infusions">
-              <Button size="lg" className="bg-white text-green-700 hover:bg-green-50 font-bold text-lg px-8 py-6 shadow-xl">
-                Build My Infusion — Free
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <Link to="/recipes" className="text-green-200 hover:text-white font-semibold flex items-center gap-2 transition-colors">
-              Browse Recipes <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-center gap-10">
 
-      {/* ── EXAMPLE OUTPUT ───────────────────────────────────── */}
-      <section className="mb-12 px-2">
-        <div className="max-w-2xl mx-auto">
-          <p className="text-center text-gray-500 text-sm font-semibold uppercase tracking-widest mb-4">Example Output</p>
-          <div className="bg-gray-900 rounded-2xl p-6 shadow-2xl border border-gray-700">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-3 h-3 rounded-full bg-red-500" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <div className="w-3 h-3 rounded-full bg-green-500" />
-              <span className="text-gray-500 text-xs ml-2 font-mono">infusion-calculator</span>
+            {/* Left: headline + CTA */}
+            <div className="flex-1 text-center lg:text-left">
+              <Badge className="bg-green-900/70 text-green-200 border border-green-600/50 mb-5 text-sm px-4 py-1.5 inline-flex">
+                <Zap className="w-3.5 h-3.5 mr-1.5" /> Free Cannabis Cooking Tool
+              </Badge>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 leading-tight">
+                Get Exact THC<br />
+                Per Serving —<br />
+                <span className="text-green-300">Every Time.</span>
+              </h1>
+              <p className="text-lg md:text-xl text-green-100 mb-8 leading-relaxed max-w-xl">
+                Stop guessing potency. Build infused butter, oils, and recipes with real-time THC calculations — so every edible hits exactly how you want.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
+                <Link to="/infusions">
+                  <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-lg px-8 py-6 shadow-xl rounded-xl transition-transform hover:scale-105">
+                    Start My Infusion (Free)
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+                <Link to="/recipes" className="text-green-200 hover:text-white font-semibold flex items-center gap-1.5 transition-colors text-sm">
+                  Browse Recipes <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+              <p className="text-green-400 text-sm mt-4 font-medium">
+                ✓ No account &nbsp;·&nbsp; ✓ No setup &nbsp;·&nbsp; ✓ Instant results
+              </p>
             </div>
-            <div className="font-mono text-sm space-y-1">
-              <p className="text-green-400 font-bold text-base">🍫 Chocolate Brownies</p>
-              <p className="text-gray-300">→ <span className="text-green-400 font-bold">10mg THC</span> per serving</p>
-              <p className="text-gray-300">→ <span className="text-green-400 font-bold">160mg total</span> batch</p>
-              <p className="text-gray-300">→ <span className="text-green-400 font-bold">1 cup</span> infused butter</p>
-              <div className="border-t border-gray-700 mt-3 pt-3 space-y-1">
-                <p className="text-green-500">✔ Precise dosing</p>
-                <p className="text-green-500">✔ Consistent results</p>
-                <p className="text-green-500">✔ No guesswork</p>
+
+            {/* Right: terminal preview — the secret weapon */}
+            <div className="flex-shrink-0 w-full max-w-sm">
+              <p className="text-green-400 text-xs font-semibold uppercase tracking-widest text-center mb-3">See exactly what you'll get:</p>
+              <div className="bg-gray-950 rounded-2xl shadow-2xl border border-gray-700/60 overflow-hidden">
+                <div className="bg-gray-900 px-4 py-3 flex items-center gap-2 border-b border-gray-700/60">
+                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                  <span className="text-gray-500 text-xs font-mono ml-2">infusion-calculator</span>
+                </div>
+                <div className="p-5 font-mono text-sm space-y-2">
+                  <p className="text-green-400 font-bold text-base">🍫 Chocolate Brownies</p>
+                  <div className="space-y-1.5 text-sm">
+                    <p className="text-gray-300">→ <span className="text-green-400 font-bold text-base">10mg THC</span> per serving</p>
+                    <p className="text-gray-300">→ <span className="text-green-400 font-bold">160mg total</span> batch</p>
+                    <p className="text-gray-300">→ <span className="text-green-400 font-bold">1 cup</span> infused butter</p>
+                    <p className="text-gray-300">→ <span className="text-green-400 font-bold">16</span> servings</p>
+                  </div>
+                  <div className="border-t border-gray-700/60 mt-3 pt-3 space-y-1.5">
+                    <p className="text-emerald-400 font-semibold">✔ Precise dosing</p>
+                    <p className="text-emerald-400 font-semibold">✔ Consistent results</p>
+                    <p className="text-emerald-400 font-semibold">✔ No guesswork</p>
+                  </div>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>
 
       {/* ── TRUST STRIP ──────────────────────────────────────── */}
-      <section className="mb-12">
-        <div className="bg-green-50 border-2 border-green-200 rounded-2xl py-5 px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            {[
-              { icon: "🌿", label: "20+ Strain Profiles" },
-              { icon: "🧮", label: "Live THC Calculator" },
-              { icon: "📋", label: "Tested Recipes" },
-              { icon: "🛡️", label: "Built for Safe Dosing" },
-            ].map(({ icon, label }) => (
-              <div key={label} className="flex items-center justify-center gap-2">
-                <span className="text-xl">{icon}</span>
-                <span className="text-green-800 font-semibold text-sm">{label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS ─────────────────────────────────────── */}
-      <section className="mb-16">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-black text-gray-900 mb-2">How It Works</h2>
-          <p className="text-gray-600">Three steps from flower to perfectly dosed edible</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
+      <section className="-mt-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            {
-              step: "1",
-              icon: <Beaker className="w-8 h-8 text-green-600" />,
-              title: "Enter Your Strain",
-              desc: "Input your THC%, cannabis weight, and infusion type. Infusion Sensei handles the decarb math automatically.",
-            },
-            {
-              step: "2",
-              icon: <ChefHat className="w-8 h-8 text-green-600" />,
-              title: "Choose or Create a Recipe",
-              desc: "Pick from our tested recipe library or build your own. Every ingredient updates your calculations live.",
-            },
-            {
-              step: "3",
-              icon: <Calculator className="w-8 h-8 text-green-600" />,
-              title: "Get Exact THC Per Serving",
-              desc: "See the precise milligrams per serving in real time. Scale servings up or down — the math updates instantly.",
-            },
-          ].map(({ step, icon, title, desc }) => (
-            <div key={step} className="relative bg-white border-2 border-green-200 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow">
-              <div className="absolute -top-4 -left-4 w-9 h-9 bg-green-600 text-white rounded-full flex items-center justify-center font-black text-lg shadow-md">
-                {step}
-              </div>
-              <div className="mb-4 mt-2">{icon}</div>
-              <h3 className="font-bold text-gray-900 text-lg mb-2">{title}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">{desc}</p>
+            { icon: "🌿", label: "20+ Verified Strains", sub: "With real THC profiles" },
+            { icon: "🧮", label: "Live THC Calculator", sub: "Updates instantly" },
+            { icon: "📋", label: "Tested Recipes", sub: "Exact mg per serving" },
+            { icon: "🛡️", label: "Safe Dosing Built-In", sub: "Know before you eat" },
+          ].map(({ icon, label, sub }) => (
+            <div key={label} className="bg-white border-2 border-green-100 rounded-2xl p-4 text-center shadow-sm hover:border-green-300 hover:shadow-md transition-all">
+              <div className="text-2xl mb-1">{icon}</div>
+              <div className="font-bold text-gray-900 text-sm">{label}</div>
+              <div className="text-gray-500 text-xs mt-0.5">{sub}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── EMOTIONAL HOOK ───────────────────────────────────── */}
-      <section className="mb-16">
-        <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 md:p-12 text-center">
-          <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
+      <section>
+        <div className="bg-gray-950 rounded-3xl p-8 md:p-12 text-center shadow-2xl border border-gray-800">
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-6">
             Edibles shouldn't be a gamble.
           </h2>
-          <div className="flex flex-col md:flex-row justify-center gap-6 mb-6">
-            <div className="bg-red-900/40 border border-red-700 rounded-xl px-6 py-4">
-              <p className="text-red-300 font-semibold">Too strong?</p>
-              <p className="text-red-200 text-sm">Bad experience.</p>
+          <div className="flex flex-col md:flex-row justify-center gap-4 mb-8 max-w-lg mx-auto">
+            <div className="flex-1 bg-red-950/60 border border-red-800/60 rounded-2xl px-6 py-5">
+              <p className="text-red-400 font-black text-lg">Too strong?</p>
+              <p className="text-red-300/80 text-sm mt-1">Anxiety. Bad trip. Hours of misery.</p>
             </div>
-            <div className="flex items-center text-gray-500 font-bold text-2xl">vs</div>
-            <div className="bg-yellow-900/40 border border-yellow-700 rounded-xl px-6 py-4">
-              <p className="text-yellow-300 font-semibold">Too weak?</p>
-              <p className="text-yellow-200 text-sm">Waste of time.</p>
+            <div className="flex items-center justify-center text-gray-600 font-black text-xl">vs</div>
+            <div className="flex-1 bg-yellow-950/60 border border-yellow-800/60 rounded-2xl px-6 py-5">
+              <p className="text-yellow-400 font-black text-lg">Too weak?</p>
+              <p className="text-yellow-300/80 text-sm mt-1">Wasted product. Wasted time.</p>
             </div>
           </div>
-          <p className="text-green-300 text-xl font-semibold mb-6">
-            Infusion Sensei gives you control — so every recipe hits exactly how you want.
+          <p className="text-green-400 text-xl md:text-2xl font-bold mb-8">
+            Infusion Sensei gives you control —<br className="hidden md:block" />
+            so every batch hits exactly how you want.
           </p>
           <Link to="/infusions">
-            <Button size="lg" className="bg-green-500 hover:bg-green-400 text-white font-bold text-lg px-8 py-6">
-              Start My First Infusion
+            <Button size="lg" className="bg-green-500 hover:bg-green-400 text-white font-black text-lg px-10 py-6 rounded-xl shadow-lg transition-transform hover:scale-105">
+              Start My Infusion — Free
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
         </div>
       </section>
 
-      {/* ── FEATURES ─────────────────────────────────────────── */}
-      <section className="mb-16">
+      {/* ── HOW IT WORKS ─────────────────────────────────────── */}
+      <section>
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-black text-gray-900 mb-2">Everything You Need</h2>
-          <p className="text-gray-600">Built specifically for cannabis cooking — not a generic recipe app</p>
+          <p className="text-green-600 font-bold text-sm uppercase tracking-widest mb-2">Takes less than 60 seconds</p>
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900">How It Works</h2>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            { step: "1", icon: <Beaker className="w-8 h-8 text-green-600" />, title: "Enter Your Strain", desc: "Input your THC%, cannabis weight, and infusion type. Decarb math is handled automatically.", color: "green" },
+            { step: "2", icon: <ChefHat className="w-8 h-8 text-blue-600" />, title: "Choose or Build a Recipe", desc: "Use one of our tested recipes or build your own. Every ingredient updates your dose calculation live.", color: "blue" },
+            { step: "3", icon: <Calculator className="w-8 h-8 text-purple-600" />, title: "Get Exact THC Per Serving", desc: "Precise milligrams per serving in real time. Scale servings up or down — the math follows instantly.", color: "purple" },
+          ].map(({ step, icon, title, desc, color }) => (
+            <div key={step} className={`relative bg-white border-2 border-${color}-100 rounded-2xl p-6 shadow-md hover:shadow-xl hover:border-${color}-300 transition-all`}>
+              <div className={`absolute -top-4 -left-4 w-10 h-10 bg-${color}-600 text-white rounded-full flex items-center justify-center font-black text-lg shadow-lg`}>{step}</div>
+              <div className="mb-4 mt-2">{icon}</div>
+              <h3 className="font-black text-gray-900 text-lg mb-2">{title}</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── FEATURES ─────────────────────────────────────────── */}
+      <section>
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-2">Built for Precise, Repeatable Results</h2>
+          <p className="text-gray-500">Not a generic recipe app — built specifically for cannabis cooking</p>
         </div>
         <div className="grid md:grid-cols-3 gap-4">
           {[
-            { icon: <Calculator className="w-6 h-6 text-green-600" />, title: "Real-Time THC Calculations", desc: "Every ingredient change updates your mg per serving instantly. No manual math." },
-            { icon: <FlaskConical className="w-6 h-6 text-green-600" />, title: "Custom Infusion Builder", desc: "Cannabutter, coconut oil, tinctures, cream, syrups — with strain-specific profiles." },
-            { icon: <Package className="w-6 h-6 text-green-600" />, title: "Recipe Scaling with Dosage", desc: "Scale servings up or down and your THC per serving recalculates automatically." },
-            { icon: <Shield className="w-6 h-6 text-green-600" />, title: "Decarb Guidance Built In", desc: "Temperature and time controls with live feedback on THC and terpene retention." },
-            { icon: <BookOpen className="w-6 h-6 text-green-600" />, title: "Pre-Made & Custom Products", desc: "Use commercial products like Select Squeeze or build from raw flower — both supported." },
-            { icon: <Leaf className="w-6 h-6 text-green-600" />, title: "Clean, Simple Interface", desc: "No account required. Open it, build your infusion, get your numbers." },
+            { icon: <Calculator className="w-5 h-5 text-green-600" />, title: "Real-Time THC Calculations", desc: "Every change updates your mg per serving instantly. No manual math ever." },
+            { icon: <Beaker className="w-5 h-5 text-blue-600" />, title: "Custom Infusion Builder", desc: "Cannabutter, coconut oil, tinctures, cream, syrups — with strain-specific profiles." },
+            { icon: <ChefHat className="w-5 h-5 text-purple-600" />, title: "Recipe Scaling with Dosage", desc: "Scale servings up or down and your THC per serving recalculates automatically." },
+            { icon: <Shield className="w-5 h-5 text-orange-600" />, title: "Decarb Guidance Built In", desc: "Temperature and time controls with live feedback on THC retention." },
+            { icon: <Star className="w-5 h-5 text-yellow-600" />, title: "Pre-Made Products Supported", desc: "Use Select Squeeze, distillates, or any commercial product alongside homemade infusions." },
+            { icon: <Zap className="w-5 h-5 text-pink-600" />, title: "No Account Required", desc: "Open it, build your infusion, get your numbers. Done in under 60 seconds." },
           ].map(({ icon, title, desc }) => (
-            <div key={title} className="bg-white border border-green-200 rounded-xl p-5 hover:border-green-400 hover:shadow-md transition-all">
-              <div className="flex items-center gap-3 mb-2">
-                {icon}
-                <h3 className="font-bold text-gray-900">{title}</h3>
+            <div key={title} className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-green-300 hover:shadow-md transition-all group">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 bg-gray-50 rounded-xl flex items-center justify-center group-hover:bg-green-50 transition-colors">{icon}</div>
+                <h3 className="font-bold text-gray-900 text-sm">{title}</h3>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed">{desc}</p>
+              <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
@@ -185,43 +184,44 @@ export function Home() {
 
       {/* ── NEW RECIPES ──────────────────────────────────────── */}
       {featuredRecipes.length > 0 && (
-        <section className="mb-16">
-          <div className="flex items-center justify-between mb-8">
+        <section>
+          <div className="flex items-end justify-between mb-6">
             <div>
               <h2 className="text-3xl font-black text-gray-900">New Recipes</h2>
-              <p className="text-gray-600 text-sm mt-1">Fresh additions — 5 new recipes every week</p>
+              <p className="text-green-600 text-sm font-semibold mt-1">✓ Includes exact THC per serving</p>
             </div>
             <Link to="/recipes">
-              <Button variant="ghost" className="text-green-700 hover:text-green-800 hover:bg-green-100">
-                View All <TrendingUp className="w-4 h-4 ml-2" />
+              <Button variant="ghost" className="text-green-700 hover:text-green-800 hover:bg-green-50 font-semibold">
+                View All <TrendingUp className="w-4 h-4 ml-1.5" />
               </Button>
             </Link>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {featuredRecipes.map((recipe) => (
               <Link key={recipe.id} to={`/recipes/${recipe.id}`}>
-                <Card className="bg-white border-green-200 hover:border-green-400 transition-all hover:scale-105 overflow-hidden group shadow-md hover:shadow-xl h-full">
+                <Card className="bg-white border-2 border-green-100 hover:border-green-400 transition-all hover:-translate-y-1 overflow-hidden group shadow-md hover:shadow-xl h-full">
                   <div className="relative h-48 overflow-hidden">
-                    <img src={recipe.image} alt={recipe.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                    <img src={recipe.image} alt={recipe.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                     <div className="absolute top-3 left-3">
-                      <span className="bg-green-500 text-white text-xs font-black px-2 py-1 rounded-full">✨ NEW</span>
+                      <span className="bg-green-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-lg">✨ NEW</span>
                     </div>
                     <div className="absolute top-3 right-3">
-                      <Badge className="bg-green-600 text-white border-0">{recipe.difficulty}</Badge>
+                      <Badge className="bg-white/90 text-gray-800 border-0 capitalize font-semibold">{recipe.difficulty}</Badge>
                     </div>
                   </div>
-                  <CardHeader>
-                    <CardTitle className="text-gray-900">{recipe.name}</CardTitle>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-gray-900 text-lg">{recipe.name}</CardTitle>
                     <p className="text-gray-500 text-sm line-clamp-2">{recipe.description}</p>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-                      <div className="flex items-center gap-1"><Clock className="w-4 h-4 text-green-600" /><span>{recipe.prepTime + recipe.cookTime} min</span></div>
-                      <div className="flex items-center gap-1"><ChefHat className="w-4 h-4 text-green-600" /><span>{recipe.servings} servings</span></div>
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                      <div className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-green-500" />{recipe.prepTime + recipe.cookTime} min</div>
+                      <div className="flex items-center gap-1.5"><ChefHat className="w-4 h-4 text-green-500" />{recipe.servings} servings</div>
                     </div>
-                    <div className="pt-2 border-t border-green-200 text-sm">
+                    <div className="bg-green-50 border border-green-200 rounded-xl px-3 py-2 text-sm text-center">
                       <span className="text-gray-600">THC per serving: </span>
-                      <span className="text-green-700 font-bold">{recipe.thcPerServing}</span>
+                      <span className="text-green-700 font-black">{recipe.thcPerServing}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -232,36 +232,35 @@ export function Home() {
       )}
 
       {/* ── FINAL CTA ────────────────────────────────────────── */}
-      <section className="mb-8">
-        <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-3xl p-10 text-center shadow-xl">
-          <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
-            Start Your First Infusion in 60 Seconds
-          </h2>
-          <p className="text-green-100 text-lg mb-8">No account. No setup. Just open it and build.</p>
-          <Link to="/infusions">
-            <Button size="lg" className="bg-white text-green-700 hover:bg-green-50 font-bold text-xl px-10 py-7 shadow-xl">
-              Build My Infusion — Free
-              <ArrowRight className="w-6 h-6 ml-2" />
-            </Button>
-          </Link>
+      <section>
+        <div className="bg-gradient-to-br from-green-600 to-green-800 rounded-3xl p-10 md:p-16 text-center shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 text-white text-9xl leading-none">🌿</div>
+          </div>
+          <div className="relative z-10">
+            <h2 className="text-3xl md:text-5xl font-black text-white mb-3 leading-tight">
+              Get Exact THC Per Serving<br className="hidden md:block" />
+              <span className="text-green-200">in Under 60 Seconds</span>
+            </h2>
+            <p className="text-green-100 text-lg mb-8">Try it now — it's free. No account. No setup.</p>
+            <Link to="/infusions">
+              <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-xl px-12 py-7 rounded-xl shadow-2xl transition-transform hover:scale-105">
+                Start My Infusion — Free
+                <ArrowRight className="w-6 h-6 ml-2" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* ── SAFETY NOTICE ────────────────────────────────────── */}
-      <section className="bg-amber-50 border-2 border-amber-300 rounded-xl p-6 shadow-sm">
-        <div className="flex gap-4">
-          <div className="flex-shrink-0 w-10 h-10 bg-amber-400 rounded-full flex items-center justify-center shadow">
-            <span className="text-xl">⚠️</span>
-          </div>
-          <div>
-            <h3 className="font-bold text-amber-900 mb-1">Important Safety Information</h3>
-            <ul className="text-sm text-gray-700 space-y-1">
-              <li>• Start low and go slow — edibles take 30–120 minutes to take effect</li>
-              <li>• Store all cannabis products safely away from children and pets</li>
-              <li>• Never drive or operate machinery under the influence</li>
-              <li>• Know your local laws. Must be 21+ or comply with local regulations</li>
-            </ul>
-          </div>
+      {/* ── SAFETY (compact) ─────────────────────────────────── */}
+      <section>
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex gap-3 items-start">
+          <span className="text-lg flex-shrink-0 mt-0.5">⚠️</span>
+          <p className="text-sm text-amber-800">
+            <strong>Safety:</strong> Edibles take 30–120 min to kick in — start low and wait before consuming more.
+            Store safely away from children and pets. Must be 21+ or comply with local regulations. Never drive under the influence.
+          </p>
         </div>
       </section>
 

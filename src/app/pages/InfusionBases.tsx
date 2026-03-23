@@ -665,22 +665,22 @@ export function InfusionBases() {
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold text-white mb-2">🧪 My Infusions</h1>
-        <p className="text-gray-400">
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">🧪 My Infusions</h1>
+        <p className="text-gray-600">
           "Take it slow. That's the secret." — Create perfectly dosed infusion bases
         </p>
       </div>
 
       {/* Strain Manager Section */}
-      <Card className="bg-gradient-to-br from-purple-900/30 to-gray-800/50 border-purple-700/30">
+      <Card className="bg-white border-purple-200">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-white flex items-center gap-2">
+              <CardTitle className="text-gray-900 flex items-center gap-2">
                 <FlaskConical className="w-6 h-6 text-purple-400" />
                 🌿 My Cannabis Strains
               </CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardDescription className="text-gray-600">
                 {customStrains.length} custom strains saved
               </CardDescription>
             </div>
@@ -693,7 +693,7 @@ export function InfusionBases() {
               {customStrains.map((strain) => (
                 <div
                   key={strain.name}
-                  className="bg-gray-900/50 border border-purple-700/30 rounded-lg p-3"
+                  className="bg-white border border-purple-200 rounded-lg p-3"
                 >
                   <h3 className="font-semibold text-white text-sm">{strain.name}</h3>
                   <Badge className={
@@ -705,12 +705,12 @@ export function InfusionBases() {
                   </Badge>
                   {strain.cannabinoids && (
                     <div className="mt-2 text-xs space-y-0.5">
-                      <div className="flex justify-between text-gray-400">
+                      <div className="flex justify-between text-gray-600">
                         <span>THC:</span>
-                        <span className="text-green-400 font-semibold">{strain.cannabinoids.thc}%</span>
+                        <span className="text-green-700 font-semibold">{strain.cannabinoids.thc}%</span>
                       </div>
                       {strain.cannabinoids.cbd > 0 && (
-                        <div className="flex justify-between text-gray-400">
+                        <div className="flex justify-between text-gray-600">
                           <span>CBD:</span>
                           <span className="text-blue-400 font-semibold">{strain.cannabinoids.cbd}%</span>
                         </div>
@@ -725,10 +725,10 @@ export function InfusionBases() {
       </Card>
 
       {/* Main Infusion Builder */}
-      <Card className="bg-gray-800/50 border-green-700/30">
+      <Card className="bg-white border-green-200">
         <CardHeader>
-          <CardTitle className="text-white text-2xl">Create New Infusion</CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardTitle className="text-gray-900 text-2xl">Create New Infusion</CardTitle>
+          <CardDescription className="text-gray-600">
             Follow the steps below to create your perfect infusion base
           </CardDescription>
         </CardHeader>
@@ -736,17 +736,17 @@ export function InfusionBases() {
           {/* STEP 1: Choose Strain - hidden for pre-made products */}
           {selectedBaseType !== "premade" && (
           <div>
-            <Label className="text-white text-lg font-semibold mb-3 block">
-              <span className="text-green-400">STEP 1:</span> Choose Your Strain
+            <Label className="text-gray-900 text-lg font-semibold mb-3 block">
+              <span className="text-green-700">STEP 1:</span> Choose Your Strain
             </Label>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label className="text-gray-300 text-sm mb-2 block">Select Strain</Label>
+                <Label className="text-gray-800 text-sm mb-2 block">Select Strain</Label>
                 <Select value={selectedStrain} onValueChange={handleStrainChange}>
-                  <SelectTrigger className="bg-gray-900 border-green-700/30 text-white">
+                  <SelectTrigger className="bg-white border-green-300 text-gray-900">
                     <SelectValue placeholder="Choose a strain..." />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-900 border-green-700/30 text-white">
+                  <SelectContent className="bg-white border-green-300 text-gray-900">
                     <SelectItem value="none">-- Select Strain --</SelectItem>
                     <SelectItem value="custom">🌟 Custom Strain (Fill Info Below)</SelectItem>
                     {allStrains.filter(s => s.type !== "custom").map((strain) => (
@@ -761,30 +761,30 @@ export function InfusionBases() {
               {isCustomStrain && (
                 <>
                   <div>
-                    <Label className="text-gray-300 text-sm mb-2 block">Custom Strain Name</Label>
+                    <Label className="text-gray-800 text-sm mb-2 block">Custom Strain Name</Label>
                     <Input
                       value={customStrainName}
                       onChange={(e) => setCustomStrainName(e.target.value)}
                       placeholder="e.g., Blue Dream"
-                      className="bg-gray-900 border-green-700/30 text-white"
+                      className="bg-white border-green-300 text-gray-900"
                     />
                   </div>
                   <div>
-                    <Label className="text-gray-300 text-sm mb-2 block">THC %</Label>
+                    <Label className="text-gray-800 text-sm mb-2 block">THC %</Label>
                     <Input
                       type="number"
                       value={customThc}
                       onChange={(e) => setCustomThc(parseFloat(e.target.value) || 0)}
-                      className="bg-gray-900 border-green-700/30 text-white"
+                      className="bg-white border-green-300 text-gray-900"
                     />
                   </div>
                   <div>
-                    <Label className="text-gray-300 text-sm mb-2 block">CBD % (optional)</Label>
+                    <Label className="text-gray-800 text-sm mb-2 block">CBD % (optional)</Label>
                     <Input
                       type="number"
                       value={customCbd}
                       onChange={(e) => setCustomCbd(parseFloat(e.target.value) || 0)}
-                      className="bg-gray-900 border-green-700/30 text-white"
+                      className="bg-white border-green-300 text-gray-900"
                     />
                   </div>
                 </>
@@ -795,8 +795,8 @@ export function InfusionBases() {
 
           {/* STEP 2: Choose Base Type */}
           <div>
-            <Label className="text-white text-lg font-semibold mb-3 block">
-              <span className="text-green-400">STEP 2:</span> Choose Your Base
+            <Label className="text-gray-900 text-lg font-semibold mb-3 block">
+              <span className="text-green-700">STEP 2:</span> Choose Your Base
             </Label>
             <div className="grid md:grid-cols-5 gap-4">
               {[
@@ -813,11 +813,11 @@ export function InfusionBases() {
                   className={`p-6 rounded-xl border-2 transition-all ${
                     selectedBaseType === base.value
                       ? `border-${base.color}-500 bg-${base.color}-500/20`
-                      : "border-gray-700 bg-gray-900/50 hover:border-gray-600"
+                      : "border-gray-700 bg-white hover:border-green-400"
                   }`}
                 >
                   <div className="text-4xl mb-2">{base.emoji}</div>
-                  <div className="text-white font-semibold">{base.label}</div>
+                  <div className="text-gray-900 font-semibold">{base.label}</div>
                 </button>
               ))}
             </div>
@@ -826,8 +826,8 @@ export function InfusionBases() {
           {/* STEP 3: Choose Recipe */}
           {selectedBaseType !== "none" && selectedBaseType !== "premade" && (
             <div>
-              <Label className="text-white text-lg font-semibold mb-3 block">
-                <span className="text-green-400">STEP 3:</span> Choose Recipe & Configure
+              <Label className="text-gray-900 text-lg font-semibold mb-3 block">
+                <span className="text-green-700">STEP 3:</span> Choose Recipe & Configure
               </Label>
               <div className="grid md:grid-cols-2 gap-4">
                 {filteredRecipes.map((recipe) => (
@@ -837,11 +837,11 @@ export function InfusionBases() {
                     className={`text-left p-4 rounded-lg border-2 transition-all ${
                       selectedRecipe?.id === recipe.id
                         ? "border-green-500 bg-green-500/10"
-                        : "border-gray-700 bg-gray-900/50 hover:border-gray-600"
+                        : "border-gray-700 bg-white hover:border-green-400"
                     }`}
                   >
-                    <h3 className="text-white font-semibold mb-2">{recipe.name}</h3>
-                    <div className="space-y-1 text-sm text-gray-400">
+                    <h3 className="text-gray-900 font-semibold mb-2">{recipe.name}</h3>
+                    <div className="space-y-1 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <Thermometer className="w-4 h-4 text-orange-400" />
                         {recipe.temperature}
@@ -851,7 +851,7 @@ export function InfusionBases() {
                         {recipe.time}
                       </div>
                       <div className="flex items-center gap-2">
-                        <Beaker className="w-4 h-4 text-green-400" />
+                        <Beaker className="w-4 h-4 text-green-700" />
                         THC: {recipe.thcRetention}% | Terpenes: {recipe.terpeneRetention}%
                       </div>
                     </div>
@@ -864,8 +864,8 @@ export function InfusionBases() {
           {/* PRE-MADE PRODUCT SECTION */}
           {selectedBaseType === "premade" && (
             <div>
-              <Label className="text-white text-lg font-semibold mb-3 block">
-                <span className="text-green-400">STEP 3:</span> Choose Your Product
+              <Label className="text-gray-900 text-lg font-semibold mb-3 block">
+                <span className="text-green-700">STEP 3:</span> Choose Your Product
               </Label>
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 {preMadeProducts.map((product) => (
@@ -875,20 +875,20 @@ export function InfusionBases() {
                     className={`text-left p-4 rounded-lg border-2 transition-all ${
                       selectedProduct?.id === product.id
                         ? "border-pink-500 bg-pink-500/10"
-                        : "border-gray-700 bg-gray-900/50 hover:border-gray-600"
+                        : "border-gray-700 bg-white hover:border-green-400"
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       <span className="text-3xl">{product.emoji}</span>
                       <div className="flex-1">
-                        <div className="text-xs text-gray-400 mb-0.5">{product.brand}</div>
-                        <h3 className="text-white font-semibold">{product.name}</h3>
+                        <div className="text-xs text-gray-600 mb-0.5">{product.brand}</div>
+                        <h3 className="text-gray-900 font-semibold">{product.name}</h3>
                         <div className="flex flex-wrap gap-1 mt-1">
                           <Badge className="bg-pink-700 text-xs">{product.type}</Badge>
                           <Badge className="bg-green-700 text-xs">{product.thcPerDose}mg/{product.doseUnit}</Badge>
                           <Badge className="bg-blue-700 text-xs">⏱ {product.onsetTime}</Badge>
                         </div>
-                        <p className="text-xs text-gray-400 mt-2 line-clamp-2">{product.description}</p>
+                        <p className="text-xs text-gray-600 mt-2 line-clamp-2">{product.description}</p>
                       </div>
                     </div>
                   </button>
@@ -896,17 +896,17 @@ export function InfusionBases() {
               </div>
 
               {selectedProduct && (
-                <div className="bg-gray-900/50 border border-pink-700/30 rounded-xl p-6 space-y-6">
-                  <h3 className="text-white text-xl font-semibold">
+                <div className="bg-white border border-pink-200 rounded-xl p-6 space-y-6">
+                  <h3 className="text-gray-900 text-xl font-semibold">
                     {selectedProduct.emoji} {selectedProduct.name}
-                    <span className="text-gray-400 text-sm font-normal ml-2">by {selectedProduct.brand}</span>
+                    <span className="text-gray-600 text-sm font-normal ml-2">by {selectedProduct.brand}</span>
                   </h3>
 
-                  <p className="text-gray-300 text-sm">{selectedProduct.description}</p>
+                  <p className="text-gray-800 text-sm">{selectedProduct.description}</p>
 
                   {selectedProduct.flavors && (
                     <div>
-                      <h4 className="text-white font-semibold text-sm mb-2">🎨 Available Flavors</h4>
+                      <h4 className="text-gray-900 font-semibold text-sm mb-2">🎨 Available Flavors</h4>
                       <div className="flex flex-wrap gap-2">
                         {selectedProduct.flavors.map((f) => (
                           <Badge key={f} className="bg-purple-700 text-white text-xs">{f}</Badge>
@@ -916,7 +916,7 @@ export function InfusionBases() {
                   )}
 
                   <div>
-                    <h4 className="text-white font-semibold text-sm mb-2">✨ Best For</h4>
+                    <h4 className="text-gray-900 font-semibold text-sm mb-2">✨ Best For</h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedProduct.bestFor.map((use) => (
                         <Badge key={use} className="bg-green-800 text-white text-xs">{use}</Badge>
@@ -926,15 +926,15 @@ export function InfusionBases() {
 
                   <div className="bg-yellow-900/20 border border-yellow-600/40 rounded-lg p-4">
                     <h4 className="text-yellow-400 font-semibold text-sm mb-1">📏 Dosage Guide</h4>
-                    <p className="text-gray-300 text-sm">{selectedProduct.dosageNote}</p>
+                    <p className="text-gray-800 text-sm">{selectedProduct.dosageNote}</p>
                   </div>
 
                   {/* Dose Calculator */}
                   <div className="bg-green-900/20 border border-green-700/50 rounded-lg p-4">
-                    <h4 className="text-green-400 font-semibold mb-3">💚 Dose Calculator</h4>
+                    <h4 className="text-green-700 font-semibold mb-3">💚 Dose Calculator</h4>
                     <div className="grid md:grid-cols-2 gap-4 items-center">
                       <div>
-                        <Label className="text-gray-300 text-sm mb-2 block">
+                        <Label className="text-gray-800 text-sm mb-2 block">
                           How many {selectedProduct.doseUnit}s are you using?
                         </Label>
                         <Input
@@ -942,21 +942,21 @@ export function InfusionBases() {
                           min="1"
                           value={productDoses}
                           onChange={(e) => setProductDoses(Math.max(1, parseInt(e.target.value) || 1))}
-                          className="bg-gray-900 border-green-700/30 text-white"
+                          className="bg-white border-green-300 text-gray-900"
                         />
                       </div>
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-400">THC per {selectedProduct.doseUnit}:</span>
-                          <span className="text-green-400 font-bold">{selectedProduct.thcPerDose}mg</span>
+                          <span className="text-gray-600">THC per {selectedProduct.doseUnit}:</span>
+                          <span className="text-green-700 font-bold">{selectedProduct.thcPerDose}mg</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-400">Total THC:</span>
-                          <span className="text-green-400 font-bold text-lg">{(selectedProduct.thcPerDose * productDoses).toFixed(1)}mg</span>
+                          <span className="text-gray-600">Total THC:</span>
+                          <span className="text-green-700 font-bold text-lg">{(selectedProduct.thcPerDose * productDoses).toFixed(1)}mg</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-400">Technology:</span>
-                          <span className="text-white">{selectedProduct.technology}</span>
+                          <span className="text-gray-600">Technology:</span>
+                          <span className="text-gray-900">{selectedProduct.technology}</span>
                         </div>
                       </div>
                     </div>
@@ -977,34 +977,34 @@ export function InfusionBases() {
 
           {/* Recipe Details */}
           {selectedRecipe && (
-            <div className="bg-gray-900/50 border border-green-700/30 rounded-xl p-6 space-y-6">
+            <div className="bg-white border border-green-200 rounded-xl p-6 space-y-6">
               <div>
-                <h3 className="text-white text-xl font-semibold mb-4">📖 Recipe Details: {selectedRecipe.name}</h3>
+                <h3 className="text-gray-900 text-xl font-semibold mb-4">📖 Recipe Details: {selectedRecipe.name}</h3>
                 
                 {/* Amounts */}
                 <div className="grid md:grid-cols-2 gap-4 mb-6">
                   <div>
-                    <Label className="text-gray-300 text-sm mb-2 block">Cannabis Amount (grams)</Label>
+                    <Label className="text-gray-800 text-sm mb-2 block">Cannabis Amount (grams)</Label>
                     <Input
                       type="number"
                       value={cannabisAmount}
                       onChange={(e) => setCannabisAmount(parseFloat(e.target.value) || 0)}
-                      className="bg-gray-900 border-green-700/30 text-white"
+                      className="bg-white border-green-300 text-gray-900"
                     />
                   </div>
                   <div>
-                    <Label className="text-gray-300 text-sm mb-2 block">Base Amount (grams)</Label>
+                    <Label className="text-gray-800 text-sm mb-2 block">Base Amount (grams)</Label>
                     <Input
                       type="number"
                       value={baseAmount}
                       onChange={(e) => setBaseAmount(parseFloat(e.target.value) || 0)}
-                      className="bg-gray-900 border-green-700/30 text-white"
+                      className="bg-white border-green-300 text-gray-900"
                     />
                   </div>
                 </div>
 
                 {/* Temperature and Time Controls */}
-                <div className="mb-6 bg-gray-800/70 border-2 border-orange-500/30 rounded-xl p-5">
+                <div className="mb-6 bg-orange-50 border-2 border-orange-300 rounded-xl p-5">
                   <h4 className="text-orange-400 font-semibold mb-4 flex items-center gap-2">
                     <Thermometer className="w-5 h-5" />
                     🌡️ Temperature & Time Control
@@ -1014,8 +1014,8 @@ export function InfusionBases() {
                     {/* Temperature Slider */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <Label className="text-gray-300 text-sm">Infusion Temperature (°F)</Label>
-                        <span className="text-white font-bold text-lg">{customTemp}°F</span>
+                        <Label className="text-gray-800 text-sm">Infusion Temperature (°F)</Label>
+                        <span className="text-gray-900 font-bold text-lg">{customTemp}°F</span>
                       </div>
                       <input
                         type="range"
@@ -1036,8 +1036,8 @@ export function InfusionBases() {
                     {/* Time Slider */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <Label className="text-gray-300 text-sm">Infusion Time (hours)</Label>
-                        <span className="text-white font-bold text-lg">{customTime}h</span>
+                        <Label className="text-gray-800 text-sm">Infusion Time (hours)</Label>
+                        <span className="text-gray-900 font-bold text-lg">{customTime}h</span>
                       </div>
                       <input
                         type="range"
@@ -1065,7 +1065,7 @@ export function InfusionBases() {
                     retention.warningColor === "cyan" ? "bg-cyan-900/30 border-cyan-500" :
                     "bg-blue-900/30 border-blue-500"
                   } mb-4`}>
-                    <p className="text-white font-medium whitespace-pre-line">{retention.warning}</p>
+                    <p className="text-gray-900 font-medium whitespace-pre-line">{retention.warning}</p>
                   </div>
 
                   {/* Retention Display */}
@@ -1073,7 +1073,7 @@ export function InfusionBases() {
                     <div className="bg-green-900/30 border border-green-600/50 rounded-lg p-4">
                       <div className="text-sm text-green-300 mb-1">THC Retention</div>
                       <div className="flex items-end gap-2">
-                        <span className="text-3xl font-bold text-green-400">{retention.thcRetention.toFixed(0)}%</span>
+                        <span className="text-3xl font-bold text-green-700">{retention.thcRetention.toFixed(0)}%</span>
                         <span className="text-green-300 text-sm mb-1">of cannabinoids</span>
                       </div>
                       <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
@@ -1102,14 +1102,14 @@ export function InfusionBases() {
 
                 {/* THC Calculation */}
                 <div className="bg-green-900/20 border border-green-700/50 rounded-lg p-4 mb-6">
-                  <h4 className="text-green-400 font-semibold mb-2">💚 Calculated THC</h4>
+                  <h4 className="text-green-700 font-semibold mb-2">💚 Calculated THC</h4>
                   <div className="grid md:grid-cols-2 gap-4 text-white">
                     <div>
-                      <div className="text-sm text-gray-400">Total THC</div>
+                      <div className="text-sm text-gray-600">Total THC</div>
                       <div className="text-2xl font-bold">{totalTHC.toFixed(2)} mg</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-400">THC per gram</div>
+                      <div className="text-sm text-gray-600">THC per gram</div>
                       <div className="text-2xl font-bold">{thcPerGram.toFixed(2)} mg/g</div>
                     </div>
                   </div>
@@ -1117,8 +1117,8 @@ export function InfusionBases() {
 
                 {/* Ingredients */}
                 <div className="mb-6">
-                  <h4 className="text-white font-semibold mb-2">🥄 Ingredients</h4>
-                  <ul className="space-y-1 text-gray-300">
+                  <h4 className="text-gray-900 font-semibold mb-2">🥄 Ingredients</h4>
+                  <ul className="space-y-1 text-gray-800">
                     {selectedRecipe.ingredients.map((ing, i) => (
                       <li key={i}>• {ing}</li>
                     ))}
@@ -1127,8 +1127,8 @@ export function InfusionBases() {
 
                 {/* Steps */}
                 <div className="mb-6">
-                  <h4 className="text-white font-semibold mb-2">👨‍🍳 Steps</h4>
-                  <ol className="space-y-2 text-gray-300">
+                  <h4 className="text-gray-900 font-semibold mb-2">👨‍🍳 Steps</h4>
+                  <ol className="space-y-2 text-gray-800">
                     {selectedRecipe.steps.map((step, i) => (
                       <li key={i}>{i + 1}. {step}</li>
                     ))}
@@ -1137,7 +1137,7 @@ export function InfusionBases() {
 
                 {/* Best Uses */}
                 <div className="mb-6">
-                  <h4 className="text-white font-semibold mb-2">✨ Best Uses</h4>
+                  <h4 className="text-gray-900 font-semibold mb-2">✨ Best Uses</h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedRecipe.bestUses.map((use, i) => (
                       <Badge key={i} className="bg-purple-600 text-white">
@@ -1149,10 +1149,10 @@ export function InfusionBases() {
 
                 {/* What to Make Next */}
                 <div>
-                  <h4 className="text-white font-semibold mb-3">👉 What to Make Next</h4>
+                  <h4 className="text-gray-900 font-semibold mb-3">👉 What to Make Next</h4>
                   <div className="flex gap-4">
                     {selectedRecipe.compatibleCategories.map((cat) => (
-                      <div key={cat} className="flex items-center gap-2 text-gray-300">
+                      <div key={cat} className="flex items-center gap-2 text-gray-800">
                         {cat === "cookies" && <Cookie className="w-5 h-5 text-yellow-400" />}
                         {cat === "drinks" && <Wine className="w-5 h-5 text-blue-400" />}
                         {cat === "savory" && <UtensilsCrossed className="w-5 h-5 text-orange-400" />}
@@ -1179,10 +1179,10 @@ export function InfusionBases() {
 
       {/* Saved Infusions */}
       {infusionBases.length > 0 && (
-        <Card className="bg-gray-800/50 border-green-700/30">
+        <Card className="bg-white border-green-200">
           <CardHeader>
-            <CardTitle className="text-white">💾 My Saved Infusions</CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardTitle className="text-gray-900">💾 My Saved Infusions</CardTitle>
+            <CardDescription className="text-gray-600">
               {infusionBases.length} infusion{infusionBases.length !== 1 ? 's' : ''} saved
             </CardDescription>
           </CardHeader>
@@ -1191,7 +1191,7 @@ export function InfusionBases() {
               {infusionBases.map((base) => (
                 <div
                   key={base.id}
-                  className="bg-gray-900/50 border border-green-700/30 rounded-lg p-4"
+                  className="bg-white border border-green-200 rounded-lg p-4"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
@@ -1211,21 +1211,21 @@ export function InfusionBases() {
                   </div>
                   
                   <div className="space-y-2 text-sm">
-                    <div className="flex justify-between text-gray-400">
+                    <div className="flex justify-between text-gray-600">
                       <span>Total THC:</span>
-                      <span className="text-green-400 font-semibold">{base.totalTHC} mg</span>
+                      <span className="text-green-700 font-semibold">{base.totalTHC} mg</span>
                     </div>
-                    <div className="flex justify-between text-gray-400">
+                    <div className="flex justify-between text-gray-600">
                       <span>THC per {base.baseUnit}:</span>
-                      <span className="text-green-400 font-semibold">{base.thcPerUnit} mg</span>
+                      <span className="text-green-700 font-semibold">{base.thcPerUnit} mg</span>
                     </div>
-                    <div className="flex justify-between text-gray-400">
+                    <div className="flex justify-between text-gray-600">
                       <span>Cannabis:</span>
-                      <span className="text-white">{base.cannabisAmount}{base.cannabisUnit}</span>
+                      <span className="text-gray-900">{base.cannabisAmount}{base.cannabisUnit}</span>
                     </div>
-                    <div className="flex justify-between text-gray-400">
+                    <div className="flex justify-between text-gray-600">
                       <span>THC %:</span>
-                      <span className="text-white">{base.thcPercentage}%</span>
+                      <span className="text-gray-900">{base.thcPercentage}%</span>
                     </div>
                   </div>
                 </div>
