@@ -37,15 +37,127 @@ export function RecipeDetail() {
     <>
       {/* ── PRINT STYLES ──────────────────────────────────── */}
       <style>{`
+        .print-only { display: none !important; }
+
         @media print {
           header, footer, nav, .no-print { display: none !important; }
-          .print-page { background: white !important; color: black !important; padding: 0 !important; }
-          * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          a { text-decoration: none; color: black; }
+          .screen-only { display: none !important; }
+          .print-only { display: block !important; }
+
+          body, html {
+            background: white !important;
+            color: black !important;
+            font-family: Georgia, serif !important;
+            font-size: 11pt !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .print-page {
+            max-width: 100% !important;
+            padding: 0.5in 0.75in !important;
+          }
+          .print-title { font-size: 26pt !important; font-weight: 900 !important; border-bottom: 3px solid black !important; padding-bottom: 6pt !important; margin-bottom: 10pt !important; }
+          .print-meta { font-size: 9.5pt !important; color: #555 !important; margin-bottom: 14pt !important; }
+          .print-thc-box { border: 2px solid black !important; padding: 10pt 14pt !important; margin-bottom: 14pt !important; background: #f8f8f8 !important; display: flex !important; gap: 24pt !important; flex-wrap: wrap !important; }
+          .print-big-num { font-size: 26pt !important; font-weight: 900 !important; line-height: 1 !important; }
+          .print-small-label { font-size: 9pt !important; color: #444 !important; margin-top: 2pt !important; }
+          .print-divider { border-left: 1.5px solid #ccc !important; padding-left: 20pt !important; }
+          .print-section { font-size: 12pt !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; border-bottom: 1pt solid #ccc !important; padding-bottom: 3pt !important; margin: 14pt 0 8pt 0 !important; }
+          .print-ingredient { display: flex !important; gap: 8pt !important; padding: 3pt 0 !important; border-bottom: 0.5pt solid #eee !important; font-size: 10.5pt !important; }
+          .print-ingredient-amount { min-width: 80pt !important; font-weight: 600 !important; }
+          .print-step { display: flex !important; gap: 10pt !important; margin-bottom: 8pt !important; font-size: 10.5pt !important; line-height: 1.5 !important; }
+          .print-step-num { width: 18pt !important; height: 18pt !important; border: 1.5px solid black !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 700 !important; font-size: 9pt !important; flex-shrink: 0 !important; margin-top: 1pt !important; }
+          .print-tip { font-size: 9.5pt !important; padding: 2pt 0 !important; border-bottom: 0.5pt solid #eee !important; }
+          .print-safety { font-size: 9pt !important; color: #333 !important; line-height: 1.6 !important; border: 1pt solid #ccc !important; padding: 8pt !important; margin-top: 14pt !important; }
+          .print-footer { margin-top: 16pt !important; padding-top: 6pt !important; border-top: 1pt solid #ccc !important; font-size: 8pt !important; color: #888 !important; text-align: center !important; }
+          @page { margin: 0; }
         }
       `}</style>
 
-      <div className="max-w-4xl mx-auto space-y-8 print-page">
+      {/* ── PRINT-ONLY KITCHEN RECIPE ───────────────────── */}
+      <div className="print-only">
+        <div className="print-page">
+          <div className="print-title">{recipe.name}</div>
+          <div className="print-meta">
+            {recipe.servings} servings &nbsp;·&nbsp; {recipe.prepTime + recipe.cookTime} min total &nbsp;·&nbsp; {recipe.difficulty} &nbsp;·&nbsp; {recipe.category}
+          </div>
+
+          {/* THC box */}
+          <div className="print-thc-box">
+            <div>
+              <div className="print-big-num">{recipe.thcPerServing}</div>
+              <div className="print-small-label">THC per serving</div>
+            </div>
+            <div className="print-divider">
+              <div style={{fontSize:"13pt", fontWeight:"700"}}>{recipe.servings} servings</div>
+              <div className="print-small-label">total in recipe</div>
+            </div>
+            <div className="print-divider">
+              <div style={{fontSize:"10pt", fontWeight:"600"}}>{recipe.difficulty.toUpperCase()}</div>
+              <div className="print-small-label">difficulty</div>
+            </div>
+          </div>
+
+          {/* Description */}
+          <p style={{fontSize:"10pt", color:"#444", marginBottom:"12pt", lineHeight:"1.5"}}>{recipe.description}</p>
+
+          {/* Ingredients */}
+          <div className="print-section">Ingredients</div>
+          {recipe.ingredients.map((ing, i) => (
+            <div key={i} className="print-ingredient">
+              <span className="print-ingredient-amount">•</span>
+              <span>{ing}</span>
+            </div>
+          ))}
+
+          {/* Instructions */}
+          <div className="print-section">Instructions</div>
+          {recipe.instructions.map((step, i) => (
+            <div key={i} className="print-step">
+              <div className="print-step-num">{i + 1}</div>
+              <div>{step}</div>
+            </div>
+          ))}
+
+          {/* Tips */}
+          {recipe.tips && recipe.tips.length > 0 && (
+            <>
+              <div className="print-section">Pro Tips</div>
+              {recipe.tips.map((tip, i) => (
+                <div key={i} className="print-tip">🔥 {tip}</div>
+              ))}
+            </>
+          )}
+
+          {/* Strain */}
+          {recipe.strainRecommendation && (
+            <>
+              <div className="print-section">Strain Recommendation</div>
+              <p style={{fontSize:"10pt", color:"#444"}}>{recipe.strainRecommendation}</p>
+            </>
+          )}
+
+          {/* Dosing guide */}
+          <div className="print-section">Dosing Reference</div>
+          <table style={{borderCollapse:"collapse", fontSize:"9pt", width:"100%"}}>
+            <tbody>
+              {[["1–2.5 mg","Microdose","Subtle, ideal for beginners"],["2.5–5 mg","Low","Mild relaxation"],["5–15 mg","Moderate","Standard recreational"],["15–30 mg","High","Experienced users only"],["30+ mg","Very High","Tolerance required"]].map(([r,l,d]) => (
+                <tr key={r}><td style={{padding:"2pt 8pt", minWidth:"60pt"}}>{r}</td><td style={{padding:"2pt 8pt", fontWeight:"600", minWidth:"80pt"}}>{l}</td><td style={{padding:"2pt 8pt", color:"#666"}}>{d}</td></tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* Safety */}
+          <div className="print-safety">
+            <strong>⚠️ Safety:</strong> Edibles take 30–120 minutes to take effect. Start with a low dose and wait 2 hours before consuming more. Keep away from children and pets. Never drive after consuming. For adults 21+ only.
+          </div>
+
+          <div className="print-footer">Generated by Infusion Sensei · infusionsensei.com · Exact THC dosing for every recipe</div>
+        </div>
+      </div>
+
+      {/* ── SCREEN VERSION ──────────────────────────────── */}
+      <div className="screen-only max-w-4xl mx-auto space-y-8">
 
         {/* ── TOP BAR ─────────────────────────────────────── */}
         <div className="flex items-center justify-between no-print">
@@ -203,7 +315,7 @@ export function RecipeDetail() {
           </p>
         </div>
 
-      </div>
+      </div>{/* end screen-only */}
     </>
   );
 }
