@@ -58,19 +58,19 @@ export function RecipeDetail() {
           }
           .print-title { font-size: 26pt !important; font-weight: 900 !important; border-bottom: 3px solid black !important; padding-bottom: 6pt !important; margin-bottom: 10pt !important; }
           .print-meta { font-size: 9.5pt !important; color: #555 !important; margin-bottom: 14pt !important; }
-          .print-thc-box { border: 2px solid black !important; padding: 10pt 14pt !important; margin-bottom: 14pt !important; background: #f8f8f8 !important; display: flex !important; gap: 24pt !important; flex-wrap: wrap !important; }
+          .print-thc-box { border: 2px solid black !important; padding: 10pt 14pt !important; margin-bottom: 14pt !important; background: #f8f8f8 !important; display: flex !important; gap: 24pt !important; flex-wrap: wrap !important; page-break-inside: avoid !important; break-inside: avoid !important; }
           .print-big-num { font-size: 26pt !important; font-weight: 900 !important; line-height: 1 !important; }
           .print-small-label { font-size: 9pt !important; color: #444 !important; margin-top: 2pt !important; }
           .print-divider { border-left: 1.5px solid #ccc !important; padding-left: 20pt !important; }
-          .print-section { font-size: 12pt !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; border-bottom: 1pt solid #ccc !important; padding-bottom: 3pt !important; margin: 14pt 0 8pt 0 !important; }
-          .print-ingredient { display: flex !important; gap: 8pt !important; padding: 3pt 0 !important; border-bottom: 0.5pt solid #eee !important; font-size: 10.5pt !important; }
+          .print-section { font-size: 12pt !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; border-bottom: 1pt solid #ccc !important; padding-bottom: 3pt !important; margin: 14pt 0 8pt 0 !important; page-break-after: avoid !important; break-after: avoid !important; }
+          .print-ingredient { display: flex !important; gap: 8pt !important; padding: 3pt 0 !important; border-bottom: 0.5pt solid #eee !important; font-size: 10.5pt !important; page-break-inside: avoid !important; break-inside: avoid !important; }
           .print-ingredient-amount { min-width: 80pt !important; font-weight: 600 !important; }
-          .print-step { display: flex !important; gap: 10pt !important; margin-bottom: 8pt !important; font-size: 10.5pt !important; line-height: 1.5 !important; }
+          .print-step { display: flex !important; gap: 10pt !important; margin-bottom: 8pt !important; font-size: 10.5pt !important; line-height: 1.5 !important; page-break-inside: avoid !important; break-inside: avoid !important; }
           .print-step-num { width: 18pt !important; height: 18pt !important; border: 1.5px solid black !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: 700 !important; font-size: 9pt !important; flex-shrink: 0 !important; margin-top: 1pt !important; }
-          .print-tip { font-size: 9.5pt !important; padding: 2pt 0 !important; border-bottom: 0.5pt solid #eee !important; }
-          .print-safety { font-size: 9pt !important; color: #333 !important; line-height: 1.6 !important; border: 1pt solid #ccc !important; padding: 8pt !important; margin-top: 14pt !important; }
-          .print-footer { margin-top: 16pt !important; padding-top: 6pt !important; border-top: 1pt solid #ccc !important; font-size: 8pt !important; color: #888 !important; text-align: center !important; }
-          @page { margin: 0; }
+          .print-tip { font-size: 9.5pt !important; padding: 2pt 0 !important; border-bottom: 0.5pt solid #eee !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+          .print-safety { font-size: 9pt !important; color: #333 !important; line-height: 1.6 !important; border: 1pt solid #ccc !important; padding: 8pt !important; margin-top: 14pt !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+          .print-footer { margin-top: 16pt !important; padding-top: 6pt !important; border-top: 1pt solid #ccc !important; font-size: 8pt !important; color: #888 !important; text-align: center !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+          @page { margin: 0.5in 0.75in; size: letter; }
         }
       `}</style>
 

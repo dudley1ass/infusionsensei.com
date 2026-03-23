@@ -1128,6 +1128,9 @@ export function CreateRecipes() {
       const libraryItem = INGREDIENT_LIBRARY.find(i => i.name === ing.name);
       const ingredientType = libraryItem?.type || ing.type || "solid";
 
+      // CRITICAL: Never convert infused ingredients — thcPerUnit is calibrated to their unit
+      if (ing.isInfused) return ing;
+
       // Skip items that don't use g or ml (count, squeeze, packet, dropper, etc.)
       const skipUnits = ["large", "medium", "small", "whole", "pieces", "cloves", "squeeze", "packet", "dropper", "0.1ml"];
       if (skipUnits.includes(ing.unit)) return ing;
@@ -1259,18 +1262,18 @@ export function CreateRecipes() {
   if (!selectedCategory) {
     return (
       <div className="max-w-6xl mx-auto space-y-6">
-        <div className="text-center bg-gradient-to-br from-green-600 to-green-800 p-8 rounded-2xl shadow-lg">
-          <h1 className="text-4xl font-black text-white mb-2">What do you want to make?</h1>
-          <p className="text-green-200 text-lg mb-5">
-            We'll calculate the exact THC per serving for you — automatically.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border-2 border-green-200 rounded-2xl px-6 py-4 shadow-sm">
+          <div>
+            <h1 className="text-2xl font-black text-gray-900">What do you want to make?</h1>
+            <p className="text-gray-500 text-sm mt-0.5">We'll calculate the exact THC per serving automatically.</p>
+          </div>
           <Button
             onClick={() => setShowWhatCanIMake(!showWhatCanIMake)}
-            className="bg-white text-green-700 hover:bg-green-50 font-bold"
-            size="lg"
+            className="bg-purple-600 hover:bg-purple-700 flex-shrink-0"
+            size="sm"
           >
-            <Lightbulb className="w-5 h-5 mr-2" />
-            What Can I Make With What I Have?
+            <Lightbulb className="w-4 h-4 mr-2" />
+            What Can I Make?
           </Button>
         </div>
 
@@ -1644,6 +1647,8 @@ export function CreateRecipes() {
               padding: 10pt 14pt !important;
               margin-bottom: 14pt !important;
               background: #f9f9f9 !important;
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
             }
 
             .print-thc-number {
@@ -1666,18 +1671,30 @@ export function CreateRecipes() {
               margin-top: 4pt !important;
             }
 
+            /* Keep section title with its first item */
+            .print-section-title {
+              page-break-after: avoid !important;
+              break-after: avoid !important;
+            }
+
+            /* Never break inside an ingredient row */
             .print-ingredient {
               padding: 3pt 0 !important;
               border-bottom: 0.5pt solid #eee !important;
               display: flex !important;
               gap: 8pt !important;
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
             }
 
+            /* Never break inside a step — this is the key fix */
             .print-step {
               display: flex !important;
               gap: 10pt !important;
               margin-bottom: 8pt !important;
               align-items: flex-start !important;
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
             }
 
             .print-step-num {
@@ -1693,9 +1710,20 @@ export function CreateRecipes() {
               flex-shrink: 0 !important;
             }
 
+            .print-dose-table {
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+            }
+
             .print-dose-table td {
               padding: 2pt 8pt !important;
               font-size: 9pt !important;
+            }
+
+            /* Keep safety and footer together and off the bottom of a page */
+            .print-safety {
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
             }
 
             .print-footer {
@@ -1705,10 +1733,13 @@ export function CreateRecipes() {
               font-size: 8pt !important;
               color: #666 !important;
               text-align: center !important;
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
             }
 
             @page {
-              margin: 0;
+              margin: 0.5in 0.75in;
+              size: letter;
             }
           }
         `}</style>
