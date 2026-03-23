@@ -1611,8 +1611,9 @@ export function CreateRecipes() {
     });
     const catEmojis: Record<string, string> = {
       infused: "🧪", flour: "🌾", fat: "🧈", sugar: "🍬",
-      dairy: "🥛", liquid: "💧", protein: "🥩", spices: "🌶️",
-      chocolate: "🍫", eggs: "🥚", leavening: "🧂", other: "📦",
+      dairy: "🥛", liquid: "💧", protein: "🥩", spice: "🌶️",
+      chocolate: "🍫", egg: "🥚", leavening: "🧂", other: "📦",
+      fruit: "🍓", nuts: "🥜", flavoring: "🌸", filling: "🍯", savory: "🍝",
     };
 
     const infusedIngredients = ingredients.filter(i => i.isInfused && i.thcPerUnit);
@@ -2077,7 +2078,7 @@ export function CreateRecipes() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-white max-h-[300px]">
-                            {["infused","flour","sugar","fat","eggs","leavening","dairy","liquid","chocolate","fruits","nuts","flavoring","spices","fillings","savory"].map(cat => (
+                            {["infused","flour","sugar","fat","egg","leavening","dairy","liquid","chocolate","fruit","nuts","flavoring","spice","filling","savory"].map(cat => (
                               <>
                                 <div key={`hdr-${cat}`} className="font-bold text-xs text-gray-500 px-2 py-1 mt-1 uppercase">{catEmojis[cat] || "📦"} {cat}</div>
                                 {INGREDIENT_LIBRARY.filter(i => i.category === cat).map(item => (

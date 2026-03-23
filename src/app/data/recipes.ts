@@ -208,7 +208,7 @@ export const recipes: Recipe[] = [
     cookTime: 240,
     servings: 48,
     thcPerServing: "~10-15mg",
-    image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "/IMAGES/cannabis-oil.jpg",
     description: "Versatile cooking base for all your cannabis culinary creations. Great for vegan recipes.",
     ingredients: [
       "1 cup coconut oil",
@@ -239,7 +239,7 @@ export const recipes: Recipe[] = [
     cookTime: 0,
     servings: 1,
     thcPerServing: "~10-15mg",
-    image: "/IMAGES/fruit-smoothie.jpg",
+    image: "/IMAGES/protein-smoothie.jpg",
     description: "Healthy, energizing breakfast or post-workout drink with cannabis benefits.",
     ingredients: [
       "1 banana",
