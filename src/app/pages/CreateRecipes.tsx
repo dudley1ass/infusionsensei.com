@@ -19,11 +19,14 @@ import {
   Lightbulb,
   ArrowLeft,
   Calculator,
-  ArrowLeftRight
+  ArrowLeftRight,
+  Printer,
+  Copy,
+  Share2,
+  CheckCheck
 } from "lucide-react";
 import { InfusionBase } from "../types/infusion";
 import { NutritionFactsLabel } from "../components/NutritionFactsLabel";
-import { unitToGrams } from "../utils/nutritionCalculator";
 
 // Common ingredient library
 const INGREDIENT_LIBRARY = [
@@ -87,7 +90,7 @@ const INGREDIENT_LIBRARY = [
   { name: "Cream Cheese",           category: "fat",        defaultAmount: 200, defaultUnit: "g",     calories: 342, carbs: 2.9,  protein: 6.2,  fat: 34.2, type: "semi-solid" },
 
   // ── EGGS ────────────────────────────────────────────────────────
-  { name: "Whole Egg (large)",      category: "egg",        defaultAmount: 1,   defaultUnit: "large", calories: 143, carbs: 0.7,  protein: 12.6, fat: 9.5,  type: "count" },
+  { name: "Whole Egg (large)",      category: "egg",        defaultAmount: 50,  defaultUnit: "g",     calories: 143, carbs: 0.7,  protein: 12.6, fat: 9.5,  type: "count" },
   { name: "Egg Yolk",               category: "egg",        defaultAmount: 40,  defaultUnit: "g",     calories: 322, carbs: 3.6,  protein: 15.9, fat: 26.5, type: "count" },
   { name: "Egg White",              category: "egg",        defaultAmount: 60,  defaultUnit: "g",     calories: 52,  carbs: 0.7,  protein: 10.9, fat: 0.2,  type: "count" },
   { name: "Flax Egg",               category: "egg",        defaultAmount: 45,  defaultUnit: "g",     calories: 37,  carbs: 2.8,  protein: 2.0,  fat: 2.5,  type: "semi-solid" },
@@ -536,10 +539,8 @@ export function CreateRecipes() {
   
   const [showNutritionLabel, setShowNutritionLabel] = useState(false);
   const [showWhatCanIMake, setShowWhatCanIMake] = useState(false);
-  const [measurementSystem, setMeasurementSystem] = useState<"metric" | "imperial">("metric"); // metric = g/ml, imperial = oz/cups/tbsp
-  
-  type ActiveRecipeTab = "thc" | "nutrition" | "instructions";
-  const [activeRecipeTab, setActiveRecipeTab] = useState<ActiveRecipeTab>("thc");
+  const [measurementSystem, setMeasurementSystem] = useState<"metric" | "imperial">("metric");
+  const [copied, setCopied] = useState(false);
   
   // What Can I Make - Ingredient Selection
   const [selectedPantryItems, setSelectedPantryItems] = useState<string[]>([]);
@@ -604,28 +605,6 @@ export function CreateRecipes() {
     }
   }, []);
 
-  // Build dynamic ingredient entries from saved infusions
-  // These have the user's real calculated THC-per-unit values
-  const myInfusionIngredients = infusionBases.map((base) => {
-    // Map base type to a fat/liquid type
-    const ingType = base.type === "tincture" ? "liquid" : "fat";
-    return {
-      name: base.name,
-      category: "my-infusions" as const,
-      defaultAmount: 100,
-      defaultUnit: base.baseUnit || "g",
-      thcPerUnit: base.thcPerUnit, // real calculated mg per unit
-      calories: base.type === "butter" ? 717 : base.type === "coconut-oil" ? 862 : base.type === "olive-oil" ? 884 : 7,
-      carbs: 0,
-      protein: base.type === "butter" ? 1 : 0,
-      fat: ingType === "fat" ? 81 : 0,
-      type: ingType,
-      // Extra display info
-      strainName: base.strainName,
-      totalTHC: base.totalTHC,
-    };
-  });
-
   // Load standard recipe
   useEffect(() => {
     if (selectedStandardRecipe && selectedCategory) {
@@ -669,17 +648,7 @@ export function CreateRecipes() {
     }
   }, [selectedStandardRecipe, selectedCategory]);
 
-  // ── Unit-aware gram conversion for accurate nutrition/THC calcs ──
-  // When ingredients are in cups/oz/tbsp the raw amount is NOT grams.
-  // This converts any unit to grams (or ml, treated as grams) before maths.
-  const toGrams = (amount: number, unit: string): number => {
-    const factor = unitToGrams[unit.toLowerCase()] ?? 1;
-    return amount * factor;
-  };
-
   // Calculate total THC
-  // thcPerUnit = mg per display unit (whatever unit is currently shown)
-  // e.g. "10 mg/oz" with 4 oz = 4 × 10 = 40mg — NO gram conversion needed
   const totalTHC = ingredients.reduce((sum, ing) => {
     if (ing.isInfused && ing.thcPerUnit) {
       return sum + (ing.amount * ing.thcPerUnit);
@@ -689,22 +658,22 @@ export function CreateRecipes() {
 
   const thcPerServing = servings > 0 ? totalTHC / servings : 0;
 
-  // Calculate nutrition per serving — unit-aware (convert all amounts to grams first)
-  const totalCalories = ingredients.reduce((sum, ing) => sum + ((ing.calories / 100) * toGrams(ing.amount, ing.unit)), 0);
-  const totalProtein  = ingredients.reduce((sum, ing) => sum + ((ing.protein  / 100) * toGrams(ing.amount, ing.unit)), 0);
-  const totalCarbs    = ingredients.reduce((sum, ing) => sum + ((ing.carbs    / 100) * toGrams(ing.amount, ing.unit)), 0);
-  const totalFat      = ingredients.reduce((sum, ing) => sum + ((ing.fat      / 100) * toGrams(ing.amount, ing.unit)), 0);
+  // Calculate nutrition per serving
+  const totalCalories = ingredients.reduce((sum, ing) => sum + ((ing.calories / 100) * ing.amount), 0);
+  const totalProtein  = ingredients.reduce((sum, ing) => sum + ((ing.protein  / 100) * ing.amount), 0);
+  const totalCarbs    = ingredients.reduce((sum, ing) => sum + ((ing.carbs    / 100) * ing.amount), 0);
+  const totalFat      = ingredients.reduce((sum, ing) => sum + ((ing.fat      / 100) * ing.amount), 0);
   const totalFiber    = ingredients.reduce((sum, ing) => {
     const lib = INGREDIENT_LIBRARY.find(l => l.name === ing.name);
-    return sum + (((lib as any)?.fiber || 0) / 100) * toGrams(ing.amount, ing.unit);
+    return sum + (((lib as any)?.fiber || 0) / 100) * ing.amount;
   }, 0);
   const totalSugar    = ingredients.reduce((sum, ing) => {
     const lib = INGREDIENT_LIBRARY.find(l => l.name === ing.name);
-    return sum + (((lib as any)?.sugar || 0) / 100) * toGrams(ing.amount, ing.unit);
+    return sum + (((lib as any)?.sugar || 0) / 100) * ing.amount;
   }, 0);
   const totalSodium   = ingredients.reduce((sum, ing) => {
     const lib = INGREDIENT_LIBRARY.find(l => l.name === ing.name);
-    return sum + (((lib as any)?.sodium || 0) / 100) * toGrams(ing.amount, ing.unit);
+    return sum + (((lib as any)?.sodium || 0) / 100) * ing.amount;
   }, 0);
 
   const caloriesPerServing = servings > 0 ? totalCalories / servings : 0;
@@ -784,25 +753,6 @@ export function CreateRecipes() {
   };
 
   const changeIngredientFromLibrary = (index: number, newIngredientName: string) => {
-    // Check user's saved infusions first — they have real THC values
-    const myInfusion = myInfusionIngredients.find(i => i.name === newIngredientName);
-    if (myInfusion) {
-      const updated = [...ingredients];
-      updated[index] = {
-        name: myInfusion.name,
-        amount: myInfusion.defaultAmount,
-        unit: myInfusion.defaultUnit,
-        isInfused: true,
-        thcPerUnit: myInfusion.thcPerUnit,
-        calories: myInfusion.calories,
-        carbs: myInfusion.carbs,
-        protein: myInfusion.protein,
-        fat: myInfusion.fat,
-        type: myInfusion.type,
-      };
-      setIngredients(updated);
-      return;
-    }
     const libraryItem = INGREDIENT_LIBRARY.find(i => i.name === newIngredientName);
     if (libraryItem) {
       const updated = [...ingredients];
@@ -843,34 +793,15 @@ export function CreateRecipes() {
 
   // ── Category totals helper ─────────────────────────────────
   const getCategoryTotals = () => {
-    // Grams per cup for common ingredients — same table as the toggle function
-    const gramsPerCup: Record<string, number> = {
-      'All-Purpose Flour': 125, 'Cake Flour': 114, 'Bread Flour': 127,
-      'Whole Wheat Flour': 120, 'Almond Flour': 96, 'Oat Flour': 92,
-      'Rice Flour': 158, 'Coconut Flour': 112, 'Buckwheat Flour': 120,
-      'Cornstarch': 128, 'Tapioca Starch': 152,
-      'Cocoa Powder (Natural)': 100, 'Dutch Cocoa Powder': 100, 'Cocoa Powder': 100,
-      'Espresso Powder': 85, 'Matcha Powder': 85, 'Graham Cracker Crumbs': 90, 'Cornmeal': 157,
-      'Granulated Sugar': 200, 'Sugar': 200,
-      'Brown Sugar (Light)': 220, 'Brown Sugar (Dark)': 220, 'Brown Sugar': 220,
-      'Powdered Sugar': 120, 'Raw Turbinado Sugar': 200, 'Coconut Sugar': 180,
-      'Monk Fruit Sweetener': 200,
-      'Unsalted Butter': 227, 'Salted Butter': 227, 'Brown Butter': 227,
-      'Vegan Butter': 227, 'Shortening': 190, 'Cannabutter': 227,
-      'Baking Powder': 192, 'Baking Soda': 220, 'Cream of Tartar': 150,
-      'Instant Yeast': 150, 'Gelatin (unflavored)': 150,
-      'Flavored Jello Mix': 85, 'Rolled Oats': 90, 'Protein Powder': 120,
-      'Salt': 273, 'Black Pepper': 100, 'Cinnamon': 125, 'Nutmeg': 100,
-    };
-
     const totals: Record<string, number> = {};
     for (const ing of ingredients) {
       const lib = INGREDIENT_LIBRARY.find(i => i.name === ing.name);
       const rawCat = lib?.category || 'other';
+      // Map Infusion Sensei categories → cookie engine categories
+      // chocolate/cocoa counts as flour (dry structural ingredient)
       const cat =
         rawCat === 'flour'     ? 'flour'    :
-        // 'chocolate' = chips/bars/mix-ins — NOT structural flour. Cocoa powder is
-        // already categorised as 'flour' in INGREDIENT_LIBRARY so it counts correctly.
+        rawCat === 'chocolate' ? 'flour'    : // cocoa powder, chocolate bars = dry structure
         rawCat === 'sugar'     ? 'sugar'    :
         rawCat === 'fat'       ? 'fat'      :
         rawCat === 'egg'       ? 'egg'      :
@@ -880,25 +811,15 @@ export function CreateRecipes() {
         rawCat === 'infused'   ? 'fat'      :
         'other';
 
-      // Convert to grams using ingredient-specific density for cups/tbsp/tsp
-      const ingType = lib?.type || 'solid';
-      const isPowderOrFat = ingType === 'powder' || ingType === 'fat';
-      const gpc = gramsPerCup[ing.name] || (isPowderOrFat ? 130 : 240);
-
+      // Convert ingredient amount to grams
       let grams = ing.amount;
-      if (ing.unit === 'cups')        grams = ing.amount * gpc;
-      else if (ing.unit === 'tbsp')   grams = ing.amount * (gpc / 16);
-      else if (ing.unit === 'tsp')    grams = ing.amount * (gpc / 48);
-      else if (ing.unit === 'oz')     grams = ing.amount * 28.35;
-      else if (ing.unit === 'lb')     grams = ing.amount * 453.592;
-      else if (ing.unit === 'fl oz')  grams = ing.amount * 29.57;
-      else if (ing.unit === 'ml')     grams = ing.amount;
-      else if (ing.unit === 'large')  grams = ing.amount * 57;
-      else if (ing.unit === 'medium') grams = ing.amount * 50;
-      else if (ing.unit === 'small')  grams = ing.amount * 43;
-      else if (ing.unit === 'pieces') grams = ing.amount * 100;
-      else if (ing.unit === 'cloves') grams = ing.amount * 3;
-      // squeeze/packet/dropper/0.1ml stay as negligible amounts
+      if (ing.unit === 'cups')  grams = ing.amount * 240;
+      else if (ing.unit === 'tbsp') grams = ing.amount * 15;
+      else if (ing.unit === 'tsp')  grams = ing.amount * 5;
+      else if (ing.unit === 'oz')   grams = ing.amount * 28.35;
+      else if (ing.unit === 'lb')   grams = ing.amount * 453.592;
+      else if (ing.unit === 'fl oz') grams = ing.amount * 29.57;
+      else if (ing.unit === 'ml')   grams = ing.amount;
 
       totals[cat] = (totals[cat] ?? 0) + grams;
     }
@@ -935,101 +856,74 @@ export function CreateRecipes() {
 
     if (flour === 0) return { warning, color };
 
-    // Skip warnings for no-bake / snack / non-flour-based recipes.
-    // These use ingredients like oats, gelatin, protein powder that get
-    // categorised as 'flour' but don't follow baking ratios.
-    // Heuristic: if there are no eggs AND no dairy AND fat < 20% of flour,
-    // this is probably a no-bake snack — don't apply baking warnings.
-    const isNoBake = egg === 0 && dairy === 0 && fat < flour * 0.2;
-    if (isNoBake) return { warning, color };
-
-    const flourToFat  = flour / Math.max(fat, 1);
-    const fatToFlour  = fat   / Math.max(flour, 1);
-    const sugarToFlour = sugar / Math.max(flour, 1);
-    const eggToFlour  = egg   / Math.max(flour, 1);
-    // Dairy contributes moisture AND fat — count it as moisture for these checks
-    const totalMoistureAdj = egg + liquid + dairy * 0.5; // dairy partially counts
-
     if (cat === 'flour') {
-      // Only warn if BOTH ratio AND moisture are genuinely off.
-      // Standard cookies/brownies are ~2–2.5x flour:fat with eggs providing moisture.
-      // Real threshold: >4.5 flour:fat AND very low combined moisture
-      if (flourToFat > 4.5 && totalMoistureAdj < flour * 0.3) {
-        warning = 'Way too much flour for this fat & moisture — result will be very dry. Add more butter or eggs.';
+      const flourToFat = flour / Math.max(fat, 1);
+      if (flourToFat > 3.5 && totalMoisture < flour * 0.4) {
+        warning = 'Way too much flour for this fat & moisture — baked goods will be dry and crumbly. Add more butter, eggs, or liquid.';
         color = 'red';
-      } else if (flourToFat > 3.5 && totalMoistureAdj < flour * 0.35) {
-        warning = 'Flour is high relative to fat — consider adding an extra egg or tablespoon of butter.';
+      } else if (flourToFat > 2.8 && totalMoisture < flour * 0.5) {
+        warning = 'Flour is high relative to fat and moisture — consider adding more butter or eggs for balance.';
         color = 'yellow';
       }
     }
 
     if (cat === 'fat') {
-      // Cookies: butter at 40–55% of flour weight is normal. Brownies can go higher.
-      // Only warn at genuinely problematic levels.
-      if (fatToFlour > 1.0) {
-        warning = 'Fat is very high — baked goods will be greasy and spread flat. Reduce butter or add more flour.';
+      const fatToFlour = fat / Math.max(flour, 1);
+      if (fatToFlour > 0.85) {
+        warning = 'Too much fat — baked goods will be greasy and spread flat. Reduce butter or add more flour.';
         color = 'red';
-      } else if (fatToFlour > 0.8) {
-        warning = 'Fat is quite high — expect significant spread. Chill the dough before baking.';
+      } else if (fatToFlour > 0.65) {
+        warning = 'Fat is on the high side — expect significant spread. Consider chilling the dough before baking.';
         color = 'yellow';
-      } else if (fatToFlour < 0.15 && flour > 150 && egg > 0) {
-        // Only warn about low fat when there ARE eggs (real baked goods)
-        warning = 'Low fat for this flour amount — baked goods may be tough and dry.';
+      } else if (fatToFlour < 0.25 && flour > 100) {
+        warning = 'Low fat for this amount of flour — baked goods may be dry and tough.';
         color = 'yellow';
       }
     }
 
     if (cat === 'sugar') {
-      // Cookies: sugar at 80–120% of flour is completely normal (crispy → chewy range).
-      // Brownies: sugar at 100–150% of flour is normal (fudgy).
-      // Only warn at truly excessive levels.
-      if (sugarToFlour > 1.8) {
-        warning = 'Sugar is very high — baked goods will burn easily and be very thin. Reduce sugar.';
+      const sugarToFlour = sugar / Math.max(flour, 1);
+      if (sugarToFlour > 1.2) {
+        warning = 'Too much sugar — baked goods will be overly sweet, thin, and burn easily. Reduce sugar or add more flour.';
         color = 'red';
-      } else if (sugarToFlour > 1.5) {
-        warning = 'Sugar is on the high side — watch bake time carefully and check for burning.';
+      } else if (sugarToFlour > 0.95) {
+        warning = 'Sugar is high — expect more spread and browning. Watch bake time carefully.';
         color = 'yellow';
-      } else if (sugarToFlour < 0.1 && flour > 150 && egg > 0) {
-        warning = 'Very low sugar — result may be bland and pale.';
+      } else if (sugarToFlour < 0.2 && flour > 100) {
+        warning = 'Low sugar — result may be pale, bland, and dense.';
         color = 'yellow';
       }
     }
 
     if (cat === 'egg') {
-      // Eggs in brownies: 3 eggs to 130g flour = 1.15 ratio — perfectly normal.
-      // Only warn at truly excessive egg ratios.
-      if (eggToFlour > 1.2) {
-        warning = 'Too many eggs — result will be very custardy or rubbery. Reduce eggs or add more flour.';
+      const eggToFlour = egg / Math.max(flour, 1);
+      if (eggToFlour > 0.6) {
+        warning = 'Too many eggs for this flour — result will be puffy and cakey. Reduce eggs or add more flour.';
         color = 'red';
-      } else if (eggToFlour > 0.9) {
-        warning = 'High egg ratio — will be very soft and cake-like. Fine for certain recipes.';
+      } else if (eggToFlour > 0.45) {
+        warning = 'High egg ratio — will lean soft and cakey. Great for moist bakes, but may not suit all recipes.';
         color = 'yellow';
       }
     }
 
     if (cat === 'liquid' || cat === 'dairy') {
-      // Dairy-heavy batters (pancakes, cakes) are intentionally liquid.
-      // Only flag if non-dairy liquid alone is excessive.
-      const pureLiquidToFlour = (egg + liquid) / Math.max(flour, 1);
-      const totalToFlour = totalMoisture / Math.max(flour, 1);
-      if (pureLiquidToFlour > 1.5) {
+      const liquidToFlour = totalMoisture / Math.max(flour, 1);
+      if (liquidToFlour > 1.1) {
         warning = 'Way too much liquid — batter will not hold shape and won\'t bake properly.';
         color = 'red';
-      } else if (totalToFlour > 2.2) {
-        warning = 'Very high moisture content — this will be a very thin batter. Make sure that\'s intended.';
+      } else if (liquidToFlour > 0.7) {
+        warning = 'High moisture content — dough will be very soft. Chill well before baking or add more flour.';
         color = 'yellow';
       }
     }
 
     if (cat === 'leavener') {
       const leavenerToFlour = leavener / Math.max(flour, 1);
-      // Standard: 4g baking powder per 125g flour = 0.032
-      // Pancakes legitimately use 0.05–0.07 for extra fluffiness
-      if (leavenerToFlour > 0.12) {
-        warning = 'Too much leavener — baked goods will taste bitter and soapy.';
+      if (leavenerToFlour > 0.04) {
+        warning = 'Too much leavener — baked goods will taste bitter and soapy. Typical is 1 tsp per 2¼ cups flour.';
         color = 'red';
-      } else if (leavenerToFlour > 0.09) {
-        warning = 'Leavener is on the high side — may cause excessive puffing.';
+      } else if (leavenerToFlour > 0.025) {
+        warning = 'Leavener is on the high side — may cause excessive puffing and a slightly off taste.';
         color = 'yellow';
       }
     }
@@ -1253,15 +1147,13 @@ export function CreateRecipes() {
               return { ...ing, amount: rounded.amount, unit: rounded.unit };
             }
           } else if (ingredientType === "fat") {
-            // Fats convert to oz — cleaner numbers than cups for butter amounts
-            // e.g. 113g butter → 4 oz, 56g → 2 oz, 227g → 8 oz
-            const oz = ing.amount * 0.035274;
-            if (oz >= 1) {
-              const rounded = roundToCommonMeasurement(oz, "oz");
-              return { ...ing, amount: rounded.amount, unit: rounded.unit };
+            const gPerCup = gramsPerCup[ing.name] || 227;
+            const cups = ing.amount / gPerCup;
+            if (cups >= 0.25) {
+              const formattedCups = formatCups(cups);
+              return { ...ing, amount: formattedCups.amount, unit: formattedCups.unit };
             } else {
-              // Small fat amounts: convert to tbsp
-              const tbsp = ing.amount / 14.1748; // 1 tbsp butter ≈ 14.175g
+              const tbsp = cups * 16;
               const rounded = roundToCommonMeasurement(Math.max(tbsp, 0.5), "tbsp");
               return { ...ing, amount: rounded.amount, unit: rounded.unit };
             }
@@ -1330,28 +1222,7 @@ export function CreateRecipes() {
       return ing;
     });
     
-    // Rescale thcPerUnit to match the new display unit
-    // thcPerUnit is always mg per DISPLAY unit, so when unit changes we must rescale
-    const rescaled = convertedIngredients.map(ing => {
-      if (!ing.isInfused || !ing.thcPerUnit) return ing;
-      // Find what the original ingredient was (before conversion) to get old unit
-      const original = ingredients.find(o => o.name === ing.name);
-      if (!original || original.unit === ing.unit) return ing;
-      // Convert: mg/oldUnit → mg/newUnit
-      // mg/newUnit = mg/oldUnit × (grams_per_oldUnit / grams_per_newUnit)
-      const unitToG: Record<string, number> = {
-        g: 1, ml: 1, kg: 1000, L: 1000,
-        oz: 28.35, lb: 453.6, "fl oz": 29.57,
-        cups: 240, tbsp: 14.79, tsp: 4.93,
-        large: 57, medium: 50, small: 43,
-      };
-      const oldG = unitToG[original.unit] ?? 1;
-      const newG = unitToG[ing.unit] ?? 1;
-      const rescaledThc = ing.thcPerUnit * (newG / oldG);
-      return { ...ing, thcPerUnit: Math.round(rescaledThc * 100) / 100 };
-    });
-
-    setIngredients(rescaled);
+    setIngredients(convertedIngredients);
     setMeasurementSystem(newSystem);
   };
 
@@ -1388,19 +1259,18 @@ export function CreateRecipes() {
   if (!selectedCategory) {
     return (
       <div className="max-w-6xl mx-auto space-y-6">
-        <div className="text-center bg-white p-6 rounded-xl shadow-sm border-2 border-green-200">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">👨‍🍳 Create Your Recipe</h1>
-          <p className="text-gray-700 mb-4">
-            Choose a recipe category to get started
+        <div className="text-center bg-gradient-to-br from-green-600 to-green-800 p-8 rounded-2xl shadow-lg">
+          <h1 className="text-4xl font-black text-white mb-2">What do you want to make?</h1>
+          <p className="text-green-200 text-lg mb-5">
+            We'll calculate the exact THC per serving for you — automatically.
           </p>
-          
           <Button
             onClick={() => setShowWhatCanIMake(!showWhatCanIMake)}
-            className="bg-purple-600 hover:bg-purple-700"
+            className="bg-white text-green-700 hover:bg-green-50 font-bold"
             size="lg"
           >
             <Lightbulb className="w-5 h-5 mr-2" />
-            What Can I Make?
+            What Can I Make With What I Have?
           </Button>
         </div>
 
@@ -1425,21 +1295,6 @@ export function CreateRecipes() {
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     <SelectItem value="none" className="text-gray-900">None</SelectItem>
-                    {myInfusionIngredients.length > 0 && (
-                      <>
-                        <div className="font-bold text-xs text-purple-800 bg-purple-50 px-2 py-1.5">
-                          🧪 MY SAVED INFUSIONS
-                        </div>
-                        {myInfusionIngredients.map((item) => (
-                          <SelectItem key={item.name} value={item.name} className="text-gray-900 font-medium">
-                            {item.name} ({item.thcPerUnit.toFixed(1)}mg/{item.defaultUnit})
-                          </SelectItem>
-                        ))}
-                        <div className="font-bold text-xs text-gray-500 px-2 py-1 border-t border-gray-100">
-                          GENERIC
-                        </div>
-                      </>
-                    )}
                     {INGREDIENT_LIBRARY.filter(i => i.category === "infused").map((item) => (
                       <SelectItem key={item.name} value={item.name} className="text-gray-900">
                         {item.name}
@@ -1471,10 +1326,6 @@ export function CreateRecipes() {
                     ))}
                     <div className="font-bold text-xs text-orange-700 px-2 py-1 mt-2">🥚 EGGS</div>
                     {INGREDIENT_LIBRARY.filter(i => i.category === "egg").map((item) => (
-                      <SelectItem key={item.name} value={item.name} className="text-gray-900 text-sm">{item.name}</SelectItem>
-                    ))}
-                    <div className="font-bold text-xs text-gray-600 px-2 py-1 mt-2">🧪 LEAVENING & BINDERS</div>
-                    {INGREDIENT_LIBRARY.filter(i => i.category === "leavening").map((item) => (
                       <SelectItem key={item.name} value={item.name} className="text-gray-900 text-sm">{item.name}</SelectItem>
                     ))}
                     <div className="font-bold text-xs text-blue-700 px-2 py-1 mt-2">🥛 DAIRY</div>
@@ -1608,32 +1459,6 @@ export function CreateRecipes() {
           </Card>
         )}
 
-        {/* My Saved Infusions Banner */}
-        {infusionBases.length > 0 && (
-          <div className="bg-gradient-to-r from-purple-50 to-green-50 border-2 border-purple-300 rounded-xl p-4 shadow-sm">
-            <div className="flex items-center gap-3 mb-3">
-              <FlaskConical className="w-6 h-6 text-purple-600 flex-shrink-0" />
-              <div>
-                <h3 className="font-bold text-gray-900">🧪 Your Saved Infusions Are Ready to Use!</h3>
-                <p className="text-sm text-gray-700">
-                  {infusionBases.length} infusion{infusionBases.length !== 1 ? "s" : ""} from My Infusions — select any recipe below and swap in your real infusion with its exact THC values.
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {infusionBases.map((base) => (
-                <div key={base.id} className="bg-white border border-purple-200 rounded-lg px-3 py-1.5 flex items-center gap-2">
-                  <span className="text-purple-600">🧪</span>
-                  <div>
-                    <div className="text-xs font-semibold text-gray-900">{base.name}</div>
-                    <div className="text-xs text-gray-500">{base.thcPerUnit.toFixed(1)} mg/{base.baseUnit} · {base.strainName}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
           {recipeCategories.map((category) => (
             <Card
@@ -1731,540 +1556,406 @@ export function CreateRecipes() {
     );
   }
 
-  // STEP 3: Recipe Builder — Two-column cookie-style layout
+  // STEP 3: Recipe Builder
   if (recipeType && ingredients.length > 0) {
     const category = recipeCategories.find(c => c.id === selectedCategory);
 
+    // Dosing tier
+    const dosingTier = thcPerServing < 2.5 ? { label: "Microdose", color: "text-blue-700", bg: "bg-blue-50 border-blue-200" }
+      : thcPerServing < 5   ? { label: "Low",       color: "text-green-700",  bg: "bg-green-50 border-green-200" }
+      : thcPerServing < 15  ? { label: "Moderate",  color: "text-yellow-700", bg: "bg-yellow-50 border-yellow-200" }
+      : thcPerServing < 30  ? { label: "High",       color: "text-orange-700", bg: "bg-orange-50 border-orange-200" }
+      : { label: "Very High", color: "text-red-700",    bg: "bg-red-50 border-red-200" };
+
+    // Category summary for ingredient breakdown
+    const categorySummary: Record<string, number> = {};
+    ingredients.forEach(ing => {
+      const lib = INGREDIENT_LIBRARY.find(i => i.name === ing.name);
+      const cat = lib?.category || "other";
+      let g = ing.amount;
+      if (ing.unit === "cups") g *= 240;
+      else if (ing.unit === "tbsp") g *= 15;
+      else if (ing.unit === "tsp") g *= 5;
+      else if (ing.unit === "oz") g *= 28.35;
+      else if (ing.unit === "lb") g *= 453.592;
+      categorySummary[cat] = (categorySummary[cat] || 0) + g;
+    });
+    const catEmojis: Record<string, string> = {
+      infused: "🧪", flour: "🌾", fat: "🧈", sugar: "🍬",
+      dairy: "🥛", liquid: "💧", protein: "🥩", spices: "🌶️",
+      chocolate: "🍫", eggs: "🥚", leavening: "🧂", other: "📦",
+    };
+
+    const infusedIngredients = ingredients.filter(i => i.isInfused && i.thcPerUnit);
+
     return (
-      <div className="min-h-screen -mx-4 -mt-8" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #f0fdf4 100%)' }}>
+      <>
+        <style>{`
+          @media print {
+            header, footer, nav, .no-print { display: none !important; }
+            .print-area { background: white !important; }
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          }
+        `}</style>
 
-        {/* ── Sticky Header ── */}
-        <header className="text-white shadow-lg sticky top-0 z-30" style={{ background: 'linear-gradient(135deg, #14532d, #16a34a, #15803d)' }}>
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <div className="flex items-center gap-3">
+        <div className="max-w-5xl mx-auto space-y-6 print-area">
+
+          {/* ── TOP BAR ──────────────────────────────────────── */}
+          <div className="flex items-center justify-between bg-white px-4 py-3 rounded-2xl shadow-sm border border-gray-200 no-print">
+            <Button
+              onClick={() => { setRecipeType(""); setSelectedStandardRecipe(""); setIngredients([]); }}
+              variant="ghost" className="text-gray-600 hover:text-gray-900 -ml-2"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" /> Back
+            </Button>
+            <div className="flex items-center gap-2">
+              <Badge className="bg-green-600 text-white px-3 py-1">{category?.emoji} {category?.name}</Badge>
+              <Button onClick={() => window.print()} variant="outline" size="sm"
+                className="border-green-300 text-green-700 hover:bg-green-50 gap-1.5">
+                <Printer className="w-4 h-4" /> Print
+              </Button>
+            </div>
+          </div>
+
+          {/* ── RECIPE NAME + SERVINGS ───────────────────────── */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-gray-700 font-semibold text-sm">Recipe Name</Label>
+                <Input value={recipeName} onChange={(e) => setRecipeName(e.target.value)}
+                  className="text-gray-900 border-gray-300 mt-1" placeholder="My Cannabis Recipe" />
+              </div>
+              <div>
+                <Label className="text-gray-700 font-semibold text-sm">Servings</Label>
+                <Input type="number" value={servings} onChange={(e) => setServings(parseInt(e.target.value) || 1)}
+                  min={1} className="text-gray-900 border-gray-300 mt-1" />
+              </div>
+            </div>
+          </div>
+
+          {/* ── THC DASHBOARD ────────────────────────────────── */}
+          <div className="bg-gradient-to-br from-green-700 to-green-900 rounded-2xl overflow-hidden shadow-xl">
+
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Calculator className="w-5 h-5 text-green-300" />
+                <span className="font-bold text-green-200 text-sm uppercase tracking-widest">Live THC Results</span>
+              </div>
+              <div className="flex items-center gap-1.5 no-print">
+                {/* Flash feedback */}
+                <span className={`text-xs text-green-300 font-medium transition-opacity duration-300 ${copied ? 'opacity-100' : 'opacity-0'}`}>
+                  ✓ Copied!
+                </span>
                 <Button
-                  onClick={() => { setRecipeType(""); setSelectedStandardRecipe(""); setIngredients([]); }}
-                  variant="ghost"
                   size="sm"
-                  className="text-white/80 hover:text-white hover:bg-white/20 p-1"
+                  variant="ghost"
+                  onClick={() => {
+                    const summary = `${recipeName || "My Recipe"}\n${thcPerServing.toFixed(1)}mg THC per serving\n${totalTHC.toFixed(0)}mg total batch\n${servings} servings\n\nCalculated with Infusion Sensei — infusionsensei.com`;
+                    navigator.clipboard.writeText(summary);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="text-green-200 hover:text-white hover:bg-white/10 gap-1.5 text-xs border border-green-600/50"
                 >
-                  <ArrowLeft className="w-5 h-5" />
+                  {copied ? <CheckCheck className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? "Copied!" : "Copy Summary"}
                 </Button>
-                <span className="text-2xl">{category?.emoji || "🌿"}</span>
-                <div>
-                  <h1 className="text-lg font-bold leading-tight">{recipeName || "Cannabis Recipe"}</h1>
-                  <p className="text-green-200 text-xs">{category?.name} · {servings} serving{servings !== 1 ? "s" : ""}</p>
+              </div>
+            </div>
+
+            {/* DOMINANT: THC per serving hero number */}
+            <div className="px-6 pb-5 text-center">
+              <div className="bg-white/10 rounded-2xl px-6 py-5 border border-white/20 mb-4">
+                <div className="text-6xl font-black text-white leading-none">{thcPerServing.toFixed(1)}</div>
+                <div className="text-green-200 font-bold text-lg mt-1">mg THC per serving</div>
+                {/* Dosing badge — prominent */}
+                <div className={`inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-full border font-black text-sm ${dosingTier.bg} ${dosingTier.color}`}>
+                  <span>
+                    {dosingTier.label === "Microdose" ? "🔬" :
+                     dosingTier.label === "Low" ? "✅" :
+                     dosingTier.label === "Moderate" ? "⚡" :
+                     dosingTier.label === "High" ? "🔥" : "⚠️"}
+                  </span>
+                  {dosingTier.label.toUpperCase()} DOSE
                 </div>
               </div>
 
-              {/* Right controls */}
-              <div className="flex items-center gap-2 flex-wrap">
-                {/* THC Quick Stats */}
-                <div className="flex items-center gap-3 bg-white/10 rounded-xl px-3 py-1.5 text-sm">
-                  <div className="text-center">
-                    <div className="font-black text-white leading-none">{totalTHC.toFixed(1)}<span className="text-xs font-normal text-green-200">mg</span></div>
-                    <div className="text-green-300 text-xs">total THC</div>
-                  </div>
-                  <div className="w-px h-6 bg-white/20" />
-                  <div className="text-center">
-                    <div className="font-black text-white leading-none">{thcPerServing.toFixed(1)}<span className="text-xs font-normal text-green-200">mg</span></div>
-                    <div className="text-green-300 text-xs">per serving</div>
-                  </div>
+              {/* Secondary stats */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white/10 rounded-xl p-3 text-center border border-white/20">
+                  <div className="text-2xl font-black text-white">{totalTHC.toFixed(1)}<span className="text-sm font-normal text-green-300">mg</span></div>
+                  <div className="text-green-300 text-xs font-semibold uppercase tracking-wide mt-0.5">Total Batch</div>
                 </div>
-
-                {/* Measurement toggle */}
-                <div className="flex bg-white/20 rounded-lg p-0.5">
-                  {(["metric", "imperial"] as const).map((m) => (
-                    <button key={m} onClick={() => { if (m !== measurementSystem) toggleMeasurementSystem(); }}
-                      className={`px-2 py-1 rounded-md text-xs font-medium transition-all ${measurementSystem === m ? "bg-white text-green-700" : "text-white hover:bg-white/20"}`}>
-                      {m === "metric" ? "g/ml" : "oz"}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Servings */}
-                <div className="flex items-center gap-1 bg-white/20 rounded-lg px-2 py-1">
-                  <span className="text-xs text-white/80">Servings:</span>
-                  <input type="number" value={servings} min={1} step={1}
-                    onChange={(e) => { const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1) setServings(v); }}
-                    className="w-10 bg-white/20 rounded text-white text-xs text-center outline-none" />
+                <div className="bg-white/10 rounded-xl p-3 text-center border border-white/20">
+                  <div className="text-2xl font-black text-white">{servings}</div>
+                  <div className="text-green-300 text-xs font-semibold uppercase tracking-wide mt-0.5">Servings</div>
                 </div>
               </div>
             </div>
-          </div>
-        </header>
 
-        {/* ── Recipe info banner ── */}
-        <div className="container mx-auto px-4 pt-4">
-          <div className="bg-white/80 border border-green-200 rounded-xl p-4 shadow-sm">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 space-y-3">
-
-                {/* Recipe switcher dropdown */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">
-                    📖 Recipe
-                  </label>
-                  <select
-                    value={recipeType === "custom" ? "__custom__" : selectedStandardRecipe}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === "__custom__") {
-                        startCustomRecipe();
-                      } else {
-                        setRecipeType("standard");
-                        setSelectedStandardRecipe(val);
-                        // ingredients reload via the existing useEffect
-                      }
-                    }}
-                    className="w-full text-sm border-2 border-green-200 rounded-xl px-3 py-2.5 bg-white text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 cursor-pointer"
-                  >
-                    {(standardRecipes[selectedCategory] || []).map((r: any) => (
-                      <option key={r.id} value={r.id}>
-                        {r.name} ({r.servings} servings)
-                      </option>
-                    ))}
-                    <option value="__custom__">✏️ Custom Recipe (blank)</option>
-                  </select>
-                </div>
-
-                {/* Editable recipe name */}
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">
-                    ✏️ Custom Name (optional)
-                  </label>
-                  <input
-                    value={recipeName}
-                    onChange={(e) => setRecipeName(e.target.value)}
-                    className="w-full text-sm font-semibold text-gray-900 bg-white border-2 border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 placeholder-gray-400"
-                    placeholder="Give your recipe a name..."
-                  />
-                </div>
-
-                {/* Stats chips */}
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-xs bg-green-100 px-2 py-1 rounded-full text-green-800 font-medium">{category?.name}</span>
-                  <span className="text-xs bg-purple-100 px-2 py-1 rounded-full text-purple-800 font-medium">⚗️ {totalTHC.toFixed(1)}mg total THC</span>
-                  <span className="text-xs bg-blue-100 px-2 py-1 rounded-full text-blue-800 font-medium">{ingredients.length} ingredients</span>
-                  <span className="text-xs bg-amber-100 px-2 py-1 rounded-full text-amber-800 font-medium">{servings} serving{servings !== 1 ? "s" : ""}</span>
-                </div>
-              </div>
-
-              {/* Saved infusions panel */}
-              {infusionBases.length > 0 && (
-                <div className="border-t md:border-t-0 md:border-l border-green-200 pt-3 md:pt-0 md:pl-4 min-w-[200px]">
-                  <div className="text-xs text-green-700 font-semibold mb-2">🧪 Your Infusions Available</div>
-                  {infusionBases.map(b => (
-                    <div key={b.id} className="text-xs text-gray-600 py-0.5">{b.name} · <span className="text-purple-600 font-medium">{b.thcPerUnit.toFixed(1)}mg/{b.baseUnit}</span></div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ── Main two-column grid ── */}
-        <main className="container mx-auto px-4 py-6">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-            {/* ════ LEFT COLUMN ════ */}
-            <div className="space-y-6">
-
-              {/* Recipe Summary Analysis */}
-              <RecipeSummaryCard />
-
-              {/* ── Ingredients Card ── */}
-              <div className="bg-white rounded-2xl shadow-md p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-bold text-gray-900">🌿 Ingredients</h2>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={toggleMeasurementSystem}
-                      className="flex items-center gap-1 text-blue-700 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors"
-                    >
-                      <ArrowLeftRight className="w-3 h-3" />
-                      {measurementSystem === "metric" ? "Switch to oz" : "Switch to g"}
-                    </button>
-                    <button
-                      onClick={addIngredient}
-                      className="flex items-center gap-1 text-white text-xs font-medium px-2.5 py-1.5 rounded-lg transition-colors"
-                      style={{ background: "linear-gradient(135deg, #14532d, #16a34a)" }}
-                    >
-                      <Plus className="w-3 h-3" /> Add
-                    </button>
+            {/* Infused ingredients list */}
+            {infusedIngredients.length > 0 && (
+              <div className="mx-6 mb-5 bg-white/10 rounded-xl p-3 border border-white/20">
+                <p className="text-green-300 text-xs font-bold uppercase tracking-wide mb-2">🧪 Infused Ingredients</p>
+                {infusedIngredients.map((ing, i) => (
+                  <div key={i} className="flex justify-between text-sm py-0.5">
+                    <span className="text-green-100">{ing.name}</span>
+                    <span className="text-white font-bold">{(ing.amount * (ing.thcPerUnit || 0)).toFixed(1)}mg THC</span>
                   </div>
-                </div>
-
-                {/* My Saved Infusions quick-add strip */}
-                {myInfusionIngredients.length > 0 && (
-                  <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-xl">
-                    <div className="text-xs font-bold text-purple-700 mb-2">🧪 MY SAVED INFUSIONS — click to add</div>
-                    <div className="flex flex-wrap gap-2">
-                      {myInfusionIngredients.map((inf) => (
-                        <button
-                          key={inf.name}
-                          onClick={() => {
-                            setIngredients(prev => [...prev, {
-                              name: inf.name,
-                              amount: inf.defaultAmount,
-                              unit: inf.defaultUnit,
-                              isInfused: true,
-                              thcPerUnit: inf.thcPerUnit,
-                              calories: inf.calories,
-                              carbs: inf.carbs,
-                              protein: inf.protein,
-                              fat: inf.fat,
-                              type: inf.type,
-                            }]);
-                          }}
-                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-purple-300 bg-white hover:bg-purple-100 text-xs text-purple-800 font-medium transition-colors"
-                        >
-                          <span>🧪</span>
-                          <span>{inf.name}</span>
-                          <span className="text-purple-500">({inf.thcPerUnit.toFixed(1)}mg/{inf.defaultUnit})</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Ingredient category summary bar */}
-                {ingredients.length > 0 && (() => {
-                  const catTotals: Record<string, number> = {};
-                  ingredients.forEach(ing => {
-                    const lib = INGREDIENT_LIBRARY.find(i => i.name === ing.name);
-                    const cat = lib?.category || "other";
-                    let g = ing.amount;
-                    if (ing.unit === "cups") g = ing.amount * 240;
-                    else if (ing.unit === "tbsp") g = ing.amount * 15;
-                    else if (ing.unit === "tsp") g = ing.amount * 5;
-                    else if (ing.unit === "oz") g = ing.amount * 28.35;
-                    catTotals[cat] = (catTotals[cat] || 0) + g;
-                  });
-                  const catEmoji: Record<string, string> = { "my-infusions": "🧪", infused: "🧪", flour: "🌾", fat: "🧈", sugar: "🍬", dairy: "🥛", liquid: "💧", egg: "🥚", spice: "🌶️", chocolate: "🍫", other: "📦" };
-                  return (
-                    <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-blue-100">
-                      <div className="text-xs font-bold text-blue-700 mb-2">📊 INGREDIENT BREAKDOWN</div>
-                      <div className="flex flex-wrap gap-2">
-                        {Object.entries(catTotals).map(([cat, g]) => (
-                          <div key={cat} className="bg-white px-2 py-1 rounded-lg border border-gray-200 text-center min-w-[60px]">
-                            <div className="text-xs text-gray-500 capitalize">{catEmoji[cat] || "📦"} {cat}</div>
-                            <div className="text-sm font-bold text-gray-800">{g.toFixed(0)}g</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                {/* Ingredient rows */}
-                <div className="space-y-3">
-                  {ingredients.map((ing, idx) => {
-                    const warning = getIngredientWarning(ing, servings);
-                    const lib = INGREDIENT_LIBRARY.find(i => i.name === ing.name);
-                    const catEmoji: Record<string, string> = { "my-infusions": "🧪", infused: "🧪", flour: "🌾", fat: "🧈", sugar: "🍬", dairy: "🥛", liquid: "💧", egg: "🥚", spice: "🌶️", chocolate: "🍫", other: "📦" };
-                    const isMyInfusion = myInfusionIngredients.some(i => i.name === ing.name);
-                    return (
-                      <div key={idx}>
-                        <div className={`flex items-center gap-2 p-2 rounded-xl border ${isMyInfusion ? "bg-purple-50 border-purple-200" : "bg-gray-50 border-gray-200"}`}>
-                          <span className="text-lg flex-shrink-0">{catEmoji[lib?.category || "other"] || "📦"}</span>
-                          <div className="flex-1 min-w-[160px]">
-                            <Select value={ing.name} onValueChange={(val) => changeIngredientFromLibrary(idx, val)}>
-                              <SelectTrigger className="bg-white border-gray-300 text-gray-900 h-9 text-sm">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent className="bg-white max-h-[300px]">
-                                {myInfusionIngredients.length > 0 && (
-                                  <>
-                                    <div className="font-bold text-xs text-purple-800 bg-purple-50 px-2 py-1.5 border-b border-purple-100">🧪 MY SAVED INFUSIONS</div>
-                                    {myInfusionIngredients.map((item) => (
-                                      <SelectItem key={item.name} value={item.name} className="text-gray-900 text-sm">
-                                        <span className="font-medium">{item.name}</span>
-                                        <span className="text-purple-600 ml-1 text-xs">({item.thcPerUnit.toFixed(1)}mg/{item.defaultUnit})</span>
-                                      </SelectItem>
-                                    ))}
-                                    <div className="font-bold text-xs text-gray-500 px-2 py-1 border-t border-gray-100">GENERIC INFUSED</div>
-                                  </>
-                                )}
-                                {(() => {
-                                  const catConfig: Record<string, { label: string; color: string }> = {
-                                    infused:   { label: "🧪 INFUSED",            color: "text-purple-700" },
-                                    flour:     { label: "🌾 FLOURS & STARCHES",  color: "text-amber-700" },
-                                    sugar:     { label: "🍬 SUGARS",             color: "text-pink-700" },
-                                    fat:       { label: "🧈 FATS & OILS",        color: "text-yellow-700" },
-                                    egg:       { label: "🥚 EGGS",               color: "text-orange-700" },
-                                    leavening: { label: "🧪 LEAVENING",          color: "text-gray-600" },
-                                    dairy:     { label: "🥛 DAIRY",              color: "text-blue-700" },
-                                    liquid:    { label: "💧 LIQUIDS",            color: "text-cyan-700" },
-                                    chocolate: { label: "🍫 CHOCOLATE & CHIPS",  color: "text-stone-700" },
-                                    fruit:     { label: "🍓 FRUITS",             color: "text-red-700" },
-                                    nuts:      { label: "🥜 NUTS & SEEDS",       color: "text-green-700" },
-                                    flavoring: { label: "🌸 FLAVORINGS",         color: "text-indigo-700" },
-                                    spice:     { label: "🌶️ SPICES",             color: "text-orange-800" },
-                                    filling:   { label: "🍯 FILLINGS & SPREADS", color: "text-rose-700" },
-                                    savory:    { label: "🍝 SAVORY & OTHER",     color: "text-gray-700" },
-                                  };
-                                  const order = Object.keys(catConfig);
-                                  return order.map(cat => {
-                                    const items = INGREDIENT_LIBRARY.filter(i => i.category === cat);
-                                    if (items.length === 0) return null;
-                                    const cfg = catConfig[cat];
-                                    return (
-                                      <div key={cat}>
-                                        <div className={`font-bold text-xs ${cfg.color} px-2 py-1 mt-1`}>{cfg.label}</div>
-                                        {items.map(item => (
-                                          <SelectItem key={item.name} value={item.name} className="text-gray-900 text-sm">{item.name}</SelectItem>
-                                        ))}
-                                      </div>
-                                    );
-                                  });
-                                })()}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <input
-                            type="text"
-                            inputMode="decimal"
-                            value={ing.amount === 0 ? "" : String(ing.amount)}
-                            onChange={(e) => {
-                              const raw = e.target.value;
-                              // Allow digits, one decimal point, empty string
-                              if (raw === "" || /^\d*\.?\d*$/.test(raw)) {
-                                const val = parseFloat(raw);
-                                updateIngredient(idx, "amount", isNaN(val) ? 0 : val);
-                              }
-                            }}
-                            className="w-20 h-9 text-sm text-gray-900 border border-gray-300 rounded-md px-2 focus:outline-none focus:ring-2 focus:ring-green-400"
-                          />
-                          <Select value={ing.unit} onValueChange={(v) => updateIngredient(idx, "unit", v)}>
-                            <SelectTrigger className="w-20 h-9 text-gray-900 border-gray-300 text-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white">
-                              {["g","ml","kg","L","tsp","tbsp","cups","fl oz","oz","lb","large","medium","small","cloves","pieces","pinch"].map(u => (
-                                <SelectItem key={u} value={u} className="text-gray-900 text-sm">{u}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {ing.isInfused && (
-                            <>
-                              <Badge className="bg-purple-100 text-purple-700 border-0 text-xs flex-shrink-0">🧪</Badge>
-                              <input
-                                type="text"
-                                inputMode="decimal"
-                                value={ing.thcPerUnit === 0 ? "" : String(ing.thcPerUnit || "")}
-                                onChange={(e) => {
-                                  const raw = e.target.value;
-                                  if (raw === "" || /^\d*\.?\d*$/.test(raw)) {
-                                    const val = parseFloat(raw);
-                                    updateIngredient(idx, "thcPerUnit", isNaN(val) ? 0 : val);
-                                  }
-                                }}
-                                placeholder="mg/unit"
-                                className="w-20 h-9 text-sm bg-purple-50 border border-purple-300 text-gray-900 rounded-md px-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                              />
-                              <span className="text-xs text-purple-600 flex-shrink-0">mg/{ing.unit}</span>
-                            </>
-                          )}
-                          <Button onClick={() => removeIngredient(idx)} variant="ghost" size="sm"
-                            className="text-red-400 hover:text-red-600 hover:bg-red-50 h-9 w-9 p-0 flex-shrink-0">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        {warning.warning && (
-                          <div className={`mt-1.5 px-3 py-2 rounded-lg text-xs flex items-start gap-2 ${
-                            warning.color === "red" ? "bg-red-50 text-red-700 border border-red-200" : "bg-yellow-50 text-yellow-800 border border-yellow-200"
-                          }`}>
-                            <span className="flex-shrink-0">{warning.color === "red" ? "🚨" : "⚠️"}</span>
-                            <span>{warning.warning}</span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* ── Science Links placeholder ── */}
-              <div className="bg-white rounded-2xl shadow-md p-5">
-                <h2 className="text-lg font-bold text-gray-900 mb-3">📚 Cannabis Cooking Guides</h2>
-                <div className="space-y-2">
-                  {[
-                    { label: "Decarboxylation Guide", url: "/learn/articles/beginner-guide" },
-                    { label: "Dosing Fundamentals", url: "/learn/articles/dosing-guide" },
-                    { label: "Infusion Base Comparison", url: "/learn/articles/base-comparison" },
-                    { label: "Converting Regular Recipes", url: "/learn/articles/convert-recipes" },
-                  ].map((link) => (
-                    <a key={link.url} href={link.url}
-                      className="flex items-center justify-between p-3 rounded-xl border border-green-200 hover:bg-green-50 hover:border-green-400 transition-all group">
-                      <span className="text-sm font-medium text-gray-700 group-hover:text-green-800">{link.label}</span>
-                      <span className="text-green-500 group-hover:translate-x-0.5 transition-transform">→</span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-
-            </div>
-
-            {/* ════ RIGHT COLUMN — Tabbed Panel ════ */}
-            <div>
-              {/* Tab bar */}
-              <div className="flex bg-white rounded-2xl shadow-sm p-1 mb-4">
-                {([
-                  { id: "thc", label: "⚗️ THC Calc" },
-                  { id: "nutrition", label: "📋 Nutrition" },
-                  { id: "instructions", label: "👨‍🍳 Method" },
-                ] as { id: ActiveRecipeTab; label: string }[]).map(tab => (
-                  <button key={tab.id} onClick={() => setActiveRecipeTab(tab.id)}
-                    className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${activeRecipeTab === tab.id ? "text-white shadow" : "text-gray-500 hover:text-gray-800"}`}
-                    style={activeRecipeTab === tab.id ? { background: "linear-gradient(135deg, #14532d, #16a34a)" } : {}}>
-                    {tab.label}
-                  </button>
                 ))}
               </div>
+            )}
 
-              {/* ── ⚗️ THC Calculator Tab ── */}
-              {activeRecipeTab === "thc" && (
-                <div className="bg-white rounded-2xl shadow-md p-5 space-y-5">
-                  {/* Big THC readout */}
-                  <div className="grid grid-cols-3 gap-3 text-center">
-                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200">
-                      <div className="text-2xl font-black text-purple-700">{totalTHC.toFixed(1)}<span className="text-sm font-normal">mg</span></div>
-                      <div className="text-xs text-gray-500 mt-1">Total THC</div>
-                    </div>
-                    <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
-                      <div className="text-2xl font-black text-green-700">{thcPerServing.toFixed(1)}<span className="text-sm font-normal">mg</span></div>
-                      <div className="text-xs text-gray-500 mt-1">Per Serving</div>
-                    </div>
-                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
-                      <div className="text-2xl font-black text-blue-700">{servings}</div>
-                      <div className="text-xs text-gray-500 mt-1">Servings</div>
-                    </div>
-                  </div>
+            {/* Save / Share / Print action strip */}
+            <div className="bg-black/20 px-6 py-4 border-t border-white/10 no-print">
+              <p className="text-green-300 text-xs font-semibold mb-3 text-center uppercase tracking-wide">Want consistent results every time?</p>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => {
+                    const summary = `${recipeName || "My Recipe"}\n${thcPerServing.toFixed(1)}mg THC per serving\n${totalTHC.toFixed(0)}mg total batch\n${servings} servings\n\nCalculated with Infusion Sensei — infusionsensei.com`;
+                    navigator.clipboard.writeText(summary);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="flex flex-col items-center gap-1 bg-white/10 hover:bg-white/20 rounded-xl py-3 px-2 text-white transition-all border border-white/10 hover:border-white/30"
+                >
+                  {copied ? <CheckCheck className="w-5 h-5 text-green-300" /> : <Copy className="w-5 h-5" />}
+                  <span className="text-xs font-semibold">{copied ? "Copied!" : "Copy"}</span>
+                </button>
+                <button
+                  onClick={() => window.print()}
+                  className="flex flex-col items-center gap-1 bg-white/10 hover:bg-white/20 rounded-xl py-3 px-2 text-white transition-all border border-white/10 hover:border-white/30"
+                >
+                  <Printer className="w-5 h-5" />
+                  <span className="text-xs font-semibold">Print</span>
+                </button>
+                <button
+                  onClick={() => {
+                    const text = `I just calculated my ${recipeName || "edible recipe"} — ${thcPerServing.toFixed(1)}mg THC per serving! Try Infusion Sensei: infusionsensei.com`;
+                    if (navigator.share) {
+                      navigator.share({ title: "Infusion Sensei", text, url: "https://infusionsensei.com" });
+                    } else {
+                      navigator.clipboard.writeText(text);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }
+                  }}
+                  className="flex flex-col items-center gap-1 bg-white/10 hover:bg-white/20 rounded-xl py-3 px-2 text-white transition-all border border-white/10 hover:border-white/30"
+                >
+                  <Share2 className="w-5 h-5" />
+                  <span className="text-xs font-semibold">Share</span>
+                </button>
+              </div>
+            </div>
+          </div>
 
-                  {/* Dosing guide */}
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                    <h4 className="text-sm font-bold text-amber-900 mb-2">💡 Dosing Reference</h4>
-                    <div className="space-y-1.5 text-xs">
-                      {[
-                        { range: "1–2.5mg", label: "Microdose", desc: "Subtle effect, ideal for beginners" },
-                        { range: "2.5–5mg", label: "Low", desc: "Mild relaxation, light relief" },
-                        { range: "5–15mg", label: "Moderate", desc: "Standard recreational/therapeutic" },
-                        { range: "15–30mg", label: "High", desc: "Experienced users only" },
-                        { range: "30mg+", label: "Very High", desc: "Tolerance required" },
-                      ].map(d => {
-                        const isMatch = thcPerServing >= parseFloat(d.range.split("–")[0]) &&
-                          (d.range.includes("+") || thcPerServing < parseFloat(d.range.split("–")[1] || "999"));
-                        return (
-                          <div key={d.label} className={`flex items-center gap-2 p-2 rounded-lg ${isMatch ? "bg-green-100 border border-green-300" : ""}`}>
-                            <span className="font-mono text-amber-700 w-16 flex-shrink-0">{d.range}</span>
-                            <span className={`font-semibold ${isMatch ? "text-green-800" : "text-amber-800"}`}>{d.label}</span>
-                            {isMatch && <span className="text-green-600 text-xs">← your recipe</span>}
-                            <span className="text-gray-500 ml-auto text-right">{d.desc}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+          {/* ── RECIPE ANALYSIS ──────────────────────────────── */}
+          <RecipeSummaryCard />
 
-                  {/* Infused ingredients summary */}
-                  {ingredients.filter(i => i.isInfused).length > 0 && (
-                    <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-                      <h4 className="text-sm font-bold text-purple-900 mb-2">🧪 Infused Ingredients</h4>
-                      {ingredients.filter(i => i.isInfused).map((ing, idx) => (
-                        <div key={idx} className="flex justify-between text-sm py-1 border-b border-purple-100 last:border-0">
-                          <span className="text-gray-700">{ing.name}</span>
-                          <span className="text-purple-700 font-semibold">
-                            {(ing.amount * (ing.thcPerUnit || 0)).toFixed(1)}mg THC
-                            <span className="text-gray-400 font-normal text-xs ml-1">({ing.amount}{ing.unit} × {ing.thcPerUnit?.toFixed(1)}mg)</span>
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Safety reminder */}
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
-                    <p className="text-xs text-yellow-800">
-                      <strong>⚠️ Start Low, Go Slow</strong> — Edibles take 30–120 min to take effect. Wait before taking more. Store safely away from children and pets.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* ── 📋 Nutrition Tab ── */}
-              {activeRecipeTab === "nutrition" && (
-                <div className="bg-white rounded-2xl shadow-md p-5">
-                  <h3 className="font-bold text-gray-900 mb-4">📊 Nutrition Per Serving</h3>
-                  <NutritionFactsLabel
-                    servings={servings}
-                    servingSize="1 serving"
-                    thcPerServing={thcPerServing}
-                    caloriesPerServing={caloriesPerServing}
-                    proteinPerServing={proteinPerServing}
-                    carbsPerServing={carbsPerServing}
-                    fatPerServing={fatPerServing}
-                    fiberPerServing={fiberPerServing}
-                    sugarPerServing={sugarPerServing}
-                    sodiumPerServing={sodiumPerServing}
-                  />
-                  {/* Macros bar */}
-                  <div className="mt-4 space-y-2">
-                    {[
-                      { label: "Carbs", val: carbsPerServing, max: 300, color: "bg-amber-400" },
-                      { label: "Fat", val: fatPerServing, max: 78, color: "bg-yellow-400" },
-                      { label: "Protein", val: proteinPerServing, max: 50, color: "bg-blue-400" },
-                    ].map(m => (
-                      <div key={m.label}>
-                        <div className="flex justify-between text-xs text-gray-600 mb-0.5">
-                          <span>{m.label}</span>
-                          <span>{m.val.toFixed(1)}g</span>
-                        </div>
-                        <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                          <div className={`h-full rounded-full ${m.color}`} style={{ width: `${Math.min((m.val / m.max) * 100, 100)}%` }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ── 👨‍🍳 Method Tab ── */}
-              {activeRecipeTab === "instructions" && (
-                <div className="bg-white rounded-2xl shadow-md p-5">
-                  <h3 className="font-bold text-gray-900 mb-4">👨‍🍳 Preparation Method</h3>
-                  <div className="space-y-3">
-                    {instructions.map((step, idx) => (
-                      <div key={idx} className="flex gap-3 items-start">
-                        <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm text-white"
-                          style={{ background: "linear-gradient(135deg, #14532d, #16a34a)" }}>
-                          {idx + 1}
-                        </div>
-                        <div className="flex-1 text-gray-800 text-sm bg-gray-50 p-3 rounded-xl border border-gray-100">
-                          {step}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Cannabis safety note */}
-                  <div className="mt-5 bg-green-50 border border-green-200 rounded-xl p-4">
-                    <h4 className="text-sm font-bold text-green-900 mb-2">🌿 Cannabis Cooking Tips</h4>
-                    <ul className="space-y-1 text-xs text-green-800">
-                      <li>• Decarboxylate your cannabis before infusing (240°F / 40 min)</li>
-                      <li>• Never exceed 245°F when infusing — you'll degrade THC</li>
-                      <li>• Label all infused items clearly and store separately</li>
-                      <li>• Allow edibles to fully cool before dosing — heat can affect potency</li>
-                    </ul>
-                  </div>
-                </div>
-              )}
+          {/* ── INGREDIENTS ──────────────────────────────────── */}
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-green-600 px-5 py-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-white font-black text-lg">✏️ Customize Your Recipe</h2>
+                <p className="text-green-200 text-xs mt-0.5">Adjust ingredients — THC updates instantly</p>
+              </div>
+              <div className="flex gap-2 no-print">
+                <Button onClick={toggleMeasurementSystem} size="sm" variant="ghost"
+                  className="text-white hover:bg-green-700 border border-green-500 text-xs gap-1">
+                  <ArrowLeftRight className="w-3 h-3" />
+                  {measurementSystem === "metric" ? "Switch to oz" : "Switch to g"}
+                </Button>
+                <Button onClick={addIngredient} size="sm" className="bg-white text-green-700 hover:bg-green-50 font-bold text-xs gap-1">
+                  <Plus className="w-3 h-3" /> Add
+                </Button>
+              </div>
             </div>
 
+            {/* Category breakdown */}
+            {Object.keys(categorySummary).length > 0 && (
+              <div className="px-5 pt-4 pb-2">
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-3 border border-blue-100">
+                  <p className="text-xs font-bold text-blue-700 uppercase tracking-wide mb-2">📊 Ingredient Breakdown</p>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(categorySummary).map(([cat, grams]) => (
+                      <span key={cat} className="bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs">
+                        <span className="mr-1">{catEmojis[cat] || "📦"}</span>
+                        <span className="text-gray-500 capitalize">{cat}</span>
+                        <span className="ml-1 font-bold text-gray-800">{grams.toFixed(0)}g</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="divide-y divide-gray-100 px-2 py-2">
+              {ingredients.map((ing, idx) => {
+                const warning = getIngredientWarning(ing, servings);
+                const lib = INGREDIENT_LIBRARY.find(i => i.name === ing.name);
+                const cat = lib?.category || "other";
+                return (
+                  <div key={idx} className="py-2 px-3 hover:bg-gray-50/60 rounded-xl transition-colors">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-base">{catEmojis[cat] || "📦"}</span>
+                      <div className="flex-1 min-w-32">
+                        <Select value={ing.name} onValueChange={(v) => {
+                          const item = INGREDIENT_LIBRARY.find(i => i.name === v);
+                          if (item) updateIngredient(idx, "name", v);
+                        }}>
+                          <SelectTrigger className="h-9 text-gray-900 border-gray-200 bg-white text-sm font-medium">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white max-h-[300px]">
+                            {["infused","flour","sugar","fat","eggs","leavening","dairy","liquid","chocolate","fruits","nuts","flavoring","spices","fillings","savory"].map(cat => (
+                              <>
+                                <div key={`hdr-${cat}`} className="font-bold text-xs text-gray-500 px-2 py-1 mt-1 uppercase">{catEmojis[cat] || "📦"} {cat}</div>
+                                {INGREDIENT_LIBRARY.filter(i => i.category === cat).map(item => (
+                                  <SelectItem key={item.name} value={item.name} className="text-gray-900 text-sm">{item.name}</SelectItem>
+                                ))}
+                              </>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Input type="number" value={ing.amount}
+                        onChange={(e) => updateIngredient(idx, "amount", parseFloat(e.target.value) || 0)}
+                        className="w-20 text-gray-900 border-gray-200 h-9 text-sm" />
+                      <Select value={ing.unit} onValueChange={(v) => updateIngredient(idx, "unit", v)}>
+                        <SelectTrigger className="w-24 h-9 text-gray-900 border-gray-200 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white max-h-[280px]">
+                          <div className="font-bold text-xs text-blue-700 px-2 py-1">📏 Metric</div>
+                          {["g","ml","kg","L"].map(u => <SelectItem key={u} value={u} className="text-gray-900 text-sm">{u}</SelectItem>)}
+                          <div className="font-bold text-xs text-orange-700 px-2 py-1 mt-1">🥄 Imperial</div>
+                          {["tsp","tbsp","cups","fl oz","oz","lb"].map(u => <SelectItem key={u} value={u} className="text-gray-900 text-sm">{u}</SelectItem>)}
+                          <div className="font-bold text-xs text-green-700 px-2 py-1 mt-1">🔢 Count</div>
+                          {["large","medium","small","whole","pieces","cloves","pinch","squeeze","packet","dropper"].map(u => <SelectItem key={u} value={u} className="text-gray-900 text-sm">{u}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      {ing.isInfused && (
+                        <>
+                          <Badge className="bg-purple-100 text-purple-700 border-0 text-xs px-2 no-print">🧪 THC</Badge>
+                          <Input type="number" value={ing.thcPerUnit || 0}
+                            onChange={(e) => updateIngredient(idx, "thcPerUnit", parseFloat(e.target.value) || 0)}
+                            placeholder="mg/unit" className="w-20 bg-purple-50 border-purple-200 text-gray-900 h-9 text-sm no-print" />
+                          <span className="text-xs text-purple-600 no-print">mg/{ing.unit}</span>
+                        </>
+                      )}
+                      <Button onClick={() => removeIngredient(idx)} variant="ghost" size="sm"
+                        className="text-red-400 hover:text-red-600 hover:bg-red-50 h-9 w-9 p-0 no-print">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    {warning.warning && (
+                      <div className={`mt-1.5 ml-8 px-3 py-1.5 rounded-lg text-xs flex items-start gap-1.5 ${
+                        warning.color === "red" ? "bg-red-50 text-red-700 border border-red-200" :
+                        warning.color === "orange" ? "bg-orange-50 text-orange-700 border border-orange-200" :
+                        "bg-yellow-50 text-yellow-800 border border-yellow-200"}`}>
+                        <span>{warning.color === "red" ? "🚨" : "⚠️"}</span>
+                        <span>{warning.warning}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </main>
-      </div>
+
+          {/* ── INSTRUCTIONS ─────────────────────────────────── */}
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-gray-900 px-5 py-4">
+              <h2 className="text-white font-black text-lg">👨‍🍳 Instructions</h2>
+              <p className="text-gray-400 text-xs mt-0.5">{instructions.length} steps</p>
+            </div>
+            <ol className="divide-y divide-gray-100">
+              {instructions.map((step, i) => (
+                <li key={i} className="flex gap-4 px-5 py-4 hover:bg-gray-50/60 transition-colors">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="text-white font-black text-sm">{i + 1}</span>
+                  </div>
+                  <p className="text-gray-800 text-sm leading-relaxed pt-1">{step}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          {/* ── NUTRITION + PRINT ROW ─────────────────────────── */}
+          <div className="grid sm:grid-cols-2 gap-4 no-print">
+            <button
+              onClick={() => setShowNutritionLabel(!showNutritionLabel)}
+              className="bg-white border-2 border-blue-200 hover:border-blue-400 rounded-2xl p-5 text-left transition-all shadow-sm hover:shadow-md group"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                  <span className="text-xl">🥗</span>
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">Nutrition Facts</p>
+                  <p className="text-xs text-gray-500">{showNutritionLabel ? "Hide label" : "Show full label"}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2 mt-3">
+                {[
+                  { label: "Calories", val: caloriesPerServing.toFixed(0) },
+                  { label: "Carbs", val: `${carbsPerServing.toFixed(1)}g` },
+                  { label: "Fat", val: `${fatPerServing.toFixed(1)}g` },
+                ].map(({ label, val }) => (
+                  <div key={label} className="bg-gray-50 rounded-lg px-2 py-1.5 text-center">
+                    <div className="text-xs text-gray-500">{label}</div>
+                    <div className="font-bold text-gray-900 text-sm">{val}</div>
+                  </div>
+                ))}
+              </div>
+            </button>
+
+            <button
+              onClick={() => window.print()}
+              className="bg-white border-2 border-green-200 hover:border-green-500 rounded-2xl p-5 text-left transition-all shadow-sm hover:shadow-md group"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                  <Printer className="w-5 h-5 text-green-700" />
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">Print Recipe</p>
+                  <p className="text-xs text-gray-500">Clean printout with all details</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mt-2">Includes ingredients, instructions, and exact THC per serving.</p>
+            </button>
+          </div>
+
+          {/* Nutrition Facts Label (expanded) */}
+          {showNutritionLabel && (
+            <div className="bg-white border border-blue-200 rounded-2xl p-6 shadow-sm">
+              <NutritionFactsLabel
+                servings={servings}
+                servingSize="1 serving"
+                thcPerServing={thcPerServing}
+                caloriesPerServing={caloriesPerServing}
+                proteinPerServing={proteinPerServing}
+                carbsPerServing={carbsPerServing}
+                fatPerServing={fatPerServing}
+                fiberPerServing={fiberPerServing}
+                sugarPerServing={sugarPerServing}
+                sodiumPerServing={sodiumPerServing}
+              />
+            </div>
+          )}
+
+          {/* ── SAFETY ───────────────────────────────────────── */}
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex gap-3 items-start">
+            <span className="text-lg flex-shrink-0">⚠️</span>
+            <p className="text-sm text-amber-800">
+              <strong>Start Low, Go Slow</strong> — Edibles take 30–120 min to take effect. Wait before taking more. Store safely away from children and pets.
+            </p>
+          </div>
+
+        </div>
+      </>
     );
   }
 

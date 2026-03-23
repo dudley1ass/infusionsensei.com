@@ -664,11 +664,16 @@ export function InfusionBases() {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">🧪 My Infusions</h1>
-        <p className="text-gray-600">
-          "Take it slow. That's the secret." — Create perfectly dosed infusion bases
+      <div className="bg-gradient-to-br from-green-700 to-green-900 rounded-2xl px-8 py-8 text-white shadow-xl">
+        <h1 className="text-4xl font-black text-white mb-2">🧪 Create Your Infusion Base</h1>
+        <p className="text-green-200 text-lg">
+          Takes 30 seconds — start with your strain and base type. We'll calculate everything automatically.
         </p>
+        <div className="flex items-center gap-4 mt-4 text-sm text-green-300">
+          <span>✓ Auto dose calculation</span>
+          <span>✓ 20+ strain profiles</span>
+          <span>✓ Butter, oil, cream & more</span>
+        </div>
       </div>
 
       {/* Strain Manager Section */}

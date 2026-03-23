@@ -41,6 +41,18 @@ export function ConvertRecipes() {
             You don't need special recipes—you just need to understand <strong>molecular substitution</strong> and how cannabinoids bind to different carriers. Every recipe contains at least one THC-compatible ingredient.
           </p>
 
+          {/* Mid-article CTA */}
+          <div className="bg-green-50 border-2 border-green-400 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-4 no-print">
+            <div className="flex-1">
+              <p className="font-black text-green-900 text-lg">🧮 Calculate Your Exact THC Per Serving</p>
+              <p className="text-green-700 text-sm mt-0.5">Enter your strain and recipe — get precise mg per serving in under 60 seconds.</p>
+            </div>
+            <Link to="/infusions" className="flex-shrink-0 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm whitespace-nowrap">
+              Try It Free →
+            </Link>
+          </div>
+
+
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-5 rounded-lg border border-purple-200">
             <h3 className="font-bold text-gray-900 mb-3 text-lg">🧪 The Core Principle: Cannabinoid Carriers</h3>
             <p className="text-gray-700 mb-3">

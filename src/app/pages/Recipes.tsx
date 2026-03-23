@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Clock, ChefHat, Search, Sparkles } from "lucide-react";
+import { Clock, ChefHat, Search, Sparkles, Calculator, ArrowRight } from "lucide-react";
 import { Input } from "../components/ui/input";
 
 export function Recipes() {
@@ -54,15 +54,22 @@ export function Recipes() {
         <div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Recipe Library</h1>
           <p className="text-gray-700">
-            Cannabis-infused recipes from basics to advanced creations — new recipes added every week
+            Browse recipes — then customize the THC dose to match exactly what you want.
           </p>
         </div>
-        {newCount > 0 && (
-          <div className="flex items-center gap-2 bg-green-50 border-2 border-green-400 rounded-xl px-4 py-2 flex-shrink-0">
-            <Sparkles className="w-5 h-5 text-green-600" />
-            <span className="text-green-800 font-bold">{newCount} New Recipes Added!</span>
-          </div>
-        )}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          {newCount > 0 && (
+            <div className="flex items-center gap-2 bg-green-50 border-2 border-green-400 rounded-xl px-4 py-2">
+              <Sparkles className="w-5 h-5 text-green-600" />
+              <span className="text-green-800 font-bold">{newCount} New Recipes Added!</span>
+            </div>
+          )}
+          <Link to="/ingredients">
+            <Button className="bg-green-600 hover:bg-green-700 gap-2 font-bold">
+              <Calculator className="w-4 h-4" /> Build Custom Recipe
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Search */}
@@ -145,12 +152,22 @@ export function Recipes() {
                       <span>{recipe.servings} servings</span>
                     </div>
                   </div>
-                  <div className="pt-3 border-t border-green-200">
+                  <div className="pt-3 border-t border-green-200 mb-3">
                     <div className="text-sm">
                       <span className="text-gray-600">THC per serving: </span>
                       <span className="text-green-700 font-bold">{recipe.thcPerServing}</span>
                     </div>
                   </div>
+                  {/* Funnel CTA */}
+                  <Link
+                    to="/ingredients"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center justify-center gap-2 w-full bg-green-50 hover:bg-green-100 border border-green-300 hover:border-green-500 text-green-700 font-bold text-sm py-2 rounded-lg transition-all group/cta"
+                  >
+                    <Calculator className="w-3.5 h-3.5" />
+                    Customize THC
+                    <ArrowRight className="w-3.5 h-3.5 group-hover/cta:translate-x-0.5 transition-transform" />
+                  </Link>
                 </CardContent>
               </Card>
             </Link>

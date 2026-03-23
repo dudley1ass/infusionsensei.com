@@ -67,6 +67,18 @@ export function EasyRecipes() {
           <div className="space-y-5 bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-lg border-2 border-orange-200">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900">1. THC Coffee ☕</h2>
+
+          {/* Mid-article CTA */}
+          <div className="bg-green-50 border-2 border-green-400 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-4 no-print">
+            <div className="flex-1">
+              <p className="font-black text-green-900 text-lg">🧮 Calculate Your Exact THC Per Serving</p>
+              <p className="text-green-700 text-sm mt-0.5">Enter your strain and recipe — get precise mg per serving in under 60 seconds.</p>
+            </div>
+            <Link to="/infusions" className="flex-shrink-0 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm whitespace-nowrap">
+              Try It Free →
+            </Link>
+          </div>
+
               <Badge className="bg-orange-600 text-white">5-20 mg</Badge>
             </div>
             
