@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
@@ -13,6 +14,13 @@ export function WhyEdiblesFeelDifferent() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
+      <Helmet>
+        <title>Why Some Edibles Feel Stronger Than Others at the Same Dose | Infusion Sensei</title>
+        <meta name="description" content="Fat content, nano-emulsification, sugar, and terpenes — why the same mg THC can feel completely different depending on the edible." />
+        <meta property="og:title" content="Why Some Edibles Feel Stronger Than Others at the Same Dose | Infusion Sensei" />
+        <meta property="og:description" content="Fat content, nano-emulsification, sugar, and terpenes — why the same mg THC can feel completely different depending on the edible." />
+        <link rel="canonical" href="https://infusionsensei.com/learn/articles/why-edibles-feel-different" />
+      </Helmet>
       <div className="text-sm text-gray-600">
         <Link to="/learn" className="hover:text-green-600">Learn</Link> / <span className="text-gray-900">Why Edibles Feel Different</span>
       </div>
@@ -100,6 +108,15 @@ export function WhyEdiblesFeelDifferent() {
             <p className="text-lg font-bold mb-2">💡 The Takeaway</p>
             <p className="text-indigo-100 text-sm">Same mg ≠ same experience. Fat content, emulsification, sugar, terpenes, and your individual biology all shape the effect. Track what works for you and log your experiences to find your patterns.</p>
           </div>
+          {/* Internal CTA */}
+          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
+            <p className="text-lg font-bold mb-1">🧮 Calculate Your Exact THC Per Serving</p>
+            <p className="text-green-100 text-sm mb-4">Use Infusion Sensei's free THC dosage calculator — enter your strain, base type, and recipe to get precise mg per serving instantly.</p>
+            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+              Build My Infusion — Free <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
 
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-gray-900">Related Articles</h3>

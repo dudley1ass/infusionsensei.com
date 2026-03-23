@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
@@ -13,6 +14,13 @@ export function DosingGuide() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      <Helmet>
+        <title>How to Dose THC Edibles Correctly — Stop Guessing | Infusion Sensei</title>
+        <meta name="description" content="The standard THC dose guide from 1mg to 100mg, how to calculate exact mg per serving, and the 7 most common dosing mistakes." />
+        <meta property="og:title" content="How to Dose THC Edibles Correctly — Stop Guessing | Infusion Sensei" />
+        <meta property="og:description" content="The standard THC dose guide from 1mg to 100mg, how to calculate exact mg per serving, and the 7 most common dosing mistakes." />
+        <link rel="canonical" href="https://infusionsensei.com/learn/articles/dosing-guide" />
+      </Helmet>
       <div className="text-sm text-gray-600">
         <Link to="/learn" className="hover:text-green-600">Learn</Link> / <span className="text-gray-900">Dosing Guide</span>
       </div>
@@ -222,7 +230,16 @@ export function DosingGuide() {
 
           <div className="space-y-5">
             <h2 className="text-2xl font-bold text-gray-900">The 7 Most Common Dosing Mistakes</h2>
-            <div className="space-y-3">
+            {/* Internal CTA */}
+          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
+            <p className="text-lg font-bold mb-1">🧮 Calculate Your Exact THC Per Serving</p>
+            <p className="text-green-100 text-sm mb-4">Use Infusion Sensei's free THC dosage calculator — enter your strain, base type, and recipe to get precise mg per serving instantly.</p>
+            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+              Build My Infusion — Free <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="space-y-3">
               {[
                 { mistake: "Not waiting long enough", fix: "Always wait at least 90 minutes — preferably 2 hours — before concluding a dose is not working. Many people re-dose too soon and end up overwhelmed when both hit together." },
                 { mistake: "Uneven mixing", fix: "THC-infused butter or oil does not distribute evenly through batter automatically. Mix thoroughly so every portion gets the same amount of infusion. Hotspots in homemade edibles are very real." },

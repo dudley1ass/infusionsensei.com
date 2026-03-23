@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Sparkles, ArrowRight } from "lucide-react";
@@ -12,6 +13,13 @@ export function ConvertRecipes() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      <Helmet>
+        <title>How to Turn ANY Recipe Into a THC Recipe | Infusion Sensei</title>
+        <meta name="description" content="A 4-step system to convert any regular recipe into a cannabis-infused version with accurate dosing every time." />
+        <meta property="og:title" content="How to Turn ANY Recipe Into a THC Recipe | Infusion Sensei" />
+        <meta property="og:description" content="A 4-step system to convert any regular recipe into a cannabis-infused version with accurate dosing every time." />
+        <link rel="canonical" href="https://infusionsensei.com/learn/articles/convert-recipes" />
+      </Helmet>
       <div className="text-sm text-gray-600">
         <Link to="/learn" className="hover:text-green-600">Learn</Link> / <span className="text-gray-900">Convert Recipes</span>
       </div>
@@ -189,7 +197,16 @@ export function ConvertRecipes() {
               </div>
             </div>
 
-            <div className="space-y-3">
+            {/* Internal CTA */}
+          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
+            <p className="text-lg font-bold mb-1">🧮 Calculate Your Exact THC Per Serving</p>
+            <p className="text-green-100 text-sm mb-4">Use Infusion Sensei's free THC dosage calculator — enter your strain, base type, and recipe to get precise mg per serving instantly.</p>
+            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+              Build My Infusion — Free <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="space-y-3">
               <div className="bg-white p-3 rounded border border-pink-200">
                 <p className="font-semibold text-gray-900 mb-1">🔬 Bioavailability Factors:</p>
                 <ul className="text-sm text-gray-700 space-y-1 ml-4">

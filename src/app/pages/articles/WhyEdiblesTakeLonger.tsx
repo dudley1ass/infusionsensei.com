@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
@@ -13,6 +14,13 @@ export function WhyEdiblesTakeLonger() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
+      <Helmet>
+        <title>Why Edibles Take Longer Than Smoking — The Biology | Infusion Sensei</title>
+        <meta name="description" content="Lungs vs liver, delta-9 THC vs 11-hydroxy-THC. The complete biological explanation of why eating cannabis works differently than inhaling it." />
+        <meta property="og:title" content="Why Edibles Take Longer Than Smoking — The Biology | Infusion Sensei" />
+        <meta property="og:description" content="Lungs vs liver, delta-9 THC vs 11-hydroxy-THC. The complete biological explanation of why eating cannabis works differently than inhaling it." />
+        <link rel="canonical" href="https://infusionsensei.com/learn/articles/why-edibles-take-longer" />
+      </Helmet>
       <div className="text-sm text-gray-600">
         <Link to="/learn" className="hover:text-green-600">Learn</Link> / <span className="text-gray-900">Why Edibles Take Longer Than Smoking</span>
       </div>
@@ -103,6 +111,15 @@ export function WhyEdiblesTakeLonger() {
             <p className="text-lg font-bold mb-1">🕐 The Practical Takeaway</p>
             <p className="text-teal-100 text-sm">Your tolerance to smoked cannabis tells you almost nothing about your edible tolerance. Treat them as separate experiences with separate dose limits. Always start at 5mg and wait the full 2 hours.</p>
           </div>
+          {/* Internal CTA */}
+          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
+            <p className="text-lg font-bold mb-1">🧮 Calculate Your Exact THC Per Serving</p>
+            <p className="text-green-100 text-sm mb-4">Use Infusion Sensei's free THC dosage calculator — enter your strain, base type, and recipe to get precise mg per serving instantly.</p>
+            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+              Build My Infusion — Free <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
 
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-gray-900">Related Articles</h3>

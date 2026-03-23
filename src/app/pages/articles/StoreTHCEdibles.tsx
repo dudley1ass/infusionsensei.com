@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
@@ -13,6 +14,13 @@ export function StoreTHCEdibles() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
+      <Helmet>
+        <title>How to Store THC Edibles Without Losing Potency | Infusion Sensei</title>
+        <meta name="description" content="Light, heat, oxygen, and moisture degrade THC. Complete storage guide for cannabutter, baked edibles, gummies, tinctures, and capsules." />
+        <meta property="og:title" content="How to Store THC Edibles Without Losing Potency | Infusion Sensei" />
+        <meta property="og:description" content="Light, heat, oxygen, and moisture degrade THC. Complete storage guide for cannabutter, baked edibles, gummies, tinctures, and capsules." />
+        <link rel="canonical" href="https://infusionsensei.com/learn/articles/store-thc-edibles" />
+      </Helmet>
       <div className="text-sm text-gray-600">
         <Link to="/learn" className="hover:text-green-600">Learn</Link> / <span className="text-gray-900">How to Store THC Edibles</span>
       </div>
@@ -90,6 +98,15 @@ export function StoreTHCEdibles() {
             <h3 className="font-bold text-amber-900 mb-2">⚠️ Always Label Your Edibles</h3>
             <p className="text-amber-800 text-sm">Every stored cannabis product must be labeled with: product name, date made, strain used, total THC (mg), THC per serving (mg), and a cannabis warning. Unlabeled edibles are a safety hazard — to you, to guests, and especially to children.</p>
           </div>
+          {/* Internal CTA */}
+          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
+            <p className="text-lg font-bold mb-1">🧮 Calculate Your Exact THC Per Serving</p>
+            <p className="text-green-100 text-sm mb-4">Use Infusion Sensei's free THC dosage calculator — enter your strain, base type, and recipe to get precise mg per serving instantly.</p>
+            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+              Build My Infusion — Free <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
 
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-gray-900">Related Articles</h3>

@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Beaker, ArrowRight } from "lucide-react";
@@ -12,6 +13,13 @@ export function BaseComparison() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      <Helmet>
+        <title>THC Butter vs Oil vs Syrup — Which Should You Use? | Infusion Sensei</title>
+        <meta name="description" content="Compare all 5 cannabis infusion bases. Find out which base is best for your recipe, cooking method, and desired effect." />
+        <meta property="og:title" content="THC Butter vs Oil vs Syrup — Which Should You Use? | Infusion Sensei" />
+        <meta property="og:description" content="Compare all 5 cannabis infusion bases. Find out which base is best for your recipe, cooking method, and desired effect." />
+        <link rel="canonical" href="https://infusionsensei.com/learn/articles/base-comparison" />
+      </Helmet>
       <div className="text-sm text-gray-600">
         <Link to="/learn" className="hover:text-green-600">Learn</Link> / <span className="text-gray-900">Base Comparison</span>
       </div>
@@ -206,6 +214,16 @@ export function BaseComparison() {
               <strong>Remember:</strong> You're not just choosing a flavor—you're choosing how the cannabinoids will enter your bloodstream and metabolize in your body. That's why the same 10mg dose can feel completely different depending on the carrier!
             </p>
           </div>
+
+          {/* Internal CTA */}
+          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
+            <p className="text-lg font-bold mb-1">🧮 Calculate Your Exact THC Per Serving</p>
+            <p className="text-green-100 text-sm mb-4">Use Infusion Sensei's free THC dosage calculator — enter your strain, base type, and recipe to get precise mg per serving instantly.</p>
+            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+              Build My Infusion — Free <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
         </CardContent>
       </Card>
 

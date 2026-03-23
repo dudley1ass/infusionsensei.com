@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
@@ -13,6 +14,13 @@ export function EasyRecipes() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
+      <Helmet>
+        <title>5 Easy THC Recipes You Can Make Right Now | Infusion Sensei</title>
+        <meta name="description" content="Simple cannabis-infused recipes using ingredients you already have. No special equipment needed — just the right infusion base." />
+        <meta property="og:title" content="5 Easy THC Recipes You Can Make Right Now | Infusion Sensei" />
+        <meta property="og:description" content="Simple cannabis-infused recipes using ingredients you already have. No special equipment needed — just the right infusion base." />
+        <link rel="canonical" href="https://infusionsensei.com/learn/articles/easy-recipes" />
+      </Helmet>
       <div className="text-sm text-gray-600">
         <Link to="/learn" className="hover:text-green-600">Learn</Link> / <span className="text-gray-900">Easy THC Recipes</span>
       </div>
@@ -300,7 +308,16 @@ export function EasyRecipes() {
               </div>
             </div>
 
-            <div className="space-y-3">
+            {/* Internal CTA */}
+          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
+            <p className="text-lg font-bold mb-1">🧮 Calculate Your Exact THC Per Serving</p>
+            <p className="text-green-100 text-sm mb-4">Use Infusion Sensei's free THC dosage calculator — enter your strain, base type, and recipe to get precise mg per serving instantly.</p>
+            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+              Build My Infusion — Free <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="space-y-3">
               <h4 className="font-semibold text-gray-900">📝 Instructions:</h4>
               <ol className="space-y-2 text-gray-700">
                 <li><strong>1.</strong> Add 1 cup frozen fruit to your blender (berries, mango, banana—whatever you like).</li>

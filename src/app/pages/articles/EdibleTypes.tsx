@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Leaf, ArrowRight } from "lucide-react";
@@ -12,6 +13,13 @@ export function EdibleTypes() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      <Helmet>
+        <title>The 4 Types of THC Edibles and Why They Feel Different | Infusion Sensei</title>
+        <meta name="description" content="Fat-based, water-soluble, sublingual, and capsule edibles all feel different at the same dose. Here is the science behind why." />
+        <meta property="og:title" content="The 4 Types of THC Edibles and Why They Feel Different | Infusion Sensei" />
+        <meta property="og:description" content="Fat-based, water-soluble, sublingual, and capsule edibles all feel different at the same dose. Here is the science behind why." />
+        <link rel="canonical" href="https://infusionsensei.com/learn/articles/edible-types" />
+      </Helmet>
       <div className="text-sm text-gray-600">
         <Link to="/learn" className="hover:text-green-600">Learn</Link> / <span className="text-gray-900">Edible Types</span>
       </div>
@@ -242,7 +250,16 @@ export function EdibleTypes() {
               <h3 className="font-bold text-gray-900 mb-3 text-2xl">4. Direct Tincture (Sublingual) 💧</h3>
               <p className="text-sm text-purple-700 mb-4 font-semibold">Alcohol-based tinctures | Glycerin tinctures | MCT oil droppers | Sublingual strips</p>
               
-              <div className="space-y-3">
+              {/* Internal CTA */}
+          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
+            <p className="text-lg font-bold mb-1">🧮 Calculate Your Exact THC Per Serving</p>
+            <p className="text-green-100 text-sm mb-4">Use Infusion Sensei's free THC dosage calculator — enter your strain, base type, and recipe to get precise mg per serving instantly.</p>
+            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+              Build My Infusion — Free <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="space-y-3">
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <p className="font-bold text-gray-900 mb-2">⚗️ Transmucosal Absorption Mechanism</p>
                   <p className="text-sm text-gray-700 mb-2">

@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
@@ -13,6 +14,13 @@ export function WhatHappensWithoutDecarb() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
+      <Helmet>
+        <title>What Happens If You Skip Decarbing Cannabis | Infusion Sensei</title>
+        <meta name="description" content="Raw cannabis contains THCA not THC. What decarboxylation does, why skipping it means no effect, and the perfect decarb method." />
+        <meta property="og:title" content="What Happens If You Skip Decarbing Cannabis | Infusion Sensei" />
+        <meta property="og:description" content="Raw cannabis contains THCA not THC. What decarboxylation does, why skipping it means no effect, and the perfect decarb method." />
+        <link rel="canonical" href="https://infusionsensei.com/learn/articles/what-happens-without-decarb" />
+      </Helmet>
       <div className="text-sm text-gray-600">
         <Link to="/learn" className="hover:text-green-600">Learn</Link> / <span className="text-gray-900">What Happens Without Decarbing</span>
       </div>
@@ -115,6 +123,15 @@ export function WhatHappensWithoutDecarb() {
             <h3 className="font-bold text-amber-900 mb-2">⚠️ Temperature Matters</h3>
             <p className="text-amber-800 text-sm">Above 300°F, you start destroying THC (turning it into CBN) and evaporating terpenes. Below 220°F, conversion is incomplete and slow. The 230–240°F range is the sweet spot proven by laboratory analysis to maximize THC yield while preserving terpene content.</p>
           </div>
+          {/* Internal CTA */}
+          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
+            <p className="text-lg font-bold mb-1">🧮 Calculate Your Exact THC Per Serving</p>
+            <p className="text-green-100 text-sm mb-4">Use Infusion Sensei's free THC dosage calculator — enter your strain, base type, and recipe to get precise mg per serving instantly.</p>
+            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+              Build My Infusion — Free <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
 
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-gray-900">Related Articles</h3>

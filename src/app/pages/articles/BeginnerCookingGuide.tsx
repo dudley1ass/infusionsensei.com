@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
@@ -13,6 +14,13 @@ export function BeginnerCookingGuide() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
+      <Helmet>
+        <title>How to Cook with THC: The Complete Beginner Guide | Infusion Sensei</title>
+        <meta name="description" content="Master cannabis cooking with a repeatable system. Decarboxylation, infusion, dosing, and recipes — everything a beginner needs." />
+        <meta property="og:title" content="How to Cook with THC: The Complete Beginner Guide | Infusion Sensei" />
+        <meta property="og:description" content="Master cannabis cooking with a repeatable system. Decarboxylation, infusion, dosing, and recipes — everything a beginner needs." />
+        <link rel="canonical" href="https://infusionsensei.com/learn/articles/beginner-guide" />
+      </Helmet>
       {/* Breadcrumb */}
       <div className="text-sm text-gray-600">
         <Link to="/learn" className="hover:text-green-600">Learn</Link> / <span className="text-gray-900">Beginner Cooking Guide</span>
@@ -429,6 +437,16 @@ export function BeginnerCookingGuide() {
               Follow this system and you'll never have inconsistent edibles again. 🌿
             </p>
           </div>
+
+          {/* Internal CTA */}
+          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
+            <p className="text-lg font-bold mb-1">🧮 Calculate Your Exact THC Per Serving</p>
+            <p className="text-green-100 text-sm mb-4">Use Infusion Sensei's free THC dosage calculator — enter your strain, base type, and recipe to get precise mg per serving instantly.</p>
+            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+              Build My Infusion — Free <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
         </CardContent>
       </Card>
 
