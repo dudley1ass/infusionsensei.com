@@ -26,7 +26,7 @@ export const recipes: Recipe[] = [
     cookTime: 180,
     servings: 32,
     thcPerServing: "~15-25mg",
-    image: "/images/cannabutter.jpg",
+    image: "/IMAGES/cannabutter.jpg",
     description: "The foundation of cannabis cooking. Master this recipe and unlock endless edible possibilities.",
     ingredients: [
       "1 cup (2 sticks) unsalted butter",
@@ -137,7 +137,7 @@ export const recipes: Recipe[] = [
     cookTime: 10,
     servings: 50,
     thcPerServing: "~5-10mg",
-    image: "/images/gummies.jpg",
+    image: "/IMAGES/gummies.jpg",
     description: "Discrete, precise, and delicious. Perfect for microdosing and on-the-go consumption.",
     ingredients: [
       "1/2 cup cold water",
@@ -208,7 +208,7 @@ export const recipes: Recipe[] = [
     cookTime: 240,
     servings: 48,
     thcPerServing: "~10-15mg",
-    image: "/images/cannabis-oil.jpg",
+    image: "/IMAGES/cannabis-oil.jpg",
     description: "Versatile cooking base for all your cannabis culinary creations. Great for vegan recipes.",
     ingredients: [
       "1 cup coconut oil",
@@ -272,7 +272,7 @@ export const recipes: Recipe[] = [
     cookTime: 180,
     servings: 32,
     thcPerServing: "~8-12mg",
-    image: "/images/cannabis-honey.jpg",
+    image: "/IMAGES/cannabis-honey.jpg",
     description: "Sweet, versatile infusion perfect for tea, toast, or drizzling over desserts.",
     ingredients: [
       "2 cups honey",
@@ -347,7 +347,7 @@ export const recipes: Recipe[] = [
     cookTime: 0,
     servings: 6,
     thcPerServing: "~8–15mg",
-    image: "/images/mint-ice-cream.jpg",
+    image: "/IMAGES/mint-ice-cream.jpg",
     description: "THC binds to fat — infused heavy cream is the ideal base for ice cream. Rich, smooth, and accurately dosed with a refreshing mint kick.",
     isNew: true,
     ingredients: [
@@ -425,7 +425,7 @@ export const recipes: Recipe[] = [
     cookTime: 0,
     servings: 1,
     thcPerServing: "~5–10mg",
-    image: "/images/protein-smoothie.jpg",
+    image: "/IMAGES/protein-smoothie.jpg",
     description: "Fast, clean, and precise. MCT oil or tincture blends seamlessly into a smoothie with no separation — and MCT oil means faster onset than most edibles.",
     isNew: true,
     ingredients: [
@@ -461,7 +461,7 @@ export const recipes: Recipe[] = [
     cookTime: 20,
     servings: 4,
     thcPerServing: "~12–20mg",
-    image: "/images/mac-and-cheese.jpg",
+    image: "/IMAGES/mac-and-cheese.jpg",
     description: "The ultimate comfort edible. Cheese and butter create a high-fat environment for excellent THC bioavailability — portion before serving for accurate dosing.",
     isNew: true,
     ingredients: [
