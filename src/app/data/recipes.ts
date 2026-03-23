@@ -26,7 +26,7 @@ export const recipes: Recipe[] = [
     cookTime: 180,
     servings: 32,
     thcPerServing: "~15-25mg",
-    image: "https://images.unsplash.com/photo-1617735605078-8a9336be0816?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb29raW5nJTIwa2l0Y2hlbiUyMGluZ3JlZGllbnRzfGVufDF8fHx8MTc3Mzc0OTIwOHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    image: "/images/cannabutter.jpg",
     description: "The foundation of cannabis cooking. Master this recipe and unlock endless edible possibilities.",
     ingredients: [
       "1 cup (2 sticks) unsalted butter",
@@ -137,7 +137,7 @@ export const recipes: Recipe[] = [
     cookTime: 10,
     servings: 50,
     thcPerServing: "~5-10mg",
-    image: "https://images.unsplash.com/photo-1602863811548-71b620fa96d2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYW5uYWJpcyUyMGd1bW1pZXMlMjBjYW5keXxlbnwxfHx8fDE3NzM3NjM1MTJ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    image: "/images/gummies.jpg",
     description: "Discrete, precise, and delicious. Perfect for microdosing and on-the-go consumption.",
     ingredients: [
       "1/2 cup cold water",
@@ -208,7 +208,7 @@ export const recipes: Recipe[] = [
     cookTime: 240,
     servings: 48,
     thcPerServing: "~10-15mg",
-    image: "https://images.unsplash.com/photo-1600753230816-94fc22e82859?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYW5uYWJpcyUyMG9pbCUyMGJvdHRsZXxlbnwxfHx8fDE3NzM3NjM1MTV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    image: "/images/cannabis-oil.jpg",
     description: "Versatile cooking base for all your cannabis culinary creations. Great for vegan recipes.",
     ingredients: [
       "1 cup coconut oil",
@@ -272,7 +272,7 @@ export const recipes: Recipe[] = [
     cookTime: 180,
     servings: 32,
     thcPerServing: "~8-12mg",
-    image: "https://images.unsplash.com/photo-1664339030103-42227126b6ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaG9jb2xhdGUlMjBicm93bmllcyUyMGRlc3NlcnR8ZW58MXx8fHwxNzczNjgwMjc5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    image: "/images/cannabis-honey.jpg",
     description: "Sweet, versatile infusion perfect for tea, toast, or drizzling over desserts.",
     ingredients: [
       "2 cups honey",
@@ -347,7 +347,7 @@ export const recipes: Recipe[] = [
     cookTime: 0,
     servings: 6,
     thcPerServing: "~8–15mg",
-    image: "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "/images/mint-ice-cream.jpg",
     description: "THC binds to fat — infused heavy cream is the ideal base for ice cream. Rich, smooth, and accurately dosed with a refreshing mint kick.",
     isNew: true,
     ingredients: [
@@ -425,7 +425,7 @@ export const recipes: Recipe[] = [
     cookTime: 0,
     servings: 1,
     thcPerServing: "~5–10mg",
-    image: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "/images/protein-smoothie.jpg",
     description: "Fast, clean, and precise. MCT oil or tincture blends seamlessly into a smoothie with no separation — and MCT oil means faster onset than most edibles.",
     isNew: true,
     ingredients: [
@@ -461,7 +461,7 @@ export const recipes: Recipe[] = [
     cookTime: 20,
     servings: 4,
     thcPerServing: "~12–20mg",
-    image: "https://images.unsplash.com/photo-1612152328957-7e99f3eaaed6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "/images/mac-and-cheese.jpg",
     description: "The ultimate comfort edible. Cheese and butter create a high-fat environment for excellent THC bioavailability — portion before serving for accurate dosing.",
     isNew: true,
     ingredients: [
