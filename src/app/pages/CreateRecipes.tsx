@@ -830,11 +830,9 @@ export function CreateRecipes() {
     for (const ing of ingredients) {
       const lib = INGREDIENT_LIBRARY.find(i => i.name === ing.name);
       const rawCat = lib?.category || 'other';
-      // Map Infusion Sensei categories → cookie engine categories
-      // chocolate/cocoa counts as flour (dry structural ingredient)
       const cat =
         rawCat === 'flour'     ? 'flour'    :
-        rawCat === 'chocolate' ? 'flour'    : // cocoa powder, chocolate bars = dry structure
+        rawCat === 'chocolate' ? 'flour'    :
         rawCat === 'sugar'     ? 'sugar'    :
         rawCat === 'fat'       ? 'fat'      :
         rawCat === 'egg'       ? 'egg'      :
@@ -844,15 +842,26 @@ export function CreateRecipes() {
         rawCat === 'infused'   ? 'fat'      :
         'other';
 
-      // Convert ingredient amount to grams
-      let grams = ing.amount;
-      if (ing.unit === 'cups')  grams = ing.amount * 240;
-      else if (ing.unit === 'tbsp') grams = ing.amount * 15;
-      else if (ing.unit === 'tsp')  grams = ing.amount * 5;
-      else if (ing.unit === 'oz')   grams = ing.amount * 28.35;
-      else if (ing.unit === 'lb')   grams = ing.amount * 453.592;
-      else if (ing.unit === 'fl oz') grams = ing.amount * 29.57;
-      else if (ing.unit === 'ml')   grams = ing.amount;
+      // Convert ALL units to grams for ratio math
+      const u = ing.unit;
+      let grams =
+        u === 'g'      ? ing.amount :
+        u === 'kg'     ? ing.amount * 1000 :
+        u === 'ml'     ? ing.amount :
+        u === 'L'      ? ing.amount * 1000 :
+        u === 'cups'   ? ing.amount * 240 :
+        u === 'tbsp'   ? ing.amount * 14.787 :
+        u === 'tsp'    ? ing.amount * 4.929 :
+        u === 'oz'     ? ing.amount * 28.3495 :
+        u === 'lb'     ? ing.amount * 453.592 :
+        u === 'fl oz'  ? ing.amount * 29.574 :
+        u === 'large'  ? ing.amount * 57 :
+        u === 'medium' ? ing.amount * 44 :
+        u === 'small'  ? ing.amount * 38 :
+        u === 'whole'  ? ing.amount * 100 :
+        u === 'cloves' ? ing.amount * 3 :
+        u === 'pinch'  ? ing.amount * 0.36 :
+        ing.amount; // fallback
 
       totals[cat] = (totals[cat] ?? 0) + grams;
     }
