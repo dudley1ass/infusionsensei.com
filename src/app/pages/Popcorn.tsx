@@ -230,18 +230,19 @@ export function Popcorn() {
       </Helmet>
 
       {/* Hero */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-yellow-500 via-amber-500 to-orange-500 shadow-2xl text-center">
-        <img src="/IMAGES/popcorn.webp" alt="Infused popcorn" className="absolute inset-0 w-full h-full object-cover opacity-25" />
-        <div className="relative z-10 px-6 py-12">
+      <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{minHeight: "280px"}}>
+        <img src="/IMAGES/popcorn.webp" alt="Infused popcorn" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+        <div className="relative z-10 px-6 py-14 text-center">
           <div className="text-6xl mb-3">🍿</div>
           <h1 className="text-4xl md:text-5xl font-black text-white mb-3">Infused Popcorn</h1>
-          <p className="text-yellow-100 text-lg max-w-2xl mx-auto mb-6">
+          <p className="text-white/80 text-lg max-w-2xl mx-auto mb-6">
             20 cannabis popcorn recipes — savory, spicy, sweet, and chocolatey. Every recipe built with cannabutter or cannabis oil so you know the exact THC per bowl.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">🍿 20 Flavors</Badge>
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">🧈 Butter • Oil • Caramel</Badge>
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">⚖️ Exact THC Per Serving</Badge>
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1 backdrop-blur-sm">🍿 20 Flavors</Badge>
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1 backdrop-blur-sm">🧈 Butter • Oil • Caramel</Badge>
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1 backdrop-blur-sm">⚖️ Exact THC Per Serving</Badge>
           </div>
         </div>
       </div>
@@ -310,20 +311,13 @@ export function Popcorn() {
                         <p className="text-xs text-gray-500 italic bg-yellow-50 rounded-lg px-3 py-2">💡 {RECIPES[flavor.id].note}</p>
                       </div>
                     )}
-                    <div className="grid grid-cols-2 gap-2" onClick={e => e.stopPropagation()}>
-                      <Link
-                        to={`/ingredients?category=baked-goods&recipe=brownies`}
-                        className="flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
-                      >
-                        <ChefHat className="w-3.5 h-3.5" /> Move to Builder
-                      </Link>
-                      <Link
-                        to="/infusions"
-                        className="flex items-center justify-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
-                      >
-                        🧮 Exact THC
-                      </Link>
-                    </div>
+                    <Link
+                      to={`/ingredients?category=baked-goods&recipe=brownies`}
+                      className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <ChefHat className="w-4 h-4" /> Move to Recipe Builder
+                    </Link>
                   </div>
                 )}
               </button>

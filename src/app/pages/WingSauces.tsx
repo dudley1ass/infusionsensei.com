@@ -108,18 +108,18 @@ export function WingSauces() {
       </Helmet>
 
       {/* Hero */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-orange-600 via-red-600 to-orange-800 shadow-2xl text-center">
-        <img src="/IMAGES/chickenwings.jpg" alt="Infused chicken wings" className="absolute inset-0 w-full h-full object-cover opacity-30" />
-        <div className="relative z-10 px-6 py-12">
-          <div className="text-6xl mb-3">🍗</div>
+      <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{minHeight: "280px"}}>
+        <img src="/IMAGES/chickenwings.jpg" alt="Infused chicken wings" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+        <div className="relative z-10 px-6 py-14 text-center">
           <h1 className="text-4xl md:text-5xl font-black text-white mb-3">Infused Wing Sauces</h1>
-          <p className="text-orange-100 text-lg max-w-2xl mx-auto mb-6">
+          <p className="text-white/80 text-lg max-w-2xl mx-auto mb-6">
             20 cannabis wing sauce recipes — every sauce built with cannabutter or cannabis oil so you know the exact THC per wing.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">🔥 20 Sauces</Badge>
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">🧈 Butter • Oil • Reduction</Badge>
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">⚖️ Exact THC Per Wing</Badge>
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1 backdrop-blur-sm">🔥 20 Sauces</Badge>
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1 backdrop-blur-sm">🧈 Butter • Oil • Reduction</Badge>
+            <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1 backdrop-blur-sm">⚖️ Exact THC Per Wing</Badge>
           </div>
         </div>
       </div>
@@ -187,20 +187,13 @@ export function WingSauces() {
                       <p className="text-sm text-gray-700">{sauce.build}</p>
                     </div>
                     <SauceRecipe sauce={sauce} />
-                    <div className="grid grid-cols-2 gap-2" onClick={e => e.stopPropagation()}>
-                      <Link
-                        to={`/ingredients?category=savory-meals&recipe=${sauce.id === 'classic-buffalo' ? 'classic-buffalo-wings' : sauce.id === 'garlic-parmesan' ? 'garlic-parmesan-wings' : 'classic-buffalo-wings'}`}
-                        className="flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
-                      >
-                        <ChefHat className="w-3.5 h-3.5" /> Move to Builder
-                      </Link>
-                      <Link
-                        to="/infusions"
-                        className="flex items-center justify-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
-                      >
-                        🧮 Exact THC
-                      </Link>
-                    </div>
+                    <Link
+                      to={`/ingredients?category=savory-meals&recipe=${sauce.id === 'classic-buffalo' ? 'classic-buffalo-wings' : sauce.id === 'garlic-parmesan' ? 'garlic-parmesan-wings' : 'classic-buffalo-wings'}`}
+                      className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <ChefHat className="w-4 h-4" /> Move to Recipe Builder
+                    </Link>
                   </div>
                 )}
               </button>
