@@ -29,6 +29,7 @@ import { WhatHappensWithoutDecarb } from "./pages/articles/WhatHappensWithoutDec
 import { WingSauces } from "./pages/WingSauces";
 import { Popcorn } from "./pages/Popcorn";
 
+export const router = createBrowserRouter([
   {
     path: "/",
     Component: Layout,
