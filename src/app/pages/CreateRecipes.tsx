@@ -970,12 +970,22 @@ export function CreateRecipes() {
     }
 
     if (cat === 'egg') {
-      const eggToFlour = egg / Math.max(flour, 1);
-      if (eggToFlour > 0.6) {
-        warning = 'Too many eggs for this flour — result will be puffy and cakey. Reduce eggs or add more flour.';
+      // Use real flour only (exclude cocoa) for egg ratio — brownies are intentionally egg-heavy
+      const realFlour = ingredients.reduce((sum, i) => {
+        const l = INGREDIENT_LIBRARY.find(lib => lib.name === i.name);
+        if (l?.category === 'flour' && !i.name.toLowerCase().includes('cocoa') && !i.name.toLowerCase().includes('chocolate')) {
+          const u = i.unit;
+          const g = u === 'g' ? i.amount : u === 'cups' ? i.amount * 240 : u === 'tbsp' ? i.amount * 14.787 : u === 'tsp' ? i.amount * 4.929 : u === 'oz' ? i.amount * 28.35 : i.amount;
+          return sum + g;
+        }
+        return sum;
+      }, 0);
+      const eggToFlour = egg / Math.max(realFlour || flour, 1);
+      if (eggToFlour > 1.8) {
+        warning = 'Too many eggs for this flour — result will be very puffy and cakey. Reduce eggs or add more flour.';
         color = 'red';
-      } else if (eggToFlour > 0.45) {
-        warning = 'High egg ratio — will lean soft and cakey. Great for moist bakes, but may not suit all recipes.';
+      } else if (eggToFlour > 1.4) {
+        warning = 'High egg ratio — will lean soft and fudgy. Great for brownies, but may not suit all recipes.';
         color = 'yellow';
       }
     }
@@ -1074,9 +1084,21 @@ export function CreateRecipes() {
       };
     }
 
+    // For egg ratio, only count real structural flour (not cocoa/chocolate)
+    // Brownies are intentionally egg-heavy — cocoa inflates "flour" total unfairly
+    const realFlourOnly = ingredients.reduce((sum, ing) => {
+      const l = INGREDIENT_LIBRARY.find(lib => lib.name === ing.name);
+      if (l?.category === 'flour' && !ing.name.toLowerCase().includes('cocoa') && !ing.name.toLowerCase().includes('chocolate')) {
+        const u = ing.unit;
+        const g = u === 'g' ? ing.amount : u === 'cups' ? ing.amount * 240 : u === 'tbsp' ? ing.amount * 14.787 : u === 'tsp' ? ing.amount * 4.929 : u === 'oz' ? ing.amount * 28.35 : ing.amount;
+        return sum + g;
+      }
+      return sum;
+    }, 0);
+    const eggRatio = egg / Math.max(realFlourOnly || flour, 1);
+
     const fatRatio      = fat      / flour;
     const sugarRatio    = sugar    / flour;
-    const eggRatio      = egg      / flour;
     const moistureRatio = totalMoisture / flour;
     const leavenerRatio = leavener / flour;
 
@@ -1101,8 +1123,8 @@ export function CreateRecipes() {
     else if (fatRatio > 0.65)   { issues.push('fat is elevated — expect significant spread, chill dough before baking'); tags.push({ label: 'High fat', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
     else if (fatRatio < 0.25 && flour > 100) { issues.push('low fat for this flour — dough may be dry and stiff'); tags.push({ label: 'Low fat', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    if (eggRatio > 0.6)         { issues.push('too many eggs for this flour — result will be puffy and cakey'); tags.push({ label: 'Too many eggs', color: 'red' }); severity = 'problem'; }
-    else if (eggRatio > 0.55)   { issues.push('high egg ratio — will lean very soft and cakey'); tags.push({ label: 'High eggs', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
+    if (eggRatio > 1.8)         { issues.push('too many eggs for this flour — result will be very puffy and cakey'); tags.push({ label: 'Too many eggs', color: 'red' }); severity = 'problem'; }
+    else if (eggRatio > 1.4)   { issues.push('high egg ratio — will lean soft and cakey. Great for fudgy bakes'); tags.push({ label: 'High eggs', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
     if (moistureRatio > 0.9 && !isHighLiquidRecipe) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
@@ -1111,11 +1133,11 @@ export function CreateRecipes() {
 
     // Positive descriptions when balanced
     if (severity === 'good') {
-      const chewy      = fatRatio >= 0.35 && fatRatio <= 0.55 && sugarRatio >= 0.4 && sugarRatio <= 0.7 && eggRatio >= 0.15 && eggRatio <= 0.35;
-      const crispy     = fatRatio >= 0.3  && sugarRatio >= 0.6 && eggRatio < 0.25 && moistureRatio < 0.3;
-      const cakey      = eggRatio > 0.3   && moistureRatio > 0.3 && fatRatio < 0.4;
+      const chewy      = fatRatio >= 0.35 && fatRatio <= 0.55 && sugarRatio >= 0.4 && sugarRatio <= 0.7 && eggRatio >= 0.15 && eggRatio <= 1.0;
+      const crispy     = fatRatio >= 0.3  && sugarRatio >= 0.6 && eggRatio < 0.5  && moistureRatio < 0.3;
+      const cakey      = eggRatio > 0.8   && moistureRatio > 0.3 && fatRatio < 0.4;
       const buttery    = fatRatio > 0.55  && sugarRatio < 0.5;
-      const fudgy      = eggRatio >= 0.4  && sugarRatio >= 0.8 && fatRatio >= 0.4 && fatRatio <= 0.8;
+      const fudgy      = eggRatio >= 0.8  && sugarRatio >= 0.8 && fatRatio >= 0.4 && fatRatio <= 0.8;
       const moistBake  = moistureRatio >= 0.3 && fatRatio >= 0.3 && fatRatio <= 0.6;
 
       if (fudgy)     return { headline: '✅ Balanced — Fudgy Brownie Profile', description: 'High eggs, sugar, and fat relative to flour is exactly right for dense, fudgy brownies. This ratio creates that characteristic crinkle top and chewy center.', tags: [...tags, { label: 'Fudgy', color: 'green' }, { label: 'Dense & rich', color: 'green' }], severity: 'good' };
