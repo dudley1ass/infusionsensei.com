@@ -259,6 +259,7 @@ const INGREDIENT_LIBRARY = [
   { name: "Garlic",                 category: "savory",     defaultAmount: 3,   defaultUnit: "cloves",calories: 13,  carbs: 3.0,  protein: 1.0,  fat: 0.0,  type: "count" },
   { name: "Garlic Powder",          category: "savory",     defaultAmount: 3,   defaultUnit: "g",     calories: 331, carbs: 73.0, protein: 15.0, fat: 0.7,  type: "powder" },
   { name: "Onion Powder",           category: "savory",     defaultAmount: 3,   defaultUnit: "g",     calories: 341, carbs: 79.1, protein: 10.4, fat: 0.9,  type: "powder" },
+  { name: "Chicken Wings",          category: "savory",     defaultAmount: 900, defaultUnit: "g",     calories: 203, carbs: 0.0,  protein: 30.0, fat: 9.0,  type: "solid" },
   { name: "Hot Sauce",              category: "savory",     defaultAmount: 60,  defaultUnit: "ml",    calories: 11,  carbs: 1.0,  protein: 0.5,  fat: 0.5,  type: "liquid" },
   { name: "Italian Seasoning",      category: "savory",     defaultAmount: 5,   defaultUnit: "g",     calories: 265, carbs: 46.0, protein: 8.0,  fat: 7.0,  type: "powder" },
   { name: "Pasta (dry)",            category: "savory",     defaultAmount: 454, defaultUnit: "g",     calories: 371, carbs: 74.0, protein: 13.0, fat: 2.0,  type: "solid" },
