@@ -683,6 +683,19 @@ export function CreateRecipes() {
 
   // Convert any ingredient amount to grams for nutrition math
   const toGrams = (amount: number, unit: string, ingName: string): number => {
+    // Ingredient-specific grams per cup (powder/solid densities vary widely)
+    const gramsPerCup: Record<string, number> = {
+      "All-Purpose Flour": 125, "Cake Flour": 114, "Bread Flour": 127,
+      "Whole Wheat Flour": 120, "Almond Flour": 96, "Oat Flour": 92,
+      "Rice Flour": 158, "Coconut Flour": 112, "Buckwheat Flour": 120,
+      "Cornstarch": 128, "Tapioca Starch": 152,
+      "Cocoa Powder (Natural)": 100, "Dutch Cocoa Powder": 100,
+      "Granulated Sugar": 200, "Brown Sugar (Light)": 220, "Brown Sugar (Dark)": 220,
+      "Powdered Sugar": 120, "Coconut Sugar": 180, "Raw Turbinado Sugar": 200,
+      "Rolled Oats": 90, "Protein Powder": 120,
+      "Unsalted Butter": 227, "Salted Butter": 227, "Cannabutter": 227,
+      "Shortening": 190, "Peanut Butter": 258, "Almond Butter": 250,
+    };
     switch (unit) {
       case "g":       return amount;
       case "kg":      return amount * 1000;
@@ -690,9 +703,9 @@ export function CreateRecipes() {
       case "L":       return amount * 1000;
       case "oz":      return amount * 28.3495;
       case "lb":      return amount * 453.592;
-      case "cups":    return amount * 240;
-      case "tbsp":    return amount * 14.787;
-      case "tsp":     return amount * 4.929;
+      case "cups":    return amount * (gramsPerCup[ingName] ?? 240);
+      case "tbsp":    return amount * (gramsPerCup[ingName] ? gramsPerCup[ingName] / 16 : 14.787);
+      case "tsp":     return amount * (gramsPerCup[ingName] ? gramsPerCup[ingName] / 48 : 4.929);
       case "fl oz":   return amount * 29.574;
       case "pint":    return amount * 473.176;
       case "quart":   return amount * 946.353;
@@ -864,47 +877,8 @@ export function CreateRecipes() {
         rawCat === 'infused'   ? 'fat'      :
         'other';
 
-      // Convert ALL units to grams for ratio math
-      // For cups, use ingredient-specific density — powder/flour ≠ liquid
-      const u = ing.unit;
-      const gramsPerCupLookup: Record<string, number> = {
-        "All-Purpose Flour": 125, "Cake Flour": 114, "Bread Flour": 127,
-        "Whole Wheat Flour": 120, "Almond Flour": 96, "Oat Flour": 92,
-        "Rice Flour": 158, "Coconut Flour": 112, "Buckwheat Flour": 120,
-        "Cornstarch": 128, "Tapioca Starch": 152,
-        "Cocoa Powder (Natural)": 100, "Dutch Cocoa Powder": 100,
-        "Granulated Sugar": 200, "Brown Sugar (Light)": 220, "Brown Sugar (Dark)": 220,
-        "Powdered Sugar": 120, "Coconut Sugar": 180, "Raw Turbinado Sugar": 200,
-        "Rolled Oats": 90, "Protein Powder": 120,
-        "Unsalted Butter": 227, "Salted Butter": 227, "Cannabutter": 227,
-        "Shortening": 190, "Peanut Butter": 258, "Almond Butter": 250,
-      };
-      const cupsToGrams = (amount: number, name: string): number => {
-        if (gramsPerCupLookup[name]) return amount * gramsPerCupLookup[name];
-        // Fat/solid default, liquid default
-        if (lib?.type === 'liquid') return amount * 240;
-        if (lib?.type === 'powder') return amount * 120;
-        if (lib?.type === 'fat') return amount * 227;
-        return amount * 240; // fallback
-      };
-      let grams =
-        u === 'g'      ? ing.amount :
-        u === 'kg'     ? ing.amount * 1000 :
-        u === 'ml'     ? ing.amount :
-        u === 'L'      ? ing.amount * 1000 :
-        u === 'cups'   ? cupsToGrams(ing.amount, ing.name) :
-        u === 'tbsp'   ? ing.amount * 14.787 :
-        u === 'tsp'    ? ing.amount * 4.929 :
-        u === 'oz'     ? ing.amount * 28.3495 :
-        u === 'lb'     ? ing.amount * 453.592 :
-        u === 'fl oz'  ? ing.amount * 29.574 :
-        u === 'large'  ? ing.amount * 57 :
-        u === 'medium' ? ing.amount * 44 :
-        u === 'small'  ? ing.amount * 38 :
-        u === 'whole'  ? ing.amount * 100 :
-        u === 'cloves' ? ing.amount * 3 :
-        u === 'pinch'  ? ing.amount * 0.36 :
-        ing.amount; // fallback
+      // Convert ALL units to grams using shared toGrams helper
+      const grams = toGrams(ing.amount, ing.unit, ing.name);
 
       totals[cat] = (totals[cat] ?? 0) + grams;
     }
@@ -996,7 +970,7 @@ export function CreateRecipes() {
         const l = INGREDIENT_LIBRARY.find(lib => lib.name === i.name);
         if (l?.category === 'flour' && !i.name.toLowerCase().includes('cocoa') && !i.name.toLowerCase().includes('chocolate')) {
           const u = i.unit;
-          const g = u === 'g' ? i.amount : u === 'cups' ? i.amount * 240 : u === 'tbsp' ? i.amount * 14.787 : u === 'tsp' ? i.amount * 4.929 : u === 'oz' ? i.amount * 28.35 : i.amount;
+          const g = toGrams(i.amount, u, i.name);
           return sum + g;
         }
         return sum;
@@ -1113,7 +1087,7 @@ export function CreateRecipes() {
       const l = INGREDIENT_LIBRARY.find(lib => lib.name === ing.name);
       if (l?.category === 'flour' && !ing.name.toLowerCase().includes('cocoa') && !ing.name.toLowerCase().includes('chocolate')) {
         const u = ing.unit;
-        const g = u === 'g' ? ing.amount : u === 'cups' ? ing.amount * 240 : u === 'tbsp' ? ing.amount * 14.787 : u === 'tsp' ? ing.amount * 4.929 : u === 'oz' ? ing.amount * 28.35 : ing.amount;
+        const g = toGrams(ing.amount, u, ing.name);
         return sum + g;
       }
       return sum;
@@ -1773,12 +1747,7 @@ export function CreateRecipes() {
     ingredients.forEach(ing => {
       const lib = INGREDIENT_LIBRARY.find(i => i.name === ing.name);
       const cat = lib?.category || "other";
-      let g = ing.amount;
-      if (ing.unit === "cups") g *= 240;
-      else if (ing.unit === "tbsp") g *= 15;
-      else if (ing.unit === "tsp") g *= 5;
-      else if (ing.unit === "oz") g *= 28.35;
-      else if (ing.unit === "lb") g *= 453.592;
+      const g = toGrams(ing.amount, ing.unit, ing.name);
       categorySummary[cat] = (categorySummary[cat] || 0) + g;
     });
     const catEmojis: Record<string, string> = {
