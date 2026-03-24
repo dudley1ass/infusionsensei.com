@@ -37,8 +37,8 @@ export function Home() {
             {[
               { emoji: "🍗", label: "Infused Wings", sub: "20 sauces", to: "/wings", img: "/IMAGES/chickenwings.jpg", coming: false },
               { emoji: "🍿", label: "Infused Popcorn", sub: "20 flavors", to: "/popcorn", img: "/IMAGES/popcorn.webp", coming: false },
-              { emoji: "☕", label: "Infused Coffee", sub: "Build your dose", to: "/ingredients?category=drinks&recipe=coffee", img: null, coming: false },
-              { emoji: "🍟", label: "Infused Fries", sub: "Coming soon", to: "/recipes", img: null, coming: true },
+              { emoji: "☕", label: "Infused Coffee", sub: "20 drinks", to: "/coffee", img: null, coming: false },
+              { emoji: "🍟", label: "Infused Fries", sub: "20 flavors", to: "/fries", img: null, coming: false },
             ].map(({ emoji, label, sub, to, img, coming }) => (
               <Link key={label} to={to}>
                 <div className={`relative overflow-hidden rounded-2xl h-32 md:h-40 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-white/50 group ${coming ? "opacity-60" : ""}`}>
@@ -89,6 +89,8 @@ export function Home() {
               { label: "Garlic Butter Popcorn", to: "/popcorn", emoji: "🧄" },
               { label: "Nashville Hot Wings", to: "/wings", emoji: "🔥" },
               { label: "Caramel Popcorn", to: "/popcorn", emoji: "🍬" },
+              { label: "Bulletproof Coffee", to: "/coffee", emoji: "☕" },
+              { label: "Truffle Fries", to: "/fries", emoji: "🍄" },
               { label: "Korean Gochujang Wings", to: "/wings", emoji: "🇰🇷" },
               { label: "Chocolate Drizzle Popcorn", to: "/popcorn", emoji: "🍫" },
               { label: "Truffle Butter Wings", to: "/wings", emoji: "🍄" },

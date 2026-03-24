@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router";
+import { useSearchParams, useNavigate } from "react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -260,6 +260,7 @@ const INGREDIENT_LIBRARY = [
   { name: "Garlic Powder",          category: "savory",     defaultAmount: 3,   defaultUnit: "g",     calories: 331, carbs: 73.0, protein: 15.0, fat: 0.7,  type: "powder" },
   { name: "Onion Powder",           category: "savory",     defaultAmount: 3,   defaultUnit: "g",     calories: 341, carbs: 79.1, protein: 10.4, fat: 0.9,  type: "powder" },
   { name: "Chicken Wings",          category: "savory",     defaultAmount: 900, defaultUnit: "g",     calories: 203, carbs: 0.0,  protein: 30.0, fat: 9.0,  type: "solid" },
+  { name: "French Fries",          category: "savory",     defaultAmount: 400, defaultUnit: "g",     calories: 312, carbs: 41.0, protein: 3.4,  fat: 15.0, type: "solid" },
   { name: "Popcorn Kernels",        category: "savory",     defaultAmount: 100, defaultUnit: "g",     calories: 375, carbs: 74.0, protein: 11.0, fat: 4.5,  type: "solid" },
   { name: "Hot Sauce",              category: "savory",     defaultAmount: 60,  defaultUnit: "ml",    calories: 11,  carbs: 1.0,  protein: 0.5,  fat: 0.5,  type: "liquid" },
   { name: "Italian Seasoning",      category: "savory",     defaultAmount: 5,   defaultUnit: "g",     calories: 265, carbs: 46.0, protein: 8.0,  fat: 7.0,  type: "powder" },
@@ -366,7 +367,22 @@ const standardRecipes: Record<string, any[]> = {
       ],
     },
   ],
-  "savory-meals": [
+  "savory-meals": [    {
+      id: "garlic-butter-fries",
+      name: "Garlic Butter Fries",
+      servings: 2,
+      ingredients: ["French Fries", "Cannabutter", "Garlic Powder", "Salt", "Black Pepper"],
+      amounts: [400, 28, 3, 3, 1],
+      units: ["g", "g", "g", "g", "g"],
+      instructions: [
+        "Cook fries your way — oven, air fryer, or deep fry until crispy.",
+        "Melt cannabutter in a small saucepan over low heat.",
+        "Stir garlic powder into the melted butter.",
+        "Transfer hot fries to a large bowl.",
+        "Drizzle garlic cannabutter over fries while tossing.",
+        "Season with salt and pepper. Serve immediately.",
+      ],
+    },
     {
       id: "classic-buffalo-wings",
       name: "Classic Buffalo Wings",
@@ -678,6 +694,7 @@ export function CreateRecipes() {
 
   // Auto-load recipe from URL params: /ingredients?category=savory-meals&recipe=classic-buffalo-wings
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   useEffect(() => {
     const cat = searchParams.get("category");
     const rec = searchParams.get("recipe");
@@ -2146,10 +2163,30 @@ export function CreateRecipes() {
           {/* ── TOP BAR ──────────────────────────────────────── */}
           <div className="flex items-center justify-between bg-white px-4 py-3 rounded-2xl shadow-sm border border-gray-200 no-print mb-6">
             <Button
-              onClick={() => { setRecipeType(""); setSelectedStandardRecipe(""); setIngredients([]); }}
+              onClick={() => {
+                // If came from URL params, go back to the source page
+                const cat = searchParams.get("category");
+                const rec = searchParams.get("recipe");
+                if (cat === "savory-meals" && rec?.includes("wings")) {
+                  navigate("/wings");
+                } else if (cat === "popcorn") {
+                  navigate("/popcorn");
+                } else if (cat === "savory-meals" && rec?.includes("fries")) {
+                  navigate("/fries");
+                } else if (cat === "drinks") {
+                  navigate("/coffee");
+                } else {
+                  setRecipeType(""); setSelectedStandardRecipe(""); setIngredients([]);
+                }
+              }}
               variant="ghost" className="text-gray-600 hover:text-gray-900 -ml-2"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" /> Back
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {searchParams.get("category") === "savory-meals" && searchParams.get("recipe")?.includes("wings") ? "← Back to Wings" :
+               searchParams.get("category") === "popcorn" ? "← Back to Popcorn" :
+               searchParams.get("category") === "drinks" ? "← Back to Coffee" :
+               searchParams.get("category") === "savory-meals" && searchParams.get("recipe")?.includes("fries") ? "← Back to Fries" :
+               "Back"}
             </Button>
             <div className="flex items-center gap-2">
               <Badge className="bg-green-600 text-white px-3 py-1">{category?.emoji} {category?.name}</Badge>

@@ -28,6 +28,10 @@ import { WhatHappensWithoutDecarb } from "./pages/articles/WhatHappensWithoutDec
 
 import { WingSauces } from "./pages/WingSauces";
 import { Popcorn } from "./pages/Popcorn";
+import { Coffee } from "./pages/Coffee";
+import { Fries } from "./pages/Fries";
+import { Coffee } from "./pages/Coffee";
+import { Fries } from "./pages/Fries";
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +46,10 @@ export const router = createBrowserRouter([
       { path: "mixer", Component: Mixer },
       { path: "wings", Component: WingSauces },
       { path: "popcorn", Component: Popcorn },
+      { path: "coffee", Component: Coffee },
+      { path: "fries", Component: Fries },
+      { path: "coffee", Component: Coffee },
+      { path: "fries", Component: Fries },
       { path: "learn", Component: Learn },
       // Original articles
       { path: "learn/articles/beginner-guide", Component: BeginnerCookingGuide },
