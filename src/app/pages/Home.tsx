@@ -79,56 +79,6 @@ export function Home() {
         </div>
       </section>
 
-      {/* WINGS — photo full bleed, text overlay */}
-      <section>
-        <Link to="/wings">
-          <div className="relative rounded-3xl overflow-hidden h-64 md:h-80 cursor-pointer group shadow-xl hover:shadow-2xl transition-all">
-            <img src="/IMAGES/chickenwings.jpg" alt="Infused chicken wings" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-            <div className="absolute inset-0 flex items-center px-8 md:px-12">
-              <div className="max-w-lg">
-                <Badge className="bg-white/20 text-white border-white/30 mb-3 text-xs backdrop-blur-sm">🔥 20 Sauces</Badge>
-                <h2 className="text-3xl md:text-4xl font-black text-white mb-2">Infused Wing Sauces</h2>
-                <p className="text-white/80 mb-4 text-sm md:text-base">Buffalo to Korean Gochujang — every sauce built with cannabutter or cannabis oil. Exact THC per wing.</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {["🌶️ Spicy", "🍯 Sweet", "🧄 Garlic", "🔥 Nashville Hot", "🥢 Asian"].map(tag => (
-                    <span key={tag} className="bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full border border-white/30">{tag}</span>
-                  ))}
-                </div>
-                <div className="inline-flex items-center gap-2 bg-white text-gray-900 font-black px-5 py-2.5 rounded-xl text-sm group-hover:bg-green-50 transition-colors shadow-lg">
-                  Pick Your Wing Sauce <ArrowRight className="w-4 h-4" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Link>
-      </section>
-
-      {/* POPCORN — photo full bleed, text overlay */}
-      <section>
-        <Link to="/popcorn">
-          <div className="relative rounded-3xl overflow-hidden h-64 md:h-80 cursor-pointer group shadow-xl hover:shadow-2xl transition-all">
-            <img src="/IMAGES/popcorn.webp" alt="Infused popcorn" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-            <div className="absolute inset-0 flex items-center px-8 md:px-12">
-              <div className="max-w-lg">
-                <Badge className="bg-white/20 text-white border-white/30 mb-3 text-xs backdrop-blur-sm">🍿 20 Flavors</Badge>
-                <h2 className="text-3xl md:text-4xl font-black text-white mb-2">Infused Popcorn</h2>
-                <p className="text-white/80 mb-4 text-sm md:text-base">Garlic butter to salted caramel chocolate — the easiest infused snack you can make. Exact THC per bowl.</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {["🧂 Savory", "🍫 Chocolate", "🍬 Caramel", "🌶️ Spicy", "🍯 Sweet"].map(tag => (
-                    <span key={tag} className="bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full border border-white/30">{tag}</span>
-                  ))}
-                </div>
-                <div className="inline-flex items-center gap-2 bg-white text-gray-900 font-black px-5 py-2.5 rounded-xl text-sm group-hover:bg-amber-50 transition-colors shadow-lg">
-                  Pick Your Flavor <ArrowRight className="w-4 h-4" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Link>
-      </section>
-
       {/* TRENDING FLAVORS */}
       <section>
         <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">

@@ -312,7 +312,12 @@ export function Popcorn() {
                       </div>
                     )}
                     <Link
-                      to={`/ingredients?category=baked-goods&recipe=brownies`}
+                      to={`/ingredients?category=popcorn&recipe=${
+                        flavor.id === 'caramel' || flavor.id === 'maple' ? 'caramel-popcorn' :
+                        flavor.id === 'buffalo' || flavor.id === 'cajun-spice' || flavor.id === 'nashville-hot' || flavor.id === 'sriracha' || flavor.id === 'chili-lime' ? 'buffalo-popcorn' :
+                        flavor.id === 'chocolate-drizzle' || flavor.id === 'cookies-cream' || flavor.id === 'smores' || flavor.id === 'salted-caramel-choc' ? 'chocolate-drizzle-popcorn' :
+                        'garlic-butter-popcorn'
+                      }`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
                       onClick={e => e.stopPropagation()}
                     >
