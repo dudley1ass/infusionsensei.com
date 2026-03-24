@@ -230,9 +230,9 @@ export function Popcorn() {
       </Helmet>
 
       {/* Hero */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-yellow-500 via-amber-500 to-orange-500 shadow-2xl text-center px-6 py-12">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
-        <div className="relative z-10">
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-yellow-500 via-amber-500 to-orange-500 shadow-2xl text-center">
+        <img src="/IMAGES/popcorn.webp" alt="Infused popcorn" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+        <div className="relative z-10 px-6 py-12">
           <div className="text-6xl mb-3">🍿</div>
           <h1 className="text-4xl md:text-5xl font-black text-white mb-3">Infused Popcorn</h1>
           <p className="text-yellow-100 text-lg max-w-2xl mx-auto mb-6">
@@ -310,7 +310,7 @@ export function Popcorn() {
                         <p className="text-xs text-gray-500 italic bg-yellow-50 rounded-lg px-3 py-2">💡 {RECIPES[flavor.id].note}</p>
                       </div>
                     )}
-                    <Link to="/ingredients"
+                    <Link to="/infusions"
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
                       onClick={e => e.stopPropagation()}>
                       <ChefHat className="w-4 h-4" /> Calculate THC Per Serving
@@ -347,7 +347,7 @@ export function Popcorn() {
         <div className="text-4xl mb-3">🧮</div>
         <h2 className="text-2xl font-black mb-2">Calculate Exact THC Per Bowl</h2>
         <p className="text-green-200 mb-6 max-w-lg mx-auto">Enter your cannabutter or cannabis oil potency and the recipe builder tells you exactly how many milligrams per serving.</p>
-        <Link to="/ingredients">
+        <Link to="/infusions">
           <Button className="bg-white text-green-800 hover:bg-green-50 font-black text-base px-8 py-3">
             Open Recipe Builder <ArrowRight className="w-4 h-4 ml-2" />
           </Button>

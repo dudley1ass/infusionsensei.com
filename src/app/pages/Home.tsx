@@ -18,71 +18,65 @@ export function Home() {
       </Helmet>
 
       {/* ── HERO ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-800 via-green-700 to-green-900 px-6 py-14 md:py-20 shadow-2xl">
-        {/* Decorative blobs */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-800 via-green-700 to-green-900 px-6 py-12 md:py-16 shadow-2xl">
         <div className="absolute top-0 right-0 w-72 h-72 bg-green-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-green-900/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
 
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <div className="flex flex-col lg:flex-row items-center gap-10">
+        <div className="relative z-10 max-w-5xl mx-auto">
 
-            {/* Left: headline + CTA */}
-            <div className="flex-1 text-center lg:text-left">
-              <Badge className="bg-green-900/70 text-green-200 border border-green-600/50 mb-5 text-sm px-4 py-1.5 inline-flex">
-                <Zap className="w-3.5 h-3.5 mr-1.5" /> Free Cannabis Cooking Tool
-              </Badge>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 leading-tight">
-                Get Exact THC<br />
-                Per Serving —<br />
-                <span className="text-green-300">Every Time.</span>
-              </h1>
-              <p className="text-lg md:text-xl text-green-100 mb-8 leading-relaxed max-w-xl">
-                Stop guessing potency. Build infused butter, oils, and recipes with real-time THC calculations — so every edible hits exactly how you want.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
-                <Link to="/infusions">
-                  <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-lg px-8 py-6 shadow-xl rounded-xl transition-transform hover:scale-105">
-                    Start My Infusion (Free)
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </Link>
-                <Link to="/recipes" className="text-green-200 hover:text-white font-semibold flex items-center gap-1.5 transition-colors text-sm">
-                  Browse Recipes <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-              <p className="text-green-400 text-sm mt-4 font-medium">
-                ✓ No account &nbsp;·&nbsp; ✓ No setup &nbsp;·&nbsp; ✓ Instant results
-              </p>
-            </div>
-
-            {/* Right: terminal preview — the secret weapon */}
-            <div className="flex-shrink-0 w-full max-w-sm">
-              <p className="text-green-400 text-xs font-semibold uppercase tracking-widest text-center mb-3">See exactly what you'll get:</p>
-              <div className="bg-gray-950 rounded-2xl shadow-2xl border border-gray-700/60 overflow-hidden">
-                <div className="bg-gray-900 px-4 py-3 flex items-center gap-2 border-b border-gray-700/60">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/80" />
-                  <span className="text-gray-500 text-xs font-mono ml-2">infusion-calculator</span>
-                </div>
-                <div className="p-5 font-mono text-sm space-y-2">
-                  <p className="text-green-400 font-bold text-base">🍫 Chocolate Brownies</p>
-                  <div className="space-y-1.5 text-sm">
-                    <p className="text-gray-300">→ <span className="text-green-400 font-bold text-base">10mg THC</span> per serving</p>
-                    <p className="text-gray-300">→ <span className="text-green-400 font-bold">160mg total</span> batch</p>
-                    <p className="text-gray-300">→ <span className="text-green-400 font-bold">1 cup</span> infused butter</p>
-                    <p className="text-gray-300">→ <span className="text-green-400 font-bold">16</span> servings</p>
-                  </div>
-                  <div className="border-t border-gray-700/60 mt-3 pt-3 space-y-1.5">
-                    <p className="text-emerald-400 font-semibold">✔ Precise dosing</p>
-                    <p className="text-emerald-400 font-semibold">✔ Consistent results</p>
-                    <p className="text-emerald-400 font-semibold">✔ No guesswork</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+          {/* Headline */}
+          <div className="text-center mb-8">
+            <Badge className="bg-green-900/70 text-green-200 border border-green-600/50 mb-4 text-sm px-4 py-1.5 inline-flex">
+              <Zap className="w-3.5 h-3.5 mr-1.5" /> Free Cannabis Cooking Tool
+            </Badge>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 leading-tight">
+              Get Exact THC Per Serving —<br />
+              <span className="text-green-300">Every Time.</span>
+            </h1>
+            <p className="text-lg text-green-100 max-w-2xl mx-auto">
+              Stop guessing potency. Pick what you're making and we'll calculate the exact mg per serving — automatically.
+            </p>
           </div>
+
+          {/* Snack Buttons */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            {[
+              { emoji: "🍗", label: "Infused Wings", sub: "20 sauces", to: "/wings", color: "from-orange-500/30 to-red-600/30 border-orange-400/50 hover:border-orange-300" },
+              { emoji: "🍿", label: "Infused Popcorn", sub: "20 flavors", to: "/popcorn", color: "from-yellow-500/30 to-amber-500/30 border-yellow-400/50 hover:border-yellow-300" },
+              { emoji: "☕", label: "Infused Coffee", sub: "Bulletproof style", to: "/ingredients", color: "from-amber-800/30 to-yellow-900/30 border-amber-600/50 hover:border-amber-400" },
+              { emoji: "🍟", label: "Infused Fries", sub: "Coming soon", to: "/recipes", color: "from-yellow-400/20 to-orange-400/20 border-yellow-500/30 hover:border-yellow-400" },
+            ].map(({ emoji, label, sub, to, color }) => (
+              <Link key={label} to={to}>
+                <div className={`bg-gradient-to-br ${color} border-2 rounded-2xl p-4 text-center cursor-pointer transition-all hover:scale-105 hover:shadow-xl h-full`}>
+                  <div className="text-4xl mb-2">{emoji}</div>
+                  <div className="text-white font-black text-sm">{label}</div>
+                  <div className="text-green-300 text-xs mt-0.5">{sub}</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Bottom CTAs */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <Link to="/infusions">
+              <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-base px-8 py-5 shadow-xl rounded-xl transition-transform hover:scale-105">
+                Build My Infusion (Free)
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Link to="/ingredients">
+              <Button size="lg" variant="outline" className="border-2 border-white/40 text-white hover:bg-white/10 font-bold text-base px-8 py-5 rounded-xl">
+                <Calculator className="w-4 h-4 mr-2" /> THC Calculator
+              </Button>
+            </Link>
+            <Link to="/recipes" className="text-green-200 hover:text-white font-semibold flex items-center gap-1.5 transition-colors text-sm">
+              Browse Recipes <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+          <p className="text-green-400 text-sm mt-4 font-medium text-center">
+            ✓ No account &nbsp;·&nbsp; ✓ No setup &nbsp;·&nbsp; ✓ Instant results
+          </p>
+
         </div>
       </section>
 
