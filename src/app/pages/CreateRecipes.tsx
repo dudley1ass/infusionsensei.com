@@ -33,8 +33,8 @@ import { NutritionFactsLabel } from "../components/NutritionFactsLabel";
 const INGREDIENT_LIBRARY = [
   // ── INFUSED (Cannabis) ──────────────────────────────────────────
   { name: "Cannabutter",                          category: "infused",    defaultAmount: 113, defaultUnit: "g",       thcPerUnit: 1,   calories: 717, carbs: 0,   protein: 1,   fat: 81,  type: "fat" },
-  { name: "Cannabis Coconut Oil",                 category: "infused",    defaultAmount: 60,  defaultUnit: "ml",      thcPerUnit: 15,  calories: 862, carbs: 0,   protein: 0,   fat: 100, type: "liquid" },
-  { name: "Cannabis Olive Oil",                   category: "infused",    defaultAmount: 60,  defaultUnit: "ml",      thcPerUnit: 12,  calories: 884, carbs: 0,   protein: 0,   fat: 100, type: "liquid" },
+  { name: "Cannabis Coconut Oil",                 category: "infused",    defaultAmount: 60,  defaultUnit: "ml",      thcPerUnit: 1,   calories: 862, carbs: 0,   protein: 0,   fat: 100, type: "liquid" },
+  { name: "Cannabis Olive Oil",                   category: "infused",    defaultAmount: 60,  defaultUnit: "ml",      thcPerUnit: 1,   calories: 884, carbs: 0,   protein: 0,   fat: 100, type: "liquid" },
   { name: "THC Tincture",                         category: "infused",    defaultAmount: 1,   defaultUnit: "ml",      thcPerUnit: 25,  calories: 7,   carbs: 0,   protein: 0,   fat: 0,   type: "liquid" },
   { name: "Cannabis Agave Syrup",                 category: "infused",    defaultAmount: 15,  defaultUnit: "ml",      thcPerUnit: 5,   calories: 60,  carbs: 16,  protein: 0,   fat: 0,   type: "liquid" },
   { name: "THC Distillate",                       category: "infused",    defaultAmount: 1,   defaultUnit: "g",       thcPerUnit: 800, calories: 9,   carbs: 0,   protein: 0,   fat: 1,   type: "solid" },
@@ -1028,11 +1028,13 @@ export function CreateRecipes() {
 
     if (cat === 'leavener') {
       const leavenerToFlour = leavener / Math.max(flour, 1);
-      if (leavenerToFlour > 0.04) {
-        warning = 'Too much leavener — baked goods will taste bitter and soapy. Typical is 1 tsp per 2¼ cups flour.';
+      // Standard: 1 tsp (5g) per 125g flour = 0.04
+      // Pancakes/quick breads use 1.5-2x more leavening — only warn at >3x normal
+      if (leavenerToFlour > 0.12) {
+        warning = 'Too much leavener — baked goods will taste bitter and soapy. Typical is 1 tsp per cup of flour.';
         color = 'red';
-      } else if (leavenerToFlour > 0.025) {
-        warning = 'Leavener is on the high side — may cause excessive puffing and a slightly off taste.';
+      } else if (leavenerToFlour > 0.08) {
+        warning = 'Leavener is on the high side — may cause excessive puffing. Fine for pancakes, but watch it for cakes.';
         color = 'yellow';
       }
     }
@@ -1149,8 +1151,8 @@ export function CreateRecipes() {
 
     if (moistureRatio > 0.9 && !isHighLiquidRecipe) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    if (leavenerRatio > 0.04)   { issues.push('leavener is very high — may taste bitter or soapy'); tags.push({ label: 'Too much leavener', color: 'red' }); severity = 'problem'; }
-    else if (leavenerRatio > 0.025) { issues.push('leavener is slightly high — may cause excessive puffing'); tags.push({ label: 'High leavener', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
+    if (leavenerRatio > 0.12)   { issues.push('leavener is very high — may taste bitter or soapy'); tags.push({ label: 'Too much leavener', color: 'red' }); severity = 'problem'; }
+    else if (leavenerRatio > 0.08) { issues.push('leavener is elevated — fine for pancakes/quick breads, watch for cakes'); tags.push({ label: 'High leavener', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
     // Positive descriptions when balanced
     if (severity === 'good') {
