@@ -257,7 +257,8 @@ const INGREDIENT_LIBRARY = [
 
   // ── SAVORY ──────────────────────────────────────────────────────
   { name: "Garlic",                 category: "savory",     defaultAmount: 3,   defaultUnit: "cloves",calories: 13,  carbs: 3.0,  protein: 1.0,  fat: 0.0,  type: "count" },
-  { name: "Chicken Wings",          category: "savory",     defaultAmount: 900, defaultUnit: "g",     calories: 203, carbs: 0.0,  protein: 30.0, fat: 9.0,  type: "solid" },
+  { name: "Garlic Powder",          category: "savory",     defaultAmount: 3,   defaultUnit: "g",     calories: 331, carbs: 73.0, protein: 15.0, fat: 0.7,  type: "powder" },
+  { name: "Onion Powder",           category: "savory",     defaultAmount: 3,   defaultUnit: "g",     calories: 341, carbs: 79.1, protein: 10.4, fat: 0.9,  type: "powder" },
   { name: "Hot Sauce",              category: "savory",     defaultAmount: 60,  defaultUnit: "ml",    calories: 11,  carbs: 1.0,  protein: 0.5,  fat: 0.5,  type: "liquid" },
   { name: "Italian Seasoning",      category: "savory",     defaultAmount: 5,   defaultUnit: "g",     calories: 265, carbs: 46.0, protein: 8.0,  fat: 7.0,  type: "powder" },
   { name: "Pasta (dry)",            category: "savory",     defaultAmount: 454, defaultUnit: "g",     calories: 371, carbs: 74.0, protein: 13.0, fat: 2.0,  type: "solid" },
@@ -371,12 +372,12 @@ const standardRecipes: Record<string, any[]> = {
       amounts: [900, 56, 120, 3, 3, 2],
       units: ["g", "g", "ml", "g", "g", "g"],
       instructions: [
-        "Pat wings dry and season with salt, pepper, and garlic powder.",
-        "Bake at 425°F (220°C) for 45-50 min, flipping halfway, until crispy.",
-        "While wings bake, melt cannabutter in saucepan over low heat.",
-        "Whisk in hot sauce until fully combined — don't boil.",
-        "Toss hot wings in the sauce immediately before serving.",
-        "Serve with celery sticks and blue cheese or ranch.",
+        "Cook your wings however you like — oven (425°F/45 min), air fryer (400°F/20 min), or grill. We're here for the sauce.",
+        "While wings cook, melt cannabutter in a saucepan over low heat.",
+        "Whisk in hot sauce and garlic powder until fully combined — don't let it boil.",
+        "Taste and adjust heat with more hot sauce if desired.",
+        "Toss hot wings in the infused buffalo sauce immediately before serving.",
+        "Serve with celery sticks and blue cheese or ranch dipping sauce.",
       ],
     },
     {
@@ -387,12 +388,12 @@ const standardRecipes: Record<string, any[]> = {
       amounts: [900, 56, 4, 50, 5, 3],
       units: ["g", "g", "cloves", "g", "g", "g"],
       instructions: [
-        "Pat wings dry, season with salt, bake at 425°F for 45-50 min until crispy.",
-        "Melt cannabutter over medium-low heat.",
-        "Add minced garlic and sauté 1-2 minutes — do not brown.",
-        "Remove from heat, stir in Italian seasoning.",
-        "Toss wings in garlic butter, then top with grated parmesan.",
-        "Serve immediately while parmesan is still warm.",
+        "Cook wings your way — oven (425°F/45 min), air fryer (400°F/20 min), or grill until crispy. We're here for the sauce.",
+        "Melt cannabutter in a pan over medium-low heat.",
+        "Add minced garlic and sauté 1-2 minutes until fragrant — don't let it brown.",
+        "Remove from heat and stir in Italian seasoning.",
+        "Toss wings in the garlic butter until fully coated.",
+        "Plate and finish with a generous shower of grated parmesan. Serve immediately.",
       ],
     },
     {
@@ -1002,15 +1003,25 @@ export function CreateRecipes() {
 
     if (cat === 'sugar') {
       const sugarToFlour = sugar / Math.max(flour, 1);
-      if (sugarToFlour > 1.2) {
-        warning = 'Too much sugar — baked goods will be overly sweet, thin, and burn easily. Reduce sugar or add more flour.';
-        color = 'red';
-      } else if (sugarToFlour > 0.95) {
-        warning = 'Sugar is high — expect more spread and browning. Watch bake time carefully.';
-        color = 'yellow';
-      } else if (sugarToFlour < 0.2 && flour > 100) {
-        warning = 'Low sugar — result may be pale, bland, and dense.';
-        color = 'yellow';
+      // Only warn on the biggest sugar contributor to avoid duplicate warnings
+      const thisSugarGrams = toGrams(ing.amount, ing.unit, ing.name);
+      const isLargestSugar = !ingredients.some(other => {
+        if (other.name === ing.name) return false;
+        const otherLib = INGREDIENT_LIBRARY.find(l => l.name === other.name);
+        if (otherLib?.category !== 'sugar') return false;
+        return toGrams(other.amount, other.unit, other.name) > thisSugarGrams;
+      });
+      if (isLargestSugar) {
+        if (sugarToFlour > 1.2) {
+          warning = 'Total sugar is very high — baked goods will be overly sweet, thin, and burn easily.';
+          color = 'red';
+        } else if (sugarToFlour > 0.95) {
+          warning = 'Total sugar is high — expect more spread and browning. Watch bake time carefully.';
+          color = 'yellow';
+        } else if (sugarToFlour < 0.2 && flour > 100) {
+          warning = 'Low sugar — result may be pale, bland, and dense.';
+          color = 'yellow';
+        }
       }
     }
 
