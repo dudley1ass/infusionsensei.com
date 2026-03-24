@@ -182,6 +182,31 @@ export function Home() {
         </div>
       </section>
 
+      {/* ── WING SAUCES FEATURE ──────────────────────────────── */}
+      <section>
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-orange-500 via-red-500 to-orange-700 shadow-xl">
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-yellow-300 via-transparent to-transparent" />
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 px-8 py-10">
+            <div className="text-7xl flex-shrink-0">🍗</div>
+            <div className="flex-1 text-center md:text-left">
+              <Badge className="bg-white/20 text-white border-white/30 mb-3 text-xs">NEW SECTION</Badge>
+              <h2 className="text-3xl font-black text-white mb-2">20 Infused Wing Sauces</h2>
+              <p className="text-orange-100 mb-5 max-w-lg">Buffalo to Korean Gochujang — every sauce built with cannabutter or cannabis oil for exact THC per wing. Pick your flavor and get the recipe.</p>
+              <div className="flex flex-wrap gap-2 justify-center md:justify-start mb-5">
+                {["🌶️ Spicy", "🍯 Sweet", "🧄 Garlic", "🔥 Nashville Hot", "🥢 Asian"].map(tag => (
+                  <span key={tag} className="bg-white/20 text-white text-xs font-semibold px-2.5 py-1 rounded-full border border-white/30">{tag}</span>
+                ))}
+              </div>
+              <Link to="/wings">
+                <Button className="bg-white text-orange-700 hover:bg-orange-50 font-black text-base px-8 py-3 shadow-lg">
+                  Pick Your Wing Sauce <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── NEW RECIPES ──────────────────────────────────────── */}
       {featuredRecipes.length > 0 && (
         <section>

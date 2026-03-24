@@ -26,7 +26,8 @@ import { WhyEdiblesFeelDifferent } from "./pages/articles/WhyEdiblesFeelDifferen
 import { StoreTHCEdibles } from "./pages/articles/StoreTHCEdibles";
 import { WhatHappensWithoutDecarb } from "./pages/articles/WhatHappensWithoutDecarb";
 
-export const router = createBrowserRouter([
+import { WingSauces } from "./pages/WingSauces";
+
   {
     path: "/",
     Component: Layout,
@@ -37,6 +38,7 @@ export const router = createBrowserRouter([
       { path: "infusions", Component: InfusionBases },
       { path: "ingredients", Component: CreateRecipes },
       { path: "mixer", Component: Mixer },
+      { path: "wings", Component: WingSauces },
       { path: "learn", Component: Learn },
       // Original articles
       { path: "learn/articles/beginner-guide", Component: BeginnerCookingGuide },
