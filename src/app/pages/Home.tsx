@@ -207,6 +207,32 @@ export function Home() {
         </div>
       </section>
 
+
+      {/* ── POPCORN FEATURE ──────────────────────────────────── */}
+      <section>
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-yellow-400 via-amber-400 to-yellow-500 shadow-xl">
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 px-8 py-10">
+            <div className="text-7xl flex-shrink-0">🍿</div>
+            <div className="flex-1 text-center md:text-left">
+              <Badge className="bg-black/20 text-yellow-900 border-yellow-600/30 mb-3 text-xs">NEW SECTION</Badge>
+              <h2 className="text-3xl font-black text-yellow-900 mb-2">20 Infused Popcorn Flavors</h2>
+              <p className="text-yellow-800 mb-5 max-w-lg">Garlic butter to salted caramel chocolate — every flavor built with cannabutter or cannabis oil. The easiest infused snack you can make.</p>
+              <div className="flex flex-wrap gap-2 justify-center md:justify-start mb-5">
+                {["🧂 Savory", "🍫 Chocolate", "🍬 Caramel", "🌶️ Spicy", "🍯 Sweet"].map(tag => (
+                  <span key={tag} className="bg-black/10 text-yellow-900 text-xs font-semibold px-2.5 py-1 rounded-full border border-yellow-600/20">{tag}</span>
+                ))}
+              </div>
+              <Link to="/popcorn">
+                <Button className="bg-yellow-900 text-yellow-100 hover:bg-yellow-800 font-black text-base px-8 py-3 shadow-lg">
+                  Pick Your Flavor <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── NEW RECIPES ──────────────────────────────────────── */}
       {featuredRecipes.length > 0 && (
         <section>

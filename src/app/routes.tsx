@@ -27,6 +27,7 @@ import { StoreTHCEdibles } from "./pages/articles/StoreTHCEdibles";
 import { WhatHappensWithoutDecarb } from "./pages/articles/WhatHappensWithoutDecarb";
 
 import { WingSauces } from "./pages/WingSauces";
+import { Popcorn } from "./pages/Popcorn";
 
   {
     path: "/",
@@ -39,6 +40,7 @@ import { WingSauces } from "./pages/WingSauces";
       { path: "ingredients", Component: CreateRecipes },
       { path: "mixer", Component: Mixer },
       { path: "wings", Component: WingSauces },
+      { path: "popcorn", Component: Popcorn },
       { path: "learn", Component: Learn },
       // Original articles
       { path: "learn/articles/beginner-guide", Component: BeginnerCookingGuide },

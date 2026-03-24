@@ -400,6 +400,80 @@ const infusionRecipes: InfusionRecipe[] = [
     ],
     bestUses: ["Coffee creamer", "Lighter sauces", "Soups", "Ice cream (lighter)", "Baking"],
     compatibleCategories: ["drinks", "cookies", "savory"]
+  },
+  {
+    id: "dark-chocolate-infusion",
+    name: "Infused Dark Chocolate",
+    baseType: "chocolate" as any,
+    temperature: "115-120°F (46-49°C)",
+    time: "45-60 min",
+    thcRetention: 88,
+    terpeneRetention: 70,
+    ingredients: [
+      "200g (7oz) dark chocolate (60-70% cacao), chopped",
+      "2 tbsp cannabis coconut oil",
+      "Pinch of flaky sea salt",
+      "Silicone molds or parchment-lined tray"
+    ],
+    steps: [
+      "Make cannabis coconut oil first using your preferred infusion method",
+      "Melt chocolate in double boiler — keep below 120°F to preserve THC",
+      "Remove from heat, stir in cannabis coconut oil completely",
+      "Add sea salt and stir until smooth",
+      "Pour into molds or spread on parchment",
+      "Refrigerate 30-45 min until fully set",
+      "Store in airtight container in refrigerator up to 3 weeks"
+    ],
+    bestUses: ["Chocolate bars", "Popcorn drizzle", "Baking", "Fondue", "Dessert coating"],
+    compatibleCategories: ["desserts", "popcorn", "candy"]
+  },
+  {
+    id: "milk-chocolate-infusion",
+    name: "Infused Milk Chocolate",
+    baseType: "chocolate" as any,
+    temperature: "110-115°F (43-46°C)",
+    time: "45-60 min",
+    thcRetention: 85,
+    terpeneRetention: 65,
+    ingredients: [
+      "200g (7oz) milk chocolate chips or chopped bar",
+      "2 tbsp cannabis coconut oil",
+      "Optional: 1 tsp vanilla extract"
+    ],
+    steps: [
+      "Make cannabis coconut oil first",
+      "Melt milk chocolate gently — it burns more easily than dark",
+      "Keep temperature below 115°F throughout",
+      "Stir in cannabis coconut oil and vanilla if using",
+      "Pour into molds, top with toppings if desired",
+      "Refrigerate 30 min until set"
+    ],
+    bestUses: ["Candy bars", "Dipping fruit", "Popcorn drizzle", "Hot chocolate"],
+    compatibleCategories: ["desserts", "popcorn", "candy"]
+  },
+  {
+    id: "white-chocolate-infusion",
+    name: "Infused White Chocolate",
+    baseType: "chocolate" as any,
+    temperature: "105-110°F (40-43°C)",
+    time: "30-45 min",
+    thcRetention: 82,
+    terpeneRetention: 60,
+    ingredients: [
+      "200g (7oz) white chocolate chips (use real cocoa butter, not coating)",
+      "2 tbsp cannabis coconut oil",
+      "Pinch of salt"
+    ],
+    steps: [
+      "Make cannabis coconut oil first",
+      "White chocolate scorches easily — melt very gently below 110°F",
+      "Stir constantly while melting",
+      "Add cannabis coconut oil and stir until smooth",
+      "Pour into molds immediately",
+      "Refrigerate 30 min until set"
+    ],
+    bestUses: ["Popcorn drizzle", "Cookies & Cream coating", "Fruit dipping", "Bark"],
+    compatibleCategories: ["desserts", "popcorn", "candy"]
   }
 ];
 
@@ -419,7 +493,7 @@ export function InfusionBases() {
   const [customThc, setCustomThc] = useState(20);
   const [customCbd, setCustomCbd] = useState(0);
   
-  const [selectedBaseType, setSelectedBaseType] = useState<"butter" | "oil" | "syrup" | "liquid" | "cream" | "premade" | "none">("none");
+  const [selectedBaseType, setSelectedBaseType] = useState<"butter" | "oil" | "syrup" | "liquid" | "cream" | "chocolate" | "premade" | "none">("none");
   const [selectedProduct, setSelectedProduct] = useState<PreMadeProduct | null>(null);
   const [productDoses, setProductDoses] = useState<number>(1);
   const [selectedRecipe, setSelectedRecipe] = useState<InfusionRecipe | null>(null);
@@ -571,7 +645,7 @@ export function InfusionBases() {
   };
 
   const filteredRecipes = selectedBaseType !== "none" && selectedBaseType !== "premade"
-    ? infusionRecipes.filter(r => selectedBaseType === "cream" ? r.baseType === "liquid" && r.id.includes("cream") : r.baseType === selectedBaseType)
+    ? infusionRecipes.filter(r => selectedBaseType === "cream" ? r.baseType === "liquid" && r.id.includes("cream") : selectedBaseType === "chocolate" ? (r.baseType as string) === "chocolate" : r.baseType === selectedBaseType)
     : [];
 
   // Calculate dynamic THC and Terpene retention based on temperature and time
@@ -803,13 +877,14 @@ export function InfusionBases() {
             <Label className="text-gray-900 text-lg font-semibold mb-3 block">
               <span className="text-green-700">STEP 2:</span> Choose Your Base
             </Label>
-            <div className="grid md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
               {[
                 { value: "butter", label: "Butter", emoji: "🧈", color: "yellow" },
                 { value: "oil", label: "Oil", emoji: "🫒", color: "green" },
                 { value: "syrup", label: "Syrup", emoji: "🍯", color: "orange" },
                 { value: "liquid", label: "Liquid", emoji: "💧", color: "blue" },
                 { value: "cream", label: "Cream", emoji: "🍦", color: "pink" },
+                { value: "chocolate", label: "Chocolate", emoji: "🍫", color: "purple" },
                 { value: "premade", label: "Pre-Made Product", emoji: "🛒", color: "pink" },
               ].map((base) => (
                 <button
