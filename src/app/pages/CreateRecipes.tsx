@@ -116,6 +116,9 @@ const INGREDIENT_LIBRARY = [
   { name: "Greek Yogurt",           category: "dairy",      defaultAmount: 120, defaultUnit: "g",     calories: 59,  carbs: 3.6,  protein: 10.2, fat: 0.4,  type: "semi-solid" },
   { name: "Ricotta Cheese",         category: "dairy",      defaultAmount: 120, defaultUnit: "g",     calories: 174, carbs: 3.0,  protein: 11.3, fat: 13.0, type: "semi-solid" },
   { name: "Mascarpone",             category: "dairy",      defaultAmount: 100, defaultUnit: "g",     calories: 429, carbs: 3.6,  protein: 4.8,  fat: 44.1, type: "semi-solid" },
+  { name: "Parmesan Cheese",        category: "dairy",      defaultAmount: 50,  defaultUnit: "g",     calories: 431, carbs: 4.1,  protein: 38.0, fat: 29.0, type: "semi-solid" },
+  { name: "Cheddar Cheese",         category: "dairy",      defaultAmount: 50,  defaultUnit: "g",     calories: 403, carbs: 1.3,  protein: 25.0, fat: 33.0, type: "semi-solid" },
+  { name: "Mozzarella Cheese",      category: "dairy",      defaultAmount: 50,  defaultUnit: "g",     calories: 280, carbs: 2.2,  protein: 28.0, fat: 17.0, type: "semi-solid" },
   { name: "Sweetened Condensed Milk", category: "dairy",   defaultAmount: 400, defaultUnit: "ml",    calories: 321, carbs: 54.4, protein: 8.0,  fat: 8.7,  type: "liquid" },
   { name: "Evaporated Milk",        category: "dairy",      defaultAmount: 355, defaultUnit: "ml",    calories: 134, carbs: 10.0, protein: 6.8,  fat: 7.6,  type: "liquid" },
 
@@ -280,6 +283,7 @@ const standardRecipes: Record<string, any[]> = {
       servings: 16,
       ingredients: ["Cannabutter", "Granulated Sugar", "Cocoa Powder (Natural)", "All-Purpose Flour", "Whole Egg (large)", "Vanilla Extract"],
       amounts: [113, 200, 65, 130, 3, 5],
+      units: ["g", "g", "g", "g", "large", "ml"],
       instructions: [
         "Preheat oven to 350°F (175°C). Grease a 9x9 inch baking pan.",
         "Melt cannabutter in microwave or double boiler.",
@@ -296,6 +300,7 @@ const standardRecipes: Record<string, any[]> = {
       servings: 24,
       ingredients: ["Cannabutter", "Brown Sugar (Light)", "Granulated Sugar", "All-Purpose Flour", "Whole Egg (large)", "Dark Chocolate Chips", "Vanilla Extract"],
       amounts: [113, 220, 100, 280, 2, 340, 5],
+      units: ["g", "g", "g", "g", "large", "g", "ml"],
       instructions: [
         "Preheat oven to 375°F (190°C).",
         "Cream together cannabutter and both sugars until fluffy.",
@@ -314,6 +319,7 @@ const standardRecipes: Record<string, any[]> = {
       servings: 1,
       ingredients: ["Cannabis Coconut Oil", "Fresh Raspberries", "Banana (mashed)", "Greek Yogurt", "Almond Milk", "Honey"],
       amounts: [10, 150, 120, 170, 240, 15],
+      units: ["ml", "g", "g", "g", "ml", "g"],
       instructions: [
         "Add all ingredients to blender.",
         "Blend on high for 30-60 seconds until smooth.",
@@ -327,6 +333,7 @@ const standardRecipes: Record<string, any[]> = {
       servings: 1,
       ingredients: ["Water", "THC Tincture", "Granulated Sugar", "Lemon Juice"],
       amounts: [240, 2, 30, 30],
+      units: ["ml", "ml", "g", "ml"],
       instructions: [
         "Add water to a glass.",
         "Stir in sugar until dissolved.",
@@ -340,7 +347,8 @@ const standardRecipes: Record<string, any[]> = {
       name: "Infused Coffee",
       servings: 1,
       ingredients: ["Coffee (brewed)", "Cannabutter", "Heavy Cream"],
-      amounts: [240, 5, 15],
+      amounts: [240, 14, 15],
+      units: ["ml", "g", "ml"],
       instructions: [
         "Brew 8 oz of hot coffee.",
         "Add cannabutter to hot coffee.",
@@ -355,15 +363,16 @@ const standardRecipes: Record<string, any[]> = {
       id: "alfredo",
       name: "Cannabis Alfredo Sauce",
       servings: 4,
-      ingredients: ["Cannabutter", "Heavy Cream", "Mascarpone", "Garlic", "Salt", "Black Pepper"],
+      ingredients: ["Cannabutter", "Heavy Cream", "Parmesan Cheese", "Garlic", "Salt", "Black Pepper"],
       amounts: [56, 480, 100, 3, 3, 2],
+      units: ["g", "ml", "g", "cloves", "g", "g"],
       instructions: [
-        "In a pan, melt cannabutter over medium heat.",
-        "Add minced garlic and sauté for 1 minute.",
-        "Pour in heavy cream and simmer gently.",
-        "Stir in mascarpone until melted and smooth.",
-        "Season with salt and pepper.",
-        "Toss with cooked pasta.",
+        "In a pan, melt cannabutter over medium-low heat.",
+        "Add minced garlic and sauté for 1 minute until fragrant.",
+        "Pour in heavy cream and bring to a gentle simmer.",
+        "Reduce heat and stir in freshly grated parmesan until melted and smooth.",
+        "Season with salt and pepper to taste.",
+        "Toss immediately with cooked pasta and serve.",
       ],
     },
     {
@@ -371,15 +380,16 @@ const standardRecipes: Record<string, any[]> = {
       name: "Garlic Infused Pasta",
       servings: 2,
       ingredients: ["Pasta (dry)", "Cannabis Olive Oil", "Olive Oil", "Garlic", "Salt", "Black Pepper"],
-      amounts: [170, 15, 15, 2, 2, 1],
+      amounts: [170, 15, 15, 3, 3, 1],
+      units: ["g", "ml", "ml", "cloves", "g", "g"],
       instructions: [
-        "Cook pasta according to package directions.",
-        "In a pan, heat both oils over medium heat.",
-        "Add minced garlic and sauté until fragrant (1-2 minutes).",
-        "Drain pasta and add to pan with garlic oil.",
-        "Toss pasta in the oil mixture.",
-        "Season with salt and pepper.",
-        "Serve immediately.",
+        "Cook pasta according to package directions until al dente.",
+        "In a pan, heat both oils over medium-low heat.",
+        "Add minced garlic and sauté until fragrant, about 1-2 minutes.",
+        "Drain pasta, reserving ¼ cup pasta water.",
+        "Add pasta to pan with garlic oil, toss to coat.",
+        "Add a splash of pasta water if needed for consistency.",
+        "Season with salt and pepper and serve immediately.",
       ],
     },
     {
@@ -387,15 +397,16 @@ const standardRecipes: Record<string, any[]> = {
       name: "THC Garlic Butter Steak",
       servings: 2,
       ingredients: ["Steak", "Cannabutter", "Unsalted Butter", "Garlic", "Salt", "Black Pepper"],
-      amounts: [2, 15, 15, 2, 3, 2],
+      amounts: [2, 14, 28, 2, 3, 2],
+      units: ["whole", "g", "g", "cloves", "g", "g"],
       instructions: [
-        "Season steaks with salt and pepper.",
-        "Cook steaks in a hot pan to desired doneness.",
-        "In a small pan, melt both butters over low heat.",
-        "Add minced garlic to butter and cook for 1 minute.",
-        "Remove from heat and let cannabutter mixture cool slightly.",
-        "Pour garlic butter over cooked steaks.",
-        "Let rest for 5 minutes before serving.",
+        "Remove steaks from fridge 30 minutes before cooking.",
+        "Season generously with salt and pepper on both sides.",
+        "Heat a cast iron pan over high heat until very hot.",
+        "Cook steaks 3-4 minutes per side for medium-rare.",
+        "Reduce heat to low, add both butters and garlic.",
+        "Baste steaks continuously with the butter for 1 minute.",
+        "Rest steaks 5 minutes before serving, spoon butter over top.",
       ],
     },
   ],
@@ -406,13 +417,15 @@ const standardRecipes: Record<string, any[]> = {
       servings: 12,
       ingredients: ["Cannabutter", "Banana (mashed)", "Granulated Sugar", "All-Purpose Flour", "Whole Egg (large)", "Baking Soda"],
       amounts: [113, 360, 200, 280, 2, 1],
+      units: ["g", "g", "g", "g", "large", "tsp"],
       instructions: [
-        "Preheat oven to 350°F (175°C).",
-        "Mash bananas in a large bowl.",
-        "Mix in melted cannabutter, eggs, and sugar.",
-        "Fold in flour and baking soda.",
-        "Pour into greased 9x5 loaf pan.",
-        "Bake 60-65 minutes until toothpick comes out clean.",
+        "Preheat oven to 350°F (175°C). Grease a 9x5 inch loaf pan.",
+        "Mash 3 ripe bananas in a large bowl.",
+        "Mix in melted cannabutter, eggs, and sugar until combined.",
+        "Add flour and baking soda, fold until just combined — don't overmix.",
+        "Pour into prepared loaf pan.",
+        "Bake 60-65 minutes until a toothpick inserted in center comes out clean.",
+        "Cool in pan 10 minutes, then turn out onto a wire rack.",
       ],
     },
     {
@@ -421,15 +434,16 @@ const standardRecipes: Record<string, any[]> = {
       servings: 4,
       ingredients: ["All-Purpose Flour", "Granulated Sugar", "Baking Powder", "Whole Milk", "Whole Egg (large)", "Cannabutter"],
       amounts: [140, 15, 2, 180, 1, 30],
+      units: ["g", "g", "tsp", "ml", "large", "g"],
       instructions: [
-        "Mix flour, sugar, and baking powder in a bowl.",
+        "Whisk flour, sugar, and baking powder together in a bowl.",
         "In another bowl, whisk milk and egg together.",
-        "Melt cannabutter and add to wet ingredients.",
-        "Combine wet and dry ingredients, mix until just combined.",
-        "Heat a skillet over medium heat.",
-        "Pour batter to make 4-inch pancakes.",
-        "Cook until bubbles form, then flip and cook until golden.",
-        "Serve with butter or syrup.",
+        "Melt cannabutter and stir into wet ingredients.",
+        "Pour wet into dry and mix until just combined — lumps are fine.",
+        "Heat a non-stick skillet over medium heat, lightly grease.",
+        "Pour ¼ cup batter per pancake — batter will spread, that's normal.",
+        "Cook until bubbles form and edges look set, about 2 minutes.",
+        "Flip and cook 1-2 minutes more until golden. Serve with maple syrup.",
       ],
     },
   ],
@@ -440,14 +454,15 @@ const standardRecipes: Record<string, any[]> = {
       servings: 6,
       ingredients: ["Heavy Cream", "Whole Milk", "Granulated Sugar", "Vanilla Extract", "Cannabis Coconut Oil"],
       amounts: [480, 240, 150, 5, 30],
+      units: ["ml", "ml", "g", "ml", "ml"],
       instructions: [
-        "In a saucepan, heat cream, milk, and sugar over medium heat.",
-        "Stir until sugar dissolves (do not boil).",
-        "Remove from heat and add vanilla extract and cannabis oil.",
-        "Stir well to combine.",
-        "Chill mixture in refrigerator for at least 2 hours.",
-        "Pour into ice cream maker and churn according to manufacturer instructions.",
-        "Freeze for 2-4 hours before serving.",
+        "In a saucepan, combine cream, milk, and sugar over medium heat.",
+        "Stir until sugar fully dissolves — do not let it boil.",
+        "Remove from heat and stir in vanilla and cannabis coconut oil.",
+        "Whisk thoroughly to fully incorporate the oil.",
+        "Chill mixture in refrigerator for at least 2 hours or overnight.",
+        "Churn in ice cream maker per manufacturer instructions.",
+        "Transfer to freezer container and freeze 2-4 hours before serving.",
       ],
     },
   ],
@@ -458,13 +473,15 @@ const standardRecipes: Record<string, any[]> = {
       servings: 12,
       ingredients: ["Rolled Oats", "Peanut Butter", "Honey", "Protein Powder", "Cannabis Coconut Oil"],
       amounts: [200, 120, 60, 30, 15],
+      units: ["g", "g", "g", "g", "ml"],
       instructions: [
-        "Mix all dry ingredients in a bowl.",
-        "Add peanut butter, honey, and cannabis oil.",
-        "Mix until well combined.",
-        "Roll mixture into 12 equal-sized balls.",
-        "Place on parchment paper.",
-        "Refrigerate for at least 30 minutes before eating.",
+        "Mix rolled oats and protein powder in a large bowl.",
+        "Add peanut butter, honey, and cannabis coconut oil.",
+        "Stir until everything is well combined — mixture should hold its shape.",
+        "If too dry, add a little more honey. If too wet, add more oats.",
+        "Roll into 12 equal-sized balls about 1½ inches across.",
+        "Place on a parchment-lined tray.",
+        "Refrigerate at least 30 minutes to firm up before eating.",
       ],
     },
   ],
@@ -475,13 +492,16 @@ const standardRecipes: Record<string, any[]> = {
       servings: 50,
       ingredients: ["THC Tincture", "Gelatin (unflavored)", "Flavored Jello Mix", "Water", "Corn Syrup"],
       amounts: [30, 28, 85, 120, 60],
+      units: ["ml", "g", "g", "ml", "ml"],
       instructions: [
-        "Mix gelatin, jello, and water in saucepan.",
-        "Let sit 5 minutes to bloom.",
-        "Heat over low, stirring until dissolved.",
-        "Remove from heat, add corn syrup and tincture.",
-        "Pour into silicone molds.",
+        "Combine gelatin, jello mix, and water in a small saucepan.",
+        "Let sit 5 minutes to bloom — do not stir yet.",
+        "Heat over low heat, stirring gently until fully dissolved.",
+        "Remove from heat and let cool 2 minutes.",
+        "Stir in corn syrup and THC tincture thoroughly.",
+        "Use a dropper or pour carefully into silicone gummy molds.",
         "Refrigerate 2-3 hours until firm.",
+        "Pop out and store in an airtight container. Label with THC per piece.",
       ],
     },
   ],
@@ -618,11 +638,13 @@ export function CreateRecipes() {
         // Build ingredients from template
         const builtIngredients = recipe.ingredients.map((ingName: string, idx: number) => {
           const libraryItem = INGREDIENT_LIBRARY.find(i => i.name === ingName);
+          // Use recipe-defined unit if available, otherwise fall back to library default
+          const unit = recipe.units?.[idx] || libraryItem?.defaultUnit || "g";
           if (libraryItem) {
             return {
               name: ingName,
               amount: recipe.amounts[idx],
-              unit: libraryItem.defaultUnit,
+              unit,
               isInfused: libraryItem.category === "infused",
               thcPerUnit: libraryItem.thcPerUnit || 0,
               calories: libraryItem.calories,
@@ -635,7 +657,7 @@ export function CreateRecipes() {
           return {
             name: ingName,
             amount: recipe.amounts[idx],
-            unit: "g",
+            unit,
             calories: 0,
             carbs: 0,
             protein: 0,
@@ -896,7 +918,17 @@ export function CreateRecipes() {
     let warning = '';
     let color = '';
 
-    if (flour === 0) return { warning, color };
+    // Only run baking-science warnings if recipe has real structural flour
+    // (not just cocoa powder or chocolate which are mapped to flour category)
+    const hasRealFlour = ingredients.some(i => {
+      const l = INGREDIENT_LIBRARY.find(lib => lib.name === i.name);
+      return l?.category === 'flour' && !i.name.toLowerCase().includes('cocoa') && !i.name.toLowerCase().includes('chocolate');
+    });
+
+    if (flour === 0 || !hasRealFlour) return { warning, color };
+
+    // High liquid ratio is expected for batters — only warn if extreme
+    const isHighLiquidRecipe = totalMoisture > flour * 1.2; // pancakes, waffles etc
 
     if (cat === 'flour') {
       const flourToFat = flour / Math.max(fat, 1);
@@ -949,13 +981,17 @@ export function CreateRecipes() {
     }
 
     if (cat === 'liquid' || cat === 'dairy') {
-      const liquidToFlour = totalMoisture / Math.max(flour, 1);
-      if (liquidToFlour > 1.1) {
-        warning = 'Way too much liquid — batter will not hold shape and won\'t bake properly.';
-        color = 'red';
-      } else if (liquidToFlour > 0.7) {
-        warning = 'High moisture content — dough will be very soft. Chill well before baking or add more flour.';
-        color = 'yellow';
+      // Skip liquid warnings for batter-style recipes (pancakes, waffles, crepes)
+      // where high liquid is intentional — identified by leavening + dairy + no fat-heavy mix
+      if (!isHighLiquidRecipe) {
+        const liquidToFlour = totalMoisture / Math.max(flour, 1);
+        if (liquidToFlour > 1.1) {
+          warning = 'Way too much liquid — batter will not hold shape and won\'t bake properly.';
+          color = 'red';
+        } else if (liquidToFlour > 0.7) {
+          warning = 'High moisture content — dough will be very soft. Chill well before baking or add more flour.';
+          color = 'yellow';
+        }
       }
     }
 
@@ -998,11 +1034,20 @@ export function CreateRecipes() {
       return lib?.category === 'infused';
     });
 
+    // Check if recipe has real structural flour (not just cocoa/chocolate)
+    const hasRealFlour = ingredients.some(i => {
+      const l = INGREDIENT_LIBRARY.find(lib => lib.name === i.name);
+      return l?.category === 'flour' && !i.name.toLowerCase().includes('cocoa') && !i.name.toLowerCase().includes('chocolate');
+    });
+
+    // High liquid intentional recipes (pancakes, waffles, crepes, batters)
+    const isHighLiquidRecipe = hasRealFlour && totalMoisture > flour * 1.2;
+
     const tags: { label: string; color: string }[] = [];
     if (hasInfused) tags.push({ label: '🧪 Cannabis Infused', color: 'purple' });
 
-    // No flour — beverage / sauce / no-bake
-    if (flour === 0) {
+    // No real flour — beverage / sauce / no-bake
+    if (!hasRealFlour) {
       if (liquid > 0 || dairy > 0) {
         return {
           headline: '🥤 Beverage or Sauce Recipe',
@@ -1019,6 +1064,16 @@ export function CreateRecipes() {
       };
     }
 
+    // Batter recipe — high liquid is intentional
+    if (isHighLiquidRecipe) {
+      return {
+        headline: '🥞 Batter Recipe',
+        description: 'High liquid ratio detected — this is expected for pancakes, waffles, or crepe-style batters. Ratios look correct.',
+        tags: [...tags, { label: 'Batter', color: 'blue' }, { label: 'Balanced', color: 'green' }],
+        severity: 'good',
+      };
+    }
+
     const fatRatio      = fat      / flour;
     const sugarRatio    = sugar    / flour;
     const eggRatio      = egg      / flour;
@@ -1028,8 +1083,8 @@ export function CreateRecipes() {
     const issues: string[] = [];
     let severity: 'good' | 'warning' | 'problem' = 'good';
 
-    // Way too much liquid — bail early
-    if (moistureRatio > 1.1) {
+    // Way too much liquid — bail early (but only if not an intentional batter)
+    if (moistureRatio > 1.1 && !isHighLiquidRecipe) {
       return {
         headline: '💧 This will not bake properly',
         description: 'The liquid content is far too high relative to flour. This batter will not hold shape — it will spread into a puddle. Dramatically reduce milk/liquid or add much more flour.',
@@ -1049,7 +1104,7 @@ export function CreateRecipes() {
     if (eggRatio > 0.6)         { issues.push('too many eggs for this flour — result will be puffy and cakey'); tags.push({ label: 'Too many eggs', color: 'red' }); severity = 'problem'; }
     else if (eggRatio > 0.55)   { issues.push('high egg ratio — will lean very soft and cakey'); tags.push({ label: 'High eggs', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    if (moistureRatio > 0.9)    { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
+    if (moistureRatio > 0.9 && !isHighLiquidRecipe) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
     if (leavenerRatio > 0.04)   { issues.push('leavener is very high — may taste bitter or soapy'); tags.push({ label: 'Too much leavener', color: 'red' }); severity = 'problem'; }
     else if (leavenerRatio > 0.025) { issues.push('leavener is slightly high — may cause excessive puffing'); tags.push({ label: 'High leavener', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
