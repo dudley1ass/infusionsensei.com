@@ -867,7 +867,9 @@ export function CreateRecipes() {
       const rawCat = lib?.category || 'other';
       const cat =
         rawCat === 'flour'     ? 'flour'    :
-        rawCat === 'chocolate' ? 'flour'    :
+        // Cocoa POWDER is a dry structural ingredient like flour
+        // Chocolate CHIPS/bars are fat+sugar — don't count as flour
+        rawCat === 'chocolate' ? (ing.name.toLowerCase().includes('powder') || ing.name.toLowerCase().includes('cocoa') ? 'flour' : 'other') :
         rawCat === 'sugar'     ? 'sugar'    :
         rawCat === 'fat'       ? 'fat'      :
         rawCat === 'egg'       ? 'egg'      :
