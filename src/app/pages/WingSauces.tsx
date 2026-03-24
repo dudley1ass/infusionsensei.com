@@ -187,14 +187,20 @@ export function WingSauces() {
                       <p className="text-sm text-gray-700">{sauce.build}</p>
                     </div>
                     <SauceRecipe sauce={sauce} />
-                    <Link
-                      to="/infusions"
-                      className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
-                      onClick={e => e.stopPropagation()}
-                    >
-                      <ChefHat className="w-4 h-4" />
-                      Calculate THC Per Wing
-                    </Link>
+                    <div className="grid grid-cols-2 gap-2" onClick={e => e.stopPropagation()}>
+                      <Link
+                        to={`/ingredients?category=savory-meals&recipe=${sauce.id === 'classic-buffalo' ? 'classic-buffalo-wings' : sauce.id === 'garlic-parmesan' ? 'garlic-parmesan-wings' : 'classic-buffalo-wings'}`}
+                        className="flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
+                      >
+                        <ChefHat className="w-3.5 h-3.5" /> Move to Builder
+                      </Link>
+                      <Link
+                        to="/infusions"
+                        className="flex items-center justify-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
+                      >
+                        🧮 Exact THC
+                      </Link>
+                    </div>
                   </div>
                 )}
               </button>

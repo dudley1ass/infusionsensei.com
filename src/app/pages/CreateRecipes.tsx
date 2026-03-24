@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -256,6 +257,9 @@ const INGREDIENT_LIBRARY = [
 
   // ── SAVORY ──────────────────────────────────────────────────────
   { name: "Garlic",                 category: "savory",     defaultAmount: 3,   defaultUnit: "cloves",calories: 13,  carbs: 3.0,  protein: 1.0,  fat: 0.0,  type: "count" },
+  { name: "Chicken Wings",          category: "savory",     defaultAmount: 900, defaultUnit: "g",     calories: 203, carbs: 0.0,  protein: 30.0, fat: 9.0,  type: "solid" },
+  { name: "Hot Sauce",              category: "savory",     defaultAmount: 60,  defaultUnit: "ml",    calories: 11,  carbs: 1.0,  protein: 0.5,  fat: 0.5,  type: "liquid" },
+  { name: "Italian Seasoning",      category: "savory",     defaultAmount: 5,   defaultUnit: "g",     calories: 265, carbs: 46.0, protein: 8.0,  fat: 7.0,  type: "powder" },
   { name: "Pasta (dry)",            category: "savory",     defaultAmount: 454, defaultUnit: "g",     calories: 371, carbs: 74.0, protein: 13.0, fat: 2.0,  type: "solid" },
   { name: "Steak",                  category: "savory",     defaultAmount: 2,   defaultUnit: "pieces",calories: 271, carbs: 0.0,  protein: 25.0, fat: 19.0, type: "count" },
   { name: "Protein Powder",         category: "savory",     defaultAmount: 30,  defaultUnit: "g",     calories: 120, carbs: 3.0,  protein: 24.0, fat: 1.5,  type: "powder" },
@@ -359,6 +363,38 @@ const standardRecipes: Record<string, any[]> = {
     },
   ],
   "savory-meals": [
+    {
+      id: "classic-buffalo-wings",
+      name: "Classic Buffalo Wings",
+      servings: 4,
+      ingredients: ["Chicken Wings", "Cannabutter", "Hot Sauce", "Garlic Powder", "Salt", "Black Pepper"],
+      amounts: [900, 56, 120, 3, 3, 2],
+      units: ["g", "g", "ml", "g", "g", "g"],
+      instructions: [
+        "Pat wings dry and season with salt, pepper, and garlic powder.",
+        "Bake at 425°F (220°C) for 45-50 min, flipping halfway, until crispy.",
+        "While wings bake, melt cannabutter in saucepan over low heat.",
+        "Whisk in hot sauce until fully combined — don't boil.",
+        "Toss hot wings in the sauce immediately before serving.",
+        "Serve with celery sticks and blue cheese or ranch.",
+      ],
+    },
+    {
+      id: "garlic-parmesan-wings",
+      name: "Garlic Parmesan Wings",
+      servings: 4,
+      ingredients: ["Chicken Wings", "Cannabutter", "Garlic", "Parmesan Cheese", "Italian Seasoning", "Salt"],
+      amounts: [900, 56, 4, 50, 5, 3],
+      units: ["g", "g", "cloves", "g", "g", "g"],
+      instructions: [
+        "Pat wings dry, season with salt, bake at 425°F for 45-50 min until crispy.",
+        "Melt cannabutter over medium-low heat.",
+        "Add minced garlic and sauté 1-2 minutes — do not brown.",
+        "Remove from heat, stir in Italian seasoning.",
+        "Toss wings in garlic butter, then top with grated parmesan.",
+        "Serve immediately while parmesan is still warm.",
+      ],
+    },
     {
       id: "alfredo",
       name: "Cannabis Alfredo Sauce",
@@ -567,6 +603,18 @@ export function CreateRecipes() {
   const [selectedPantryItems, setSelectedPantryItems] = useState<string[]>([]);
   const [selectedInfusionType, setSelectedInfusionType] = useState<string>("none");
   const [availableRecipes, setAvailableRecipes] = useState<any[]>([]);
+
+  // Auto-load recipe from URL params: /ingredients?category=savory-meals&recipe=classic-buffalo-wings
+  const [searchParams] = useSearchParams();
+  useEffect(() => {
+    const cat = searchParams.get("category");
+    const rec = searchParams.get("recipe");
+    if (cat && rec) {
+      setSelectedCategory(cat);
+      setRecipeType("standard");
+      setSelectedStandardRecipe(rec);
+    }
+  }, []);
 
   // Add pantry item
   const addPantryItem = (item: string) => {

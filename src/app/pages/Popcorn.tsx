@@ -310,11 +310,20 @@ export function Popcorn() {
                         <p className="text-xs text-gray-500 italic bg-yellow-50 rounded-lg px-3 py-2">💡 {RECIPES[flavor.id].note}</p>
                       </div>
                     )}
-                    <Link to="/infusions"
-                      className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
-                      onClick={e => e.stopPropagation()}>
-                      <ChefHat className="w-4 h-4" /> Calculate THC Per Serving
-                    </Link>
+                    <div className="grid grid-cols-2 gap-2" onClick={e => e.stopPropagation()}>
+                      <Link
+                        to={`/ingredients?category=baked-goods&recipe=brownies`}
+                        className="flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
+                      >
+                        <ChefHat className="w-3.5 h-3.5" /> Move to Builder
+                      </Link>
+                      <Link
+                        to="/infusions"
+                        className="flex items-center justify-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
+                      >
+                        🧮 Exact THC
+                      </Link>
+                    </div>
                   </div>
                 )}
               </button>
