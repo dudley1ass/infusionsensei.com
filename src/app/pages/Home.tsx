@@ -67,7 +67,7 @@ export function Home() {
                 Build My Infusion (Free) <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Link to="/ingredients">
+            <Link to="/thc-calculator">
               <Button size="lg" variant="outline" className="border-2 border-white/40 text-white hover:bg-white/10 font-bold text-base px-8 py-5 rounded-xl">
                 <Calculator className="w-4 h-4 mr-2" /> THC Calculator
               </Button>

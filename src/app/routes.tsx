@@ -31,9 +31,11 @@ import { Popcorn } from "./pages/Popcorn";
 import { Coffee } from "./pages/Coffee";
 import { Fries } from "./pages/Fries";
 import { UTMBuilder } from "./pages/UTMBuilder";
+import { THCCalculatorPage } from "./pages/THCCalculatorPage";
 import { Coffee } from "./pages/Coffee";
 import { Fries } from "./pages/Fries";
 import { UTMBuilder } from "./pages/UTMBuilder";
+import { THCCalculatorPage } from "./pages/THCCalculatorPage";
 
 export const router = createBrowserRouter([
   {
@@ -51,9 +53,11 @@ export const router = createBrowserRouter([
       { path: "coffee", Component: Coffee },
       { path: "fries", Component: Fries },
       { path: "utm", Component: UTMBuilder },
+      { path: "thc-calculator", Component: THCCalculatorPage },
       { path: "coffee", Component: Coffee },
       { path: "fries", Component: Fries },
       { path: "utm", Component: UTMBuilder },
+      { path: "thc-calculator", Component: THCCalculatorPage },
       { path: "learn", Component: Learn },
       // Original articles
       { path: "learn/articles/beginner-guide", Component: BeginnerCookingGuide },
