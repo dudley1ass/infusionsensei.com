@@ -246,14 +246,9 @@ export function PartyMode() {
               </div>
 
               <div className="mt-4 flex gap-3">
-                <Link to={`/thc-calculator?pack=${bundle.id}`}>
+                <Link to={`/party-mode/plan/${bundle.id}`}>
                   <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white font-bold">
                     Plan This Pack <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                  </Button>
-                </Link>
-                <Link to="/thc-calculator">
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white font-bold">
-                    Plan Doses <ArrowRight className="w-3.5 h-3.5 ml-1" />
                   </Button>
                 </Link>
                 <Link to="/infusions">
@@ -286,9 +281,9 @@ export function PartyMode() {
       {/* CTA */}
       <div className="bg-gradient-to-br from-green-700 to-green-900 rounded-3xl p-8 text-center text-white">
         <h2 className="text-2xl font-black mb-2">Build Your Party Pack</h2>
-        <p className="text-green-200 mb-5">Calculate exact doses for every dish, then build your cannabutter or oil to match.</p>
+        <p className="text-green-200 mb-5">Plan exact doses by item, then use your saved infusion to hit those targets.</p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link to="/thc-calculator"><Button className="bg-white text-green-800 hover:bg-green-50 font-black px-8 py-3">Plan My Doses <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+          <Link to="/party-mode/plan/game-night"><Button className="bg-white text-green-800 hover:bg-green-50 font-black px-8 py-3">Plan My Pack <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
           <Link to="/infusions"><Button variant="outline" className="border-white/40 text-white hover:bg-white/10 font-bold px-8 py-3">Build My Infusion</Button></Link>
         </div>
       </div>

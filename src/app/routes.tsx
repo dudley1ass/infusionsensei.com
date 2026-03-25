@@ -42,6 +42,7 @@ import { EdiblePotencyGuide } from "./pages/EdiblePotencyGuide";
 import { CannabisEdibleRecipesPage } from "./pages/CannabisEdibleRecipesPage";
 import { InfusedDrinksPage } from "./pages/InfusedDrinksPage";
 import { SavoryCannabisPage } from "./pages/SavoryCannabisPage";
+import { PartyPackPlanner } from "./pages/PartyPackPlanner";
 
 export const router = createBrowserRouter([
   {
@@ -90,6 +91,7 @@ export const router = createBrowserRouter([
       { path: "learn/articles/infuse-any-food", Component: InfuseAnyFood },
       { path: "dinner-of-the-week", Component: DinnerOfTheWeek },
       { path: "party-mode", Component: PartyMode },
+      { path: "party-mode/plan/:packId", Component: PartyPackPlanner },
     ],
   },
 ]);
