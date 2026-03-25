@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, Save, XCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Save } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { safeJsonParse } from "../utils/storage";
-import { useNavigate } from "react-router";
 
 type WingsSplitState = {
   totalWings: number;
@@ -14,84 +13,174 @@ type WingsSplitState = {
   flavors: { sauceId: string; qtyWings: number }[];
 };
 
-// Subset of popular sauces for the party flow.
 const WING_FLAVORS: { sauceId: string; name: string; emoji: string }[] = [
-  { sauceId: "garlic-parmesan", name: "Garlic Parmesan", emoji: "🧄" },
   { sauceId: "classic-buffalo", name: "Classic Buffalo", emoji: "🌶️" },
-  { sauceId: "nashville-hot", name: "Nashville Hot", emoji: "🔥" },
+  { sauceId: "garlic-parmesan", name: "Garlic Parmesan", emoji: "🧄" },
   { sauceId: "honey-bbq", name: "Honey BBQ", emoji: "🍯" },
   { sauceId: "lemon-pepper", name: "Lemon Pepper", emoji: "🍋" },
-  { sauceId: "honey-mustard", name: "Honey Mustard", emoji: "🍯" },
+  { sauceId: "teriyaki", name: "Teriyaki Glaze", emoji: "🫙" },
+
+  { sauceId: "mango-habanero", name: "Mango Habanero", emoji: "🥭" },
+  { sauceId: "nashville-hot", name: "Nashville Hot Oil", emoji: "🔥" },
+  { sauceId: "chili-crisp", name: "Chili Crisp", emoji: "🌶️" },
+  { sauceId: "cajun-butter", name: "Cajun Butter", emoji: "🫑" },
+  { sauceId: "sriracha-honey", name: "Sriracha Honey", emoji: "🍯" },
+
+  { sauceId: "maple-bacon", name: "Maple Bacon Glaze", emoji: "🥓" },
+  { sauceId: "brown-sugar-bourbon", name: "Brown Sugar Bourbon", emoji: "🥃" },
+  { sauceId: "pineapple-ginger", name: "Pineapple Ginger", emoji: "🍍" },
+  { sauceId: "honey-mustard", name: "Honey Mustard Infusion", emoji: "🍯" },
+  { sauceId: "orange-glaze", name: "Orange Glaze", emoji: "🍊" },
+
+  { sauceId: "korean-gochujang", name: "Korean Gochujang", emoji: "🇰🇷" },
+  { sauceId: "garlic-soy-umami", name: "Garlic Soy Umami", emoji: "🧄" },
+  { sauceId: "truffle-butter", name: "Truffle Butter", emoji: "🍄" },
+  { sauceId: "chimichurri", name: "Herb Chimichurri", emoji: "🌿" },
+  { sauceId: "ranch-butter", name: "Ranch Butter Toss", emoji: "🤍" },
 ];
+
+const WING_SAUCE_TO_RECIPE_ID: Record<string, string> = {
+  "classic-buffalo": "classic-buffalo-wings",
+  "garlic-parmesan": "garlic-parmesan-wings",
+  "honey-bbq": "honey-bbq-wings",
+  "lemon-pepper": "lemon-pepper-wings",
+  teriyaki: "teriyaki-wings",
+  "mango-habanero": "mango-habanero-wings",
+  "nashville-hot": "nashville-hot-wings",
+  "chili-crisp": "chili-crisp-wings",
+  "cajun-butter": "cajun-butter-wings",
+  "sriracha-honey": "sriracha-honey-wings",
+  "maple-bacon": "maple-bacon-wings",
+  "brown-sugar-bourbon": "brown-sugar-bourbon-wings",
+  "pineapple-ginger": "pineapple-ginger-wings",
+  "honey-mustard": "honey-mustard-wings",
+  "orange-glaze": "orange-glaze-wings",
+  "korean-gochujang": "korean-gochujang-wings",
+  "garlic-soy-umami": "garlic-soy-umami-wings",
+  "truffle-butter": "truffle-butter-wings",
+  chimichurri: "chimichurri-wings",
+  "ranch-butter": "ranch-butter-wings",
+};
 
 // Baseline derived from the wings recipe template (900g wings == 4 servings).
 // That implies ~7.5 wings per "serving" in this app.
 const WINGS_PER_SERVING = 7.5;
+const WINGS_PER_PERSON = 8;
 
 export function PartyWingsSplit() {
   const { packId = "" } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const progressStorageKey = `party-pack-wings:${packId}`;
-  const initialTotalFromQuery = Number(searchParams.get("wings") ?? "");
+  const wingsStorageKey = `party-pack-wings:${packId}`;
+  const builtPartyPackId = `wings-split:${packId}`;
+  const builtStorageKey = `party-pack-progress:${builtPartyPackId}`;
 
-  const baseTotal = Number.isFinite(initialTotalFromQuery) && initialTotalFromQuery > 0 ? initialTotalFromQuery : 110;
-  const [state, setState] = useState<WingsSplitState>(() => ({
-    totalWings: baseTotal,
-    mgEach: 2.5,
-    flavors: [
-      { sauceId: "garlic-parmesan", qtyWings: Math.round(baseTotal * 0.33) },
-      { sauceId: "classic-buffalo", qtyWings: Math.round(baseTotal * 0.33) },
-      { sauceId: "nashville-hot", qtyWings: baseTotal - Math.round(baseTotal * 0.66) },
-    ],
-  }));
+  const queryWingsRaw = Number(searchParams.get("wings") ?? "");
+  const queryMgRaw = searchParams.get("mgEach");
+  const queryMg = queryMgRaw != null && queryMgRaw !== "" ? Number(queryMgRaw) : null;
 
+  const queryTotalWings = Number.isFinite(queryWingsRaw) && queryWingsRaw > 0 ? queryWingsRaw : null;
+  const queryMgEach = queryMg != null && Number.isFinite(queryMg) && queryMg >= 0 ? queryMg : null;
+
+  const [state, setState] = useState<WingsSplitState>(() => {
+    const total = queryTotalWings ?? 110;
+    const mgEach = queryMgEach ?? 2.5;
+    return {
+      totalWings: total,
+      mgEach,
+      flavors: [{ sauceId: "garlic-parmesan", qtyWings: total }],
+    };
+  });
+
+  // If user came from planner with a specific total wings, prefer query over saved.
   useEffect(() => {
-    const saved = safeJsonParse<WingsSplitState | null>(localStorage.getItem(progressStorageKey), null);
-    if (saved && saved.totalWings > 0) setState(saved);
-  }, [progressStorageKey]);
+    const saved = safeJsonParse<WingsSplitState | null>(localStorage.getItem(wingsStorageKey), null);
+    if (!saved || saved.totalWings <= 0) return;
 
-  const totalAllocated = useMemo(
-    () => state.flavors.reduce((sum, f) => sum + (f.qtyWings || 0), 0),
-    [state.flavors]
-  );
+    if (queryTotalWings != null) {
+      const nextTotalWings = queryTotalWings;
+      const nextMgEach = queryMgEach ?? saved.mgEach;
 
-  const setQty = (sauceId: string, qtyWings: number) => {
+      // If the saved split matches the same wing total, preserve the flavor breakdown.
+      // Otherwise, this is likely a "new party" with a new guest count, so reset the split.
+      const shouldPreserveFlavors = saved.totalWings === nextTotalWings && saved.flavors.length > 0;
+      setState(
+        shouldPreserveFlavors
+          ? { ...saved, totalWings: nextTotalWings, mgEach: nextMgEach }
+          : {
+              totalWings: nextTotalWings,
+              mgEach: nextMgEach,
+              flavors: [{ sauceId: "garlic-parmesan", qtyWings: nextTotalWings }],
+            }
+      );
+      return;
+    }
+
+    setState({
+      ...saved,
+      mgEach: queryMgEach ?? saved.mgEach,
+    });
+  }, [wingsStorageKey, queryTotalWings, queryMgEach]);
+
+  const builtMap = useMemo(() => {
+    return safeJsonParse<Record<string, boolean>>(localStorage.getItem(builtStorageKey), {});
+  }, [builtStorageKey, location.key]);
+
+  const totalAllocated = useMemo(() => state.flavors.reduce((sum, f) => sum + (f.qtyWings || 0), 0), [state.flavors]);
+  const remaining = state.totalWings - totalAllocated;
+  const hasSelections = state.flavors.length > 0;
+  const isAllocationExact = hasSelections && remaining === 0;
+
+  const getFlavorQty = (sauceId: string) => state.flavors.find((f) => f.sauceId === sauceId)?.qtyWings ?? 0;
+  const setFlavorQty = (sauceId: string, qtyWings: number) => {
     setState((prev) => {
-      const nextFlavors = prev.flavors.map((f) => (f.sauceId === sauceId ? { ...f, qtyWings } : f));
-      return { ...prev, flavors: nextFlavors.filter((f) => f.qtyWings > 0) };
+      const existing = prev.flavors.find((f) => f.sauceId === sauceId);
+      if (!existing && qtyWings > 0) return { ...prev, flavors: [...prev.flavors, { sauceId, qtyWings }] };
+      if (existing && qtyWings <= 0) return { ...prev, flavors: prev.flavors.filter((f) => f.sauceId !== sauceId) };
+      return {
+        ...prev,
+        flavors: prev.flavors.map((f) => (f.sauceId === sauceId ? { ...f, qtyWings } : f)),
+      };
     });
   };
 
-  const ensureFlavorsExist = () => {
+  const toggleFlavorSelected = (sauceId: string, selected: boolean) => {
+    if (!selected) {
+      setFlavorQty(sauceId, 0);
+      return;
+    }
+    // When selecting a new flavor, default to 0 and let the user type.
+    // If it's the only selection, we auto-fill with remaining.
     setState((prev) => {
-      const map = new Map(prev.flavors.map((f) => [f.sauceId, f]));
-      const next = WING_FLAVORS.map((opt) => {
-        const existing = map.get(opt.sauceId);
-        return existing ? existing : { sauceId: opt.sauceId, qtyWings: 0 };
-      }).filter((f) => f.qtyWings > 0);
-      // If user deleted everything, restore at least one flavor.
-      if (next.length === 0) return { ...prev, flavors: [{ sauceId: "garlic-parmesan", qtyWings: prev.totalWings }] };
-      return { ...prev, flavors: next };
+      const already = prev.flavors.some((f) => f.sauceId === sauceId);
+      if (already) return prev;
+      const nextFlavors = [...prev.flavors, { sauceId, qtyWings: 0 }];
+      const allocated = nextFlavors.reduce((sum, f) => sum + (f.qtyWings || 0), 0);
+      const rem = prev.totalWings - allocated;
+      // If user just created the selection and nothing else is allocated yet, give it all.
+      const onlyThis = nextFlavors.length === 1;
+      if (onlyThis && rem >= 0) return { ...prev, flavors: [{ sauceId, qtyWings: prev.totalWings }] };
+      return { ...prev, flavors: nextFlavors };
     });
   };
 
-  const isValid = totalAllocated === state.totalWings && state.totalWings > 0 && state.flavors.length > 0;
+  const servingsOverrideFor = (qtyWings: number) => Math.max(1, Math.round(qtyWings / WINGS_PER_SERVING));
 
-  useEffect(() => {
-    ensureFlavorsExist();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const selectedSauceIds = useMemo(() => state.flavors.map((f) => f.sauceId), [state.flavors]);
+  const allSelectedBuilt = selectedSauceIds.every((sauceId) => builtMap[`flavor:${sauceId}`]);
+
+  const markPlannerWingsCompleted = () => {
+    const plannerKey = `party-pack-progress:${packId}`;
+    const existing = safeJsonParse<Record<string, boolean>>(localStorage.getItem(plannerKey), {});
+    localStorage.setItem(plannerKey, JSON.stringify({ ...existing, wings: true }));
+  };
 
   const saveAndReturn = () => {
-    localStorage.setItem(progressStorageKey, JSON.stringify(state));
+    localStorage.setItem(wingsStorageKey, JSON.stringify(state));
+    markPlannerWingsCompleted();
     navigate(`/party-mode/plan/${packId}`);
-  };
-
-  const servingsOverrideFor = (qtyWings: number) => {
-    const servings = Math.max(1, Math.round(qtyWings / WINGS_PER_SERVING));
-    return servings;
   };
 
   return (
@@ -122,7 +211,9 @@ export function PartyWingsSplit() {
               onChange={(e) => setState((prev) => ({ ...prev, totalWings: Math.max(1, Number(e.target.value) || 1) }))}
               className="mt-1"
             />
-            <p className="text-xs text-gray-500 mt-1">Example: 110 wings for a big game night.</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Feeds ~{Math.max(1, Math.round(state.totalWings / WINGS_PER_PERSON))} people (using ~{WINGS_PER_PERSON} wings/person)
+            </p>
           </div>
           <div className="md:col-span-2">
             <Label className="text-sm font-bold text-gray-700">THC target (mg per wing)</Label>
@@ -140,13 +231,20 @@ export function PartyWingsSplit() {
           </div>
         </div>
 
-        <div className={`mt-4 p-3 rounded-xl border ${isValid ? "border-green-200 bg-green-50" : "border-amber-200 bg-amber-50"}`}>
+        <div
+          className={`mt-4 p-3 rounded-xl border ${
+            isAllocationExact ? "border-green-200 bg-green-50" : "border-amber-200 bg-amber-50"
+          }`}
+        >
           <p className="text-sm font-semibold text-gray-900">
-            Allocated: {totalAllocated} / {state.totalWings} wings
+            Selected wings: {totalAllocated} / {state.totalWings} (Remaining: {remaining})
           </p>
-          {!isValid && (
-            <p className="text-xs text-amber-900 mt-1">
-              Adjust flavor quantities so the total matches exactly before you build.
+          {!isAllocationExact && (
+            <p className="text-xs text-amber-900 mt-1">Make the split total match exactly before you build recipes.</p>
+          )}
+          {hasSelections && (
+            <p className="text-xs text-gray-600 mt-1">
+              {allSelectedBuilt ? "All selected flavors marked built." : `Built: ${selectedSauceIds.filter((s) => builtMap[`flavor:${s}`]).length}/${selectedSauceIds.length} flavors`}
             </p>
           )}
         </div>
@@ -156,24 +254,50 @@ export function PartyWingsSplit() {
         <h2 className="text-xl font-black text-gray-900 mb-4">Choose your wing flavors</h2>
         <div className="space-y-3">
           {WING_FLAVORS.map((opt) => {
-            const existing = state.flavors.find((f) => f.sauceId === opt.sauceId);
-            const qtyWings = existing?.qtyWings ?? 0;
+            const selected = state.flavors.some((f) => f.sauceId === opt.sauceId);
+            const built = builtMap[`flavor:${opt.sauceId}`];
+            const qty = getFlavorQty(opt.sauceId);
             return (
-              <div key={opt.sauceId} className="flex items-end gap-4">
-                <div className="w-24">
-                  <div className="text-3xl">{opt.emoji}</div>
-                  <div className="font-black text-sm">{opt.name}</div>
-                </div>
-                <div className="flex-1">
-                  <Label className="text-xs font-bold text-gray-500">Wings</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    value={qtyWings}
-                    onChange={(e) => setQty(opt.sauceId, Math.max(0, Number(e.target.value) || 0))}
-                    className="mt-1"
+              <div
+                key={opt.sauceId}
+                className={`flex items-center gap-3 p-3 rounded-xl border ${
+                  selected ? "border-orange-200 bg-orange-50" : "border-gray-200 bg-white"
+                }`}
+              >
+                <label className="flex items-center gap-3 cursor-pointer flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={(e) => toggleFlavorSelected(opt.sauceId, e.target.checked)}
                   />
-                </div>
+                  <span className="text-2xl">{opt.emoji}</span>
+                  <span className="font-black text-sm">{opt.name}</span>
+                </label>
+
+                {selected ? (
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="min-w-[140px]">
+                      <Label className="text-xs font-bold text-gray-500">Qty (wings)</Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        value={qty}
+                        onChange={(e) => setFlavorQty(opt.sauceId, Math.max(0, Number(e.target.value) || 0))}
+                        className="mt-1"
+                      />
+                    </div>
+                    {built ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-green-200 bg-green-50 text-green-700 text-xs font-bold">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        Built
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-500">Not built yet</span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex-1 text-xs text-gray-500">Select to split wings</div>
+                )}
               </div>
             );
           })}
@@ -181,11 +305,15 @@ export function PartyWingsSplit() {
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-xl font-black text-gray-900">Build each flavor recipe</h2>
+        <h2 className="text-xl font-black text-gray-900">Step-by-step: build your wing flavors</h2>
         <div className="grid md:grid-cols-2 gap-3">
           {state.flavors.map((f) => {
             const opt = WING_FLAVORS.find((o) => o.sauceId === f.sauceId);
             const servingsOverride = servingsOverrideFor(f.qtyWings);
+            const recipeId = WING_SAUCE_TO_RECIPE_ID[f.sauceId] ?? "classic-buffalo-wings";
+            const flavorProgressKey = `flavor:${f.sauceId}`;
+            const isBuilt = builtMap[flavorProgressKey];
+
             return (
               <div key={f.sauceId} className="bg-white border border-gray-200 rounded-2xl p-4">
                 <p className="font-black text-gray-900">
@@ -195,42 +323,51 @@ export function PartyWingsSplit() {
                   {f.qtyWings} wings (≈ {servingsOverride} servings)
                 </p>
                 <Link
-                  to={`/wings?sauce=${encodeURIComponent(f.sauceId)}&servings=${servingsOverride}&returnToPartyPack=/party-mode/plan/${encodeURIComponent(
-                    packId
-                  )}&partyPackId=${encodeURIComponent(packId)}&partyItemId=${encodeURIComponent(`wings:${f.sauceId}`)}`}
+                  to={`/ingredients?category=wings&recipe=${encodeURIComponent(recipeId)}&servings=${servingsOverride}&returnToPartyPack=${encodeURIComponent(
+                    `/party-mode/plan/${packId}/wings?from=${encodeURIComponent(f.sauceId)}`
+                  )}&partyPackId=${encodeURIComponent(
+                    builtPartyPackId
+                  )}&partyItemId=${encodeURIComponent(flavorProgressKey)}`}
                 >
                   <Button
                     className="mt-3 w-full bg-orange-600 hover:bg-orange-700 text-white font-bold"
-                    disabled={!isValid}
+                    disabled={!isAllocationExact}
                     onClick={() => {
-                      localStorage.setItem(progressStorageKey, JSON.stringify(state));
+                      localStorage.setItem(wingsStorageKey, JSON.stringify(state));
                     }}
                   >
-                    Build {opt?.name ?? "this flavor"} <ArrowRight className="w-4 h-4 ml-2" />
+                    {isBuilt ? "Re-build" : "Build"} {opt?.name ?? "this flavor"}{" "}
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
               </div>
             );
           })}
+          {state.flavors.length === 0 && (
+            <p className="text-sm text-gray-600">Select at least one flavor above.</p>
+          )}
         </div>
       </div>
 
       <div className="flex gap-3 flex-wrap items-center">
         <Button
-          onClick={() => {
-            localStorage.setItem(progressStorageKey, JSON.stringify(state));
-            saveAndReturn();
-          }}
-          disabled={state.totalWings <= 0}
-          className="bg-green-600 hover:bg-green-700 text-white font-bold"
+          onClick={saveAndReturn}
+          disabled={!isAllocationExact || !allSelectedBuilt}
+          className="bg-green-600 hover:bg-green-700 text-white font-bold disabled:opacity-60"
         >
           <Save className="w-4 h-4 mr-2" />
-          Save & Return to Party Pack
+          Done: Return to Party Pack
         </Button>
 
         <Button variant="outline" onClick={() => navigate(`/party-mode/plan/${packId}`)} className="font-bold">
           Back
         </Button>
+
+        {!allSelectedBuilt && selectedSauceIds.length > 0 && (
+          <p className="text-xs text-gray-600 w-full mt-1">
+            Build all selected flavors before returning. ({selectedSauceIds.filter((s) => builtMap[`flavor:${s}`]).length}/{selectedSauceIds.length} done)
+          </p>
+        )}
       </div>
     </div>
   );

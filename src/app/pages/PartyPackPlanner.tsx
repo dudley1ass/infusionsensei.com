@@ -14,6 +14,7 @@ import {
 } from "../components/ui/select";
 import { InfusionBase } from "../types/infusion";
 import { safeJsonParse } from "../utils/storage";
+import { recipes as siteRecipes, type Recipe } from "../data/recipes";
 
 type PlannerItem = {
   id: string;
@@ -112,6 +113,46 @@ const PACKS: PackTemplate[] = [
     ],
   },
   {
+    id: "savory-dinner-pack",
+    title: "Savory Dinner Pack Planner",
+    subtitle: "Spaghetti + pizza sauce + infused drinks for a controlled dinner party.",
+    items: [
+      {
+        id: "spaghetti",
+        name: "Garlic Infused Pasta (Spaghetti-style)",
+        route: "/ingredients?category=savory-meals&recipe=garlic-pasta",
+        suggestedRange: "5-10mg per serving",
+        defaultQty: 2,
+        defaultMgEach: 6,
+        perPersonQty: 1,
+        unitLabel: "servings",
+        equivalentHint: "1 pasta serving per guest (scales via recipe builder)",
+      },
+      {
+        id: "pizza-sauce",
+        name: "Infused Pizza Sauce",
+        route: "/recipes/infused-pizza-sauce",
+        suggestedRange: "~25mg per pizza",
+        defaultQty: 2,
+        defaultMgEach: 10,
+        perPersonQty: 0.5,
+        unitLabel: "pizzas",
+        equivalentHint: "1 pizza for ~2 guests (recipe details divide into 4 pizzas)",
+      },
+      {
+        id: "tea",
+        name: "Infused Cannabis Tea",
+        route: "/ingredients?category=drinks&recipe=cannabis-tea",
+        suggestedRange: "10-20mg per cup",
+        defaultQty: 1,
+        defaultMgEach: 10,
+        perPersonQty: 1,
+        unitLabel: "cups",
+        equivalentHint: "1 infused cup per guest (tea recipe servings = 1 cup)",
+      },
+    ],
+  },
+  {
     id: "drinks-pack",
     title: "Drinks Pack Planner",
     subtitle: "Dose-controlled beverages for social settings.",
@@ -140,6 +181,9 @@ const getDoseLabelForUnit = (unitLabel: string): string => {
   if (normalized === "gummies") return "Dose per gummy";
   if (normalized === "cups") return "Dose per cup";
   if (normalized === "glasses") return "Dose per glass";
+  if (normalized === "servings") return "Dose per serving";
+  if (normalized === "pizzas") return "Dose per pizza";
+  if (normalized === "slices") return "Dose per slice";
   if (normalized === "cookies" || normalized === "cake slices") return "Dose per piece";
   return "Dose per item";
 };
@@ -182,6 +226,7 @@ export function PartyPackPlanner() {
   const [selectedInfusionId, setSelectedInfusionId] = useState<string>("");
   const [peopleCount, setPeopleCount] = useState<number>(4);
   const [savedWingsSplit, setSavedWingsSplit] = useState<WingsSplitState | null>(null);
+  const [selectedRecipeToAdd, setSelectedRecipeToAdd] = useState<string>("");
 
   type WingsSplitState = {
     totalWings: number;
@@ -217,7 +262,13 @@ export function PartyPackPlanner() {
   useEffect(() => {
     if (!savedWingsSplit) return;
     setItems((prev) =>
-      prev.map((item) => (item.id === "wings" ? { ...item, qty: savedWingsSplit.totalWings, mgEach: savedWingsSplit.mgEach } : item))
+      prev.map((item) => {
+        // Only preserve saved split quantities once the wings item is completed.
+        // Otherwise, a "new party" with a new guest count should re-scale to match peopleCount.
+        if (item.id !== "wings") return item;
+        if (!item.completed) return item;
+        return { ...item, qty: savedWingsSplit.totalWings, mgEach: savedWingsSplit.mgEach };
+      })
     );
   }, [savedWingsSplit]);
 
@@ -228,7 +279,7 @@ export function PartyPackPlanner() {
       return prev.map((item) => {
         const template = templateById.get(item.id);
         if (!template) return item; // Keep custom items as-is.
-        if (item.id === "wings" && savedWingsSplit) return item;
+        if (item.id === "wings" && savedWingsSplit && item.completed) return item;
         return { ...item, qty: Math.max(1, Math.ceil(peopleCount * template.perPersonQty)) };
       });
     });
@@ -259,6 +310,55 @@ export function PartyPackPlanner() {
     ]);
   };
 
+  const parseMgFromThcPerServing = (txt: string): number | null => {
+    const cleaned = txt.replace(/,/g, " ");
+    // Range: "~10-20mg" or "~10–20mg"
+    const range = cleaned.match(/~?\s*([\d.]+)\s*(?:-|–|to)\s*([\d.]+)\s*mg/i);
+    if (range) {
+      const a = Number(range[1]);
+      const b = Number(range[2]);
+      if (Number.isFinite(a) && Number.isFinite(b)) return (a + b) / 2;
+    }
+    // Single: "~25mg"
+    const single = cleaned.match(/~?\s*([\d.]+)\s*mg/i);
+    if (single) {
+      const n = Number(single[1]);
+      if (Number.isFinite(n)) return n;
+    }
+    return null;
+  };
+
+  const addRecipeItem = () => {
+    if (!selectedRecipeToAdd) return;
+    if (selectedRecipeToAdd === "custom") {
+      addCustomItem();
+      setSelectedRecipeToAdd("");
+      return;
+    }
+
+    const recipe = siteRecipes.find((r) => r.id === selectedRecipeToAdd);
+    if (!recipe) return;
+
+    const mgGuess = parseMgFromThcPerServing(recipe.thcPerServing) ?? 5;
+    const unitLabel = recipe.category === "drinks" ? "cups" : "servings";
+
+    setItems((prev) => [
+      ...prev,
+      {
+        id: `recipe-${recipe.id}-${Date.now()}`,
+        name: recipe.name,
+        route: `/recipes/${recipe.id}`,
+        suggestedRange: recipe.thcPerServing,
+        qty: Math.max(1, Math.ceil(peopleCount)),
+        mgEach: mgGuess,
+        unitLabel,
+        equivalentHint: `Recipe makes ${recipe.servings} ${unitLabel}.`,
+        completed: false,
+      },
+    ]);
+    setSelectedRecipeToAdd("");
+  };
+
   const updateItem = (id: string, field: "name" | "qty" | "mgEach", value: string | number) => {
     setItems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
@@ -279,6 +379,19 @@ export function PartyPackPlanner() {
   const nextPendingItem = items.find((item) => !item.completed);
   const completedCount = items.filter((item) => item.completed).length;
   const nextStepIndex = nextPendingItem ? items.findIndex((i) => i.id === nextPendingItem.id) : -1;
+
+  const buildItemUrl = (item: PlannerItem) => {
+    // For the main recipe builder (`/ingredients`), pass `servings` so quantities scale correctly.
+    if (item.route.startsWith("/ingredients")) {
+      const joiner = item.route.includes("?") ? "&" : "?";
+      return `${item.route}${joiner}servings=${encodeURIComponent(item.qty)}&returnToPartyPack=${encodeURIComponent(
+        `/party-mode/plan/${pack.id}`
+      )}&partyPackId=${encodeURIComponent(pack.id)}&partyItemId=${encodeURIComponent(item.id)}`;
+    }
+    return `${item.route}${item.route.includes("?") ? "&" : "?"}returnToPartyPack=${encodeURIComponent(
+      `/party-mode/plan/${pack.id}`
+    )}&partyPackId=${encodeURIComponent(pack.id)}&partyItemId=${encodeURIComponent(item.id)}`;
+  };
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -354,39 +467,35 @@ export function PartyPackPlanner() {
                 item.id === "wings" ? "border-orange-300 shadow-md ring-2 ring-orange-100" : ""
               }`}
             >
-              <div className="grid md:grid-cols-4 gap-3 items-end">
-                <div className="md:col-span-2">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
+                <div className="md:col-span-6 flex flex-col">
                   <Label className="text-xs font-bold text-gray-500">Item</Label>
                   <Input
                     value={item.name}
                     onChange={(e) => updateItem(item.id, "name", e.target.value)}
                     className="mt-1"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Suggested: {item.suggestedRange}</p>
-                  <p className="text-xs text-gray-500 mt-1">{item.equivalentHint}</p>
+                  <p className="text-xs text-gray-500 mt-1 break-words">Suggested: {item.suggestedRange}</p>
+                  <p className="text-xs text-gray-500 mt-1 break-words">{item.equivalentHint}</p>
                 </div>
-                <div>
-                  <Label className="text-xs font-bold text-gray-500">Qty ({item.unitLabel})</Label>
+                <div className="md:col-span-3 flex flex-col">
+                  <Label className="text-xs font-bold text-gray-500 whitespace-nowrap">Qty ({item.unitLabel})</Label>
                   <Input
                     type="number"
                     min={1}
                     value={item.qty}
-                    onChange={(e) =>
-                      updateItem(item.id, "qty", Math.max(1, Number(e.target.value) || 1))
-                    }
+                    onChange={(e) => updateItem(item.id, "qty", Math.max(1, Number(e.target.value) || 1))}
                     className="mt-1"
                   />
                 </div>
-                <div>
-                  <Label className="text-xs font-bold text-gray-500">{getDoseLabelForUnit(item.unitLabel)}</Label>
+                <div className="md:col-span-3 flex flex-col">
+                  <Label className="text-xs font-bold text-gray-500 whitespace-nowrap">{getDoseLabelForUnit(item.unitLabel)}</Label>
                   <Input
                     type="number"
                     min={0}
                     step="0.5"
                     value={item.mgEach}
-                    onChange={(e) =>
-                      updateItem(item.id, "mgEach", Math.max(0, Number(e.target.value) || 0))
-                    }
+                    onChange={(e) => updateItem(item.id, "mgEach", Math.max(0, Number(e.target.value) || 0))}
                     className="mt-1"
                   />
                 </div>
@@ -414,17 +523,19 @@ export function PartyPackPlanner() {
                 <Link
                   to={
                     item.id === "wings"
-                      ? `/party-mode/plan/${encodeURIComponent(pack.id)}/wings`
-                      : `${item.route}${item.route.includes("?") ? "&" : "?"}returnTo=${encodeURIComponent(
-                          `/party-mode/plan/${pack.id}`
-                        )}&fromPack=${pack.id}&item=${item.id}`
+                      ? `/party-mode/plan/${encodeURIComponent(pack.id)}/wings?wings=${encodeURIComponent(
+                          item.qty
+                        )}&mgEach=${encodeURIComponent(item.mgEach)}`
+                      : buildItemUrl(item)
                   }
                   className="text-green-700 font-semibold hover:underline"
                 >
                   Build this item
                 </Link>
                 {item.id === "wings" && savedWingsSplit && (
-                  <Link to={`/party-mode/plan/${encodeURIComponent(pack.id)}/wings`}>
+                  <Link to={`/party-mode/plan/${encodeURIComponent(pack.id)}/wings?wings=${encodeURIComponent(
+                    item.qty
+                  )}&mgEach=${encodeURIComponent(item.mgEach)}`}>
                     <Button size="sm" variant="outline" className="border-orange-200 text-orange-800 hover:bg-orange-50">
                       Edit wing split
                     </Button>
@@ -448,10 +559,30 @@ export function PartyPackPlanner() {
         })}
       </div>
 
-      <Button onClick={addCustomItem} variant="outline" className="font-bold">
-        <Plus className="w-4 h-4 mr-1.5" />
-        Add More Item
-      </Button>
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <div className="flex-1">
+          <Label className="text-sm font-bold text-gray-700">Add an item (from recipes)</Label>
+          <Select value={selectedRecipeToAdd} onValueChange={setSelectedRecipeToAdd}>
+            <SelectTrigger className="mt-1">
+              <SelectValue placeholder="Choose a recipe to add..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="custom">Custom item (manual)</SelectItem>
+              {siteRecipes
+                .filter((r) => r.category === "edibles" || r.category === "drinks")
+                .map((r) => (
+                  <SelectItem key={r.id} value={r.id}>
+                    {r.name} ({r.category})
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Button onClick={addRecipeItem} variant="outline" className="font-bold">
+          <Plus className="w-4 h-4 mr-1.5" />
+          Add Selected
+        </Button>
+      </div>
 
       <div className="bg-gray-950 rounded-2xl p-5 text-white">
         <h2 className="text-xl font-black mb-3">Your Dose Plan</h2>
@@ -539,7 +670,7 @@ export function PartyPackPlanner() {
             Step {nextStepIndex + 1} of {items.length}
           </p>
           <Link
-            to={`${nextPendingItem.route}${nextPendingItem.route.includes("?") ? "&" : "?"}returnTo=${encodeURIComponent(`/party-mode/plan/${pack.id}`)}&fromPack=${pack.id}&item=${nextPendingItem.id}`}
+            to={buildItemUrl(nextPendingItem)}
             className="inline-flex items-center gap-2 text-green-700 font-bold hover:underline"
           >
             {nextPendingItem.id === "wings" ? "Start building your wings (main item)" : `Build ${nextPendingItem.name}`}
