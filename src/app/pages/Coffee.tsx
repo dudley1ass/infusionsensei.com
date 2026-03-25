@@ -108,7 +108,11 @@ export function Coffee() {
                       </ol>
                       <p className="text-xs text-gray-500 italic bg-yellow-50 rounded-lg px-3 py-2 mt-2">💡 {drink.note}</p>
                     </div>
-                    <Link to="/ingredients?category=drinks&recipe=coffee" className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); if(typeof window.gtag==="function") window.gtag("event","move_to_builder",{source:"coffee"}); }}>
+                    <Link to={`/ingredients?category=drinks&recipe=${
+  drink.id === 'bulletproof' || drink.id === 'cortado' || drink.id === 'infused-americano' ? 'bulletproof-coffee' :
+  drink.id === 'golden-latte' || drink.id === 'infused-matcha' || drink.id === 'infused-chai' || drink.id === 'infused-turmeric-latte' ? 'cannabis-tea' :
+  'bulletproof-coffee'
+}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); if(typeof window.gtag==="function") window.gtag("event","move_to_builder",{source:"coffee"}); }}>
                       <ChefHat className="w-4 h-4" /> Move to Recipe Builder
                     </Link>
                   </div>
@@ -136,7 +140,7 @@ export function Coffee() {
         <div className="text-4xl mb-3">🧮</div>
         <h2 className="text-2xl font-black mb-2">Calculate Exact THC Per Cup</h2>
         <p className="text-green-200 mb-6 max-w-lg mx-auto">Enter your cannabutter or tincture potency and get exact milligrams per drink.</p>
-        <Link to="/ingredients?category=drinks&recipe=coffee"><Button className="bg-white text-green-800 hover:bg-green-50 font-black text-base px-8 py-3">Open Recipe Builder <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+        <Link to="/ingredients?category=drinks&recipe=bulletproof-coffee"><Button className="bg-white text-green-800 hover:bg-green-50 font-black text-base px-8 py-3">Open Recipe Builder <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
       </div>
     </div>
   );
