@@ -1057,6 +1057,7 @@ export function CreateRecipes() {
     const totalMoisture = egg + liquid + dairy;
     const lowerNames = ingredients.map(i => i.name.toLowerCase());
     const isBrownieStyle =
+      selectedStandardRecipe === "brownies" ||
       recipeName.toLowerCase().includes("brownie") ||
       (lowerNames.some(n => n.includes("cocoa")) &&
        lowerNames.some(n => n.includes("all-purpose flour") || n.includes("flour")) &&
@@ -1147,8 +1148,8 @@ export function CreateRecipes() {
         return sum;
       }, 0);
       const eggToFlour = egg / Math.max(realFlour || flour, 1);
-      const eggProblemThreshold = isBrownieStyle ? 2.6 : 1.8;
-      const eggWarningThreshold = isBrownieStyle ? 2.2 : 1.4;
+      const eggProblemThreshold = isBrownieStyle ? 3.0 : 1.8;
+      const eggWarningThreshold = isBrownieStyle ? 2.6 : 1.4;
       if (eggToFlour > eggProblemThreshold) {
         warning = 'Too many eggs for this flour — result will be very puffy and cakey. Reduce eggs or add more flour.';
         color = 'red';
@@ -1216,6 +1217,7 @@ export function CreateRecipes() {
     });
     const lowerNames = ingredients.map(i => i.name.toLowerCase());
     const isBrownieStyle =
+      selectedStandardRecipe === "brownies" ||
       recipeName.toLowerCase().includes("brownie") ||
       (lowerNames.some(n => n.includes("cocoa")) &&
        lowerNames.some(n => n.includes("all-purpose flour") || n.includes("flour")) &&
@@ -1293,7 +1295,7 @@ export function CreateRecipes() {
     let severity: 'good' | 'warning' | 'problem' = 'good';
 
     // Way too much liquid — bail early (but only if not an intentional batter)
-    if (moistureRatio > 1.1 && !isHighLiquidRecipe) {
+    if (moistureRatio > 1.1 && !isHighLiquidRecipe && !isBrownieStyle) {
       return {
         headline: '💧 This will not bake properly',
         description: 'The liquid content is far too high relative to flour. This batter will not hold shape — it will spread into a puddle. Dramatically reduce milk/liquid or add much more flour.',
@@ -1304,8 +1306,8 @@ export function CreateRecipes() {
     }
 
     // Diagnose each ratio
-    const sugarProblemThreshold = isBrownieStyle ? 3.2 : 1.2;
-    const sugarWarningThreshold = isBrownieStyle ? 2.4 : 1.05;
+    const sugarProblemThreshold = isBrownieStyle ? 3.8 : 1.2;
+    const sugarWarningThreshold = isBrownieStyle ? 3.0 : 1.05;
     if (sugarRatio > sugarProblemThreshold)       { issues.push('sugar is very high — expect thin, sweet, fast-browning results'); tags.push({ label: 'Too much sugar', color: 'red' }); severity = 'problem'; }
     else if (sugarRatio > sugarWarningThreshold)  { issues.push('sugar is elevated — baked goods will spread more and brown faster'); tags.push({ label: 'High sugar', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
@@ -1315,12 +1317,12 @@ export function CreateRecipes() {
     else if (fatRatio > fatWarningThreshold)   { issues.push('fat is elevated — expect significant spread, chill dough before baking'); tags.push({ label: 'High fat', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
     else if (fatRatio < 0.25 && flour > 100) { issues.push('low fat for this flour — dough may be dry and stiff'); tags.push({ label: 'Low fat', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    const eggProblemThreshold = isBrownieStyle ? 2.6 : 1.8;
-    const eggWarningThreshold = isBrownieStyle ? 2.2 : 1.4;
+    const eggProblemThreshold = isBrownieStyle ? 3.0 : 1.8;
+    const eggWarningThreshold = isBrownieStyle ? 2.6 : 1.4;
     if (eggRatio > eggProblemThreshold)          { issues.push('too many eggs for this flour — result will be very puffy and cakey'); tags.push({ label: 'Too many eggs', color: 'red' }); severity = 'problem'; }
     else if (eggRatio > eggWarningThreshold)     { issues.push('high egg ratio — will lean soft and cakey. Great for fudgy bakes'); tags.push({ label: 'High eggs', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    if (moistureRatio > 0.9 && !isHighLiquidRecipe) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
+    if (moistureRatio > 0.9 && !isHighLiquidRecipe && !isBrownieStyle) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
     if (leavenerRatio > 0.12)   { issues.push('leavener is very high — may taste bitter or soapy'); tags.push({ label: 'Too much leavener', color: 'red' }); severity = 'problem'; }
     else if (leavenerRatio > 0.08) { issues.push('leavener is elevated — fine for pancakes/quick breads, watch for cakes'); tags.push({ label: 'High leavener', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
