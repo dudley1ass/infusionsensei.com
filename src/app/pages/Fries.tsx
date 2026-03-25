@@ -108,7 +108,7 @@ export function Fries() {
                       </ol>
                       <p className="text-xs text-gray-500 italic bg-orange-50 rounded-lg px-3 py-2 mt-2">💡 {recipe.note}</p>
                     </div>
-                    <Link to={`/ingredients?category=savory-meals&recipe=${recipe.id}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => e.stopPropagation()}>
+                    <Link to={`/ingredients?category=savory-meals&recipe=${recipe.id}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); if(typeof gtag!=="undefined") gtag("event","move_to_builder",{source:"fries"}); }}>
                       <ChefHat className="w-4 h-4" /> Move to Recipe Builder
                     </Link>
                   </div>

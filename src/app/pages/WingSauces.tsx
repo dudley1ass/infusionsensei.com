@@ -190,7 +190,7 @@ export function WingSauces() {
                     <Link
                       to={`/ingredients?category=savory-meals&recipe=${sauce.id === 'classic-buffalo' ? 'classic-buffalo-wings' : sauce.id === 'garlic-parmesan' ? 'garlic-parmesan-wings' : 'classic-buffalo-wings'}`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
-                      onClick={e => e.stopPropagation()}
+                      onClick={e => { e.stopPropagation(); if(typeof gtag!=="undefined") gtag("event","move_to_builder",{source:"wingsauces"}); }}
                     >
                       <ChefHat className="w-4 h-4" /> Move to Recipe Builder
                     </Link>

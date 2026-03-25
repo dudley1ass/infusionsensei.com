@@ -51,7 +51,7 @@ export function THCCalculatorPage() {
             <label className="block text-sm font-bold text-gray-700 mb-1">Flower / Concentrate THC %</label>
             <p className="text-xs text-gray-400 mb-2">Check your packaging — usually 15–30% for flower</p>
             <div className="flex items-center gap-3">
-              <input type="range" min="1" max="99" value={thcPct} onChange={e => setThcPct(Number(e.target.value))} className="flex-1 accent-green-600" />
+              <input type="range" min="1" max="99" value={thcPct} onChange={e => { setThcPct(Number(e.target.value)); if(typeof gtag!=='undefined') gtag('event','calculator_used',{thc_pct:Number(e.target.value)}); }} className="flex-1 accent-green-600" />
               <span className="font-black text-green-700 text-lg w-16 text-right">{thcPct}%</span>
             </div>
           </div>
@@ -75,7 +75,7 @@ export function THCCalculatorPage() {
             <label className="block text-sm font-bold text-gray-700 mb-1">Number of Servings</label>
             <p className="text-xs text-gray-400 mb-2">How many pieces / drinks / portions?</p>
             <div className="flex items-center gap-3">
-              <input type="range" min="1" max="100" value={servings} onChange={e => setServings(Number(e.target.value))} className="flex-1 accent-green-600" />
+              <input type="range" min="1" max="100" value={servings} onChange={e => { setServings(Number(e.target.value)); if(typeof gtag!=='undefined') gtag('event','calculator_used',{servings:Number(e.target.value)}); }} className="flex-1 accent-green-600" />
               <span className="font-black text-green-700 text-lg w-16 text-right">{servings}</span>
             </div>
           </div>
