@@ -1061,6 +1061,11 @@ export function CreateRecipes() {
       (lowerNames.some(n => n.includes("cocoa")) &&
        lowerNames.some(n => n.includes("all-purpose flour") || n.includes("flour")) &&
        lowerNames.some(n => n.includes("chocolate")));
+    const isPancakeStyle =
+      recipeName.toLowerCase().includes("pancake") ||
+      recipeName.toLowerCase().includes("waffle") ||
+      recipeName.toLowerCase().includes("crepe") ||
+      selectedStandardRecipe === "pancakes";
 
     let warning = '';
     let color = '';
@@ -1074,8 +1079,8 @@ export function CreateRecipes() {
 
     if (flour === 0 || !hasRealFlour) return { warning, color };
 
-    // High liquid ratio is expected for batters — only warn if extreme
-    const isHighLiquidRecipe = totalMoisture > flour * 1.2; // pancakes, waffles etc
+    // High liquid ratio is expected for batters (pancakes/waffles/crepes), not brownies
+    const isHighLiquidRecipe = isPancakeStyle && totalMoisture > flour * 0.8;
 
     if (cat === 'flour') {
       const flourToFat = flour / Math.max(fat, 1);
@@ -1115,10 +1120,12 @@ export function CreateRecipes() {
         return toGrams(other.amount, other.unit, other.name) > thisSugarGrams;
       });
       if (isLargestSugar) {
-        if (sugarToFlour > 1.2) {
+        const sugarProblemThreshold = isBrownieStyle ? 3.2 : 1.2;
+        const sugarWarningThreshold = isBrownieStyle ? 2.4 : 0.95;
+        if (sugarToFlour > sugarProblemThreshold) {
           warning = 'Total sugar is very high — baked goods will be overly sweet, thin, and burn easily.';
           color = 'red';
-        } else if (sugarToFlour > 0.95) {
+        } else if (sugarToFlour > sugarWarningThreshold) {
           warning = 'Total sugar is high — expect more spread and browning. Watch bake time carefully.';
           color = 'yellow';
         } else if (sugarToFlour < 0.2 && flour > 100) {
@@ -1140,10 +1147,12 @@ export function CreateRecipes() {
         return sum;
       }, 0);
       const eggToFlour = egg / Math.max(realFlour || flour, 1);
-      if (eggToFlour > 1.8) {
+      const eggProblemThreshold = isBrownieStyle ? 2.6 : 1.8;
+      const eggWarningThreshold = isBrownieStyle ? 2.2 : 1.4;
+      if (eggToFlour > eggProblemThreshold) {
         warning = 'Too many eggs for this flour — result will be very puffy and cakey. Reduce eggs or add more flour.';
         color = 'red';
-      } else if (eggToFlour > 1.4) {
+      } else if (eggToFlour > eggWarningThreshold) {
         warning = 'High egg ratio — will lean soft and fudgy. Great for brownies, but may not suit all recipes.';
         color = 'yellow';
       }
@@ -1186,6 +1195,7 @@ export function CreateRecipes() {
     description: string;
     tags: { label: string; color: string }[];
     severity: 'good' | 'warning' | 'problem';
+    styleLabel: string;
   }
 
   const computeRecipeSummary = (): RecipeSummary | null => {
@@ -1210,6 +1220,13 @@ export function CreateRecipes() {
       (lowerNames.some(n => n.includes("cocoa")) &&
        lowerNames.some(n => n.includes("all-purpose flour") || n.includes("flour")) &&
        lowerNames.some(n => n.includes("chocolate")));
+    const isPancakeStyle =
+      recipeName.toLowerCase().includes("pancake") ||
+      recipeName.toLowerCase().includes("waffle") ||
+      recipeName.toLowerCase().includes("crepe") ||
+      selectedStandardRecipe === "pancakes";
+    const isSavoryStyle = selectedCategory === "wings" || selectedCategory === "fries" || selectedCategory === "savory-meals";
+    const isDrinkStyle = selectedCategory === "drinks";
 
     // Check if recipe has real structural flour (not just cocoa/chocolate)
     const hasRealFlour = ingredients.some(i => {
@@ -1218,7 +1235,7 @@ export function CreateRecipes() {
     });
 
     // High liquid intentional recipes (pancakes, waffles, crepes, batters)
-    const isHighLiquidRecipe = hasRealFlour && totalMoisture > flour * 1.2;
+    const isHighLiquidRecipe = hasRealFlour && isPancakeStyle && totalMoisture > flour * 0.8;
 
     const tags: { label: string; color: string }[] = [];
     if (hasInfused) tags.push({ label: '🧪 Cannabis Infused', color: 'purple' });
@@ -1231,6 +1248,7 @@ export function CreateRecipes() {
           description: 'No flour detected — this looks like a drink, sauce, or no-bake recipe. Ratios look fine for a liquid-based preparation.',
           tags: [...tags, { label: 'Liquid-based', color: 'green' }],
           severity: 'good',
+          styleLabel: 'Liquid / Sauce',
         };
       }
       return {
@@ -1238,6 +1256,7 @@ export function CreateRecipes() {
         description: 'Add ingredients to get a full analysis of your recipe balance.',
         tags: [...tags, { label: 'In progress', color: 'yellow' }],
         severity: 'good',
+        styleLabel: 'In Progress',
       };
     }
 
@@ -1248,6 +1267,7 @@ export function CreateRecipes() {
         description: 'High liquid ratio detected — this is expected for pancakes, waffles, or crepe-style batters. Ratios look correct.',
         tags: [...tags, { label: 'Batter', color: 'blue' }, { label: 'Balanced', color: 'green' }],
         severity: 'good',
+        styleLabel: 'Batter',
       };
     }
 
@@ -1279,12 +1299,15 @@ export function CreateRecipes() {
         description: 'The liquid content is far too high relative to flour. This batter will not hold shape — it will spread into a puddle. Dramatically reduce milk/liquid or add much more flour.',
         tags: [...tags, { label: 'Too much liquid', color: 'red' }, { label: "Won't bake", color: 'red' }],
         severity: 'problem',
+        styleLabel: isBrownieStyle ? 'Brownie' : isPancakeStyle ? 'Batter' : isSavoryStyle ? 'Savory' : isDrinkStyle ? 'Drinks' : 'Baked',
       };
     }
 
     // Diagnose each ratio
-    if (sugarRatio > 1.2)       { issues.push('sugar is very high — expect thin, sweet, fast-browning results'); tags.push({ label: 'Too much sugar', color: 'red' }); severity = 'problem'; }
-    else if (sugarRatio > 1.05) { issues.push('sugar is elevated — baked goods will spread more and brown faster'); tags.push({ label: 'High sugar', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
+    const sugarProblemThreshold = isBrownieStyle ? 3.2 : 1.2;
+    const sugarWarningThreshold = isBrownieStyle ? 2.4 : 1.05;
+    if (sugarRatio > sugarProblemThreshold)       { issues.push('sugar is very high — expect thin, sweet, fast-browning results'); tags.push({ label: 'Too much sugar', color: 'red' }); severity = 'problem'; }
+    else if (sugarRatio > sugarWarningThreshold)  { issues.push('sugar is elevated — baked goods will spread more and brown faster'); tags.push({ label: 'High sugar', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
     const fatProblemThreshold = isBrownieStyle ? 1.8 : 0.85;
     const fatWarningThreshold = isBrownieStyle ? 1.4 : 0.65;
@@ -1292,8 +1315,10 @@ export function CreateRecipes() {
     else if (fatRatio > fatWarningThreshold)   { issues.push('fat is elevated — expect significant spread, chill dough before baking'); tags.push({ label: 'High fat', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
     else if (fatRatio < 0.25 && flour > 100) { issues.push('low fat for this flour — dough may be dry and stiff'); tags.push({ label: 'Low fat', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    if (eggRatio > 1.8)         { issues.push('too many eggs for this flour — result will be very puffy and cakey'); tags.push({ label: 'Too many eggs', color: 'red' }); severity = 'problem'; }
-    else if (eggRatio > 1.4)   { issues.push('high egg ratio — will lean soft and cakey. Great for fudgy bakes'); tags.push({ label: 'High eggs', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
+    const eggProblemThreshold = isBrownieStyle ? 2.6 : 1.8;
+    const eggWarningThreshold = isBrownieStyle ? 2.2 : 1.4;
+    if (eggRatio > eggProblemThreshold)          { issues.push('too many eggs for this flour — result will be very puffy and cakey'); tags.push({ label: 'Too many eggs', color: 'red' }); severity = 'problem'; }
+    else if (eggRatio > eggWarningThreshold)     { issues.push('high egg ratio — will lean soft and cakey. Great for fudgy bakes'); tags.push({ label: 'High eggs', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
     if (moistureRatio > 0.9 && !isHighLiquidRecipe) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
@@ -1309,14 +1334,14 @@ export function CreateRecipes() {
       const fudgy      = eggRatio >= 0.8  && sugarRatio >= 0.8 && fatRatio >= 0.4 && fatRatio <= 1.5;
       const moistBake  = moistureRatio >= 0.3 && fatRatio >= 0.3 && fatRatio <= 0.6;
 
-      if (fudgy)     return { headline: '✅ Balanced — Fudgy Brownie Profile', description: 'High eggs, sugar, and fat relative to flour is exactly right for dense, fudgy brownies. This ratio creates that characteristic crinkle top and chewy center.', tags: [...tags, { label: 'Fudgy', color: 'green' }, { label: 'Dense & rich', color: 'green' }], severity: 'good' };
-      if (chewy)     return { headline: '✅ Well-balanced — Classic Chewy Texture', description: 'Your ratios are dialed in for a classic chewy bake with a soft center and slightly crisp edges. Fat, sugar, and egg balance looks great.', tags: [...tags, { label: 'Chewy', color: 'green' }, { label: 'Balanced', color: 'green' }], severity: 'good' };
-      if (crispy)    return { headline: '✅ Balanced — Crispy Profile', description: 'Higher sugar and moderate fat with low moisture points toward crispy, snappy results. Expect good browning and thin, crunchy texture.', tags: [...tags, { label: 'Crispy', color: 'green' }, { label: 'Good spread', color: 'green' }], severity: 'good' };
-      if (cakey)     return { headline: '✅ Balanced — Soft Cake-Style', description: 'High eggs and moisture with moderate fat gives a pillowy, cake-like result. Great for muffins, cakes, or soft bakes.', tags: [...tags, { label: 'Soft & cakey', color: 'green' }, { label: 'Balanced', color: 'green' }], severity: 'good' };
-      if (buttery)   return { headline: '✅ Balanced — Rich & Buttery', description: 'High fat and lower sugar/egg points to a rich, crumbly, shortbread-style result. Minimal spread, melt-in-mouth texture.', tags: [...tags, { label: 'Rich & buttery', color: 'green' }, { label: 'Balanced', color: 'green' }], severity: 'good' };
-      if (moistBake) return { headline: '✅ Balanced — Moist & Tender', description: 'Good moisture and fat levels for a soft, tender result. Perfect for cakes, brownies, or quick breads.', tags: [...tags, { label: 'Moist & tender', color: 'green' }, { label: 'Balanced', color: 'green' }], severity: 'good' };
+      if (fudgy)     return { headline: '✅ Balanced — Fudgy Brownie Profile', description: 'High eggs, sugar, and fat relative to flour is exactly right for dense, fudgy brownies. This ratio creates that characteristic crinkle top and chewy center.', tags: [...tags, { label: 'Fudgy', color: 'green' }, { label: 'Dense & rich', color: 'green' }], severity: 'good', styleLabel: 'Brownie' };
+      if (chewy)     return { headline: '✅ Well-balanced — Classic Chewy Texture', description: 'Your ratios are dialed in for a classic chewy bake with a soft center and slightly crisp edges. Fat, sugar, and egg balance looks great.', tags: [...tags, { label: 'Chewy', color: 'green' }, { label: 'Balanced', color: 'green' }], severity: 'good', styleLabel: 'Cookie' };
+      if (crispy)    return { headline: '✅ Balanced — Crispy Profile', description: 'Higher sugar and moderate fat with low moisture points toward crispy, snappy results. Expect good browning and thin, crunchy texture.', tags: [...tags, { label: 'Crispy', color: 'green' }, { label: 'Good spread', color: 'green' }], severity: 'good', styleLabel: 'Cookie' };
+      if (cakey)     return { headline: '✅ Balanced — Soft Cake-Style', description: 'High eggs and moisture with moderate fat gives a pillowy, cake-like result. Great for muffins, cakes, or soft bakes.', tags: [...tags, { label: 'Soft & cakey', color: 'green' }, { label: 'Balanced', color: 'green' }], severity: 'good', styleLabel: 'Cake' };
+      if (buttery)   return { headline: '✅ Balanced — Rich & Buttery', description: 'High fat and lower sugar/egg points to a rich, crumbly, shortbread-style result. Minimal spread, melt-in-mouth texture.', tags: [...tags, { label: 'Rich & buttery', color: 'green' }, { label: 'Balanced', color: 'green' }], severity: 'good', styleLabel: 'Cookie' };
+      if (moistBake) return { headline: '✅ Balanced — Moist & Tender', description: 'Good moisture and fat levels for a soft, tender result. Perfect for cakes, brownies, or quick breads.', tags: [...tags, { label: 'Moist & tender', color: 'green' }, { label: 'Balanced', color: 'green' }], severity: 'good', styleLabel: isBrownieStyle ? 'Brownie' : 'Baked' };
 
-      return { headline: '✅ Recipe Looks Balanced', description: 'Your ingredient ratios are within normal baking ranges. Looking good!', tags: [...tags, { label: 'Balanced', color: 'green' }], severity: 'good' };
+      return { headline: '✅ Recipe Looks Balanced', description: 'Your ingredient ratios are within normal baking ranges. Looking good!', tags: [...tags, { label: 'Balanced', color: 'green' }], severity: 'good', styleLabel: isBrownieStyle ? 'Brownie' : isPancakeStyle ? 'Batter' : isSavoryStyle ? 'Savory' : isDrinkStyle ? 'Drinks' : 'Baked' };
     }
 
     const headline = severity === 'problem'
@@ -1327,7 +1352,7 @@ export function CreateRecipes() {
       ? `${issues[0].charAt(0).toUpperCase()}${issues[0].slice(1)}.`
       : issues.map((s, i) => `${i + 1}. ${s.charAt(0).toUpperCase()}${s.slice(1)}`).join('. ') + '.';
 
-    return { headline, description, tags, severity };
+    return { headline, description, tags, severity, styleLabel: isBrownieStyle ? 'Brownie' : isPancakeStyle ? 'Batter' : isSavoryStyle ? 'Savory' : isDrinkStyle ? 'Drinks' : 'Baked' };
   };
 
   // Recipe Summary Card Component
@@ -1362,6 +1387,11 @@ export function CreateRecipes() {
 
     return (
       <div className={`rounded-xl border-2 p-4 mb-4 ${bgClass}`}>
+        <div className="mb-2">
+          <span className="inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-full border bg-white/70 text-gray-700 border-gray-200">
+            Style: {summary.styleLabel}
+          </span>
+        </div>
         <div className={`font-bold mb-2 ${headlineClass}`}>{summary.headline}</div>
         <p className={`text-sm leading-relaxed mb-3 ${descClass}`}>{summary.description}</p>
         {summary.tags.length > 0 && (
