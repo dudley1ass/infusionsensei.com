@@ -82,10 +82,10 @@ const PACKS: PackTemplate[] = [
     title: "Game Night Pack Planner",
     subtitle: "Wings, fries, popcorn, and dessert with controlled dosing.",
     items: [
-      { id: "wings", name: "Infused Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 6, defaultMgEach: 2.5, perPersonQty: 1.5 },
+      { id: "wings", name: "Infused Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 32, defaultMgEach: 2.5, perPersonQty: 8 },
       { id: "fries", name: "Garlic Butter Fries", route: "/fries", suggestedRange: "3-5mg per serving", defaultQty: 2, defaultMgEach: 4, perPersonQty: 0.5 },
-      { id: "popcorn", name: "Caramel Popcorn", route: "/popcorn", suggestedRange: "2-3mg per bowl", defaultQty: 2, defaultMgEach: 2.5, perPersonQty: 0.5 },
-      { id: "brownie", name: "Cannabis Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 2, defaultMgEach: 7.5, perPersonQty: 0.5 },
+      { id: "popcorn", name: "Caramel Popcorn", route: "/popcorn", suggestedRange: "2-3mg per bowl", defaultQty: 2, defaultMgEach: 2.5, perPersonQty: 0.35 },
+      { id: "brownie", name: "Cannabis Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 4, defaultMgEach: 7.5, perPersonQty: 1 },
     ],
   },
   {
@@ -93,9 +93,9 @@ const PACKS: PackTemplate[] = [
     title: "Chill Night Pack Planner",
     subtitle: "Lower-dose flow for movie night or mellow hangs.",
     items: [
-      { id: "popcorn", name: "Garlic Butter Popcorn", route: "/popcorn", suggestedRange: "2-5mg per bowl", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.5 },
+      { id: "popcorn", name: "Garlic Butter Popcorn", route: "/popcorn", suggestedRange: "2-5mg per bowl", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.35 },
       { id: "coffee", name: "Infused Coffee or Tea", route: "/coffee", suggestedRange: "2.5-5mg per cup", defaultQty: 2, defaultMgEach: 3.5, perPersonQty: 0.5 },
-      { id: "wings", name: "Honey Mustard Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 4, defaultMgEach: 2.5, perPersonQty: 1 },
+      { id: "wings", name: "Honey Mustard Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 16, defaultMgEach: 2.5, perPersonQty: 4 },
     ],
   },
   {
@@ -103,7 +103,7 @@ const PACKS: PackTemplate[] = [
     title: "Dessert Pack Planner",
     subtitle: "Dessert-heavy dosing where overconsumption risk is highest.",
     items: [
-      { id: "brownie", name: "Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 2, defaultMgEach: 6, perPersonQty: 0.5 },
+      { id: "brownie", name: "Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 4, defaultMgEach: 6, perPersonQty: 1 },
       { id: "cookie", name: "Sugar Cookie", route: "/ingredients?category=baked-goods&recipe=sugar-cookies", suggestedRange: "3-7mg each", defaultQty: 2, defaultMgEach: 4, perPersonQty: 0.5 },
       { id: "gummy", name: "Gummy", route: "/ingredients?category=snacks&recipe=gummies", suggestedRange: "5-10mg each", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5 },
     ],
@@ -248,6 +248,16 @@ export function PartyPackPlanner() {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm text-blue-900">
+        <p className="font-black mb-2">Per-person quantity baseline used for auto-scaling</p>
+        <div className="grid md:grid-cols-2 gap-2">
+          <p>- Wings: 8 per person (light snack 4-6, average 6-10, game-night main 10-15)</p>
+          <p>- Fries: 0.5 order per person (1 large order serves about 2)</p>
+          <p>- Popcorn: 0.35 bowls per person (1 big bowl serves about 3-4)</p>
+          <p>- Brownies: 1 per person (rich brownies can be 0.5-1 each)</p>
         </div>
       </div>
 
