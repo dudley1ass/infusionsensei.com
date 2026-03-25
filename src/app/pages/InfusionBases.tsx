@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { InfusionBase } from "../types/infusion";
 import { defaultStrains, Strain } from "../data/cannabisData";
 import { CustomStrainDialog } from "../components/CustomStrainDialog";
+import { safeJsonParse } from "../utils/storage";
 
 interface InfusionRecipe {
   id: string;
@@ -507,16 +508,12 @@ export function InfusionBases() {
   // Load from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("infusionBases");
-    if (saved) {
-      setInfusionBases(JSON.parse(saved));
-    }
+    setInfusionBases(safeJsonParse<InfusionBase[]>(saved, []));
 
     const savedCustomStrains = localStorage.getItem("customStrains");
-    if (savedCustomStrains) {
-      const parsed = JSON.parse(savedCustomStrains);
-      setCustomStrains(parsed);
-      setAllStrains([...defaultStrains, ...parsed]);
-    }
+    const parsed = safeJsonParse<Strain[]>(savedCustomStrains, []);
+    setCustomStrains(parsed);
+    setAllStrains([...defaultStrains, ...parsed]);
   }, []);
 
   // Save to localStorage

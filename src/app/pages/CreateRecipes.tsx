@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { InfusionBase } from "../types/infusion";
 import { NutritionFactsLabel } from "../components/NutritionFactsLabel";
+import { safeJsonParse } from "../utils/storage";
 
 // GA4 event helper
 const trackEvent = (name: string, params?: Record<string, any>) => {
@@ -764,9 +765,7 @@ export function CreateRecipes() {
 
   useEffect(() => {
     const saved = localStorage.getItem("infusionBases");
-    if (saved) {
-      setInfusionBases(JSON.parse(saved));
-    }
+    setInfusionBases(safeJsonParse<InfusionBase[]>(saved, []));
   }, []);
 
   // Load standard recipe

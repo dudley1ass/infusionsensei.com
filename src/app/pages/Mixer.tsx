@@ -28,6 +28,7 @@ import { InfusionBase } from "../types/infusion";
 import { calculateTotalNutrition } from "../utils/nutritionCalculator";
 import { NutritionFactsLabel, NutritionFactsCompact } from "../components/NutritionFactsLabel";
 import { infusionTemplates } from "../data/infusionTemplates";
+import { safeJsonParse } from "../utils/storage";
 
 interface Ingredient {
   id: string;
@@ -57,10 +58,8 @@ export function Mixer() {
   // Load infusion bases
   useEffect(() => {
     const saved = localStorage.getItem("infusionBases");
-    if (saved) {
-      const customBases = JSON.parse(saved);
-      setInfusionBases(customBases);
-    }
+    const customBases = safeJsonParse<InfusionBase[]>(saved, []);
+    setInfusionBases(customBases);
   }, []);
 
   // Load template when selected
@@ -181,7 +180,7 @@ export function Mixer() {
 
     // Save to localStorage
     const saved = localStorage.getItem("customRecipes");
-    const recipes = saved ? JSON.parse(saved) : [];
+    const recipes = safeJsonParse<any[]>(saved, []);
     recipes.push(recipe);
     localStorage.setItem("customRecipes", JSON.stringify(recipes));
 
