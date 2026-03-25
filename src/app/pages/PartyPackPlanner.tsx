@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, Plus, Users } from "lucide-react";
+import { ArrowRight, CheckCircle2, Plus, Printer, Users } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -22,13 +22,16 @@ type PlannerItem = {
   suggestedRange: string;
   qty: number;
   mgEach: number;
+  unitLabel: string;
+  equivalentHint: string;
+  completed?: boolean;
 };
 
 type PackTemplate = {
   id: string;
   title: string;
   subtitle: string;
-  items: (Omit<PlannerItem, "qty" | "mgEach"> & { defaultQty: number; defaultMgEach: number; perPersonQty: number })[];
+  items: (Omit<PlannerItem, "qty" | "mgEach" | "completed"> & { defaultQty: number; defaultMgEach: number; perPersonQty: number })[];
 };
 
 const CANNED_INFUSIONS: InfusionBase[] = [
@@ -82,10 +85,10 @@ const PACKS: PackTemplate[] = [
     title: "Game Night Pack Planner",
     subtitle: "Wings, fries, popcorn, and dessert with controlled dosing.",
     items: [
-      { id: "wings", name: "Infused Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 32, defaultMgEach: 2.5, perPersonQty: 8 },
-      { id: "fries", name: "Garlic Butter Fries", route: "/fries", suggestedRange: "3-5mg per serving", defaultQty: 2, defaultMgEach: 4, perPersonQty: 0.5 },
-      { id: "popcorn", name: "Caramel Popcorn", route: "/popcorn", suggestedRange: "2-3mg per bowl", defaultQty: 2, defaultMgEach: 2.5, perPersonQty: 0.35 },
-      { id: "brownie", name: "Cannabis Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 4, defaultMgEach: 7.5, perPersonQty: 1 },
+      { id: "wings", name: "Infused Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 32, defaultMgEach: 2.5, perPersonQty: 8, unitLabel: "wings", equivalentHint: "~8-10 wings per person is average party sizing" },
+      { id: "fries", name: "Garlic Butter Fries", route: "/fries", suggestedRange: "3-5mg per serving", defaultQty: 2, defaultMgEach: 4, perPersonQty: 0.5, unitLabel: "fry orders", equivalentHint: "1 large fast-food fry order serves ~2 people" },
+      { id: "popcorn", name: "Caramel Popcorn", route: "/popcorn", suggestedRange: "2-3mg per bowl", defaultQty: 2, defaultMgEach: 2.5, perPersonQty: 0.35, unitLabel: "big bowls", equivalentHint: "1 big bowl serves ~3-4 people (~10-12 cups)" },
+      { id: "brownie", name: "Cannabis Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 4, defaultMgEach: 7.5, perPersonQty: 1, unitLabel: "brownie pieces", equivalentHint: "1 pan usually yields 9-16 brownie pieces" },
     ],
   },
   {
@@ -93,9 +96,9 @@ const PACKS: PackTemplate[] = [
     title: "Chill Night Pack Planner",
     subtitle: "Lower-dose flow for movie night or mellow hangs.",
     items: [
-      { id: "popcorn", name: "Garlic Butter Popcorn", route: "/popcorn", suggestedRange: "2-5mg per bowl", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.35 },
-      { id: "coffee", name: "Infused Coffee or Tea", route: "/coffee", suggestedRange: "2.5-5mg per cup", defaultQty: 2, defaultMgEach: 3.5, perPersonQty: 0.5 },
-      { id: "wings", name: "Honey Mustard Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 16, defaultMgEach: 2.5, perPersonQty: 4 },
+      { id: "popcorn", name: "Garlic Butter Popcorn", route: "/popcorn", suggestedRange: "2-5mg per bowl", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.35, unitLabel: "big bowls", equivalentHint: "1 big bowl serves ~3-4 people (~10-12 cups)" },
+      { id: "coffee", name: "Infused Coffee or Tea", route: "/coffee", suggestedRange: "2.5-5mg per cup", defaultQty: 2, defaultMgEach: 3.5, perPersonQty: 0.5, unitLabel: "cups", equivalentHint: "Plan 1 cup per 2 guests for chill packs" },
+      { id: "wings", name: "Honey Mustard Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 16, defaultMgEach: 2.5, perPersonQty: 4, unitLabel: "wings", equivalentHint: "Light snack baseline is 4-6 wings per person" },
     ],
   },
   {
@@ -103,9 +106,9 @@ const PACKS: PackTemplate[] = [
     title: "Dessert Pack Planner",
     subtitle: "Dessert-heavy dosing where overconsumption risk is highest.",
     items: [
-      { id: "brownie", name: "Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 4, defaultMgEach: 6, perPersonQty: 1 },
-      { id: "cookie", name: "Sugar Cookie", route: "/ingredients?category=baked-goods&recipe=sugar-cookies", suggestedRange: "3-7mg each", defaultQty: 2, defaultMgEach: 4, perPersonQty: 0.5 },
-      { id: "gummy", name: "Gummy", route: "/ingredients?category=snacks&recipe=gummies", suggestedRange: "5-10mg each", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5 },
+      { id: "brownie", name: "Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 4, defaultMgEach: 6, perPersonQty: 1, unitLabel: "brownie pieces", equivalentHint: "1 pan usually yields 9-16 brownie pieces" },
+      { id: "cookie", name: "Sugar Cookie", route: "/ingredients?category=baked-goods&recipe=sugar-cookies", suggestedRange: "3-7mg each", defaultQty: 2, defaultMgEach: 4, perPersonQty: 0.5, unitLabel: "cookies", equivalentHint: "Dessert tables usually plan 1 piece per person" },
+      { id: "gummy", name: "Gummy", route: "/ingredients?category=snacks&recipe=gummies", suggestedRange: "5-10mg each", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5, unitLabel: "gummies", equivalentHint: "Pre-portion gummies before serving for safer pacing" },
     ],
   },
   {
@@ -113,9 +116,9 @@ const PACKS: PackTemplate[] = [
     title: "Drinks Pack Planner",
     subtitle: "Dose-controlled beverages for social settings.",
     items: [
-      { id: "lemonade", name: "Infused Lemonade", route: "/ingredients?category=drinks", suggestedRange: "2.5-5mg per glass", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.5 },
-      { id: "chai", name: "Infused Chai Latte", route: "/coffee", suggestedRange: "5mg per cup", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5 },
-      { id: "tonic", name: "THC Espresso Tonic", route: "/coffee", suggestedRange: "5mg per glass", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5 },
+      { id: "lemonade", name: "Infused Lemonade", route: "/ingredients?category=drinks", suggestedRange: "2.5-5mg per glass", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.5, unitLabel: "glasses", equivalentHint: "Drinks are easy to stack; keep portions clearly labeled" },
+      { id: "chai", name: "Infused Chai Latte", route: "/coffee", suggestedRange: "5mg per cup", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5, unitLabel: "cups", equivalentHint: "Plan 1 infused cup for every 2 guests by default" },
+      { id: "tonic", name: "THC Espresso Tonic", route: "/coffee", suggestedRange: "5mg per glass", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5, unitLabel: "glasses", equivalentHint: "Offer non-infused versions beside infused drinks" },
     ],
   },
 ];
@@ -130,6 +133,7 @@ const getDoseRecommendation = (mgEach: number): string => {
 export function PartyPackPlanner() {
   const { packId = "" } = useParams();
   const pack = PACKS.find((p) => p.id === packId) ?? PACKS[0];
+  const progressStorageKey = `party-pack-progress:${pack.id}`;
 
   const buildPackItems = (people: number): PlannerItem[] =>
     pack.items.map((i) => ({
@@ -139,6 +143,9 @@ export function PartyPackPlanner() {
       suggestedRange: i.suggestedRange,
       qty: Math.max(1, Math.ceil(people * i.perPersonQty)),
       mgEach: i.defaultMgEach,
+      unitLabel: i.unitLabel,
+      equivalentHint: i.equivalentHint,
+      completed: false,
     }));
 
   const [items, setItems] = useState<PlannerItem[]>(buildPackItems(4));
@@ -159,6 +166,12 @@ export function PartyPackPlanner() {
   useEffect(() => {
     setItems(buildPackItems(peopleCount));
   }, [pack.id]);
+
+  useEffect(() => {
+    const savedProgress = safeJsonParse<Record<string, boolean>>(localStorage.getItem(progressStorageKey), {});
+    if (Object.keys(savedProgress).length === 0) return;
+    setItems((prev) => prev.map((item) => ({ ...item, completed: !!savedProgress[item.id] })));
+  }, [progressStorageKey]);
 
   useEffect(() => {
     // Auto-scale base pack quantities when guest count changes.
@@ -190,6 +203,9 @@ export function PartyPackPlanner() {
         suggestedRange: "Set your target",
         qty: 1,
         mgEach: 5,
+        unitLabel: "servings",
+        equivalentHint: "Use your own serving estimate",
+        completed: false,
       },
     ]);
   };
@@ -199,6 +215,20 @@ export function PartyPackPlanner() {
       prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
   };
+
+  const toggleCompleted = (id: string) => {
+    setItems((prev) => {
+      const next = prev.map((item) =>
+        item.id === id ? { ...item, completed: !item.completed } : item
+      );
+      const progress = Object.fromEntries(next.map((item) => [item.id, !!item.completed]));
+      localStorage.setItem(progressStorageKey, JSON.stringify(progress));
+      return next;
+    });
+  };
+
+  const nextPendingItem = items.find((item) => !item.completed);
+  const completedCount = items.filter((item) => item.completed).length;
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -213,6 +243,9 @@ export function PartyPackPlanner() {
       <div className="bg-gradient-to-br from-purple-900 via-indigo-900 to-gray-900 rounded-3xl p-8 text-white shadow-2xl">
         <h1 className="text-3xl md:text-4xl font-black mb-2">{pack.title}</h1>
         <p className="text-purple-100">{pack.subtitle}</p>
+        <p className="text-purple-200 text-sm mt-2">
+          Progress: {completedCount}/{items.length} items built
+        </p>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-2xl p-5">
@@ -275,9 +308,10 @@ export function PartyPackPlanner() {
                     className="mt-1"
                   />
                   <p className="text-xs text-gray-500 mt-1">Suggested: {item.suggestedRange}</p>
+                  <p className="text-xs text-gray-500 mt-1">{item.equivalentHint}</p>
                 </div>
                 <div>
-                  <Label className="text-xs font-bold text-gray-500">Qty</Label>
+                  <Label className="text-xs font-bold text-gray-500">Qty ({item.unitLabel})</Label>
                   <Input
                     type="number"
                     min={1}
@@ -306,12 +340,30 @@ export function PartyPackPlanner() {
                 <span className="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-semibold">
                   Item total: {itemTotal.toFixed(1)}mg
                 </span>
+                <span className="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-semibold">
+                  {item.qty} {item.unitLabel}
+                </span>
                 <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">
                   Recommendation: {getDoseRecommendation(item.mgEach)}
                 </span>
-                <Link to={item.route} className="text-green-700 font-semibold hover:underline">
-                  Open recipe
+                <Link
+                  to={`${item.route}${item.route.includes("?") ? "&" : "?"}returnTo=${encodeURIComponent(`/party-mode/plan/${pack.id}`)}&fromPack=${pack.id}&item=${item.id}`}
+                  className="text-green-700 font-semibold hover:underline"
+                >
+                  Build this item
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => toggleCompleted(item.id)}
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border font-semibold ${
+                    item.completed
+                      ? "bg-green-50 border-green-200 text-green-700"
+                      : "bg-gray-50 border-gray-200 text-gray-700"
+                  }`}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  {item.completed ? "Built" : "Mark built"}
+                </button>
               </div>
             </div>
           );
@@ -368,7 +420,26 @@ export function PartyPackPlanner() {
         )}
       </div>
 
+      {nextPendingItem && (
+        <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
+          <p className="text-sm text-green-800 font-semibold mb-2">
+            Next step in your party flow:
+          </p>
+          <Link
+            to={`${nextPendingItem.route}${nextPendingItem.route.includes("?") ? "&" : "?"}returnTo=${encodeURIComponent(`/party-mode/plan/${pack.id}`)}&fromPack=${pack.id}&item=${nextPendingItem.id}`}
+            className="inline-flex items-center gap-2 text-green-700 font-bold hover:underline"
+          >
+            Build {nextPendingItem.name}
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-3">
+        <Button onClick={() => window.print()} variant="outline" className="font-bold">
+          <Printer className="w-4 h-4 mr-1.5" />
+          Print Party Package
+        </Button>
         <Link to="/infusions">
           <Button className="bg-green-600 hover:bg-green-700 text-white font-bold">
             Build / Manage Infusions <ArrowRight className="w-4 h-4 ml-2" />
