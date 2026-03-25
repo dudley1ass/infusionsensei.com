@@ -58,7 +58,7 @@ export function Fries() {
       </Helmet>
 
       <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{minHeight:"280px"}}>
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-500 via-orange-400 to-yellow-600" />
+        <img src="/IMAGES/fries.jpg" alt="Infused fries" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         <div className="relative z-10 px-6 py-14 text-center">
           <div className="text-6xl mb-3">🍟</div>
@@ -108,7 +108,7 @@ export function Fries() {
                       </ol>
                       <p className="text-xs text-gray-500 italic bg-orange-50 rounded-lg px-3 py-2 mt-2">💡 {recipe.note}</p>
                     </div>
-                    <Link to="/ingredients?category=savory-meals&recipe=garlic-pasta" className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => e.stopPropagation()}>
+                    <Link to="/ingredients?category=savory-meals&recipe=garlic-butter-fries" className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => e.stopPropagation()}>
                       <ChefHat className="w-4 h-4" /> Move to Recipe Builder
                     </Link>
                   </div>

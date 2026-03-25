@@ -7,7 +7,29 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-NPRV1R0RPP');
+      gtag('config', 'G-NPRV1R0RPP', {
+        // Capture UTM params from URL automatically
+        allow_google_signals: true,
+        allow_ad_personalization_signals: false,
+        // Send page_view on every route change (SPA support)
+        send_page_view: true
+      });
+
+      // Capture UTM params and store them for the session
+      (function() {
+        var params = new URLSearchParams(window.location.search);
+        var utmData = {};
+        ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(key) {
+          var val = params.get(key);
+          if (val) {
+            utmData[key] = val;
+            sessionStorage.setItem(key, val);
+          }
+        });
+        if (Object.keys(utmData).length > 0) {
+          gtag('event', 'utm_capture', utmData);
+        }
+      })();
     </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />

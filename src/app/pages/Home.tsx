@@ -37,7 +37,7 @@ export function Home() {
             {[
               { emoji: "🍗", label: "Infused Wings", sub: "20 sauces", to: "/wings", img: "/IMAGES/chickenwings.jpg", coming: false },
               { emoji: "🍿", label: "Infused Popcorn", sub: "20 flavors", to: "/popcorn", img: "/IMAGES/popcorn.webp", coming: false },
-              { emoji: "☕", label: "Infused Coffee", sub: "20 drinks", to: "/coffee", img: null, coming: false },
+              { emoji: "☕", label: "Infused Coffee", sub: "20 drinks", to: "/coffee", img: "/IMAGES/coffee.jpg", coming: false },
               { emoji: "🍟", label: "Infused Fries", sub: "20 flavors", to: "/fries", img: null, coming: false },
             ].map(({ emoji, label, sub, to, img, coming }) => (
               <Link key={label} to={to}>

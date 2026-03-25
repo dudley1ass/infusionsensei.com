@@ -59,7 +59,7 @@ export function Coffee() {
       </Helmet>
 
       <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{minHeight:"280px"}}>
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-900 via-amber-800 to-yellow-900" />
+        <img src="/IMAGES/coffee.jpg" alt="Infused coffee" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         <div className="relative z-10 px-6 py-14 text-center">
           <div className="text-6xl mb-3">☕</div>
