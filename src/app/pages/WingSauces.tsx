@@ -211,7 +211,7 @@ export function WingSauces() {
   'classic-buffalo-wings'
 }`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
-                      onClick={e => { e.stopPropagation(); if(typeof gtag!=="undefined") gtag("event","move_to_builder",{source:"wingsauces"}); }}
+                      onClick={e => { e.stopPropagation(); if(typeof window.gtag==="function") window.gtag("event","move_to_builder",{source:"wingsauces"}); }}
                     >
                       <ChefHat className="w-4 h-4" /> Move to Recipe Builder
                     </Link>

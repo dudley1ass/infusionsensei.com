@@ -30,6 +30,14 @@ import {
 import { InfusionBase } from "../types/infusion";
 import { NutritionFactsLabel } from "../components/NutritionFactsLabel";
 
+// GA4 event helper
+const trackEvent = (name: string, params?: Record<string, any>) => {
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', name, params);
+  }
+};
+
+
 // Common ingredient library
 const INGREDIENT_LIBRARY = [
   // ── INFUSED (Cannabis) ──────────────────────────────────────────
@@ -1829,7 +1837,7 @@ export function CreateRecipes() {
             {categoryRecipes.map((recipe) => (
               <button
                 key={recipe.id}
-                onClick={() => { setRecipeType("standard"); setSelectedStandardRecipe(recipe.id); if(typeof gtag!=='undefined') gtag('event','recipe_selected',{recipe_name:recipe.name}); }}
+                onClick={() => { setRecipeType("standard"); setSelectedStandardRecipe(recipe.id); trackEvent('recipe_selected', {recipe_name: recipe.name}); }}
                 className="w-full bg-white border-2 border-gray-200 hover:border-green-500 hover:shadow-md rounded-2xl p-4 text-left transition-all group flex items-center gap-4"
               >
                 <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 group-hover:bg-green-200 transition-colors">
@@ -1861,7 +1869,7 @@ export function CreateRecipes() {
 
         {/* Start from scratch */}
         <button
-          onClick={() => { startCustomRecipe(); if(typeof gtag!=='undefined') gtag('event','custom_recipe_started'); }}
+          onClick={() => { startCustomRecipe(); trackEvent('custom_recipe_started'); }}
           className="w-full bg-white border-2 border-dashed border-gray-300 hover:border-purple-400 hover:bg-purple-50/30 rounded-2xl p-4 text-left transition-all group flex items-center gap-4"
         >
           <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-purple-100 transition-colors">
@@ -2188,7 +2196,7 @@ export function CreateRecipes() {
             </Button>
             <div className="flex items-center gap-2">
               <Badge className="bg-green-600 text-white px-3 py-1">{category?.emoji} {category?.name}</Badge>
-              <Button onClick={() => window.print()} variant="outline" size="sm"
+              <Button onClick={() => { window.print(); trackEvent('print_recipe'); }} variant="outline" size="sm"
                 className="border-green-300 text-green-700 hover:bg-green-50 gap-1.5">
                 <Printer className="w-4 h-4" /> Print
               </Button>
@@ -2232,7 +2240,7 @@ export function CreateRecipes() {
                   <ArrowLeftRight className="w-3 h-3" />
                   {measurementSystem === "metric" ? "Switch to oz" : "Switch to g"}
                 </Button>
-                <Button onClick={() => { addIngredient(); if(typeof gtag!=='undefined') gtag('event','ingredient_added'); }} size="sm" className="bg-white text-green-700 hover:bg-green-50 font-bold text-xs gap-1">
+                <Button onClick={() => { addIngredient(); trackEvent('ingredient_added'); }} size="sm" className="bg-white text-green-700 hover:bg-green-50 font-bold text-xs gap-1">
                   <Plus className="w-3 h-3" /> Add
                 </Button>
               </div>
