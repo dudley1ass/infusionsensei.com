@@ -32,10 +32,18 @@ import { Coffee } from "./pages/Coffee";
 import { Fries } from "./pages/Fries";
 import { UTMBuilder } from "./pages/UTMBuilder";
 import { THCCalculatorPage } from "./pages/THCCalculatorPage";
+import { EdiblePotencyGuide } from "./pages/EdiblePotencyGuide";
+import { CannabisEdibleRecipesPage } from "./pages/CannabisEdibleRecipesPage";
+import { InfusedDrinksPage } from "./pages/InfusedDrinksPage";
+import { SavoryCannabisPage } from "./pages/SavoryCannabisPage";
 import { Coffee } from "./pages/Coffee";
 import { Fries } from "./pages/Fries";
 import { UTMBuilder } from "./pages/UTMBuilder";
 import { THCCalculatorPage } from "./pages/THCCalculatorPage";
+import { EdiblePotencyGuide } from "./pages/EdiblePotencyGuide";
+import { CannabisEdibleRecipesPage } from "./pages/CannabisEdibleRecipesPage";
+import { InfusedDrinksPage } from "./pages/InfusedDrinksPage";
+import { SavoryCannabisPage } from "./pages/SavoryCannabisPage";
 
 export const router = createBrowserRouter([
   {
@@ -54,10 +62,18 @@ export const router = createBrowserRouter([
       { path: "fries", Component: Fries },
       { path: "utm", Component: UTMBuilder },
       { path: "thc-calculator", Component: THCCalculatorPage },
+      { path: "edible-potency-guide", Component: EdiblePotencyGuide },
+      { path: "edible-recipes", Component: CannabisEdibleRecipesPage },
+      { path: "infused-drinks", Component: InfusedDrinksPage },
+      { path: "savory-cannabis", Component: SavoryCannabisPage },
       { path: "coffee", Component: Coffee },
       { path: "fries", Component: Fries },
       { path: "utm", Component: UTMBuilder },
       { path: "thc-calculator", Component: THCCalculatorPage },
+      { path: "edible-potency-guide", Component: EdiblePotencyGuide },
+      { path: "edible-recipes", Component: CannabisEdibleRecipesPage },
+      { path: "infused-drinks", Component: InfusedDrinksPage },
+      { path: "savory-cannabis", Component: SavoryCannabisPage },
       { path: "learn", Component: Learn },
       // Original articles
       { path: "learn/articles/beginner-guide", Component: BeginnerCookingGuide },
