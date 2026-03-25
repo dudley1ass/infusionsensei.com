@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChefHat, Flame, Star } from "lucide-react";
 import { Badge } from "../components/ui/badge";
@@ -88,6 +88,14 @@ function SweetnessBar({ level }: { level: number }) {
 export function WingSauces() {
   const [activeTag, setActiveTag] = useState("all");
   const [selectedSauce, setSelectedSauce] = useState<Sauce | null>(null);
+  const [searchParams] = useSearchParams();
+
+  const sauceIdParam = searchParams.get("sauce");
+  const servingsParamRaw = searchParams.get("servings");
+  const servingsOverride = servingsParamRaw ? Math.max(1, Math.floor(Number(servingsParamRaw) || 1)) : null;
+  const returnToPartyPack = searchParams.get("returnToPartyPack");
+  const partyPackId = searchParams.get("partyPackId");
+  const partyItemId = searchParams.get("partyItemId");
 
   const filtered = activeTag === "all"
     ? SAUCES
@@ -99,6 +107,23 @@ export function WingSauces() {
       activeTag === "all" || s.tags.includes(activeTag)
     )
   })).filter(sec => sec.sauces.length > 0);
+
+  useEffect(() => {
+    if (!sauceIdParam) return;
+    const found = SAUCES.find((s) => s.id === sauceIdParam);
+    if (found) {
+      setActiveTag("all");
+      setSelectedSauce(found);
+    }
+  }, [sauceIdParam]);
+
+  const servingsQuery = servingsOverride ? `&servings=${encodeURIComponent(servingsOverride)}` : "";
+  const returnQuery =
+    returnToPartyPack && partyPackId && partyItemId
+      ? `&returnToPartyPack=${encodeURIComponent(returnToPartyPack)}&partyPackId=${encodeURIComponent(
+          partyPackId
+        )}&partyItemId=${encodeURIComponent(partyItemId)}`
+      : "";
 
   return (
     <div className="max-w-6xl mx-auto space-y-10">
@@ -209,7 +234,7 @@ export function WingSauces() {
   sauce.id === 'chimichurri' ? 'chimichurri-wings' :
   sauce.id === 'ranch-butter' ? 'ranch-butter-wings' :
   'classic-buffalo-wings'
-}`}
+}${servingsQuery}${returnQuery}`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
                       onClick={e => { e.stopPropagation(); if(typeof window.gtag==="function") window.gtag("event","move_to_builder",{source:"wingsauces"}); }}
                     >

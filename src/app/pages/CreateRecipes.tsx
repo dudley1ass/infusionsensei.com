@@ -703,6 +703,12 @@ export function CreateRecipes() {
   // Auto-load recipe from URL params: /ingredients?category=savory-meals&recipe=classic-buffalo-wings
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const servingsOverrideParamRaw = searchParams.get("servings");
+  const servingsOverrideParam = servingsOverrideParamRaw ? Number(servingsOverrideParamRaw) : null;
+  const returnToPartyPack = searchParams.get("returnToPartyPack");
+  const partyPackId = searchParams.get("partyPackId");
+  const partyItemId = searchParams.get("partyItemId");
+  const partyProgressKey = partyPackId ? `party-pack-progress:${partyPackId}` : null;
   useEffect(() => {
     const cat = searchParams.get("category");
     const rec = searchParams.get("recipe");
@@ -712,6 +718,21 @@ export function CreateRecipes() {
       setSelectedStandardRecipe(rec);
     }
   }, []);
+
+  const handleReturnToPartyPack = () => {
+    if (!returnToPartyPack || !partyProgressKey || !partyItemId) {
+      navigate(returnToPartyPack || "/party-mode");
+      return;
+    }
+
+    const existing = safeJsonParse<Record<string, boolean>>(
+      localStorage.getItem(partyProgressKey),
+      {}
+    );
+    const next = { ...existing, [partyItemId]: true };
+    localStorage.setItem(partyProgressKey, JSON.stringify(next));
+    navigate(returnToPartyPack);
+  };
 
   // Add pantry item
   const addPantryItem = (item: string) => {
@@ -775,7 +796,12 @@ export function CreateRecipes() {
       const recipe = standardRecipes[selectedCategory]?.find(r => r.id === selectedStandardRecipe);
       if (recipe) {
         setRecipeName(recipe.name);
-        setServings(recipe.servings);
+        const overrideServings =
+          servingsOverrideParam && servingsOverrideParam > 0
+            ? Math.max(1, Math.round(servingsOverrideParam))
+            : null;
+        const scaleFactor = overrideServings ? overrideServings / Math.max(1, recipe.servings) : 1;
+        setServings(overrideServings ?? recipe.servings);
         setInstructions([...recipe.instructions]);
         
         // Build ingredients from template
@@ -786,7 +812,7 @@ export function CreateRecipes() {
           if (libraryItem) {
             return {
               name: ingName,
-              amount: recipe.amounts[idx],
+              amount: recipe.amounts[idx] * scaleFactor,
               unit,
               isInfused: libraryItem.category === "infused",
               thcPerUnit: libraryItem.thcPerUnit || 0,
@@ -799,7 +825,7 @@ export function CreateRecipes() {
           }
           return {
             name: ingName,
-            amount: recipe.amounts[idx],
+            amount: recipe.amounts[idx] * scaleFactor,
             unit,
             calories: 0,
             carbs: 0,
@@ -812,7 +838,7 @@ export function CreateRecipes() {
         setMeasurementSystem("metric");
       }
     }
-  }, [selectedStandardRecipe, selectedCategory]);
+  }, [selectedStandardRecipe, selectedCategory, servingsOverrideParamRaw]);
 
   // Calculate total THC
   const totalTHC = ingredients.reduce((sum, ing) => {
@@ -2245,6 +2271,16 @@ export function CreateRecipes() {
             </Button>
             <div className="flex items-center gap-2">
               <Badge className="bg-green-600 text-white px-3 py-1">{category?.emoji} {category?.name}</Badge>
+              {returnToPartyPack && partyPackId && partyItemId && (
+                <Button
+                  onClick={handleReturnToPartyPack}
+                  variant="outline"
+                  size="sm"
+                  className="border-orange-300 text-orange-700 hover:bg-orange-50 gap-1.5"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to Party Pack
+                </Button>
+              )}
               <Button onClick={() => { window.print(); trackEvent('print_recipe'); }} variant="outline" size="sm"
                 className="border-green-300 text-green-700 hover:bg-green-50 gap-1.5">
                 <Printer className="w-4 h-4" /> Print

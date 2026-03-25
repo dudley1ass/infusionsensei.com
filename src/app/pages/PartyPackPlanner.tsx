@@ -134,6 +134,15 @@ export function PartyPackPlanner() {
   const { packId = "" } = useParams();
   const pack = PACKS.find((p) => p.id === packId) ?? PACKS[0];
   const progressStorageKey = `party-pack-progress:${pack.id}`;
+  const wingsStorageKey = `party-pack-wings:${pack.id}`;
+  const wingSauceLabels: Record<string, string> = {
+    "garlic-parmesan": "Garlic Parmesan",
+    "classic-buffalo": "Classic Buffalo",
+    "nashville-hot": "Nashville Hot",
+    "honey-bbq": "Honey BBQ",
+    "lemon-pepper": "Lemon Pepper",
+    "honey-mustard": "Honey Mustard",
+  };
 
   const buildPackItems = (people: number): PlannerItem[] =>
     pack.items.map((i) => ({
@@ -152,6 +161,13 @@ export function PartyPackPlanner() {
   const [infusions, setInfusions] = useState<InfusionBase[]>([]);
   const [selectedInfusionId, setSelectedInfusionId] = useState<string>("");
   const [peopleCount, setPeopleCount] = useState<number>(4);
+  const [savedWingsSplit, setSavedWingsSplit] = useState<WingsSplitState | null>(null);
+
+  type WingsSplitState = {
+    totalWings: number;
+    mgEach: number;
+    flavors: { sauceId: string; qtyWings: number }[];
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem("infusionBases");
@@ -174,16 +190,29 @@ export function PartyPackPlanner() {
   }, [progressStorageKey]);
 
   useEffect(() => {
+    const saved = safeJsonParse<WingsSplitState | null>(localStorage.getItem(wingsStorageKey), null);
+    setSavedWingsSplit(saved);
+  }, [wingsStorageKey]);
+
+  useEffect(() => {
+    if (!savedWingsSplit) return;
+    setItems((prev) =>
+      prev.map((item) => (item.id === "wings" ? { ...item, qty: savedWingsSplit.totalWings, mgEach: savedWingsSplit.mgEach } : item))
+    );
+  }, [savedWingsSplit]);
+
+  useEffect(() => {
     // Auto-scale base pack quantities when guest count changes.
     setItems((prev) => {
       const templateById = new Map(pack.items.map((i) => [i.id, i]));
       return prev.map((item) => {
         const template = templateById.get(item.id);
         if (!template) return item; // Keep custom items as-is.
+        if (item.id === "wings" && savedWingsSplit) return item;
         return { ...item, qty: Math.max(1, Math.ceil(peopleCount * template.perPersonQty)) };
       });
     });
-  }, [peopleCount, pack.id]);
+  }, [peopleCount, pack.id, savedWingsSplit]);
 
   const selectedInfusion = useMemo(
     () => infusions.find((i) => i.id === selectedInfusionId) ?? null,
@@ -347,7 +376,13 @@ export function PartyPackPlanner() {
                   Recommendation: {getDoseRecommendation(item.mgEach)}
                 </span>
                 <Link
-                  to={`${item.route}${item.route.includes("?") ? "&" : "?"}returnTo=${encodeURIComponent(`/party-mode/plan/${pack.id}`)}&fromPack=${pack.id}&item=${item.id}`}
+                  to={
+                    item.id === "wings"
+                      ? `/party-mode/plan/${encodeURIComponent(pack.id)}/wings`
+                      : `${item.route}${item.route.includes("?") ? "&" : "?"}returnTo=${encodeURIComponent(
+                          `/party-mode/plan/${pack.id}`
+                        )}&fromPack=${pack.id}&item=${item.id}`
+                  }
                   className="text-green-700 font-semibold hover:underline"
                 >
                   Build this item
@@ -451,6 +486,34 @@ export function PartyPackPlanner() {
             Back to Party Mode
           </Button>
         </Link>
+      </div>
+
+      {/* Grocery list for print */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+        <h2 className="text-xl font-black text-gray-900 mb-3">Party Grocery List (Wings)</h2>
+        {!savedWingsSplit ? (
+          <p className="text-sm text-gray-600">Plan your wings to generate a grocery list.</p>
+        ) : (
+          <div className="space-y-2 text-sm text-gray-800">
+            <p>
+              <span className="font-black">Chicken wings:</span> {savedWingsSplit.totalWings} wings
+            </p>
+            {savedWingsSplit.flavors.length === 0 ? (
+              <p className="text-gray-600">No wing flavors saved yet.</p>
+            ) : (
+              savedWingsSplit.flavors.map((f) => (
+                <div key={f.sauceId} className="bg-gray-50 border border-gray-100 rounded-xl p-3">
+                  <p className="font-black">
+                    {wingSauceLabels[f.sauceId] ?? f.sauceId} — {f.qtyWings} wings
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Build these flavors in the Wing Sauce planner to get exact ingredient amounts.
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

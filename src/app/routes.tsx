@@ -36,6 +36,7 @@ import { WingSauces } from "./pages/WingSauces";
 import { Popcorn } from "./pages/Popcorn";
 import { Coffee } from "./pages/Coffee";
 import { Fries } from "./pages/Fries";
+import { PartyWingsSplit } from "./pages/PartyWingsSplit";
 import { UTMBuilder } from "./pages/UTMBuilder";
 import { THCCalculatorPage } from "./pages/THCCalculatorPage";
 import { EdiblePotencyGuide } from "./pages/EdiblePotencyGuide";
@@ -92,6 +93,7 @@ export const router = createBrowserRouter([
       { path: "dinner-of-the-week", Component: DinnerOfTheWeek },
       { path: "party-mode", Component: PartyMode },
       { path: "party-mode/plan/:packId", Component: PartyPackPlanner },
+      { path: "party-mode/plan/:packId/wings", Component: PartyWingsSplit },
     ],
   },
 ]);
