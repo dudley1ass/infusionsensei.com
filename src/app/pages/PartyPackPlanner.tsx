@@ -123,11 +123,31 @@ const PACKS: PackTemplate[] = [
   },
 ];
 
-const getDoseRecommendation = (mgEach: number): string => {
-  if (mgEach <= 2.5) return "Micro";
-  if (mgEach <= 5) return "Low";
-  if (mgEach <= 10) return "Moderate";
-  return "High";
+const getDoseLevelDetails = (mgEach: number) => {
+  if (mgEach <= 2.5) return { label: "Micro", desc: "very light", color: "bg-blue-50 border-blue-200 text-blue-700" };
+  if (mgEach <= 5) return { label: "Low", desc: "light", color: "bg-green-50 border-green-200 text-green-700" };
+  if (mgEach <= 10) return { label: "Moderate", desc: "standard", color: "bg-yellow-50 border-yellow-200 text-yellow-800" };
+  return { label: "High", desc: "strong", color: "bg-orange-50 border-orange-200 text-orange-800" };
+};
+
+const getDoseLabelForUnit = (unitLabel: string): string => {
+  const normalized = unitLabel.trim().toLowerCase();
+  if (normalized === "wings") return "Dose per wing";
+  if (normalized === "fry orders") return "Dose per fry order";
+  if (normalized === "big bowls") return "Dose per bowl";
+  if (normalized === "brownie pieces") return "Dose per brownie";
+  if (normalized === "cookies") return "Dose per cookie";
+  if (normalized === "gummies") return "Dose per gummy";
+  if (normalized === "cups") return "Dose per cup";
+  if (normalized === "glasses") return "Dose per glass";
+  if (normalized === "cookies" || normalized === "cake slices") return "Dose per piece";
+  return "Dose per item";
+};
+
+const getPerPersonDoseTone = (mgPerPerson: number) => {
+  if (mgPerPerson < 10) return { label: "Low", color: "bg-green-50 border-green-200 text-green-700" };
+  if (mgPerPerson < 20) return { label: "Moderate", color: "bg-yellow-50 border-yellow-200 text-yellow-800" };
+  return { label: "Strong", color: "bg-red-50 border-red-200 text-red-800" };
 };
 
 export function PartyPackPlanner() {
@@ -258,6 +278,7 @@ export function PartyPackPlanner() {
 
   const nextPendingItem = items.find((item) => !item.completed);
   const completedCount = items.filter((item) => item.completed).length;
+  const nextStepIndex = nextPendingItem ? items.findIndex((i) => i.id === nextPendingItem.id) : -1;
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -327,7 +348,12 @@ export function PartyPackPlanner() {
         {items.map((item) => {
           const itemTotal = item.qty * item.mgEach;
           return (
-            <div key={item.id} className="bg-white border border-gray-200 rounded-2xl p-4">
+            <div
+              key={item.id}
+              className={`bg-white border border-gray-200 rounded-2xl p-4 ${
+                item.id === "wings" ? "border-orange-300 shadow-md ring-2 ring-orange-100" : ""
+              }`}
+            >
               <div className="grid md:grid-cols-4 gap-3 items-end">
                 <div className="md:col-span-2">
                   <Label className="text-xs font-bold text-gray-500">Item</Label>
@@ -352,7 +378,7 @@ export function PartyPackPlanner() {
                   />
                 </div>
                 <div>
-                  <Label className="text-xs font-bold text-gray-500">mg each</Label>
+                  <Label className="text-xs font-bold text-gray-500">{getDoseLabelForUnit(item.unitLabel)}</Label>
                   <Input
                     type="number"
                     min={0}
@@ -365,16 +391,26 @@ export function PartyPackPlanner() {
                   />
                 </div>
               </div>
+              {peopleCount > 0 && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Auto: ~{(item.qty / peopleCount).toFixed(1)} {item.unitLabel} per person
+                </p>
+              )}
               <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
                 <span className="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-semibold">
-                  Item total: {itemTotal.toFixed(1)}mg
+                  Total THC for this item: {itemTotal.toFixed(1)}mg
                 </span>
                 <span className="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-semibold">
                   {item.qty} {item.unitLabel}
                 </span>
-                <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">
-                  Recommendation: {getDoseRecommendation(item.mgEach)}
-                </span>
+                {(() => {
+                  const details = getDoseLevelDetails(item.mgEach);
+                  return (
+                    <span className={`${details.color} border px-2 py-0.5 rounded-full font-semibold text-xs`}>
+                      Dose level: {details.label} ({details.desc})
+                    </span>
+                  );
+                })()}
                 <Link
                   to={
                     item.id === "wings"
@@ -387,6 +423,13 @@ export function PartyPackPlanner() {
                 >
                   Build this item
                 </Link>
+                {item.id === "wings" && savedWingsSplit && (
+                  <Link to={`/party-mode/plan/${encodeURIComponent(pack.id)}/wings`}>
+                    <Button size="sm" variant="outline" className="border-orange-200 text-orange-800 hover:bg-orange-50">
+                      Edit wing split
+                    </Button>
+                  </Link>
+                )}
                 <button
                   type="button"
                   onClick={() => toggleCompleted(item.id)}
@@ -420,6 +463,16 @@ export function PartyPackPlanner() {
           <div className="bg-gray-900 rounded-xl p-3">
             <p className="text-xs text-gray-400">Per person ({peopleCount})</p>
             <p className="text-2xl font-black">{mgPerPerson.toFixed(1)}mg</p>
+            <div className="mt-2">
+              {(() => {
+                const tone = getPerPersonDoseTone(mgPerPerson);
+                return (
+                  <span className={`inline-flex items-center gap-2 border rounded-full px-3 py-1 text-xs font-bold ${tone.color}`}>
+                    🔥 {tone.label}
+                  </span>
+                );
+              })()}
+            </div>
           </div>
           <div className="bg-gray-900 rounded-xl p-3">
             <p className="text-xs text-gray-400">Safety prompt</p>
@@ -436,6 +489,31 @@ export function PartyPackPlanner() {
             <p className="text-sm text-green-100 mt-1">
               You need about <strong>{(totalMg / Math.max(selectedInfusion.thcPerUnit, 0.0001)).toFixed(1)}</strong> total units of this infusion for the full pack.
             </p>
+            {(() => {
+              const unitsNeeded = totalMg / Math.max(selectedInfusion.thcPerUnit, 0.0001);
+              const baseUnit = selectedInfusion.baseUnit.toLowerCase();
+              const type = selectedInfusion.type;
+              // Approx kitchen conversions: butter 227g per cup, oil 240ml per cup.
+              if (baseUnit === "g" && type !== "tincture") {
+                const cups = unitsNeeded / 227;
+                const tbsp = unitsNeeded / 14.2;
+                return (
+                  <p className="text-sm text-green-100 mt-1">
+                    ≈ <strong>{cups.toFixed(2)}</strong> cups (or ~<strong>{Math.round(tbsp)}</strong> tbsp) infused base
+                  </p>
+                );
+              }
+              if (baseUnit === "ml") {
+                const cups = unitsNeeded / 240;
+                const tbsp = unitsNeeded / 15;
+                return (
+                  <p className="text-sm text-green-100 mt-1">
+                    ≈ <strong>{cups.toFixed(2)}</strong> cups (or ~<strong>{Math.round(tbsp)}</strong> tbsp) infused base
+                  </p>
+                );
+              }
+              return null;
+            })()}
             <div className="mt-2 space-y-1 text-sm text-green-100">
               {items.map((item) => {
                 const mgNeeded = item.qty * item.mgEach;
@@ -458,13 +536,13 @@ export function PartyPackPlanner() {
       {nextPendingItem && (
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
           <p className="text-sm text-green-800 font-semibold mb-2">
-            Next step in your party flow:
+            Step {nextStepIndex + 1} of {items.length}
           </p>
           <Link
             to={`${nextPendingItem.route}${nextPendingItem.route.includes("?") ? "&" : "?"}returnTo=${encodeURIComponent(`/party-mode/plan/${pack.id}`)}&fromPack=${pack.id}&item=${nextPendingItem.id}`}
             className="inline-flex items-center gap-2 text-green-700 font-bold hover:underline"
           >
-            Build {nextPendingItem.name}
+            {nextPendingItem.id === "wings" ? "Start building your wings (main item)" : `Build ${nextPendingItem.name}`}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
