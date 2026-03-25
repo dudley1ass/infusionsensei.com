@@ -1053,6 +1053,12 @@ export function CreateRecipes() {
     const dairy    = totals['dairy']    ?? 0;
     const leavener = totals['leavener'] ?? 0;
     const totalMoisture = egg + liquid + dairy;
+    const lowerNames = ingredients.map(i => i.name.toLowerCase());
+    const isBrownieStyle =
+      recipeName.toLowerCase().includes("brownie") ||
+      (lowerNames.some(n => n.includes("cocoa")) &&
+       lowerNames.some(n => n.includes("all-purpose flour") || n.includes("flour")) &&
+       lowerNames.some(n => n.includes("chocolate")));
 
     let warning = '';
     let color = '';
@@ -1071,10 +1077,10 @@ export function CreateRecipes() {
 
     if (cat === 'flour') {
       const flourToFat = flour / Math.max(fat, 1);
-      if (flourToFat > 3.5 && totalMoisture < flour * 0.4) {
+      if (!isBrownieStyle && flourToFat > 3.5 && totalMoisture < flour * 0.4) {
         warning = 'Way too much flour for this fat & moisture — baked goods will be dry and crumbly. Add more butter, eggs, or liquid.';
         color = 'red';
-      } else if (flourToFat > 2.8 && totalMoisture < flour * 0.5) {
+      } else if (!isBrownieStyle && flourToFat > 2.8 && totalMoisture < flour * 0.5) {
         warning = 'Flour is high relative to fat and moisture — consider adding more butter or eggs for balance.';
         color = 'yellow';
       }
@@ -1082,10 +1088,12 @@ export function CreateRecipes() {
 
     if (cat === 'fat') {
       const fatToFlour = fat / Math.max(flour, 1);
-      if (fatToFlour > 0.85) {
+      const fatProblemThreshold = isBrownieStyle ? 1.8 : 0.85;
+      const fatWarningThreshold = isBrownieStyle ? 1.4 : 0.65;
+      if (fatToFlour > fatProblemThreshold) {
         warning = 'Too much fat — baked goods will be greasy and spread flat. Reduce butter or add more flour.';
         color = 'red';
-      } else if (fatToFlour > 0.65) {
+      } else if (fatToFlour > fatWarningThreshold) {
         warning = 'Fat is on the high side — expect significant spread. Consider chilling the dough before baking.';
         color = 'yellow';
       } else if (fatToFlour < 0.25 && flour > 100) {
@@ -1194,6 +1202,12 @@ export function CreateRecipes() {
       const lib = INGREDIENT_LIBRARY.find(l => l.name === i.name);
       return lib?.category === 'infused';
     });
+    const lowerNames = ingredients.map(i => i.name.toLowerCase());
+    const isBrownieStyle =
+      recipeName.toLowerCase().includes("brownie") ||
+      (lowerNames.some(n => n.includes("cocoa")) &&
+       lowerNames.some(n => n.includes("all-purpose flour") || n.includes("flour")) &&
+       lowerNames.some(n => n.includes("chocolate")));
 
     // Check if recipe has real structural flour (not just cocoa/chocolate)
     const hasRealFlour = ingredients.some(i => {
@@ -1270,8 +1284,10 @@ export function CreateRecipes() {
     if (sugarRatio > 1.2)       { issues.push('sugar is very high — expect thin, sweet, fast-browning results'); tags.push({ label: 'Too much sugar', color: 'red' }); severity = 'problem'; }
     else if (sugarRatio > 1.05) { issues.push('sugar is elevated — baked goods will spread more and brown faster'); tags.push({ label: 'High sugar', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    if (fatRatio > 0.85)        { issues.push('fat is very high — baked goods will be greasy and spread flat'); tags.push({ label: 'Too much fat', color: 'red' }); severity = 'problem'; }
-    else if (fatRatio > 0.65)   { issues.push('fat is elevated — expect significant spread, chill dough before baking'); tags.push({ label: 'High fat', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
+    const fatProblemThreshold = isBrownieStyle ? 1.8 : 0.85;
+    const fatWarningThreshold = isBrownieStyle ? 1.4 : 0.65;
+    if (fatRatio > fatProblemThreshold)        { issues.push('fat is very high — baked goods will be greasy and spread flat'); tags.push({ label: 'Too much fat', color: 'red' }); severity = 'problem'; }
+    else if (fatRatio > fatWarningThreshold)   { issues.push('fat is elevated — expect significant spread, chill dough before baking'); tags.push({ label: 'High fat', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
     else if (fatRatio < 0.25 && flour > 100) { issues.push('low fat for this flour — dough may be dry and stiff'); tags.push({ label: 'Low fat', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
     if (eggRatio > 1.8)         { issues.push('too many eggs for this flour — result will be very puffy and cakey'); tags.push({ label: 'Too many eggs', color: 'red' }); severity = 'problem'; }
@@ -1288,7 +1304,7 @@ export function CreateRecipes() {
       const crispy     = fatRatio >= 0.3  && sugarRatio >= 0.6 && eggRatio < 0.5  && moistureRatio < 0.3;
       const cakey      = eggRatio > 0.8   && moistureRatio > 0.3 && fatRatio < 0.4;
       const buttery    = fatRatio > 0.55  && sugarRatio < 0.5;
-      const fudgy      = eggRatio >= 0.8  && sugarRatio >= 0.8 && fatRatio >= 0.4 && fatRatio <= 0.8;
+      const fudgy      = eggRatio >= 0.8  && sugarRatio >= 0.8 && fatRatio >= 0.4 && fatRatio <= 1.5;
       const moistBake  = moistureRatio >= 0.3 && fatRatio >= 0.3 && fatRatio <= 0.6;
 
       if (fudgy)     return { headline: '✅ Balanced — Fudgy Brownie Profile', description: 'High eggs, sugar, and fat relative to flour is exactly right for dense, fudgy brownies. This ratio creates that characteristic crinkle top and chewy center.', tags: [...tags, { label: 'Fudgy', color: 'green' }, { label: 'Dense & rich', color: 'green' }], severity: 'good' };
