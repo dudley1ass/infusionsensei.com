@@ -39,13 +39,26 @@ export function Home() {
               { emoji: "🍿", label: "Infused Popcorn", sub: "20 flavors", to: "/popcorn", img: "/IMAGES/popcorn.webp", highlight: false },
               { emoji: "☕", label: "Infused Coffee", sub: "20 drinks", to: "/coffee", img: "/IMAGES/coffee.jpg", highlight: false },
               { emoji: "🍟", label: "Infused Fries", sub: "20 styles", to: "/fries", img: "/IMAGES/fries.jpg", highlight: false },
-              { emoji: "🍽️", label: "Dinner of the Week", sub: "New this week", to: "/dinner-of-the-week", img: null, highlight: true },
-              { emoji: "🎉", label: "Party Mode", sub: "Hosting? Start here", to: "/party-mode", img: null, highlight: true },
+              { emoji: "🍽️", label: "Dinner of the Week", sub: "New this week", to: "/dinner-of-the-week", img: ["/IMAGES/steakalfredo.jpg", "/IMAGES/steakalfredo.jpeg", "/IMAGES/steakalfredo.png", "/IMAGES/steakalfredo.webp"], highlight: true },
+              { emoji: "🎉", label: "Party Mode", sub: "Hosting? Start here", to: "/party-mode", img: ["/IMAGES/partynight.jpg", "/IMAGES/partynight.jpeg", "/IMAGES/partynight.png", "/IMAGES/partynight.webp"], highlight: true },
             ].map(({ emoji, label, sub, to, img, highlight }) => (
               <Link key={label} to={to}>
                 <div className={`relative overflow-hidden rounded-2xl h-32 md:h-40 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-white/50 group`}>
                   {img ? (
-                    <img src={img} alt={label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <img
+                      src={Array.isArray(img) ? img[0] : img}
+                      alt={label}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(event) => {
+                        if (!Array.isArray(img)) return;
+                        const currentSrc = event.currentTarget.getAttribute("src");
+                        const currentIndex = img.indexOf(currentSrc || "");
+                        const nextSrc = img[currentIndex + 1];
+                        if (nextSrc) {
+                          event.currentTarget.src = nextSrc;
+                        }
+                      }}
+                    />
                   ) : highlight ? (
                     <div className={`absolute inset-0 ${label === "Dinner of the Week" ? "bg-gradient-to-br from-amber-700 to-orange-900" : "bg-gradient-to-br from-purple-700 to-indigo-900"}`} />
                   ) : (
