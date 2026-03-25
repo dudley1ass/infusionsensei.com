@@ -312,7 +312,7 @@ export function Popcorn() {
                       </div>
                     )}
                     <Link
-                      to={`/ingredients?category=popcorn&recipe=${
+                      to={`/ingredients?category=snacks&recipe=${
                         flavor.id === 'caramel' || flavor.id === 'maple' ? 'caramel-popcorn' :
                         flavor.id === 'buffalo' || flavor.id === 'cajun-spice' || flavor.id === 'nashville-hot' || flavor.id === 'sriracha' || flavor.id === 'chili-lime' ? 'buffalo-popcorn' :
                         flavor.id === 'chocolate-drizzle' || flavor.id === 'cookies-cream' || flavor.id === 'smores' || flavor.id === 'salted-caramel-choc' ? 'chocolate-drizzle-popcorn' :
