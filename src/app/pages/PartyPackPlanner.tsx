@@ -28,8 +28,53 @@ type PackTemplate = {
   id: string;
   title: string;
   subtitle: string;
-  items: Omit<PlannerItem, "qty" | "mgEach"> & { defaultQty: number; defaultMgEach: number }[];
+  items: (Omit<PlannerItem, "qty" | "mgEach"> & { defaultQty: number; defaultMgEach: number; perPersonQty: number })[];
 };
+
+const CANNED_INFUSIONS: InfusionBase[] = [
+  {
+    id: "canned-cannabutter-5mg-g",
+    name: "Canned Cannabutter (5mg per g)",
+    type: "butter",
+    createdDate: "system",
+    cannabisAmount: 0,
+    cannabisUnit: "grams",
+    strainName: "Preset",
+    thcPercentage: 0,
+    baseAmount: 227,
+    baseUnit: "g",
+    totalTHC: 1135,
+    thcPerUnit: 5,
+  },
+  {
+    id: "canned-coconut-8mg-ml",
+    name: "Canned Coconut Oil (8mg per ml)",
+    type: "coconut-oil",
+    createdDate: "system",
+    cannabisAmount: 0,
+    cannabisUnit: "grams",
+    strainName: "Preset",
+    thcPercentage: 0,
+    baseAmount: 240,
+    baseUnit: "ml",
+    totalTHC: 1920,
+    thcPerUnit: 8,
+  },
+  {
+    id: "canned-tincture-10mg-ml",
+    name: "Canned Tincture (10mg per ml)",
+    type: "tincture",
+    createdDate: "system",
+    cannabisAmount: 0,
+    cannabisUnit: "grams",
+    strainName: "Preset",
+    thcPercentage: 0,
+    baseAmount: 30,
+    baseUnit: "ml",
+    totalTHC: 300,
+    thcPerUnit: 10,
+  },
+];
 
 const PACKS: PackTemplate[] = [
   {
@@ -37,10 +82,10 @@ const PACKS: PackTemplate[] = [
     title: "Game Night Pack Planner",
     subtitle: "Wings, fries, popcorn, and dessert with controlled dosing.",
     items: [
-      { id: "wings", name: "Infused Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 6, defaultMgEach: 2.5 },
-      { id: "fries", name: "Garlic Butter Fries", route: "/fries", suggestedRange: "3-5mg per serving", defaultQty: 2, defaultMgEach: 4 },
-      { id: "popcorn", name: "Caramel Popcorn", route: "/popcorn", suggestedRange: "2-3mg per bowl", defaultQty: 2, defaultMgEach: 2.5 },
-      { id: "brownie", name: "Cannabis Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 2, defaultMgEach: 7.5 },
+      { id: "wings", name: "Infused Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 6, defaultMgEach: 2.5, perPersonQty: 1.5 },
+      { id: "fries", name: "Garlic Butter Fries", route: "/fries", suggestedRange: "3-5mg per serving", defaultQty: 2, defaultMgEach: 4, perPersonQty: 0.5 },
+      { id: "popcorn", name: "Caramel Popcorn", route: "/popcorn", suggestedRange: "2-3mg per bowl", defaultQty: 2, defaultMgEach: 2.5, perPersonQty: 0.5 },
+      { id: "brownie", name: "Cannabis Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 2, defaultMgEach: 7.5, perPersonQty: 0.5 },
     ],
   },
   {
@@ -48,9 +93,9 @@ const PACKS: PackTemplate[] = [
     title: "Chill Night Pack Planner",
     subtitle: "Lower-dose flow for movie night or mellow hangs.",
     items: [
-      { id: "popcorn", name: "Garlic Butter Popcorn", route: "/popcorn", suggestedRange: "2-5mg per bowl", defaultQty: 2, defaultMgEach: 3 },
-      { id: "coffee", name: "Infused Coffee or Tea", route: "/coffee", suggestedRange: "2.5-5mg per cup", defaultQty: 2, defaultMgEach: 3.5 },
-      { id: "wings", name: "Honey Mustard Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 4, defaultMgEach: 2.5 },
+      { id: "popcorn", name: "Garlic Butter Popcorn", route: "/popcorn", suggestedRange: "2-5mg per bowl", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.5 },
+      { id: "coffee", name: "Infused Coffee or Tea", route: "/coffee", suggestedRange: "2.5-5mg per cup", defaultQty: 2, defaultMgEach: 3.5, perPersonQty: 0.5 },
+      { id: "wings", name: "Honey Mustard Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 4, defaultMgEach: 2.5, perPersonQty: 1 },
     ],
   },
   {
@@ -58,9 +103,9 @@ const PACKS: PackTemplate[] = [
     title: "Dessert Pack Planner",
     subtitle: "Dessert-heavy dosing where overconsumption risk is highest.",
     items: [
-      { id: "brownie", name: "Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 2, defaultMgEach: 6 },
-      { id: "cookie", name: "Sugar Cookie", route: "/ingredients?category=baked-goods&recipe=sugar-cookies", suggestedRange: "3-7mg each", defaultQty: 2, defaultMgEach: 4 },
-      { id: "gummy", name: "Gummy", route: "/ingredients?category=snacks&recipe=gummies", suggestedRange: "5-10mg each", defaultQty: 2, defaultMgEach: 5 },
+      { id: "brownie", name: "Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 2, defaultMgEach: 6, perPersonQty: 0.5 },
+      { id: "cookie", name: "Sugar Cookie", route: "/ingredients?category=baked-goods&recipe=sugar-cookies", suggestedRange: "3-7mg each", defaultQty: 2, defaultMgEach: 4, perPersonQty: 0.5 },
+      { id: "gummy", name: "Gummy", route: "/ingredients?category=snacks&recipe=gummies", suggestedRange: "5-10mg each", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5 },
     ],
   },
   {
@@ -68,9 +113,9 @@ const PACKS: PackTemplate[] = [
     title: "Drinks Pack Planner",
     subtitle: "Dose-controlled beverages for social settings.",
     items: [
-      { id: "lemonade", name: "Infused Lemonade", route: "/ingredients?category=drinks", suggestedRange: "2.5-5mg per glass", defaultQty: 2, defaultMgEach: 3 },
-      { id: "chai", name: "Infused Chai Latte", route: "/coffee", suggestedRange: "5mg per cup", defaultQty: 2, defaultMgEach: 5 },
-      { id: "tonic", name: "THC Espresso Tonic", route: "/coffee", suggestedRange: "5mg per glass", defaultQty: 2, defaultMgEach: 5 },
+      { id: "lemonade", name: "Infused Lemonade", route: "/ingredients?category=drinks", suggestedRange: "2.5-5mg per glass", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.5 },
+      { id: "chai", name: "Infused Chai Latte", route: "/coffee", suggestedRange: "5mg per cup", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5 },
+      { id: "tonic", name: "THC Espresso Tonic", route: "/coffee", suggestedRange: "5mg per glass", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5 },
     ],
   },
 ];
@@ -86,41 +131,46 @@ export function PartyPackPlanner() {
   const { packId = "" } = useParams();
   const pack = PACKS.find((p) => p.id === packId) ?? PACKS[0];
 
-  const [items, setItems] = useState<PlannerItem[]>(
+  const buildPackItems = (people: number): PlannerItem[] =>
     pack.items.map((i) => ({
       id: i.id,
       name: i.name,
       route: i.route,
       suggestedRange: i.suggestedRange,
-      qty: i.defaultQty,
+      qty: Math.max(1, Math.ceil(people * i.perPersonQty)),
       mgEach: i.defaultMgEach,
-    }))
-  );
+    }));
+
+  const [items, setItems] = useState<PlannerItem[]>(buildPackItems(4));
   const [infusions, setInfusions] = useState<InfusionBase[]>([]);
   const [selectedInfusionId, setSelectedInfusionId] = useState<string>("");
   const [peopleCount, setPeopleCount] = useState<number>(4);
 
   useEffect(() => {
     const saved = localStorage.getItem("infusionBases");
-    const parsed = safeJsonParse<InfusionBase[]>(saved, []);
-    setInfusions(parsed);
-    if (parsed.length > 0) {
-      setSelectedInfusionId((current) => current || parsed[0].id);
+    const parsedCustom = safeJsonParse<InfusionBase[]>(saved, []);
+    const merged = [...CANNED_INFUSIONS, ...parsedCustom];
+    setInfusions(merged);
+    if (merged.length > 0) {
+      setSelectedInfusionId((current) => current || merged[0].id);
     }
   }, []);
 
   useEffect(() => {
-    setItems(
-      pack.items.map((i) => ({
-        id: i.id,
-        name: i.name,
-        route: i.route,
-        suggestedRange: i.suggestedRange,
-        qty: i.defaultQty,
-        mgEach: i.defaultMgEach,
-      }))
-    );
+    setItems(buildPackItems(peopleCount));
   }, [pack.id]);
+
+  useEffect(() => {
+    // Auto-scale base pack quantities when guest count changes.
+    setItems((prev) => {
+      const templateById = new Map(pack.items.map((i) => [i.id, i]));
+      return prev.map((item) => {
+        const template = templateById.get(item.id);
+        if (!template) return item; // Keep custom items as-is.
+        return { ...item, qty: Math.max(1, Math.ceil(peopleCount * template.perPersonQty)) };
+      });
+    });
+  }, [peopleCount, pack.id]);
 
   const selectedInfusion = useMemo(
     () => infusions.find((i) => i.id === selectedInfusionId) ?? null,
