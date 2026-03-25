@@ -525,7 +525,9 @@ const standardRecipes: Record<string, any[]> = {
         "Top with freshly grated parmesan.",
         "Finish with flaky salt and serve immediately.",
       ],
-    }, [
+    },
+  ],
+  "breads-breakfast": [
     {
       id: "banana-bread",
       name: "Cannabis Banana Bread",
