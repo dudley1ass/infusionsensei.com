@@ -1,0 +1,215 @@
+import { Link } from "react-router";
+import { Helmet } from "react-helmet-async";
+import { ArrowRight, Users, ChefHat } from "lucide-react";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+
+const BUNDLES = [
+  {
+    id: "game-night",
+    title: "Game Night Pack",
+    emoji: "🎮",
+    desc: "The ultimate infused spread for a night in. Wings, fries, popcorn, and dessert — all portioned for a group.",
+    color: "from-orange-600 to-red-700",
+    tag: "Most Popular",
+    tagColor: "bg-white text-orange-700",
+    serves: "4–6 people",
+    vibe: "Relaxed / Social",
+    items: [
+      { name: "Infused Buffalo Wings", dose: "2–3mg each", tip: "Make 2 sauces — 1 infused, 1 regular. Label clearly.", link: "/wings", emoji: "🍗" },
+      { name: "Garlic Butter Fries", dose: "3–5mg per serving", tip: "Infuse the dipping sauce, not the fries themselves.", link: "/fries", emoji: "🍟" },
+      { name: "Caramel Popcorn", dose: "2–3mg per bowl", tip: "Easy to over-snack. Pre-portion into individual bowls.", link: "/popcorn", emoji: "🍿" },
+      { name: "Cannabis Brownies", dose: "5–10mg each", tip: "Make smaller pieces — 1 inch squares instead of big slabs.", link: "/ingredients?category=baked-goods&recipe=brownies", emoji: "🍫" },
+    ],
+    totalRange: "12–25mg if you eat everything — start slow",
+    rule: "Always offer non-infused versions of each dish. Not everyone wants to participate.",
+  },
+  {
+    id: "chill-night",
+    title: "Chill Night Pack",
+    emoji: "🛋️",
+    desc: "Lighter, lower dose. Perfect for a movie night or quiet evening with 1–2 people.",
+    color: "from-blue-600 to-indigo-700",
+    tag: "Low & Slow",
+    tagColor: "bg-white text-blue-700",
+    serves: "1–2 people",
+    vibe: "Mellow / Relaxing",
+    items: [
+      { name: "Garlic Butter Popcorn", dose: "2–5mg per bowl", tip: "The easiest infused snack. Hard to mess up.", link: "/popcorn", emoji: "🍿" },
+      { name: "Infused Coffee or Tea", dose: "2.5–5mg per cup", tip: "Great for a slow onset. Use tincture for precise dosing.", link: "/coffee", emoji: "☕" },
+      { name: "Honey Mustard Wings", dose: "2–3mg each", tip: "Lower heat sauce — good for a relaxed vibe.", link: "/wings", emoji: "🍗" },
+      { name: "Chocolate Drizzle Popcorn", dose: "3–5mg per serving", tip: "Make it fancy. Melted dark chocolate + cannabis coconut oil.", link: "/popcorn", emoji: "🍫" },
+    ],
+    totalRange: "Keep total under 15mg — this is a chill night, not an adventure",
+    rule: "Go lower than you think. Chill nights should stay chill.",
+  },
+  {
+    id: "dessert-pack",
+    title: "Dessert Pack",
+    emoji: "🍰",
+    desc: "A full infused dessert spread. Chocolate, caramel, and sweet bites — all with controlled dosing.",
+    color: "from-pink-600 to-rose-700",
+    tag: "Sweet Tooth",
+    tagColor: "bg-white text-pink-700",
+    serves: "4–8 people",
+    vibe: "Indulgent / Social",
+    items: [
+      { name: "Classic Cannabis Brownies", dose: "5–10mg each", tip: "Cut into smaller pieces for a dessert spread.", link: "/ingredients?category=baked-goods&recipe=brownies", emoji: "🍫" },
+      { name: "Cannabis Sugar Cookies", dose: "3–7mg each", tip: "Easy to decorate and identify as infused.", link: "/ingredients?category=baked-goods&recipe=sugar-cookies", emoji: "🍪" },
+      { name: "Chocolate Drizzle Popcorn", dose: "2–5mg per serving", tip: "A light closer after heavier desserts.", link: "/popcorn", emoji: "🍿" },
+      { name: "Cannabis Gummies", dose: "5–10mg each", tip: "Precise dosing. Easy to hand out individually labeled.", link: "/ingredients?category=snacks&recipe=gummies", emoji: "🍬" },
+    ],
+    totalRange: "Offer 1–2 items max per person. Dessert dosing stacks fast.",
+    rule: "Label everything. A dessert table is a high-confusion zone.",
+  },
+  {
+    id: "drinks-pack",
+    title: "Drinks Pack",
+    emoji: "🥂",
+    desc: "An infused drinks menu for a gathering. Coffee, mocktails, or tincture-based drinks with easy dose control.",
+    color: "from-amber-600 to-yellow-700",
+    tag: "Social Drinks",
+    tagColor: "bg-white text-amber-700",
+    serves: "Any size",
+    vibe: "Social / Elegant",
+    items: [
+      { name: "Bulletproof THC Coffee", dose: "5–10mg per cup", tip: "Make a big batch, let guests serve themselves. Label the infused version.", link: "/coffee", emoji: "☕" },
+      { name: "Infused Chai Latte", dose: "5mg per cup", tip: "Easy to make low-dose. Great for guests new to edibles.", link: "/coffee", emoji: "🍵" },
+      { name: "Infused Lemonade", dose: "2.5–5mg per glass", tip: "Use tincture — it mixes into liquids better than oil.", link: "/ingredients?category=drinks", emoji: "🍋" },
+      { name: "THC Espresso Tonic", dose: "5mg per glass", tip: "Fancy and low-dose. Great conversation starter.", link: "/coffee", emoji: "🫧" },
+    ],
+    totalRange: "Drinks are easy to over-consume. Make them clearly labeled and offer water.",
+    rule: "Always have non-infused drink options. Nobody should accidentally consume THC.",
+  },
+];
+
+const PARTY_RULES = [
+  { rule: "Label everything", detail: "Infused food must be clearly labeled. This isn't optional." },
+  { rule: "Start low across the board", detail: "Keep all individual items under 5mg. Guests will eat multiple things." },
+  { rule: "Don't stack doses", detail: "A 5mg wing + 5mg popcorn + 10mg brownie = 20mg. That adds up fast." },
+  { rule: "Offer non-infused versions", detail: "Not everyone wants to participate. Always have plain options." },
+  { rule: "No driving after", detail: "Make it clear before anyone eats. Effects last 4–6 hours." },
+  { rule: "Watch for new users", detail: "Check in with anyone who's new to edibles after 30–60 minutes." },
+];
+
+export function PartyMode() {
+  return (
+    <div className="max-w-5xl mx-auto space-y-10">
+      <Helmet>
+        <title>Party Mode – Infused Party Packs for Game Night, Chill Night & More | Infusion Sensei</title>
+        <meta name="description" content="Infused party packs for every occasion — game night, chill night, dessert spreads, and drinks. Pre-planned menus with exact THC dosing for groups." />
+        <link rel="canonical" href="https://infusionsensei.com/party-mode" />
+      </Helmet>
+
+      {/* Hero */}
+      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950 rounded-3xl p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="relative z-10">
+          <Badge className="bg-green-600 text-white border-0 mb-4 text-sm px-4 py-1.5">🎉 Party Mode</Badge>
+          <h1 className="text-4xl md:text-5xl font-black mb-3 leading-tight">Hosting? Start Here.</h1>
+          <p className="text-gray-300 text-lg max-w-2xl mb-6">Pre-planned infused party packs — game night, chill night, dessert spreads, and drinks menus. Every pack comes with dosing strategy and tips for hosting a group safely.</p>
+          <div className="flex flex-wrap gap-3">
+            {["🎮 Game Night", "🛋️ Chill Night", "🍰 Dessert Pack", "🥂 Drinks Pack"].map(tag => (
+              <span key={tag} className="bg-white/10 border border-white/20 text-white text-sm font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm">{tag}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Bundles */}
+      <div className="space-y-8">
+        {BUNDLES.map(bundle => (
+          <div key={bundle.id} className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
+            {/* Bundle header */}
+            <div className={`bg-gradient-to-r ${bundle.color} p-6 text-white`}>
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-4xl">{bundle.emoji}</span>
+                    <span className={`text-xs font-black px-2 py-0.5 rounded-full ${bundle.tagColor}`}>{bundle.tag}</span>
+                  </div>
+                  <h2 className="text-2xl font-black mb-1">{bundle.title}</h2>
+                  <p className="text-white/80 text-sm max-w-lg">{bundle.desc}</p>
+                </div>
+                <div className="text-right flex-shrink-0 ml-4">
+                  <div className="flex items-center gap-1 text-white/70 text-sm mb-1"><Users className="w-4 h-4" />{bundle.serves}</div>
+                  <div className="text-white/70 text-sm">{bundle.vibe}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Items */}
+            <div className="p-6">
+              <div className="grid md:grid-cols-2 gap-3 mb-5">
+                {bundle.items.map(({ name, dose, tip, link, emoji }) => (
+                  <Link key={name} to={link} className="flex gap-3 bg-gray-50 hover:bg-green-50 border border-gray-200 hover:border-green-300 rounded-2xl p-4 transition-all group">
+                    <span className="text-2xl flex-shrink-0">{emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-black text-gray-900 group-hover:text-green-700 text-sm">{name}</p>
+                        <span className="text-xs bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full flex-shrink-0">{dose}</span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-0.5">{tip}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <div>
+                  <p className="text-xs font-bold text-amber-700 uppercase mb-0.5">⚠️ Total dose reminder</p>
+                  <p className="text-sm text-amber-800">{bundle.totalRange}</p>
+                </div>
+              </div>
+
+              <div className="mt-4 bg-gray-950 rounded-xl p-3 flex items-start gap-2">
+                <span className="text-green-400 flex-shrink-0">🎯</span>
+                <p className="text-gray-300 text-sm"><strong className="text-white">Host rule:</strong> {bundle.rule}</p>
+              </div>
+
+              <div className="mt-4 flex gap-3">
+                <Link to="/thc-calculator">
+                  <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white font-bold">
+                    Plan Doses <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  </Button>
+                </Link>
+                <Link to="/infusions">
+                  <Button size="sm" variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50 font-bold">
+                    <ChefHat className="w-3.5 h-3.5 mr-1.5" /> Build Infusion
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Party Safety Rules */}
+      <div className="bg-gray-950 rounded-3xl p-8">
+        <h2 className="text-xl font-black text-white mb-5">🛡️ Party Host Rules</h2>
+        <div className="grid md:grid-cols-2 gap-3">
+          {PARTY_RULES.map(({ rule, detail }) => (
+            <div key={rule} className="flex gap-3 bg-gray-900 rounded-2xl p-4">
+              <span className="text-green-400 font-black flex-shrink-0">✓</span>
+              <div>
+                <p className="font-black text-white text-sm">{rule}</p>
+                <p className="text-gray-400 text-xs mt-0.5">{detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="bg-gradient-to-br from-green-700 to-green-900 rounded-3xl p-8 text-center text-white">
+        <h2 className="text-2xl font-black mb-2">Build Your Party Pack</h2>
+        <p className="text-green-200 mb-5">Calculate exact doses for every dish, then build your cannabutter or oil to match.</p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link to="/thc-calculator"><Button className="bg-white text-green-800 hover:bg-green-50 font-black px-8 py-3">Plan My Doses <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+          <Link to="/infusions"><Button variant="outline" className="border-white/40 text-white hover:bg-white/10 font-bold px-8 py-3">Build My Infusion</Button></Link>
+        </div>
+      </div>
+    </div>
+  );
+}

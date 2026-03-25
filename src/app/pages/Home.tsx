@@ -33,25 +33,30 @@ export function Home() {
           </div>
 
           {/* Image-based snack cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
             {[
-              { emoji: "🍗", label: "Infused Wings", sub: "20 sauces", to: "/wings", img: "/IMAGES/chickenwings.jpg", coming: false },
-              { emoji: "🍿", label: "Infused Popcorn", sub: "20 flavors", to: "/popcorn", img: "/IMAGES/popcorn.webp", coming: false },
-              { emoji: "☕", label: "Infused Coffee", sub: "20 drinks", to: "/coffee", img: "/IMAGES/coffee.jpg", coming: false },
-              { emoji: "🍟", label: "Infused Fries", sub: "20 flavors", to: "/fries", img: "/IMAGES/fries.jpg", coming: false },
-            ].map(({ emoji, label, sub, to, img, coming }) => (
+              { emoji: "🍗", label: "Infused Wings", sub: "20 sauces", to: "/wings", img: "/IMAGES/chickenwings.jpg", highlight: false },
+              { emoji: "🍿", label: "Infused Popcorn", sub: "20 flavors", to: "/popcorn", img: "/IMAGES/popcorn.webp", highlight: false },
+              { emoji: "☕", label: "Infused Coffee", sub: "20 drinks", to: "/coffee", img: "/IMAGES/coffee.jpg", highlight: false },
+              { emoji: "🍟", label: "Infused Fries", sub: "20 styles", to: "/fries", img: "/IMAGES/fries.jpg", highlight: false },
+              { emoji: "🍽️", label: "Dinner of the Week", sub: "New this week", to: "/dinner-of-the-week", img: null, highlight: true },
+              { emoji: "🎉", label: "Party Mode", sub: "Hosting? Start here", to: "/party-mode", img: null, highlight: true },
+            ].map(({ emoji, label, sub, to, img, highlight }) => (
               <Link key={label} to={to}>
-                <div className={`relative overflow-hidden rounded-2xl h-32 md:h-40 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-white/50 group ${coming ? "opacity-60" : ""}`}>
+                <div className={`relative overflow-hidden rounded-2xl h-32 md:h-40 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-white/50 group`}>
                   {img ? (
                     <img src={img} alt={label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                  ) : highlight ? (
+                    <div className={`absolute inset-0 ${label === "Dinner of the Week" ? "bg-gradient-to-br from-amber-700 to-orange-900" : "bg-gradient-to-br from-purple-700 to-indigo-900"}`} />
                   ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-green-700 to-green-900" />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  {highlight && <div className="absolute top-2 left-2"><span className="bg-green-500 text-white text-xs font-black px-2 py-0.5 rounded-full">NEW</span></div>}
                   <div className="absolute inset-0 flex flex-col justify-end p-3">
                     <div className="text-2xl mb-1">{emoji}</div>
                     <div className="text-white font-black text-sm leading-tight">{label}</div>
-                    <div className="text-green-300 text-xs mt-0.5">{coming ? "🔜 Coming Soon" : sub}</div>
+                    <div className="text-green-300 text-xs mt-0.5">{sub}</div>
                   </div>
                   <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="bg-white/20 rounded-full p-1"><ArrowRight className="w-3 h-3 text-white" /></div>
@@ -148,6 +153,52 @@ export function Home() {
             </Button>
           </Link>
         </div>
+      </section>
+
+      {/* DINNER OF THE WEEK */}
+      <section>
+        <Link to="/dinner-of-the-week">
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-amber-900 via-orange-900 to-amber-800 shadow-xl hover:shadow-2xl transition-all group cursor-pointer">
+            <img src="/IMAGES/mac-and-cheese.jpg" alt="Dinner of the Week" className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity" />
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 px-8 py-8">
+              <div className="text-6xl flex-shrink-0">🍽️</div>
+              <div className="flex-1 text-center md:text-left">
+                <div className="flex items-center gap-2 justify-center md:justify-start mb-2">
+                  <span className="bg-green-500 text-white text-xs font-black px-2.5 py-1 rounded-full">NEW THIS WEEK</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-black text-white mb-1">Dinner of the Week</h2>
+                <p className="text-orange-200 font-bold mb-1">Steak Alfredo with Spinach</p>
+                <p className="text-orange-300/80 text-sm">A complete infused dinner you can make tonight — with exact THC per serving.</p>
+              </div>
+              <div className="flex-shrink-0">
+                <div className="inline-flex items-center gap-2 bg-white text-gray-900 font-black px-5 py-2.5 rounded-xl text-sm group-hover:bg-amber-50 transition-colors shadow-lg">
+                  See This Week's Dinner <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </section>
+
+      {/* PARTY MODE */}
+      <section>
+        <Link to="/party-mode">
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-800 shadow-xl hover:shadow-2xl transition-all group cursor-pointer">
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 px-8 py-8">
+              <div className="text-6xl flex-shrink-0">🎉</div>
+              <div className="flex-1 text-center md:text-left">
+                <h2 className="text-2xl md:text-3xl font-black text-white mb-1">Party Mode</h2>
+                <p className="text-purple-200 font-bold mb-1">Game Night · Chill Night · Dessert Pack · Drinks Pack</p>
+                <p className="text-purple-300/80 text-sm">Pre-planned infused spreads for any occasion — with dosing strategy for groups.</p>
+              </div>
+              <div className="flex-shrink-0">
+                <div className="inline-flex items-center gap-2 bg-white text-gray-900 font-black px-5 py-2.5 rounded-xl text-sm group-hover:bg-purple-50 transition-colors shadow-lg">
+                  Hosting? Start Here <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Link>
       </section>
 
       {/* NEW RECIPES */}

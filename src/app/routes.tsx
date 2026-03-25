@@ -24,6 +24,14 @@ import { WhyEdiblesFeelDifferent } from "./pages/articles/WhyEdiblesFeelDifferen
 import { StoreTHCEdibles } from "./pages/articles/StoreTHCEdibles";
 import { WhatHappensWithoutDecarb } from "./pages/articles/WhatHappensWithoutDecarb";
 import { DecarboxylationGuide } from "./pages/articles/DecarboxylationGuide";
+import { CannabisButterGuide } from "./pages/articles/CannabisButterGuide";
+import { EdibleStrengthGuide } from "./pages/articles/EdibleStrengthGuide";
+import { InfusionComparison } from "./pages/articles/InfusionComparison";
+import { EdiblesTasteBad } from "./pages/articles/EdiblesTasteBad";
+import { BeginnerEdibleGuide } from "./pages/articles/BeginnerEdibleGuide";
+import { InfuseAnyFood } from "./pages/articles/InfuseAnyFood";
+import { DinnerOfTheWeek } from "./pages/DinnerOfTheWeek";
+import { PartyMode } from "./pages/PartyMode";
 import { WingSauces } from "./pages/WingSauces";
 import { Popcorn } from "./pages/Popcorn";
 import { Coffee } from "./pages/Coffee";
@@ -74,6 +82,14 @@ export const router = createBrowserRouter([
       { path: "learn/articles/store-thc-edibles", Component: StoreTHCEdibles },
       { path: "learn/articles/what-happens-without-decarb", Component: WhatHappensWithoutDecarb },
       { path: "learn/articles/decarboxylation-guide", Component: DecarboxylationGuide },
+      { path: "learn/articles/cannabutter-guide", Component: CannabisButterGuide },
+      { path: "learn/articles/edible-strength-guide", Component: EdibleStrengthGuide },
+      { path: "learn/articles/infusion-comparison", Component: InfusionComparison },
+      { path: "learn/articles/edibles-taste-bad", Component: EdiblesTasteBad },
+      { path: "learn/articles/beginner-edible-guide", Component: BeginnerEdibleGuide },
+      { path: "learn/articles/infuse-any-food", Component: InfuseAnyFood },
+      { path: "dinner-of-the-week", Component: DinnerOfTheWeek },
+      { path: "party-mode", Component: PartyMode },
     ],
   },
 ]);
