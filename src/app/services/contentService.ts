@@ -20,6 +20,10 @@ function getSupabaseConfig() {
   return { url, key };
 }
 
+export function isContentDbStrictMode(): boolean {
+  return String(import.meta.env.VITE_CONTENT_DB_STRICT || "").toLowerCase() === "true";
+}
+
 function isDifficulty(value: string): Recipe["difficulty"] {
   return value === "beginner" || value === "intermediate" || value === "advanced";
 }
@@ -44,7 +48,7 @@ function normalizeRecipe(row: DbRecipeRow): Recipe {
 
 export async function loadPublishedRecipesFromDb(): Promise<Recipe[] | null> {
   const { url, key } = getSupabaseConfig();
-  if (!url || !key) return null;
+  if (!url || !key) return isContentDbStrictMode() ? [] : null;
 
   const endpoint = `${url}/rest/v1/recipes?select=id,title,category_id,difficulty,prep_minutes,cook_minutes,servings_default,thc_per_serving_label,image_url,summary,is_new&is_published=eq.true&order=published_at.desc.nullslast`;
 
@@ -55,12 +59,12 @@ export async function loadPublishedRecipesFromDb(): Promise<Recipe[] | null> {
         Authorization: `Bearer ${key}`,
       },
     });
-    if (!res.ok) return null;
+    if (!res.ok) return isContentDbStrictMode() ? [] : null;
     const rows = (await res.json()) as DbRecipeRow[];
-    if (!Array.isArray(rows) || rows.length === 0) return null;
+    if (!Array.isArray(rows) || rows.length === 0) return isContentDbStrictMode() ? [] : null;
     return rows.map(normalizeRecipe);
   } catch {
-    return null;
+    return isContentDbStrictMode() ? [] : null;
   }
 }
 
@@ -163,7 +167,7 @@ export async function loadBuilderMapFromDb(domain: "wings" | "popcorn" | "coffee
   if (builderMapCache.has(domain)) return builderMapCache.get(domain)!;
 
   const { url, key } = getSupabaseConfig();
-  if (!url || !key) return null;
+  if (!url || !key) return isContentDbStrictMode() ? {} : null;
 
   try {
     const res = await fetch(
@@ -175,14 +179,14 @@ export async function loadBuilderMapFromDb(domain: "wings" | "popcorn" | "coffee
         },
       }
     );
-    if (!res.ok) return null;
+    if (!res.ok) return isContentDbStrictMode() ? {} : null;
     const rows = (await res.json()) as { source_id: string; builder_recipe_id: string }[];
-    if (!Array.isArray(rows) || rows.length === 0) return null;
+    if (!Array.isArray(rows) || rows.length === 0) return isContentDbStrictMode() ? {} : null;
     const mapped = Object.fromEntries(rows.map((r) => [r.source_id, r.builder_recipe_id]));
     builderMapCache.set(domain, mapped);
     return mapped;
   } catch {
-    return null;
+    return isContentDbStrictMode() ? {} : null;
   }
 }
 
@@ -213,7 +217,7 @@ export async function loadShowcaseItemsFromDb(domain: ShowcaseDomain): Promise<S
   if (showcaseCache.has(domain)) return showcaseCache.get(domain)!;
 
   const { url, key } = getSupabaseConfig();
-  if (!url || !key) return null;
+  if (!url || !key) return isContentDbStrictMode() ? [] : null;
 
   try {
     const res = await fetch(
@@ -225,7 +229,7 @@ export async function loadShowcaseItemsFromDb(domain: ShowcaseDomain): Promise<S
         },
       }
     );
-    if (!res.ok) return null;
+    if (!res.ok) return isContentDbStrictMode() ? [] : null;
     const rows = (await res.json()) as Array<{
       source_id: string;
       name: string;
@@ -239,7 +243,7 @@ export async function loadShowcaseItemsFromDb(domain: ShowcaseDomain): Promise<S
       section_key: string | null;
       sort_order: number | null;
     }>;
-    if (!Array.isArray(rows) || rows.length === 0) return null;
+    if (!Array.isArray(rows) || rows.length === 0) return isContentDbStrictMode() ? [] : null;
 
     const normalized: ShowcaseItem[] = rows.map((row) => ({
       id: row.source_id,
@@ -258,7 +262,7 @@ export async function loadShowcaseItemsFromDb(domain: ShowcaseDomain): Promise<S
     showcaseCache.set(domain, normalized);
     return normalized;
   } catch {
-    return null;
+    return isContentDbStrictMode() ? [] : null;
   }
 }
 
@@ -272,7 +276,7 @@ export type PublishedArticle = {
 
 export async function loadPublishedArticlesFromDb(): Promise<PublishedArticle[] | null> {
   const { url, key } = getSupabaseConfig();
-  if (!url || !key) return null;
+  if (!url || !key) return isContentDbStrictMode() ? [] : null;
 
   try {
     const res = await fetch(
@@ -284,7 +288,7 @@ export async function loadPublishedArticlesFromDb(): Promise<PublishedArticle[] 
         },
       }
     );
-    if (!res.ok) return null;
+    if (!res.ok) return isContentDbStrictMode() ? [] : null;
     const rows = (await res.json()) as Array<{
       slug: string;
       title: string;
@@ -292,7 +296,7 @@ export async function loadPublishedArticlesFromDb(): Promise<PublishedArticle[] 
       seo_title: string | null;
       seo_description: string | null;
     }>;
-    if (!Array.isArray(rows) || rows.length === 0) return null;
+    if (!Array.isArray(rows) || rows.length === 0) return isContentDbStrictMode() ? [] : null;
     return rows
       .filter((r) => typeof r.slug === "string" && typeof r.title === "string")
       .map((r) => ({
@@ -303,7 +307,7 @@ export async function loadPublishedArticlesFromDb(): Promise<PublishedArticle[] 
         seoDescription: r.seo_description,
       }));
   } catch {
-    return null;
+    return isContentDbStrictMode() ? [] : null;
   }
 }
 

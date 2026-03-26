@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { recipes, Recipe } from "../data/recipes";
 import { RECIPES as friesStyles } from "./Fries";
-import { loadPublishedRecipesFromDb } from "../services/contentService";
+import { isContentDbStrictMode, loadPublishedRecipesFromDb } from "../services/contentService";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -55,7 +55,8 @@ export function Recipes() {
     route: `/fries?recipe=${encodeURIComponent(fries.id)}`,
   }));
 
-  const recipeSource = dbRecipes && dbRecipes.length > 0 ? dbRecipes : recipes;
+  const strictDb = isContentDbStrictMode();
+  const recipeSource = strictDb ? (dbRecipes ?? []) : dbRecipes && dbRecipes.length > 0 ? dbRecipes : recipes;
 
   const allDisplayRecipes: DisplayRecipe[] = [
     ...recipeSource.map((r) => ({ ...r, route: `/recipes/${r.id}` })),
