@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { recipes } from "../data/recipes";
+import { trackEvent } from "../utils/analytics";
 
 export function Home() {
   const featuredRecipes = recipes.filter(r => r.isNew).slice(0, 3);
@@ -27,20 +28,21 @@ export function Home() {
               <Zap className="w-3.5 h-3.5 mr-1.5" /> Free Cannabis Cooking Tool
             </Badge>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-3 leading-tight">
-              The Ultimate Cannabis Infusion Toolkit
+              Get Perfect THC Dosing Every Time
             </h1>
             <p className="text-green-300 text-base font-semibold mb-6">
-              Calculate THC, build recipes, and create perfect edibles every time.
+              Calculate THC, build recipes, and never guess again.
             </p>
+            <p className="text-green-400 text-sm mb-6">No login. No guesswork. Just accurate dosing.</p>
           </div>
 
           {/* Image-based snack cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
             {[
-              { emoji: "🍗", label: "Infused Wings", sub: "20 sauces", to: "/wings", img: "/IMAGES/chickenwings.jpg", highlight: false },
-              { emoji: "🍿", label: "Infused Popcorn", sub: "20 flavors", to: "/popcorn", img: "/IMAGES/popcorn.webp", highlight: false },
-              { emoji: "☕", label: "Infused Coffee", sub: "20 drinks", to: "/coffee", img: "/IMAGES/coffee.jpg", highlight: false },
-              { emoji: "🍟", label: "Infused Fries", sub: "20 styles", to: "/fries", img: "/IMAGES/fries.jpg", highlight: false },
+              { emoji: "🍗", label: "Wings", sub: "Start here", to: "/wings", img: "/IMAGES/chickenwings.jpg", highlight: false },
+              { emoji: "🍿", label: "Popcorn", sub: "Start here", to: "/popcorn", img: "/IMAGES/popcorn.webp", highlight: false },
+              { emoji: "☕", label: "Coffee", sub: "Start here", to: "/coffee", img: "/IMAGES/coffee.jpg", highlight: false },
+              { emoji: "🍟", label: "Fries", sub: "Start here", to: "/fries", img: "/IMAGES/fries.jpg", highlight: false },
               { emoji: "🍽️", label: "Dinner of the Week", sub: "New this week", to: "/dinner-of-the-week", img: ["/IMAGES/steakalfredo.jpg", "/IMAGES/steakalfredo.jpeg", "/IMAGES/steakalfredo.png", "/IMAGES/steakalfredo.webp"], highlight: true },
               { emoji: "🎉", label: "Party Mode", sub: "Hosting? Start here", to: "/party-mode", img: ["/IMAGES/partynight.jpg", "/IMAGES/partynight.jpeg", "/IMAGES/partynight.png", "/IMAGES/partynight.webp"], highlight: true },
             ].map(({ emoji, label, sub, to, img, highlight }) => (
@@ -82,14 +84,20 @@ export function Home() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Link to="/infusions">
+            <Link
+              to="/thc-calculator"
+              onClick={() => trackEvent("homepage_primary_cta_click", { location: "hero", target: "thc-calculator" })}
+            >
               <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-base px-8 py-5 shadow-xl rounded-xl transition-transform hover:scale-105">
-                Recipe Builder <ArrowRight className="w-5 h-5 ml-2" />
+                <Calculator className="w-4 h-4 mr-2" /> Calculate THC
               </Button>
             </Link>
-            <Link to="/thc-calculator">
+            <Link
+              to="/infusions"
+              onClick={() => trackEvent("homepage_secondary_cta_click", { location: "hero", target: "infusions" })}
+            >
               <Button size="lg" variant="outline" className="border-2 border-white/40 text-white hover:bg-white/10 font-bold text-base px-8 py-5 rounded-xl">
-                <Calculator className="w-4 h-4 mr-2" /> Calculate THC
+                Build Recipe <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
           </div>
@@ -99,41 +107,13 @@ export function Home() {
         </div>
       </section>
 
-      {/* TRENDING FLAVORS */}
-      <section>
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">🔥 Trending Flavors</p>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { label: "Mango Habanero Wings", to: "/wings", emoji: "🥭" },
-              { label: "Garlic Butter Popcorn", to: "/popcorn", emoji: "🧄" },
-              { label: "Nashville Hot Wings", to: "/wings", emoji: "🔥" },
-              { label: "Caramel Popcorn", to: "/popcorn", emoji: "🍬" },
-              { label: "Bulletproof Coffee", to: "/coffee", emoji: "☕" },
-              { label: "Truffle Fries", to: "/fries", emoji: "🍄" },
-              { label: "Korean Gochujang Wings", to: "/wings", emoji: "🇰🇷" },
-              { label: "Chocolate Drizzle Popcorn", to: "/popcorn", emoji: "🍫" },
-              { label: "Truffle Butter Wings", to: "/wings", emoji: "🍄" },
-              { label: "S'mores Popcorn", to: "/popcorn", emoji: "🔥" },
-            ].map(({ label, to, emoji }) => (
-              <Link key={label} to={to}>
-                <span className="inline-flex items-center gap-1.5 bg-gray-50 hover:bg-green-50 hover:text-green-700 border border-gray-200 hover:border-green-300 text-gray-700 text-sm font-semibold px-3 py-1.5 rounded-full transition-all cursor-pointer">
-                  {emoji} {label}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* TRUST STRIP */}
       <section>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid md:grid-cols-3 gap-3">
           {[
-            { icon: "🌿", label: "20+ Verified Strains", sub: "With real THC profiles" },
-            { icon: "🧮", label: "Live THC Calculator", sub: "Updates instantly" },
-            { icon: "📋", label: "Tested Recipes", sub: "Exact mg per serving" },
-            { icon: "🛡️", label: "Safe Dosing Built-In", sub: "Know before you eat" },
+            { icon: "🧮", label: "Exact THC Dosing", sub: "No guesswork" },
+            { icon: "⚡", label: "Instant Results", sub: "Get values in seconds" },
+            { icon: "✅", label: "No Account Needed", sub: "Open and use immediately" },
           ].map(({ icon, label, sub }) => (
             <div key={label} className="bg-white border-2 border-green-100 rounded-2xl p-4 text-center shadow-sm hover:border-green-300 hover:shadow-md transition-all">
               <div className="text-2xl mb-1">{icon}</div>
@@ -147,7 +127,8 @@ export function Home() {
       {/* EMOTIONAL HOOK */}
       <section>
         <div className="bg-gray-950 rounded-3xl p-8 md:p-12 text-center shadow-2xl border border-gray-800">
-          <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Edibles shouldn't be a gamble.</h2>
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-4">Edibles shouldn't be a gamble.</h2>
+          <p className="text-gray-300 mb-6 font-semibold">Bad batch? Too strong or too weak. We fix that.</p>
           <div className="flex flex-col md:flex-row justify-center gap-4 mb-8 max-w-lg mx-auto">
             <div className="flex-1 bg-red-950/60 border border-red-800/60 rounded-2xl px-6 py-5">
               <p className="text-red-400 font-black text-lg">Too strong?</p>
@@ -162,58 +143,15 @@ export function Home() {
           <p className="text-green-400 text-xl md:text-2xl font-bold mb-8">
             Infusion Sensei gives you control —<br className="hidden md:block" />so every batch hits exactly how you want.
           </p>
-          <Link to="/infusions">
+          <Link
+            to="/thc-calculator"
+            onClick={() => trackEvent("homepage_primary_cta_click", { location: "problem_section", target: "thc-calculator" })}
+          >
             <Button size="lg" className="bg-green-500 hover:bg-green-400 text-white font-black text-lg px-10 py-6 rounded-xl shadow-lg transition-transform hover:scale-105">
-              Start My Infusion — Free <ArrowRight className="w-5 h-5 ml-2" />
+              Calculate THC Now <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
         </div>
-      </section>
-
-      {/* DINNER OF THE WEEK */}
-      <section>
-        <Link to="/dinner-of-the-week">
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-amber-900 via-orange-900 to-amber-800 shadow-xl hover:shadow-2xl transition-all group cursor-pointer">
-            <img src="/IMAGES/mac-and-cheese.jpg" alt="Dinner of the Week" className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity" />
-            <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 px-8 py-8">
-              <div className="text-6xl flex-shrink-0">🍽️</div>
-              <div className="flex-1 text-center md:text-left">
-                <div className="flex items-center gap-2 justify-center md:justify-start mb-2">
-                  <span className="bg-green-500 text-white text-xs font-black px-2.5 py-1 rounded-full">NEW THIS WEEK</span>
-                </div>
-                <h2 className="text-2xl md:text-3xl font-black text-white mb-1">Dinner of the Week</h2>
-                <p className="text-orange-200 font-bold mb-1">Steak Alfredo with Spinach</p>
-                <p className="text-orange-300/80 text-sm">A complete infused dinner you can make tonight — with exact THC per serving.</p>
-              </div>
-              <div className="flex-shrink-0">
-                <div className="inline-flex items-center gap-2 bg-white text-gray-900 font-black px-5 py-2.5 rounded-xl text-sm group-hover:bg-amber-50 transition-colors shadow-lg">
-                  See This Week's Dinner <ArrowRight className="w-4 h-4" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Link>
-      </section>
-
-      {/* PARTY MODE */}
-      <section>
-        <Link to="/party-mode">
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-800 shadow-xl hover:shadow-2xl transition-all group cursor-pointer">
-            <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 px-8 py-8">
-              <div className="text-6xl flex-shrink-0">🎉</div>
-              <div className="flex-1 text-center md:text-left">
-                <h2 className="text-2xl md:text-3xl font-black text-white mb-1">Party Mode</h2>
-                <p className="text-purple-200 font-bold mb-1">Game Night · Chill Night · Dessert Pack · Drinks Pack</p>
-                <p className="text-purple-300/80 text-sm">Pre-planned infused spreads for any occasion — with dosing strategy for groups.</p>
-              </div>
-              <div className="flex-shrink-0">
-                <div className="inline-flex items-center gap-2 bg-white text-gray-900 font-black px-5 py-2.5 rounded-xl text-sm group-hover:bg-purple-50 transition-colors shadow-lg">
-                  Hosting? Start Here <ArrowRight className="w-4 h-4" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Link>
       </section>
 
       {/* NEW RECIPES */}
@@ -226,7 +164,7 @@ export function Home() {
             </div>
             <Link to="/recipes">
               <Button variant="ghost" className="text-green-700 hover:text-green-800 hover:bg-green-50 font-semibold">
-                View All <TrendingUp className="w-4 h-4 ml-1.5" />
+                See all recipes <TrendingUp className="w-4 h-4 ml-1.5" />
               </Button>
             </Link>
           </div>
