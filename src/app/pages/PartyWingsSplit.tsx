@@ -7,7 +7,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { safeJsonParse } from "../utils/storage";
 import { WING_SAUCE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
-import { loadBuilderMapFromDb } from "../services/contentService";
+import { isContentDbStrictMode, loadBuilderMapFromDb } from "../services/contentService";
 
 type WingsSplitState = {
   totalWings: number;
@@ -73,6 +73,7 @@ export function PartyWingsSplit() {
     };
   });
   const [builderMap, setBuilderMap] = useState<Record<string, string>>(WING_SAUCE_TO_BUILDER_RECIPE);
+  const strictDb = isContentDbStrictMode();
 
   // If user came from planner with a specific total wings, prefer query over saved.
   useEffect(() => {
@@ -188,7 +189,9 @@ export function PartyWingsSplit() {
 
   const buildFlavorUrl = (sauceId: string, qtyWings: number) => {
     const servingsOverride = servingsOverrideFor(qtyWings);
-    const recipeId = builderMap[sauceId] ?? WING_SAUCE_TO_BUILDER_RECIPE[sauceId] ?? "classic-buffalo-wings";
+    const recipeId = strictDb
+      ? builderMap[sauceId] ?? WING_SAUCE_TO_BUILDER_RECIPE[sauceId] ?? "classic-buffalo-wings"
+      : WING_SAUCE_TO_BUILDER_RECIPE[sauceId] ?? builderMap[sauceId] ?? "classic-buffalo-wings";
     const flavorProgressKey = `flavor:${sauceId}`;
     return `/ingredients?category=wings&recipe=${encodeURIComponent(recipeId)}&servings=${servingsOverride}&wingsQty=${encodeURIComponent(
       qtyWings

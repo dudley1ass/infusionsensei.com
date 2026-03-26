@@ -6,7 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
 import { POPCORN_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
-import { loadBuilderMapFromDb, loadShowcaseItemsFromDb } from "../services/contentService";
+import { isContentDbStrictMode, loadBuilderMapFromDb, loadShowcaseItemsFromDb } from "../services/contentService";
 
 type PopcornFlavor = {
   id: string;
@@ -217,6 +217,7 @@ export function Popcorn() {
   const [selectedFlavor, setSelectedFlavor] = useState<PopcornFlavor | null>(null);
   const [flavors, setFlavors] = useState<PopcornFlavor[]>(FLAVORS);
   const [builderMap, setBuilderMap] = useState<Record<string, string>>(POPCORN_TO_BUILDER_RECIPE);
+  const strictDb = isContentDbStrictMode();
 
   const filtered = activeTag === "all" ? flavors : flavors.filter(f => f.tags.includes(activeTag));
 
@@ -357,7 +358,9 @@ export function Popcorn() {
                     )}
                     <Link
                       to={`/ingredients?category=snacks&recipe=${
-                        builderMap[flavor.id] ?? POPCORN_TO_BUILDER_RECIPE[flavor.id] ?? "garlic-butter-popcorn"
+                        strictDb
+                          ? builderMap[flavor.id] ?? POPCORN_TO_BUILDER_RECIPE[flavor.id] ?? "garlic-butter-popcorn"
+                          : POPCORN_TO_BUILDER_RECIPE[flavor.id] ?? builderMap[flavor.id] ?? "garlic-butter-popcorn"
                       }`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
                       onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"popcorn",recipe_id:flavor.id}); }}
