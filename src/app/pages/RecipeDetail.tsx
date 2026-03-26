@@ -26,6 +26,31 @@ export function RecipeDetail() {
 
   const handlePrint = () => window.print();
 
+  const getBuilderLinkForRecipe = (r: Recipe) => {
+    const explicitMap: Record<string, { category: string; recipe: string }> = {
+      "classic-brownies": { category: "baked-goods", recipe: "brownies" },
+      "cannabis-cookies": { category: "baked-goods", recipe: "chocolate-chip-cookies" },
+      "infused-sugar-cookies": { category: "baked-goods", recipe: "sugar-cookies" },
+      "canna-gummies": { category: "snacks", recipe: "gummies" },
+      "cannabis-tea": { category: "drinks", recipe: "cannabis-tea" },
+      "cannabis-smoothie": { category: "drinks", recipe: "cannabis-smoothie" },
+      "infused-protein-smoothie": { category: "drinks", recipe: "cannabis-smoothie" },
+      "infused-mac-and-cheese": { category: "savory-meals", recipe: "alfredo" },
+      "infused-pizza-sauce": { category: "savory-meals", recipe: "garlic-pasta" },
+      "infused-mint-ice-cream": { category: "ice-cream", recipe: "mint-ice-cream" },
+      "classic-cannabutter": { category: "baked-goods", recipe: "brownies" },
+      "cannabis-oil": { category: "drinks", recipe: "bulletproof-coffee" },
+      "canna-honey": { category: "drinks", recipe: "cannabis-tea" },
+    };
+
+    const mapped = explicitMap[r.id];
+    if (mapped) {
+      return `/ingredients?category=${encodeURIComponent(mapped.category)}&recipe=${encodeURIComponent(mapped.recipe)}`;
+    }
+
+    return `/ingredients?category=baked-goods&recipe=brownies`;
+  };
+
   if (!recipe) {
     return (
       <div className="text-center py-20">
@@ -315,9 +340,9 @@ export function RecipeDetail() {
           <Button onClick={handlePrint} className="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-6 text-base gap-2 rounded-xl shadow-md hover:shadow-lg transition-all">
             <Printer className="w-5 h-5" /> Print This Recipe
           </Button>
-          <Link to="/infusions">
+          <Link to={getBuilderLinkForRecipe(recipe)}>
             <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50 font-bold px-8 py-6 text-base rounded-xl">
-              Calculate My THC Dose →
+              Build Recipe →
             </Button>
           </Link>
         </div>
