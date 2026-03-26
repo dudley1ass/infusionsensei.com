@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useSearchParams } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChevronDown, ChevronUp, Plus, Printer, Trash2, Users } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -218,7 +218,12 @@ const getPerPersonDoseTone = (mgPerPerson: number) => {
 export function PartyPackPlanner() {
   const { packId = "" } = useParams();
   const pack = PACKS.find((p) => p.id === packId) ?? PACKS[0];
+  const [searchParams] = useSearchParams();
   const wingsStorageKey = `party-pack-wings:${pack.id}`;
+  const wingsReturnCtxKey = `party-wings-return-ctx:${pack.id}`;
+
+  const peopleFromQueryRaw = searchParams.get("people");
+  const peopleFromQuery = peopleFromQueryRaw ? Number(peopleFromQueryRaw) : null;
   const wingSauceLabels: Record<string, string> = {
     "garlic-parmesan": "Garlic Parmesan",
     "classic-buffalo": "Classic Buffalo",
@@ -267,10 +272,21 @@ export function PartyPackPlanner() {
 
   useEffect(() => {
     // Start fresh when planner is opened/switched to avoid stale values.
-    setPeopleCount(4);
-    setItems(buildPackItems(4));
+    const savedCtx = safeJsonParse<{ peopleCount: number } | null>(localStorage.getItem(wingsReturnCtxKey), null);
+    const initPeople =
+      peopleFromQuery && Number.isFinite(peopleFromQuery) && peopleFromQuery > 0
+        ? peopleFromQuery
+        : savedCtx && Number.isFinite(savedCtx.peopleCount) && savedCtx.peopleCount > 0
+          ? savedCtx.peopleCount
+          : 4;
+
+    // One-time context so values don't get stuck forever.
+    localStorage.removeItem(wingsReturnCtxKey);
+
+    setPeopleCount(initPeople);
+    setItems(buildPackItems(initPeople));
     setExpandedItemIds([]);
-  }, [pack.id]);
+  }, [pack.id, peopleFromQuery]);
 
   const isSavoryPack = pack.id === "savory-dinner-pack";
   const savoryItemIds = new Set(["savory-main", "vegetable-side", "starch-side", "thc-beverage-option"]);
@@ -296,6 +312,16 @@ export function PartyPackPlanner() {
     const saved = safeJsonParse<WingsSplitState | null>(localStorage.getItem(wingsStorageKey), null);
     setSavedWingsSplit(saved);
   }, [wingsStorageKey]);
+
+  useEffect(() => {
+    if (!savedWingsSplit) return;
+    // When returning from the wing splitter, apply the saved wing total + dose back here.
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === "wings" ? { ...item, qty: savedWingsSplit.totalWings, mgEach: savedWingsSplit.mgEach } : item
+      )
+    );
+  }, [savedWingsSplit]);
 
   useEffect(() => {
     // Auto-scale base pack quantities when guest count changes.
@@ -440,6 +466,10 @@ export function PartyPackPlanner() {
         savedWingsSplit,
       })
     );
+  };
+
+  const setWingsReturnContext = () => {
+    localStorage.setItem(wingsReturnCtxKey, JSON.stringify({ peopleCount }));
   };
 
   const savoryGuidance = useMemo(() => {
@@ -693,10 +723,11 @@ export function PartyPackPlanner() {
                       item.id === "wings"
                         ? `/party-mode/plan/${encodeURIComponent(pack.id)}/wings?wings=${encodeURIComponent(
                             item.qty
-                          )}&mgEach=${encodeURIComponent(item.mgEach)}`
+                          )}&mgEach=${encodeURIComponent(item.mgEach)}&people=${encodeURIComponent(peopleCount)}`
                         : buildItemUrl(item)
                     }
                     className="inline-flex"
+                    onClick={item.id === "wings" ? setWingsReturnContext : undefined}
                   >
                     <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white font-bold">
                       Start Cooking
@@ -706,9 +737,12 @@ export function PartyPackPlanner() {
                   <span className="text-gray-500 font-semibold">Not selected for infusion</span>
                 )}
                 {item.id === "wings" && savedWingsSplit && (
-                  <Link to={`/party-mode/plan/${encodeURIComponent(pack.id)}/wings?wings=${encodeURIComponent(
-                    item.qty
-                  )}&mgEach=${encodeURIComponent(item.mgEach)}`}>
+                  <Link
+                    to={`/party-mode/plan/${encodeURIComponent(pack.id)}/wings?wings=${encodeURIComponent(
+                      item.qty
+                    )}&mgEach=${encodeURIComponent(item.mgEach)}&people=${encodeURIComponent(peopleCount)}`}
+                    onClick={setWingsReturnContext}
+                  >
                     <Button size="sm" variant="outline" className="border-orange-200 text-orange-800 hover:bg-orange-50">
                       🔥 Split Flavors
                     </Button>
