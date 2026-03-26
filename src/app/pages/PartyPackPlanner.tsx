@@ -178,7 +178,7 @@ const PACKS: PackTemplate[] = [
     title: "Drinks Pack Planner",
     subtitle: "Dose-controlled beverages for social settings.",
     items: [
-      { id: "lemonade", name: "Infused Lemonade", route: "/ingredients?category=drinks&recipe=cannabis-smoothie", suggestedRange: "2.5-5mg per glass", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.5, unitLabel: "glasses", equivalentHint: "Drinks are easy to stack; keep portions clearly labeled" },
+      { id: "lemonade", name: "Infused Lemonade", route: "/ingredients?category=drinks&recipe=infused-lemonade", suggestedRange: "2.5-5mg per glass", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.5, unitLabel: "glasses", equivalentHint: "Drinks are easy to stack; keep portions clearly labeled" },
       { id: "chai", name: "Infused Chai Latte", route: "/ingredients?category=drinks&recipe=infused-chai", suggestedRange: "5mg per cup", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5, unitLabel: "cups", equivalentHint: "Plan 1 infused cup for every 2 guests by default" },
       { id: "tonic", name: "THC Espresso Tonic", route: "/ingredients?category=drinks&recipe=espresso-tonic", suggestedRange: "5mg per glass", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5, unitLabel: "glasses", equivalentHint: "Offer non-infused versions beside infused drinks" },
     ],
@@ -248,6 +248,7 @@ export function PartyPackPlanner() {
   const [savedWingsSplit, setSavedWingsSplit] = useState<WingsSplitState | null>(null);
   const [selectedRecipeToAdd, setSelectedRecipeToAdd] = useState<string>("");
   const [isHydrated, setIsHydrated] = useState(false);
+  const [savoryInfusedItemId, setSavoryInfusedItemId] = useState<string>("starch-side");
 
   type WingsSplitState = {
     totalWings: number;
@@ -280,6 +281,26 @@ export function PartyPackPlanner() {
     }
     setIsHydrated(true);
   }, [pack.id]);
+
+  const isSavoryPack = pack.id === "savory-dinner-pack";
+  const savoryItemIds = new Set(["savory-main", "vegetable-side", "starch-side", "thc-beverage-option"]);
+
+  useEffect(() => {
+    if (!isSavoryPack) return;
+    setItems((prev) =>
+      prev.map((item) => {
+        if (!savoryItemIds.has(item.id)) return item;
+        const template = pack.items.find((p) => p.id === item.id);
+        if (item.id === savoryInfusedItemId) {
+          return {
+            ...item,
+            mgEach: item.mgEach > 0 ? item.mgEach : template?.defaultMgEach ?? 5,
+          };
+        }
+        return { ...item, mgEach: 0 };
+      })
+    );
+  }, [isSavoryPack, savoryInfusedItemId, pack.id]);
 
   useEffect(() => {
     const saved = safeJsonParse<WingsSplitState | null>(localStorage.getItem(wingsStorageKey), null);
@@ -418,6 +439,14 @@ export function PartyPackPlanner() {
     )}&partyPackId=${encodeURIComponent(pack.id)}&partyItemId=${encodeURIComponent(item.id)}`;
   };
 
+  const savoryGuidance = useMemo(() => {
+    if (!isSavoryPack) return "";
+    if (savoryInfusedItemId === "savory-main") return "Infusing the protein/main: prepare starch and vegetable sides however you like.";
+    if (savoryInfusedItemId === "starch-side") return "Infusing the starch: cook your protein and vegetable sides however you like.";
+    if (savoryInfusedItemId === "vegetable-side") return "Infusing the vegetable side: cook your protein and starch however you like.";
+    return "Infusing the THC beverage option: keep meal items non-infused and prep them however you like.";
+  }, [isSavoryPack, savoryInfusedItemId]);
+
   const parseRecipeIdFromRoute = (route: string): string | null => {
     if (route.startsWith("/recipes/")) return route.replace("/recipes/", "").split("?")[0] || null;
     if (!route.startsWith("/ingredients")) return null;
@@ -492,6 +521,22 @@ export function PartyPackPlanner() {
         />
       </Helmet>
 
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 print:hidden">
+        <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Party Planner Packs</p>
+        <div className="flex flex-wrap gap-2">
+          {PACKS.map((p) => (
+            <Link key={p.id} to={`/party-mode/plan/${encodeURIComponent(p.id)}`}>
+              <Button
+                variant={p.id === pack.id ? "default" : "outline"}
+                className={p.id === pack.id ? "bg-purple-700 hover:bg-purple-800 text-white font-bold" : "font-bold"}
+              >
+                {p.title.replace(" Planner", "")}
+              </Button>
+            </Link>
+          ))}
+        </div>
+      </div>
+
       <div className="bg-gradient-to-br from-purple-900 via-indigo-900 to-gray-900 rounded-3xl p-8 text-white shadow-2xl print:hidden">
         <h1 className="text-3xl md:text-4xl font-black mb-2">{pack.title}</h1>
         <p className="text-purple-100">{pack.subtitle}</p>
@@ -536,9 +581,29 @@ export function PartyPackPlanner() {
         </div>
       </div>
 
+      {isSavoryPack && (
+        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 print:hidden">
+          <Label className="text-sm font-bold text-orange-900">Which dinner item should be infused with THC?</Label>
+          <Select value={savoryInfusedItemId} onValueChange={setSavoryInfusedItemId}>
+            <SelectTrigger className="mt-2 bg-white">
+              <SelectValue placeholder="Choose infused item" />
+            </SelectTrigger>
+            <SelectContent className="bg-white text-gray-900 border border-gray-200 shadow-lg z-50">
+              <SelectItem value="savory-main">Main protein</SelectItem>
+              <SelectItem value="starch-side">Starch side (pasta/rice/potatoes)</SelectItem>
+              <SelectItem value="vegetable-side">Vegetable side</SelectItem>
+              <SelectItem value="thc-beverage-option">THC beverage option</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-sm text-orange-900 mt-2 font-semibold">{savoryGuidance}</p>
+        </div>
+      )}
+
       <div className="space-y-3 print:hidden">
         {items.map((item) => {
           const itemTotal = item.qty * item.mgEach;
+          const canBuildThisItem = !isSavoryPack || !savoryItemIds.has(item.id) || item.id === savoryInfusedItemId;
+          const isSavoryNonInfused = isSavoryPack && savoryItemIds.has(item.id) && item.id !== savoryInfusedItemId;
           return (
             <div
               key={item.id}
@@ -576,9 +641,15 @@ export function PartyPackPlanner() {
                     value={item.mgEach}
                     onChange={(e) => updateItem(item.id, "mgEach", Math.max(0, Number(e.target.value) || 0))}
                     className="mt-1"
+                    disabled={isSavoryNonInfused}
                   />
                 </div>
               </div>
+              {isSavoryNonInfused && (
+                <p className="text-xs text-gray-600 mt-2">
+                  Prepare this course as you like it (non-infused for this meal plan).
+                </p>
+              )}
               <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
                 <span className="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-semibold">
                   Total THC for this item: {itemTotal.toFixed(1)}mg
@@ -594,18 +665,22 @@ export function PartyPackPlanner() {
                     </span>
                   );
                 })()}
-                <Link
-                  to={
-                    item.id === "wings"
-                      ? `/party-mode/plan/${encodeURIComponent(pack.id)}/wings?wings=${encodeURIComponent(
-                          item.qty
-                        )}&mgEach=${encodeURIComponent(item.mgEach)}`
-                      : buildItemUrl(item)
-                  }
-                  className="text-green-700 font-semibold hover:underline"
-                >
-                  Build this item
-                </Link>
+                {canBuildThisItem ? (
+                  <Link
+                    to={
+                      item.id === "wings"
+                        ? `/party-mode/plan/${encodeURIComponent(pack.id)}/wings?wings=${encodeURIComponent(
+                            item.qty
+                          )}&mgEach=${encodeURIComponent(item.mgEach)}`
+                        : buildItemUrl(item)
+                    }
+                    className="text-green-700 font-semibold hover:underline"
+                  >
+                    Build this item
+                  </Link>
+                ) : (
+                  <span className="text-gray-500 font-semibold">Not selected for infusion</span>
+                )}
                 {item.id === "wings" && savedWingsSplit && (
                   <Link to={`/party-mode/plan/${encodeURIComponent(pack.id)}/wings?wings=${encodeURIComponent(
                     item.qty
