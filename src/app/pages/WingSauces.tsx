@@ -65,6 +65,29 @@ const SECTIONS = [
   { label: "🧄 Savory / Umami", ids: ["korean-gochujang","garlic-soy-umami","truffle-butter","chimichurri","ranch-butter"] },
 ];
 
+const SAUCE_TO_BUILDER_RECIPE: Record<string, string> = {
+  "classic-buffalo": "classic-buffalo-wings",
+  "garlic-parmesan": "garlic-parmesan-wings",
+  "honey-bbq": "honey-bbq-wings",
+  "lemon-pepper": "lemon-pepper-wings",
+  teriyaki: "honey-bbq-wings",
+  "mango-habanero": "mango-habanero-wings",
+  "nashville-hot": "nashville-hot-wings",
+  "chili-crisp": "korean-gochujang-wings",
+  "cajun-butter": "cajun-butter-wings",
+  "sriracha-honey": "sriracha-honey-wings",
+  "maple-bacon": "honey-bbq-wings",
+  "brown-sugar-bourbon": "honey-bbq-wings",
+  "pineapple-ginger": "honey-bbq-wings",
+  "honey-mustard": "honey-mustard-wings",
+  "orange-glaze": "lemon-pepper-wings",
+  "korean-gochujang": "korean-gochujang-wings",
+  "garlic-soy-umami": "garlic-parmesan-wings",
+  "truffle-butter": "truffle-butter-wings",
+  chimichurri: "lemon-pepper-wings",
+  "ranch-butter": "ranch-butter-wings",
+};
+
 function HeatDots({ level }: { level: number }) {
   return (
     <div className="flex gap-0.5">
@@ -214,27 +237,8 @@ export function WingSauces() {
                     <SauceRecipe sauce={sauce} />
                     <Link
                       to={`/ingredients?category=wings&recipe=${
-  sauce.id === 'garlic-parmesan' ? 'garlic-parmesan-wings' :
-  sauce.id === 'honey-bbq' ? 'honey-bbq-wings' :
-  sauce.id === 'lemon-pepper' ? 'lemon-pepper-wings' :
-  sauce.id === 'teriyaki' ? 'teriyaki-wings' :
-  sauce.id === 'mango-habanero' ? 'mango-habanero-wings' :
-  sauce.id === 'nashville-hot' ? 'nashville-hot-wings' :
-  sauce.id === 'chili-crisp' ? 'chili-crisp-wings' :
-  sauce.id === 'cajun-butter' ? 'cajun-butter-wings' :
-  sauce.id === 'sriracha-honey' ? 'sriracha-honey-wings' :
-  sauce.id === 'maple-bacon' ? 'maple-bacon-wings' :
-  sauce.id === 'brown-sugar-bourbon' ? 'brown-sugar-bourbon-wings' :
-  sauce.id === 'pineapple-ginger' ? 'pineapple-ginger-wings' :
-  sauce.id === 'honey-mustard' ? 'honey-mustard-wings' :
-  sauce.id === 'orange-glaze' ? 'orange-glaze-wings' :
-  sauce.id === 'korean-gochujang' ? 'korean-gochujang-wings' :
-  sauce.id === 'garlic-soy-umami' ? 'garlic-soy-umami-wings' :
-  sauce.id === 'truffle-butter' ? 'truffle-butter-wings' :
-  sauce.id === 'chimichurri' ? 'chimichurri-wings' :
-  sauce.id === 'ranch-butter' ? 'ranch-butter-wings' :
-  'classic-buffalo-wings'
-}${servingsQuery}${returnQuery}`}
+                        SAUCE_TO_BUILDER_RECIPE[sauce.id] ?? "classic-buffalo-wings"
+                      }${servingsQuery}${returnQuery}`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
                       onClick={e => { e.stopPropagation(); if(typeof window.gtag==="function") window.gtag("event","move_to_builder",{source:"wingsauces"}); }}
                     >
