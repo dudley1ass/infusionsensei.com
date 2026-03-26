@@ -262,3 +262,48 @@ export async function loadShowcaseItemsFromDb(domain: ShowcaseDomain): Promise<S
   }
 }
 
+export type PublishedArticle = {
+  slug: string;
+  title: string;
+  summary: string;
+  seoTitle: string | null;
+  seoDescription: string | null;
+};
+
+export async function loadPublishedArticlesFromDb(): Promise<PublishedArticle[] | null> {
+  const { url, key } = getSupabaseConfig();
+  if (!url || !key) return null;
+
+  try {
+    const res = await fetch(
+      `${url}/rest/v1/articles?select=slug,title,summary,seo_title,seo_description&is_published=eq.true&order=published_at.desc.nullslast`,
+      {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+        },
+      }
+    );
+    if (!res.ok) return null;
+    const rows = (await res.json()) as Array<{
+      slug: string;
+      title: string;
+      summary: string | null;
+      seo_title: string | null;
+      seo_description: string | null;
+    }>;
+    if (!Array.isArray(rows) || rows.length === 0) return null;
+    return rows
+      .filter((r) => typeof r.slug === "string" && typeof r.title === "string")
+      .map((r) => ({
+        slug: r.slug,
+        title: r.title,
+        summary: r.summary || "",
+        seoTitle: r.seo_title,
+        seoDescription: r.seo_description,
+      }));
+  } catch {
+    return null;
+  }
+}
+

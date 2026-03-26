@@ -1,10 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
+import { useEffect, useMemo, useState } from "react";
 import {
   ChefHat, Calculator, Lightbulb, Beaker, Sparkles, Leaf, ArrowRight,
   AlertCircle, Zap, Clock, Thermometer, Settings, Wind, Layers, Package, FlaskConical,
 } from "lucide-react";
 import { Link } from "react-router";
+import { loadPublishedArticlesFromDb, PublishedArticle } from "../services/contentService";
 
 const CATEGORIES = [
   {
@@ -51,6 +53,27 @@ const CATEGORIES = [
 ];
 
 export function GuidesArticles() {
+  const [dbArticles, setDbArticles] = useState<PublishedArticle[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const rows = await loadPublishedArticlesFromDb();
+      if (!cancelled && rows) setDbArticles(rows);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const dbBySlug = useMemo(
+    () =>
+      new Map(
+        dbArticles.map((a) => [a.slug, a] as const)
+      ),
+    [dbArticles]
+  );
+
   return (
     <div className="space-y-12">
       {CATEGORIES.map(({ label, articles }) => (
@@ -59,6 +82,8 @@ export function GuidesArticles() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {articles.map((article) => {
               const Icon = article.icon;
+              const slug = article.path.split("/").pop() || "";
+              const db = dbBySlug.get(slug);
               return (
                 <Link key={article.path} to={article.path}>
                   <Card className={`bg-white ${article.borderColor} ${article.hoverBorder} shadow-md transition-all hover:shadow-xl h-full group cursor-pointer`}>
@@ -68,11 +93,11 @@ export function GuidesArticles() {
                         <Icon className={`w-8 h-8 ${article.iconColor} flex-shrink-0`} />
                       </div>
                       <CardTitle className="text-lg text-gray-900 group-hover:text-green-700 transition-colors">
-                        {article.title}
+                        {db?.title || article.title}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <p className="text-sm text-gray-600">{article.description}</p>
+                      <p className="text-sm text-gray-600">{db?.summary || article.description}</p>
                       <div className="flex items-center text-green-600 font-semibold text-sm">
                         Read Article <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                       </div>
