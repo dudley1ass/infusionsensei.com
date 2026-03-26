@@ -705,6 +705,8 @@ export function CreateRecipes() {
   const navigate = useNavigate();
   const servingsOverrideParamRaw = searchParams.get("servings");
   const servingsOverrideParam = servingsOverrideParamRaw ? Number(servingsOverrideParamRaw) : null;
+  const wingsQtyParamRaw = searchParams.get("wingsQty");
+  const wingsQtyParam = wingsQtyParamRaw ? Number(wingsQtyParamRaw) : null;
   const returnToPartyPack = searchParams.get("returnToPartyPack");
   const partyPackId = searchParams.get("partyPackId");
   const partyItemId = searchParams.get("partyItemId");
@@ -809,11 +811,22 @@ export function CreateRecipes() {
           const libraryItem = INGREDIENT_LIBRARY.find(i => i.name === ingName);
           // Use recipe-defined unit if available, otherwise fall back to library default
           const unit = recipe.units?.[idx] || libraryItem?.defaultUnit || "g";
+          const isChickenWings = ingName === "Chicken Wings";
+          const usePiecesForWings = selectedCategory === "wings" && isChickenWings;
+          const scaledAmount = recipe.amounts[idx] * scaleFactor;
+          // Keep wing quantity in pieces for user clarity (vs grams/oz).
+          const wingPiecesFromGrams = scaledAmount / 28.125; // 900g ~= 32 wings baseline
+          const finalAmount = usePiecesForWings
+            ? wingsQtyParam && wingsQtyParam > 0
+              ? wingsQtyParam
+              : Math.max(1, Math.round(wingPiecesFromGrams))
+            : scaledAmount;
+          const finalUnit = usePiecesForWings ? "pieces" : unit;
           if (libraryItem) {
             return {
               name: ingName,
-              amount: recipe.amounts[idx] * scaleFactor,
-              unit,
+              amount: finalAmount,
+              unit: finalUnit,
               isInfused: libraryItem.category === "infused",
               thcPerUnit: libraryItem.thcPerUnit || 0,
               calories: libraryItem.calories,
@@ -825,8 +838,8 @@ export function CreateRecipes() {
           }
           return {
             name: ingName,
-            amount: recipe.amounts[idx] * scaleFactor,
-            unit,
+            amount: finalAmount,
+            unit: finalUnit,
             calories: 0,
             carbs: 0,
             protein: 0,
@@ -838,7 +851,7 @@ export function CreateRecipes() {
         setMeasurementSystem("metric");
       }
     }
-  }, [selectedStandardRecipe, selectedCategory, servingsOverrideParamRaw]);
+  }, [selectedStandardRecipe, selectedCategory, servingsOverrideParamRaw, wingsQtyParamRaw]);
 
   // Calculate total THC
   const totalTHC = ingredients.reduce((sum, ing) => {
@@ -2278,7 +2291,10 @@ export function CreateRecipes() {
                   size="sm"
                   className="border-orange-300 text-orange-700 hover:bg-orange-50 gap-1.5"
                 >
-                  <ArrowLeft className="w-4 h-4" /> Back to Party Pack
+                  <ArrowLeft className="w-4 h-4" />{" "}
+                  {partyPackId.startsWith("wings-split:")
+                    ? "Back to Wings Split (build next flavor)"
+                    : "Back to Party Pack"}
                 </Button>
               )}
               <Button onClick={() => { window.print(); trackEvent('print_recipe'); }} variant="outline" size="sm"

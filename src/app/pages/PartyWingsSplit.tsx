@@ -183,6 +183,17 @@ export function PartyWingsSplit() {
     navigate(`/party-mode/plan/${packId}`);
   };
 
+  const buildFlavorUrl = (sauceId: string, qtyWings: number) => {
+    const servingsOverride = servingsOverrideFor(qtyWings);
+    const recipeId = WING_SAUCE_TO_RECIPE_ID[sauceId] ?? "classic-buffalo-wings";
+    const flavorProgressKey = `flavor:${sauceId}`;
+    return `/ingredients?category=wings&recipe=${encodeURIComponent(recipeId)}&servings=${servingsOverride}&wingsQty=${encodeURIComponent(
+      qtyWings
+    )}&returnToPartyPack=${encodeURIComponent(
+      `/party-mode/plan/${packId}/wings?from=${encodeURIComponent(sauceId)}`
+    )}&partyPackId=${encodeURIComponent(builtPartyPackId)}&partyItemId=${encodeURIComponent(flavorProgressKey)}`;
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <Helmet>
@@ -292,7 +303,18 @@ export function PartyWingsSplit() {
                         Built
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-500">Not built yet</span>
+                      <Link to={buildFlavorUrl(opt.sauceId, qty)}>
+                        <Button
+                          size="sm"
+                          className="bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs"
+                          disabled={!isAllocationExact || qty <= 0}
+                          onClick={() => {
+                            localStorage.setItem(wingsStorageKey, JSON.stringify(state));
+                          }}
+                        >
+                          Build wings
+                        </Button>
+                      </Link>
                     )}
                   </div>
                 ) : (
@@ -310,7 +332,6 @@ export function PartyWingsSplit() {
           {state.flavors.map((f) => {
             const opt = WING_FLAVORS.find((o) => o.sauceId === f.sauceId);
             const servingsOverride = servingsOverrideFor(f.qtyWings);
-            const recipeId = WING_SAUCE_TO_RECIPE_ID[f.sauceId] ?? "classic-buffalo-wings";
             const flavorProgressKey = `flavor:${f.sauceId}`;
             const isBuilt = builtMap[flavorProgressKey];
 
@@ -322,13 +343,7 @@ export function PartyWingsSplit() {
                 <p className="text-sm text-gray-600 mt-1">
                   {f.qtyWings} wings (≈ {servingsOverride} servings)
                 </p>
-                <Link
-                  to={`/ingredients?category=wings&recipe=${encodeURIComponent(recipeId)}&servings=${servingsOverride}&returnToPartyPack=${encodeURIComponent(
-                    `/party-mode/plan/${packId}/wings?from=${encodeURIComponent(f.sauceId)}`
-                  )}&partyPackId=${encodeURIComponent(
-                    builtPartyPackId
-                  )}&partyItemId=${encodeURIComponent(flavorProgressKey)}`}
-                >
+                <Link to={buildFlavorUrl(f.sauceId, f.qtyWings)}>
                   <Button
                     className="mt-3 w-full bg-orange-600 hover:bg-orange-700 text-white font-bold"
                     disabled={!isAllocationExact}
