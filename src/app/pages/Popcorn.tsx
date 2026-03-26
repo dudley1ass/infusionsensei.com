@@ -5,8 +5,7 @@ import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
-import { POPCORN_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
-import { isContentDbStrictMode, loadBuilderMapFromDb, loadShowcaseItemsFromDb } from "../services/contentService";
+import { loadShowcaseItemsFromDb } from "../services/contentService";
 
 type PopcornFlavor = {
   id: string;
@@ -216,8 +215,6 @@ export function Popcorn() {
   const [activeTag, setActiveTag] = useState("all");
   const [selectedFlavor, setSelectedFlavor] = useState<PopcornFlavor | null>(null);
   const [flavors, setFlavors] = useState<PopcornFlavor[]>(FLAVORS);
-  const [builderMap, setBuilderMap] = useState<Record<string, string>>(POPCORN_TO_BUILDER_RECIPE);
-  const strictDb = isContentDbStrictMode();
 
   const filtered = activeTag === "all" ? flavors : flavors.filter(f => f.tags.includes(activeTag));
 
@@ -227,17 +224,6 @@ export function Popcorn() {
       activeTag === "all" || f.tags.includes(activeTag)
     )
   })).filter(sec => sec.flavors.length > 0);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const fromDb = await loadBuilderMapFromDb("popcorn");
-      if (!cancelled && fromDb) setBuilderMap(fromDb);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     let cancelled = false;

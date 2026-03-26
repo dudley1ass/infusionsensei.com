@@ -5,8 +5,7 @@ import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
-import { COFFEE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
-import { isContentDbStrictMode, loadBuilderMapFromDb, loadShowcaseItemsFromDb } from "../services/contentService";
+import { loadShowcaseItemsFromDb } from "../services/contentService";
 
 type Drink = { id:string; name:string; type:"Butter"|"Oil"|"Tincture"|"Syrup"|"Cream"; profile:string; build:string; tags:string[]; emoji:string; strength:0|1|2|3; sweetness:0|1|2|3; servings:string; ingredients:string[]; steps:string[]; note:string; };
 
@@ -52,21 +51,8 @@ export function Coffee() {
   const [activeTag, setActiveTag] = useState("all");
   const [selected, setSelected] = useState<Drink | null>(null);
   const [drinks, setDrinks] = useState<Drink[]>(DRINKS);
-  const [builderMap, setBuilderMap] = useState<Record<string, string>>(COFFEE_TO_BUILDER_RECIPE);
-  const strictDb = isContentDbStrictMode();
   const filtered = activeTag === "all" ? drinks : drinks.filter(d => d.tags.includes(activeTag));
   const filteredSections = SECTIONS.map(sec => ({ ...sec, drinks: sec.ids.map(id => drinks.find(d => d.id === id)!).filter(d => activeTag === "all" || d.tags.includes(activeTag)) })).filter(sec => sec.drinks.length > 0);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const fromDb = await loadBuilderMapFromDb("coffee");
-      if (!cancelled && fromDb) setBuilderMap(fromDb);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     let cancelled = false;

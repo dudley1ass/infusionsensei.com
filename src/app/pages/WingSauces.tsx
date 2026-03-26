@@ -5,8 +5,7 @@ import { ArrowRight, ChefHat, Flame, Star } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
-import { WING_SAUCE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
-import { isContentDbStrictMode, loadBuilderMapFromDb, loadShowcaseItemsFromDb } from "../services/contentService";
+import { loadShowcaseItemsFromDb } from "../services/contentService";
 
 type Sauce = {
   id: string;
@@ -92,9 +91,7 @@ export function WingSauces() {
   const [activeTag, setActiveTag] = useState("all");
   const [selectedSauce, setSelectedSauce] = useState<Sauce | null>(null);
   const [sauces, setSauces] = useState<Sauce[]>(SAUCES);
-  const [builderMap, setBuilderMap] = useState<Record<string, string>>(WING_SAUCE_TO_BUILDER_RECIPE);
   const [searchParams] = useSearchParams();
-  const strictDb = isContentDbStrictMode();
 
   const sauceIdParam = searchParams.get("sauce");
   const servingsParamRaw = searchParams.get("servings");
@@ -122,17 +119,6 @@ export function WingSauces() {
       setSelectedSauce(found);
     }
   }, [sauceIdParam, sauces]);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const fromDb = await loadBuilderMapFromDb("wings");
-      if (!cancelled && fromDb) setBuilderMap(fromDb);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     let cancelled = false;

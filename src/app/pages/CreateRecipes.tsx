@@ -795,14 +795,19 @@ export function CreateRecipes() {
     return recipeId;
   };
 
+  const formatRecipeNameFromId = (recipeId: string) =>
+    recipeId
+      .split("-")
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+
   useEffect(() => {
     const cat = searchParams.get("category");
     const rec = searchParams.get("recipe");
     if (cat && rec) {
-      const resolvedRecipeId = resolveRecipeIdForCategory(cat, rec);
       setSelectedCategory(cat);
       setRecipeType("standard");
-      setSelectedStandardRecipe(resolvedRecipeId);
+      setSelectedStandardRecipe(rec);
     }
   }, []);
 
@@ -880,7 +885,31 @@ export function CreateRecipes() {
   // Load standard recipe
   useEffect(() => {
     if (selectedStandardRecipe && selectedCategory) {
-      const recipe = standardRecipes[selectedCategory]?.find(r => r.id === selectedStandardRecipe);
+      const resolvedRecipeId = resolveRecipeIdForCategory(selectedCategory, selectedStandardRecipe);
+      const directRecipe = standardRecipes[selectedCategory]?.find(r => r.id === resolvedRecipeId);
+      const fallbackByCategory: Record<string, string> = {
+        wings: "classic-buffalo-wings",
+        fries: "garlic-butter-fries",
+        snacks: "garlic-butter-popcorn",
+        drinks: "bulletproof-coffee",
+      };
+      const fallbackId = fallbackByCategory[selectedCategory];
+      const fallbackTemplate = fallbackId
+        ? standardRecipes[selectedCategory]?.find((r) => r.id === fallbackId)
+        : undefined;
+      const recipe =
+        directRecipe ??
+        (fallbackTemplate
+          ? {
+              ...fallbackTemplate,
+              id: selectedStandardRecipe,
+              name: formatRecipeNameFromId(selectedStandardRecipe),
+              instructions: [
+                `Built from our ${fallbackTemplate.name} base for ${formatRecipeNameFromId(selectedStandardRecipe)}.`,
+                ...fallbackTemplate.instructions,
+              ],
+            }
+          : undefined);
       if (recipe) {
         setRecipeName(recipe.name);
         const overrideServings =

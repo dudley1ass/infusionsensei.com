@@ -5,8 +5,7 @@ import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
-import { FRIES_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
-import { isContentDbStrictMode, loadBuilderMapFromDb, loadShowcaseItemsFromDb } from "../services/contentService";
+import { loadShowcaseItemsFromDb } from "../services/contentService";
 
 type FriesRecipe = { id:string; name:string; type:"Butter"|"Oil"|"Aioli"|"Glaze"|"Powder"; profile:string; build:string; tags:string[]; emoji:string; heat:0|1|2|3; sweetness:0|1|2|3; servings:string; ingredients:string[]; steps:string[]; note:string; };
 
@@ -51,8 +50,6 @@ export function Fries() {
   const [activeTag, setActiveTag] = useState("all");
   const [selected, setSelected] = useState<FriesRecipe | null>(null);
   const [friesRecipes, setFriesRecipes] = useState<FriesRecipe[]>(RECIPES);
-  const [builderMap, setBuilderMap] = useState<Record<string, string>>(FRIES_TO_BUILDER_RECIPE);
-  const strictDb = isContentDbStrictMode();
   const [searchParams] = useSearchParams();
   const filtered = activeTag === "all" ? friesRecipes : friesRecipes.filter(r => r.tags.includes(activeTag));
   const filteredSections = SECTIONS.map(sec => ({ ...sec, recipes: sec.ids.map(id => friesRecipes.find(r => r.id === id)!).filter(r => activeTag === "all" || r.tags.includes(activeTag)) })).filter(sec => sec.recipes.length > 0);
@@ -66,17 +63,6 @@ export function Fries() {
       setSelected(found);
     }
   }, [searchParams, friesRecipes]);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const fromDb = await loadBuilderMapFromDb("fries");
-      if (!cancelled && fromDb) setBuilderMap(fromDb);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
