@@ -3,10 +3,7 @@ import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, Calculator, ChefHat, BookOpen, FlaskConical } from "lucide-react";
 import { Button } from "../components/ui/button";
-
-const trackEvent = (name: string, params?: Record<string, any>) => {
-  if (typeof window.gtag === 'function') window.gtag('event', name, params);
-};
+import { trackEvent } from "../utils/analytics";
 
 
 export function THCCalculatorPage() {
@@ -28,8 +25,8 @@ export function THCCalculatorPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-12">
       <Helmet>
-        <title>THC Edible Calculator – Accurate Dosage & Potency Tool (Free)</title>
-        <meta name="description" content="Free THC edible calculator. Calculate exact milligrams of THC per serving for cannabutter, oils, brownies, gummies, and any recipe. Never guess your edible dosage again." />
+        <title>THC Dosage Calculator (Edibles, Butter, Oil - Instant Results)</title>
+        <meta name="description" content="Calculate exact THC dosage for edibles, cannabutter, and oil. Get precise potency instantly - no math required." />
         <link rel="canonical" href="https://infusionsensei.com/thc-calculator" />
       </Helmet>
 

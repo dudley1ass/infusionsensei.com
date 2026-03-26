@@ -12,8 +12,8 @@ export function Home() {
   return (
     <div className="space-y-14">
       <Helmet>
-        <title>Infusion Sensei | THC Dosage Calculator & Cannabis Edible Recipe Builder</title>
-        <meta name="description" content="Free THC dosage calculator for cannabis edibles. Calculate exact mg per serving for cannabutter, infused oils, and recipes. Stop guessing — know your dose." />
+        <title>The Ultimate Cannabis Infusion Toolkit | THC Calculator + Recipe Builder</title>
+        <meta name="description" content="Calculate THC, build recipes, and create perfect edibles every time. Free tools for dosage, infusions, and custom cannabis recipes." />
         <link rel="canonical" href="https://infusionsensei.com/" />
       </Helmet>
 
@@ -27,9 +27,11 @@ export function Home() {
               <Zap className="w-3.5 h-3.5 mr-1.5" /> Free Cannabis Cooking Tool
             </Badge>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-3 leading-tight">
-              Get Exact THC Per Serving —<br /><span className="text-green-300">Every Time.</span>
+              The Ultimate Cannabis Infusion Toolkit
             </h1>
-            <p className="text-green-300 text-base font-semibold mb-6">Choose what you want to make:</p>
+            <p className="text-green-300 text-base font-semibold mb-6">
+              Calculate THC, build recipes, and create perfect edibles every time.
+            </p>
           </div>
 
           {/* Image-based snack cards */}
@@ -82,12 +84,12 @@ export function Home() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link to="/infusions">
               <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-base px-8 py-5 shadow-xl rounded-xl transition-transform hover:scale-105">
-                Build My Infusion (Free) <ArrowRight className="w-5 h-5 ml-2" />
+                Recipe Builder <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
             <Link to="/thc-calculator">
               <Button size="lg" variant="outline" className="border-2 border-white/40 text-white hover:bg-white/10 font-bold text-base px-8 py-5 rounded-xl">
-                <Calculator className="w-4 h-4 mr-2" /> THC Calculator
+                <Calculator className="w-4 h-4 mr-2" /> Calculate THC
               </Button>
             </Link>
           </div>

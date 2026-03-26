@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChefHat, Flame, Star } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { trackEvent } from "../utils/analytics";
 
 type Sauce = {
   id: string;
@@ -151,8 +152,8 @@ export function WingSauces() {
   return (
     <div className="max-w-6xl mx-auto space-y-10">
       <Helmet>
-        <title>20 Infused Wing Sauces | Cannabis Chicken Wings | Infusion Sensei</title>
-        <meta name="description" content="20 cannabis-infused wing sauce recipes — buffalo, honey BBQ, Nashville hot, teriyaki, and more. Every sauce built with cannabutter or cannabis oil for exact THC dosing." />
+        <title>Infused Wings Recipe (THC Dosage + Step-by-Step Guide)</title>
+        <meta name="description" content="Make cannabis-infused wings with perfect THC dosing. Includes butter infusion, sauce ideas, and calculator." />
       </Helmet>
 
       {/* Hero */}
@@ -240,7 +241,7 @@ export function WingSauces() {
                         SAUCE_TO_BUILDER_RECIPE[sauce.id] ?? "classic-buffalo-wings"
                       }${servingsQuery}${returnQuery}`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
-                      onClick={e => { e.stopPropagation(); if(typeof window.gtag==="function") window.gtag("event","move_to_builder",{source:"wingsauces"}); }}
+                      onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"wings",recipe_id:sauce.id}); }}
                     >
                       <ChefHat className="w-4 h-4" /> Move to Recipe Builder
                     </Link>

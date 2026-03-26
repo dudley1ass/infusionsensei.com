@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { trackEvent } from "../utils/analytics";
 
 type FriesRecipe = { id:string; name:string; type:"Butter"|"Oil"|"Aioli"|"Glaze"|"Powder"; profile:string; build:string; tags:string[]; emoji:string; heat:0|1|2|3; sweetness:0|1|2|3; servings:string; ingredients:string[]; steps:string[]; note:string; };
 
@@ -53,8 +54,8 @@ export function Fries() {
   return (
     <div className="max-w-6xl mx-auto space-y-10">
       <Helmet>
-        <title>20 Infused Fries Recipes | Cannabis French Fries | Infusion Sensei</title>
-        <meta name="description" content="20 cannabis-infused french fries recipes — garlic butter to Korean gochujang. Every recipe uses cannabutter or cannabis oil for exact THC dosing per serving." />
+        <title>THC Infused Fries (Cannabis Oil Recipe + Dosage Calculator)</title>
+        <meta name="description" content="Make crispy infused fries using cannabis oil. Learn exact THC dosing and cooking methods for perfect results." />
       </Helmet>
 
       <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{minHeight:"280px"}}>
@@ -108,7 +109,7 @@ export function Fries() {
                       </ol>
                       <p className="text-xs text-gray-500 italic bg-orange-50 rounded-lg px-3 py-2 mt-2">💡 {recipe.note}</p>
                     </div>
-                    <Link to={`/ingredients?category=fries&recipe=${recipe.id}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); if(typeof window.gtag==="function") window.gtag("event","move_to_builder",{source:"fries"}); }}>
+                    <Link to={`/ingredients?category=fries&recipe=${recipe.id}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"fries",recipe_id:recipe.id}); }}>
                       <ChefHat className="w-4 h-4" /> Move to Recipe Builder
                     </Link>
                   </div>

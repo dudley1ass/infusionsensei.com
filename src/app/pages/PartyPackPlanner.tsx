@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, CheckCircle2, Plus, Printer, Users } from "lucide-react";
+import { ArrowRight, CheckCircle2, Plus, Printer, Trash2, Users } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -14,7 +14,7 @@ import {
 } from "../components/ui/select";
 import { InfusionBase } from "../types/infusion";
 import { safeJsonParse } from "../utils/storage";
-import { recipes as siteRecipes, type Recipe } from "../data/recipes";
+import { recipes as siteRecipes } from "../data/recipes";
 
 type PlannerItem = {
   id: string;
@@ -376,6 +376,16 @@ export function PartyPackPlanner() {
     });
   };
 
+  const removeItem = (id: string) => {
+    setItems((prev) => {
+      const next = prev.filter((item) => item.id !== id);
+      const existing = safeJsonParse<Record<string, boolean>>(localStorage.getItem(progressStorageKey), {});
+      const { [id]: _removed, ...rest } = existing;
+      localStorage.setItem(progressStorageKey, JSON.stringify(rest));
+      return next;
+    });
+  };
+
   const nextPendingItem = items.find((item) => !item.completed);
   const completedCount = items.filter((item) => item.completed).length;
   const nextStepIndex = nextPendingItem ? items.findIndex((i) => i.id === nextPendingItem.id) : -1;
@@ -430,7 +440,7 @@ export function PartyPackPlanner() {
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Select infusion" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white text-gray-900 border border-gray-200 shadow-lg z-50">
                   {infusions.map((infusion) => (
                     <SelectItem key={infusion.id} value={infusion.id}>
                       {infusion.name} ({infusion.thcPerUnit.toFixed(2)} mg per unit)
@@ -553,6 +563,16 @@ export function PartyPackPlanner() {
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   {item.completed ? "Built" : "Mark built"}
                 </button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="border-red-200 text-red-700 hover:bg-red-50"
+                  onClick={() => removeItem(item.id)}
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1" />
+                  Remove
+                </Button>
               </div>
             </div>
           );
@@ -566,7 +586,7 @@ export function PartyPackPlanner() {
             <SelectTrigger className="mt-1">
               <SelectValue placeholder="Choose a recipe to add..." />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white text-gray-900 border border-gray-200 shadow-lg z-50">
               <SelectItem value="custom">Custom item (manual)</SelectItem>
               {siteRecipes
                 .filter((r) => r.category === "edibles" || r.category === "drinks")

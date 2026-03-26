@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { trackEvent } from "../utils/analytics";
 
 type PopcornFlavor = {
   id: string;
@@ -225,8 +226,8 @@ export function Popcorn() {
   return (
     <div className="max-w-6xl mx-auto space-y-10">
       <Helmet>
-        <title>20 Infused Popcorn Recipes | Cannabis Popcorn Flavors | Infusion Sensei</title>
-        <meta name="description" content="20 cannabis-infused popcorn recipes — garlic butter, caramel, buffalo, chocolate drizzle and more. Every recipe uses cannabutter or cannabis oil for exact THC dosing per serving." />
+        <title>THC Infused Popcorn (Easy Edible Recipe + Dosage Calculator)</title>
+        <meta name="description" content="Make perfectly dosed cannabis popcorn at home. Sweet, savory, and movie-night ready with accurate THC dosing." />
       </Helmet>
 
       {/* Hero */}
@@ -319,7 +320,7 @@ export function Popcorn() {
                         'garlic-butter-popcorn'
                       }`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
-                      onClick={e => { e.stopPropagation(); if(typeof window.gtag==="function") window.gtag("event","move_to_builder",{source:"popcorn"}); }}
+                      onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"popcorn",recipe_id:flavor.id}); }}
                     >
                       <ChefHat className="w-4 h-4" /> Move to Recipe Builder
                     </Link>

@@ -30,13 +30,7 @@ import {
 import { InfusionBase } from "../types/infusion";
 import { NutritionFactsLabel } from "../components/NutritionFactsLabel";
 import { safeJsonParse } from "../utils/storage";
-
-// GA4 event helper
-const trackEvent = (name: string, params?: Record<string, any>) => {
-  if (typeof window.gtag === 'function') {
-    window.gtag('event', name, params);
-  }
-};
+import { trackEvent } from "../utils/analytics";
 
 
 // Common ingredient library
@@ -2546,6 +2540,11 @@ export function CreateRecipes() {
                       onClick={() => {
                         const summary = `${recipeName || "My Recipe"}\n${thcPerServing.toFixed(1)}mg THC per serving\n${totalTHC.toFixed(0)}mg total batch\n${servings} servings\n\nCalculated with Infusion Sensei — infusionsensei.com`;
                         navigator.clipboard.writeText(summary);
+                        trackEvent("recipe_copied", {
+                          recipe_name: recipeName || "My Recipe",
+                          servings,
+                          thc_per_serving: Number(thcPerServing.toFixed(1)),
+                        });
                         setCopied(true);
                         setTimeout(() => setCopied(false), 2000);
                       }}
@@ -2612,7 +2611,7 @@ export function CreateRecipes() {
                   {/* Action strip */}
                   <div className="bg-black/20 px-4 py-3 border-t border-white/10 grid grid-cols-3 gap-2">
                     {[
-                      { icon: <Copy className="w-4 h-4" />, label: copied ? "Copied!" : "Copy", action: () => { const s = `${recipeName || "My Recipe"}\n${thcPerServing.toFixed(1)}mg THC per serving\n${totalTHC.toFixed(0)}mg total\n${servings} servings\n\ninfusionsensei.com`; navigator.clipboard.writeText(s); setCopied(true); setTimeout(() => setCopied(false), 2000); } },
+                      { icon: <Copy className="w-4 h-4" />, label: copied ? "Copied!" : "Copy", action: () => { const s = `${recipeName || "My Recipe"}\n${thcPerServing.toFixed(1)}mg THC per serving\n${totalTHC.toFixed(0)}mg total\n${servings} servings\n\ninfusionsensei.com`; navigator.clipboard.writeText(s); trackEvent("recipe_copied", { recipe_name: recipeName || "My Recipe", servings, thc_per_serving: Number(thcPerServing.toFixed(1)) }); setCopied(true); setTimeout(() => setCopied(false), 2000); } },
                       { icon: <Printer className="w-4 h-4" />, label: "Print", action: () => window.print() },
                       { icon: <Share2 className="w-4 h-4" />, label: "Share", action: () => { if (navigator.share) navigator.share({ title: "Infusion Sensei", text: `${recipeName}: ${thcPerServing.toFixed(1)}mg THC per serving`, url: "https://infusionsensei.com" }); } },
                     ].map(({ icon, label, action }) => (
