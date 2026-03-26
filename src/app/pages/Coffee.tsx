@@ -5,6 +5,7 @@ import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
+import { COFFEE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
 
 type Drink = { id:string; name:string; type:"Butter"|"Oil"|"Tincture"|"Syrup"|"Cream"; profile:string; build:string; tags:string[]; emoji:string; strength:0|1|2|3; sweetness:0|1|2|3; servings:string; ingredients:string[]; steps:string[]; note:string; };
 
@@ -109,11 +110,7 @@ export function Coffee() {
                       </ol>
                       <p className="text-xs text-gray-500 italic bg-yellow-50 rounded-lg px-3 py-2 mt-2">💡 {drink.note}</p>
                     </div>
-                    <Link to={`/ingredients?category=drinks&recipe=${
-  drink.id === 'bulletproof' || drink.id === 'cortado' || drink.id === 'infused-americano' ? 'bulletproof-coffee' :
-  drink.id === 'golden-latte' || drink.id === 'infused-matcha' || drink.id === 'infused-chai' || drink.id === 'infused-turmeric-latte' ? 'cannabis-tea' :
-  'bulletproof-coffee'
-}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"coffee",recipe_id:drink.id}); }}>
+                    <Link to={`/ingredients?category=drinks&recipe=${COFFEE_TO_BUILDER_RECIPE[drink.id] ?? "bulletproof-coffee"}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"coffee",recipe_id:drink.id}); }}>
                       <ChefHat className="w-4 h-4" /> Move to Recipe Builder
                     </Link>
                   </div>

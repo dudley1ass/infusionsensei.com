@@ -5,6 +5,7 @@ import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
+import { POPCORN_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
 
 type PopcornFlavor = {
   id: string;
@@ -314,10 +315,7 @@ export function Popcorn() {
                     )}
                     <Link
                       to={`/ingredients?category=snacks&recipe=${
-                        flavor.id === 'caramel' || flavor.id === 'maple' ? 'caramel-popcorn' :
-                        flavor.id === 'buffalo' || flavor.id === 'cajun-spice' || flavor.id === 'nashville-hot' || flavor.id === 'sriracha' || flavor.id === 'chili-lime' ? 'buffalo-popcorn' :
-                        flavor.id === 'chocolate-drizzle' || flavor.id === 'cookies-cream' || flavor.id === 'smores' || flavor.id === 'salted-caramel-choc' ? 'chocolate-drizzle-popcorn' :
-                        'garlic-butter-popcorn'
+                        POPCORN_TO_BUILDER_RECIPE[flavor.id] ?? "garlic-butter-popcorn"
                       }`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
                       onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"popcorn",recipe_id:flavor.id}); }}

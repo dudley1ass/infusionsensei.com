@@ -6,6 +6,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { safeJsonParse } from "../utils/storage";
+import { WING_SAUCE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
 
 type WingsSplitState = {
   totalWings: number;
@@ -38,29 +39,6 @@ const WING_FLAVORS: { sauceId: string; name: string; emoji: string }[] = [
   { sauceId: "chimichurri", name: "Herb Chimichurri", emoji: "🌿" },
   { sauceId: "ranch-butter", name: "Ranch Butter Toss", emoji: "🤍" },
 ];
-
-const WING_SAUCE_TO_RECIPE_ID: Record<string, string> = {
-  "classic-buffalo": "classic-buffalo-wings",
-  "garlic-parmesan": "garlic-parmesan-wings",
-  "honey-bbq": "honey-bbq-wings",
-  "lemon-pepper": "lemon-pepper-wings",
-  teriyaki: "teriyaki-wings",
-  "mango-habanero": "mango-habanero-wings",
-  "nashville-hot": "nashville-hot-wings",
-  "chili-crisp": "chili-crisp-wings",
-  "cajun-butter": "cajun-butter-wings",
-  "sriracha-honey": "sriracha-honey-wings",
-  "maple-bacon": "maple-bacon-wings",
-  "brown-sugar-bourbon": "brown-sugar-bourbon-wings",
-  "pineapple-ginger": "pineapple-ginger-wings",
-  "honey-mustard": "honey-mustard-wings",
-  "orange-glaze": "orange-glaze-wings",
-  "korean-gochujang": "korean-gochujang-wings",
-  "garlic-soy-umami": "garlic-soy-umami-wings",
-  "truffle-butter": "truffle-butter-wings",
-  chimichurri: "chimichurri-wings",
-  "ranch-butter": "ranch-butter-wings",
-};
 
 // Baseline derived from the wings recipe template (900g wings == 4 servings).
 // That implies ~7.5 wings per "serving" in this app.
@@ -197,7 +175,7 @@ export function PartyWingsSplit() {
 
   const buildFlavorUrl = (sauceId: string, qtyWings: number) => {
     const servingsOverride = servingsOverrideFor(qtyWings);
-    const recipeId = WING_SAUCE_TO_RECIPE_ID[sauceId] ?? "classic-buffalo-wings";
+    const recipeId = WING_SAUCE_TO_BUILDER_RECIPE[sauceId] ?? "classic-buffalo-wings";
     const flavorProgressKey = `flavor:${sauceId}`;
     return `/ingredients?category=wings&recipe=${encodeURIComponent(recipeId)}&servings=${servingsOverride}&wingsQty=${encodeURIComponent(
       qtyWings

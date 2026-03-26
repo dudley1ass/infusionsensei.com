@@ -5,6 +5,7 @@ import { ArrowRight, ChefHat, Flame, Star } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
+import { WING_SAUCE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
 
 type Sauce = {
   id: string;
@@ -65,29 +66,6 @@ const SECTIONS = [
   { label: "🍯 Sweet / Sticky", ids: ["maple-bacon","brown-sugar-bourbon","pineapple-ginger","honey-mustard","orange-glaze"] },
   { label: "🧄 Savory / Umami", ids: ["korean-gochujang","garlic-soy-umami","truffle-butter","chimichurri","ranch-butter"] },
 ];
-
-const SAUCE_TO_BUILDER_RECIPE: Record<string, string> = {
-  "classic-buffalo": "classic-buffalo-wings",
-  "garlic-parmesan": "garlic-parmesan-wings",
-  "honey-bbq": "honey-bbq-wings",
-  "lemon-pepper": "lemon-pepper-wings",
-  teriyaki: "teriyaki-wings",
-  "mango-habanero": "mango-habanero-wings",
-  "nashville-hot": "nashville-hot-wings",
-  "chili-crisp": "chili-crisp-wings",
-  "cajun-butter": "cajun-butter-wings",
-  "sriracha-honey": "sriracha-honey-wings",
-  "maple-bacon": "maple-bacon-wings",
-  "brown-sugar-bourbon": "brown-sugar-bourbon-wings",
-  "pineapple-ginger": "pineapple-ginger-wings",
-  "honey-mustard": "honey-mustard-wings",
-  "orange-glaze": "orange-glaze-wings",
-  "korean-gochujang": "korean-gochujang-wings",
-  "garlic-soy-umami": "garlic-soy-umami-wings",
-  "truffle-butter": "truffle-butter-wings",
-  chimichurri: "chimichurri-wings",
-  "ranch-butter": "ranch-butter-wings",
-};
 
 function HeatDots({ level }: { level: number }) {
   return (
@@ -238,7 +216,7 @@ export function WingSauces() {
                     <SauceRecipe sauce={sauce} />
                     <Link
                       to={`/ingredients?category=wings&recipe=${
-                        SAUCE_TO_BUILDER_RECIPE[sauce.id] ?? "classic-buffalo-wings"
+                        WING_SAUCE_TO_BUILDER_RECIPE[sauce.id] ?? "classic-buffalo-wings"
                       }${servingsQuery}${returnQuery}`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
                       onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"wings",recipe_id:sauce.id}); }}
