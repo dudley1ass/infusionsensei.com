@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { recipes, Recipe } from "../data/recipes";
 import { RECIPES as friesStyles } from "./Fries";
+import { loadPublishedRecipesFromDb } from "../services/contentService";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -12,6 +13,18 @@ import { Input } from "../components/ui/input";
 export function Recipes() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [dbRecipes, setDbRecipes] = useState<Recipe[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const fromDb = await loadPublishedRecipesFromDb();
+      if (!cancelled && fromDb) setDbRecipes(fromDb);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   type DisplayRecipe = {
     id: string;
@@ -42,8 +55,10 @@ export function Recipes() {
     route: `/fries?recipe=${encodeURIComponent(fries.id)}`,
   }));
 
+  const recipeSource = dbRecipes && dbRecipes.length > 0 ? dbRecipes : recipes;
+
   const allDisplayRecipes: DisplayRecipe[] = [
-    ...recipes.map((r) => ({ ...r, route: `/recipes/${r.id}` })),
+    ...recipeSource.map((r) => ({ ...r, route: `/recipes/${r.id}` })),
     ...friesDisplayRecipes,
   ];
 
@@ -63,14 +78,14 @@ export function Recipes() {
     return matchesSearch && matchesCategory;
   });
 
-  const newCount = recipes.filter((r) => r.isNew).length;
+  const newCount = recipeSource.filter((r) => r.isNew).length;
 
   const categories = [
     { value: "all", label: "All Recipes", count: allDisplayRecipes.length },
-    { value: "basics", label: "Basics", count: recipes.filter((r) => r.category === "basics").length },
-    { value: "edibles", label: "Edibles", count: recipes.filter((r) => r.category === "edibles").length },
-    { value: "drinks", label: "Drinks", count: recipes.filter((r) => r.category === "drinks").length },
-    { value: "infusions", label: "Infusions", count: recipes.filter((r) => r.category === "infusions").length },
+    { value: "basics", label: "Basics", count: recipeSource.filter((r) => r.category === "basics").length },
+    { value: "edibles", label: "Edibles", count: recipeSource.filter((r) => r.category === "edibles").length },
+    { value: "drinks", label: "Drinks", count: recipeSource.filter((r) => r.category === "drinks").length },
+    { value: "infusions", label: "Infusions", count: recipeSource.filter((r) => r.category === "infusions").length },
     { value: "fries", label: "Fries Styles", count: friesDisplayRecipes.length },
   ];
 

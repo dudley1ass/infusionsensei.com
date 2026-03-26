@@ -59,3 +59,14 @@ Build frontend content service (read from DB with local fallback), starting with
 1. `Recipes` page reads categories + recipes from DB
 2. map lookups use `builder_recipe_maps`
 
+### Phase 2 env vars (frontend)
+
+Create `frontend/.env` with:
+
+```bash
+VITE_SUPABASE_URL=your-project-url
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+If missing, app safely falls back to local static recipe data.
+
