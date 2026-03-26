@@ -71,7 +71,7 @@ const SAUCE_TO_BUILDER_RECIPE: Record<string, string> = {
   "garlic-parmesan": "garlic-parmesan-wings",
   "honey-bbq": "honey-bbq-wings",
   "lemon-pepper": "lemon-pepper-wings",
-  teriyaki: "honey-bbq-wings",
+  teriyaki: "teriyaki-wings",
   "mango-habanero": "mango-habanero-wings",
   "nashville-hot": "nashville-hot-wings",
   "chili-crisp": "korean-gochujang-wings",

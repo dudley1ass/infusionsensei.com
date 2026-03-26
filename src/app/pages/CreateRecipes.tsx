@@ -348,6 +348,15 @@ const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way. We're here for the sauce.","Melt cannabutter in saucepan over low heat.","Whisk in hot sauce, sugar, and garlic powder until smooth.","Simmer 2 minutes until slightly thickened.","Toss hot wings in honey BBQ sauce.","Serve immediately."],
     },
     {
+      id: "teriyaki-wings",
+      name: "Teriyaki Wings",
+      servings: 4,
+      ingredients: ["Chicken Wings","Cannabis Coconut Oil","Granulated Sugar","Garlic","Salt","Black Pepper"],
+      amounts: [900,30,35,3,3,2],
+      units: ["g","ml","g","cloves","g","g"],
+      instructions: ["Cook wings your way until crispy. We're here for the sauce.","In a small pan, combine soy sauce, sugar, and minced garlic over low heat.","Stir until the sugar dissolves and the glaze starts to thicken slightly.","Remove from heat and whisk in cannabis coconut oil.","Toss hot wings in teriyaki glaze and serve immediately.","Top with sesame seeds and scallions if desired."],
+    },
+    {
       id: "nashville-hot-wings",
       name: "Nashville Hot Wings",
       servings: 4,
@@ -2281,13 +2290,13 @@ export function CreateRecipes() {
               {returnToPartyPack && partyPackId && partyItemId && (
                 <Button
                   onClick={handleReturnToPartyPack}
-                  variant="outline"
+                  variant="default"
                   size="sm"
-                  className="border-orange-300 text-orange-700 hover:bg-orange-50 gap-1.5"
+                  className="bg-orange-600 hover:bg-orange-700 text-white gap-1.5 font-bold shadow-sm ring-2 ring-orange-200"
                 >
                   <ArrowLeft className="w-4 h-4" />{" "}
                   {partyPackId.startsWith("wings-split:")
-                    ? "Back to Wings Split (build next flavor)"
+                    ? "Back to Wings Split - Build Next Flavor"
                     : "Back to Party Pack"}
                 </Button>
               )}

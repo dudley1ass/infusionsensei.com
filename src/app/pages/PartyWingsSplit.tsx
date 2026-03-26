@@ -44,8 +44,7 @@ const WING_SAUCE_TO_RECIPE_ID: Record<string, string> = {
   "garlic-parmesan": "garlic-parmesan-wings",
   "honey-bbq": "honey-bbq-wings",
   "lemon-pepper": "lemon-pepper-wings",
-  // Fallback to nearest available builder recipe IDs (must exist in CreateRecipes wings templates).
-  teriyaki: "honey-bbq-wings",
+  teriyaki: "teriyaki-wings",
   "mango-habanero": "mango-habanero-wings",
   "nashville-hot": "nashville-hot-wings",
   "chili-crisp": "korean-gochujang-wings",
@@ -116,6 +115,10 @@ export function PartyWingsSplit() {
               flavors: [{ sauceId: "garlic-parmesan", qtyWings: nextTotalWings }],
             }
       );
+      if (!shouldPreserveFlavors) {
+        // New split context: clear previous built flags so rows don't appear pre-built.
+        localStorage.removeItem(builtStorageKey);
+      }
       return;
     }
 
@@ -123,7 +126,7 @@ export function PartyWingsSplit() {
       ...saved,
       mgEach: queryMgEach ?? saved.mgEach,
     });
-  }, [wingsStorageKey, queryTotalWings, queryMgEach]);
+  }, [wingsStorageKey, builtStorageKey, queryTotalWings, queryMgEach]);
 
   const builtMap = useMemo(() => {
     return safeJsonParse<Record<string, boolean>>(localStorage.getItem(builtStorageKey), {});
@@ -182,6 +185,14 @@ export function PartyWingsSplit() {
     localStorage.setItem(wingsStorageKey, JSON.stringify(state));
     markPlannerWingsCompleted();
     navigate(`/party-mode/plan/${packId}`);
+  };
+
+  const resetWingProgress = () => {
+    localStorage.removeItem(builtStorageKey);
+    setState((prev) => ({
+      ...prev,
+      flavors: [{ sauceId: "garlic-parmesan", qtyWings: prev.totalWings }],
+    }));
   };
 
   const buildFlavorUrl = (sauceId: string, qtyWings: number) => {
@@ -377,6 +388,15 @@ export function PartyWingsSplit() {
 
         <Button variant="outline" onClick={() => navigate(`/party-mode/plan/${packId}`)} className="font-bold">
           Back
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          onClick={resetWingProgress}
+          className="font-bold border-red-200 text-red-700 hover:bg-red-50"
+        >
+          Reset wing progress
         </Button>
 
         {!allSelectedBuilt && selectedSauceIds.length > 0 && (
