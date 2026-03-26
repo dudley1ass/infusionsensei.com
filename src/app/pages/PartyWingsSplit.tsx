@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, CheckCircle2, Save } from "lucide-react";
+import { ArrowRight, CheckCircle2, Plus, Save, Trash2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -114,36 +114,26 @@ export function PartyWingsSplit() {
   const hasSelections = state.flavors.length > 0;
   const isAllocationExact = hasSelections && remaining === 0;
 
-  const getFlavorQty = (sauceId: string) => state.flavors.find((f) => f.sauceId === sauceId)?.qtyWings ?? 0;
-  const setFlavorQty = (sauceId: string, qtyWings: number) => {
+  const updateFlavorAtIndex = (index: number, patch: Partial<{ sauceId: string; qtyWings: number }>) => {
+    setState((prev) => ({
+      ...prev,
+      flavors: prev.flavors.map((f, i) => (i === index ? { ...f, ...patch } : f)),
+    }));
+  };
+
+  const addFlavorRow = () => {
     setState((prev) => {
-      const existing = prev.flavors.find((f) => f.sauceId === sauceId);
-      if (!existing && qtyWings > 0) return { ...prev, flavors: [...prev.flavors, { sauceId, qtyWings }] };
-      if (existing && qtyWings <= 0) return { ...prev, flavors: prev.flavors.filter((f) => f.sauceId !== sauceId) };
-      return {
-        ...prev,
-        flavors: prev.flavors.map((f) => (f.sauceId === sauceId ? { ...f, qtyWings } : f)),
-      };
+      const used = new Set(prev.flavors.map((f) => f.sauceId));
+      const nextFlavor = WING_FLAVORS.find((f) => !used.has(f.sauceId))?.sauceId ?? WING_FLAVORS[0].sauceId;
+      if (used.has(nextFlavor) && prev.flavors.length >= WING_FLAVORS.length) return prev;
+      return { ...prev, flavors: [...prev.flavors, { sauceId: nextFlavor, qtyWings: 0 }] };
     });
   };
 
-  const toggleFlavorSelected = (sauceId: string, selected: boolean) => {
-    if (!selected) {
-      setFlavorQty(sauceId, 0);
-      return;
-    }
-    // When selecting a new flavor, default to 0 and let the user type.
-    // If it's the only selection, we auto-fill with remaining.
+  const removeFlavorRow = (index: number) => {
     setState((prev) => {
-      const already = prev.flavors.some((f) => f.sauceId === sauceId);
-      if (already) return prev;
-      const nextFlavors = [...prev.flavors, { sauceId, qtyWings: 0 }];
-      const allocated = nextFlavors.reduce((sum, f) => sum + (f.qtyWings || 0), 0);
-      const rem = prev.totalWings - allocated;
-      // If user just created the selection and nothing else is allocated yet, give it all.
-      const onlyThis = nextFlavors.length === 1;
-      if (onlyThis && rem >= 0) return { ...prev, flavors: [{ sauceId, qtyWings: prev.totalWings }] };
-      return { ...prev, flavors: nextFlavors };
+      const next = prev.flavors.filter((_, i) => i !== index);
+      return { ...prev, flavors: next.length > 0 ? next : [{ sauceId: "garlic-parmesan", qtyWings: prev.totalWings }] };
     });
   };
 
@@ -249,105 +239,102 @@ export function PartyWingsSplit() {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-        <h2 className="text-xl font-black text-gray-900 mb-4">Choose your wing flavors</h2>
-        <div className="space-y-3">
-          {WING_FLAVORS.map((opt) => {
-            const selected = state.flavors.some((f) => f.sauceId === opt.sauceId);
-            const built = builtMap[`flavor:${opt.sauceId}`];
-            const qty = getFlavorQty(opt.sauceId);
-            return (
-              <div
-                key={opt.sauceId}
-                className={`flex items-center gap-3 p-3 rounded-xl border ${
-                  selected ? "border-orange-200 bg-orange-50" : "border-gray-200 bg-white"
-                }`}
-              >
-                <label className="flex items-center gap-3 cursor-pointer flex-shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={selected}
-                    onChange={(e) => toggleFlavorSelected(opt.sauceId, e.target.checked)}
-                  />
-                  <span className="text-2xl">{opt.emoji}</span>
-                  <span className="font-black text-sm">{opt.name}</span>
-                </label>
-
-                {selected ? (
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="min-w-[140px]">
-                      <Label className="text-xs font-bold text-gray-500">Qty (wings)</Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        value={qty}
-                        onChange={(e) => setFlavorQty(opt.sauceId, Math.max(0, Number(e.target.value) || 0))}
-                        className="mt-1"
-                      />
-                    </div>
-                    {built ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-green-200 bg-green-50 text-green-700 text-xs font-bold">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        Built
-                      </span>
-                    ) : (
-                      <Link to={buildFlavorUrl(opt.sauceId, qty)}>
-                        <Button
-                          size="sm"
-                          className="bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs"
-                          disabled={!isAllocationExact || qty <= 0}
-                          onClick={() => {
-                            localStorage.setItem(wingsStorageKey, JSON.stringify(state));
-                          }}
-                        >
-                          Build wings
-                        </Button>
-                      </Link>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex-1 text-xs text-gray-500">Select to split wings</div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        <h2 className="text-xl font-black text-gray-900">Step-by-step: build your wing flavors</h2>
-        <div className="grid md:grid-cols-2 gap-3">
-          {state.flavors.map((f) => {
+      <div className="grid lg:grid-cols-3 gap-4 items-start">
+        <div className="lg:col-span-2 space-y-4">
+          {state.flavors.map((f, index) => {
             const opt = WING_FLAVORS.find((o) => o.sauceId === f.sauceId);
-            const servingsOverride = servingsOverrideFor(f.qtyWings);
             const flavorProgressKey = `flavor:${f.sauceId}`;
             const isBuilt = builtMap[flavorProgressKey];
-
             return (
-              <div key={f.sauceId} className="bg-white border border-gray-200 rounded-2xl p-4">
-                <p className="font-black text-gray-900">
-                  {opt?.emoji} {opt?.name ?? f.sauceId}
+              <div key={`${f.sauceId}-${index}`} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+                <h3 className="text-lg font-black text-gray-900 mb-4">Wing Flavor {index + 1}</h3>
+                <div className="grid md:grid-cols-3 gap-3 items-end">
+                  <div>
+                    <Label className="text-xs font-bold text-gray-500">Wing flavor</Label>
+                    <select
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                      value={f.sauceId}
+                      onChange={(e) => updateFlavorAtIndex(index, { sauceId: e.target.value })}
+                    >
+                      {WING_FLAVORS.map((wf) => (
+                        <option key={wf.sauceId} value={wf.sauceId}>
+                          {wf.emoji} {wf.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-bold text-gray-500">Wing quantity</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={f.qtyWings}
+                      onChange={(e) => updateFlavorAtIndex(index, { qtyWings: Math.max(0, Number(e.target.value) || 0) })}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Link className="flex-1" to={buildFlavorUrl(f.sauceId, f.qtyWings)}>
+                      <Button
+                        className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold"
+                        disabled={!isAllocationExact || f.qtyWings <= 0}
+                        onClick={() => localStorage.setItem(wingsStorageKey, JSON.stringify(state))}
+                      >
+                        {isBuilt ? "Re-build" : "Build wings"}
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </Link>
+                    {state.flavors.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="border-red-200 text-red-700 hover:bg-red-50"
+                        onClick={() => removeFlavorRow(index)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  {opt?.emoji} {opt?.name} · {f.qtyWings} wings · ≈ {servingsOverrideFor(f.qtyWings)} servings
                 </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  {f.qtyWings} wings (≈ {servingsOverride} servings)
-                </p>
-                <Link to={buildFlavorUrl(f.sauceId, f.qtyWings)}>
-                  <Button
-                    className="mt-3 w-full bg-orange-600 hover:bg-orange-700 text-white font-bold"
-                    disabled={!isAllocationExact}
-                    onClick={() => {
-                      localStorage.setItem(wingsStorageKey, JSON.stringify(state));
-                    }}
-                  >
-                    {isBuilt ? "Re-build" : "Build"} {opt?.name ?? "this flavor"}{" "}
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
               </div>
             );
           })}
-          {state.flavors.length === 0 && (
-            <p className="text-sm text-gray-600">Select at least one flavor above.</p>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="font-bold"
+            onClick={addFlavorRow}
+            disabled={state.flavors.length >= WING_FLAVORS.length}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add another wing flavor
+          </Button>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm sticky top-24">
+          <h3 className="text-lg font-black text-gray-900 mb-3">Wing Split Summary</h3>
+          <div className="space-y-2 text-sm">
+            {state.flavors.map((f) => {
+              const opt = WING_FLAVORS.find((o) => o.sauceId === f.sauceId);
+              return (
+                <div key={`sum-${f.sauceId}`} className="flex justify-between gap-2">
+                  <span className="text-gray-700 truncate">{opt?.emoji} {opt?.name}</span>
+                  <span className="font-bold text-gray-900">{f.qtyWings}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-4 pt-3 border-t border-gray-200 space-y-1 text-sm">
+            <p className="flex justify-between"><span>Total wings</span><span className="font-bold">{state.totalWings}</span></p>
+            <p className="flex justify-between"><span>Assigned</span><span className="font-bold">{totalAllocated}</span></p>
+            <p className="flex justify-between"><span>Remaining</span><span className={`font-bold ${remaining === 0 ? "text-green-700" : "text-amber-700"}`}>{remaining}</span></p>
+          </div>
+          {!isAllocationExact && (
+            <p className="text-xs text-amber-700 mt-3">Adjust quantities until Remaining = 0.</p>
           )}
         </div>
       </div>

@@ -710,6 +710,47 @@ const standardRecipes: Record<string, any[]> = {
   ],
 };
 
+const toTitleFromId = (value: string) =>
+  value
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (m) => m.toUpperCase());
+
+const ensureAliasTemplates = (
+  categoryId: string,
+  map: Record<string, string>,
+  fallbackTemplateId: string
+) => {
+  const categoryRecipes = standardRecipes[categoryId] ?? [];
+  const byId = new Map(categoryRecipes.map((r) => [r.id, r]));
+  const fallbackTemplate = byId.get(fallbackTemplateId);
+  if (!fallbackTemplate) return;
+
+  Object.entries(map).forEach(([sourceId, builderTemplateId]) => {
+    if (byId.has(sourceId)) return;
+    const base = byId.get(builderTemplateId) ?? fallbackTemplate;
+    if (!base) return;
+    const aliasRecipe = {
+      ...base,
+      id: sourceId,
+      name: toTitleFromId(sourceId),
+      instructions: [
+        `Built from ${base.name} template for ${toTitleFromId(sourceId)}.`,
+        ...base.instructions,
+      ],
+    };
+    categoryRecipes.push(aliasRecipe);
+    byId.set(sourceId, aliasRecipe);
+  });
+
+  standardRecipes[categoryId] = categoryRecipes;
+};
+
+// Ensure Create Recipe lists all routable IDs used by pages.
+ensureAliasTemplates("wings", WING_SAUCE_TO_BUILDER_RECIPE, "classic-buffalo-wings");
+ensureAliasTemplates("snacks", POPCORN_TO_BUILDER_RECIPE, "garlic-butter-popcorn");
+ensureAliasTemplates("drinks", COFFEE_TO_BUILDER_RECIPE, "bulletproof-coffee");
+ensureAliasTemplates("fries", FRIES_TO_BUILDER_RECIPE, "garlic-butter-fries");
+
 
 type Ingredient = {
   name: string;
