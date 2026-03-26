@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, CheckCircle2, Plus, Printer, Trash2, Users } from "lucide-react";
+import { ArrowRight, Plus, Printer, Trash2, Users } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -25,14 +25,13 @@ type PlannerItem = {
   mgEach: number;
   unitLabel: string;
   equivalentHint: string;
-  completed?: boolean;
 };
 
 type PackTemplate = {
   id: string;
   title: string;
   subtitle: string;
-  items: (Omit<PlannerItem, "qty" | "mgEach" | "completed"> & { defaultQty: number; defaultMgEach: number; perPersonQty: number })[];
+  items: (Omit<PlannerItem, "qty" | "mgEach"> & { defaultQty: number; defaultMgEach: number; perPersonQty: number })[];
 };
 
 const CANNED_INFUSIONS: InfusionBase[] = [
@@ -98,7 +97,7 @@ const PACKS: PackTemplate[] = [
     subtitle: "Lower-dose flow for movie night or mellow hangs.",
     items: [
       { id: "popcorn", name: "Garlic Butter Popcorn", route: "/popcorn", suggestedRange: "2-5mg per bowl", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.35, unitLabel: "big bowls", equivalentHint: "1 big bowl serves ~3-4 people (~10-12 cups)" },
-      { id: "coffee", name: "Infused Coffee or Tea", route: "/coffee", suggestedRange: "2.5-5mg per cup", defaultQty: 2, defaultMgEach: 3.5, perPersonQty: 0.5, unitLabel: "cups", equivalentHint: "Plan 1 cup per 2 guests for chill packs" },
+      { id: "coffee", name: "Infused Coffee or Tea", route: "/ingredients?category=drinks&recipe=bulletproof", suggestedRange: "2.5-5mg per cup", defaultQty: 2, defaultMgEach: 3.5, perPersonQty: 0.5, unitLabel: "cups", equivalentHint: "Plan 1 cup per 2 guests for chill packs" },
       { id: "wings", name: "Honey Mustard Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 16, defaultMgEach: 2.5, perPersonQty: 4, unitLabel: "wings", equivalentHint: "Light snack baseline is 4-6 wings per person" },
     ],
   },
@@ -115,40 +114,62 @@ const PACKS: PackTemplate[] = [
   {
     id: "savory-dinner-pack",
     title: "Savory Dinner Pack Planner",
-    subtitle: "Spaghetti + pizza sauce + infused drinks for a controlled dinner party.",
+    subtitle: "Main + vegetable + starch + beverage flow for a complete savory dinner party.",
     items: [
       {
-        id: "spaghetti",
-        name: "Garlic Infused Pasta (Spaghetti-style)",
-        route: "/ingredients?category=savory-meals&recipe=garlic-pasta",
-        suggestedRange: "5-10mg per serving",
+        id: "savory-main",
+        name: "Savory Main (Steak / Chicken / Protein)",
+        route: "/ingredients?category=savory-meals&recipe=steak",
+        suggestedRange: "5-10mg per serving (or keep non-infused)",
         defaultQty: 2,
         defaultMgEach: 6,
         perPersonQty: 1,
         unitLabel: "servings",
-        equivalentHint: "1 pasta serving per guest (scales via recipe builder)",
+        equivalentHint: "Use this as your main plate item; THC can go here OR in starch.",
       },
       {
-        id: "pizza-sauce",
-        name: "Infused Pizza Sauce",
-        route: "/recipes/infused-pizza-sauce",
-        suggestedRange: "~25mg per pizza",
+        id: "vegetable-side",
+        name: "Vegetable Side (Green Beans / Broccoli / Salad)",
+        route: "/ingredients?category=savory-meals",
+        suggestedRange: "0-3mg per serving",
         defaultQty: 2,
-        defaultMgEach: 10,
-        perPersonQty: 0.5,
-        unitLabel: "pizzas",
-        equivalentHint: "1 pizza for ~2 guests (recipe details divide into 4 pizzas)",
+        defaultMgEach: 1.5,
+        perPersonQty: 1,
+        unitLabel: "servings",
+        equivalentHint: "Keep this low-dose or non-infused to balance the dinner.",
       },
       {
-        id: "tea",
-        name: "Infused Cannabis Tea",
-        route: "/ingredients?category=drinks&recipe=cannabis-tea",
-        suggestedRange: "10-20mg per cup",
-        defaultQty: 1,
-        defaultMgEach: 10,
+        id: "starch-side",
+        name: "Starch Side (Pasta / Rice / Potatoes)",
+        route: "/ingredients?category=savory-meals&recipe=garlic-pasta",
+        suggestedRange: "3-8mg per serving",
+        defaultQty: 2,
+        defaultMgEach: 5,
         perPersonQty: 1,
+        unitLabel: "servings",
+        equivalentHint: "If using infused butter/oil, this is the easiest THC control point.",
+      },
+      {
+        id: "meal-pairing-drink",
+        name: "Meal Pairing Beverage (non-THC option)",
+        route: "/ingredients?category=drinks",
+        suggestedRange: "0mg (recommended baseline)",
+        defaultQty: 2,
+        defaultMgEach: 0,
+        perPersonQty: 1,
+        unitLabel: "glasses",
+        equivalentHint: "Always offer a non-infused drink pairing with dinner.",
+      },
+      {
+        id: "thc-beverage-option",
+        name: "THC Beverage Option (Tea / Coffee)",
+        route: "/ingredients?category=drinks&recipe=cannabis-tea",
+        suggestedRange: "2.5-5mg per cup",
+        defaultQty: 2,
+        defaultMgEach: 3.5,
+        perPersonQty: 0.5,
         unitLabel: "cups",
-        equivalentHint: "1 infused cup per guest (tea recipe servings = 1 cup)",
+        equivalentHint: "Optional THC drink for guests who want beverage dosing.",
       },
     ],
   },
@@ -157,9 +178,9 @@ const PACKS: PackTemplate[] = [
     title: "Drinks Pack Planner",
     subtitle: "Dose-controlled beverages for social settings.",
     items: [
-      { id: "lemonade", name: "Infused Lemonade", route: "/ingredients?category=drinks", suggestedRange: "2.5-5mg per glass", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.5, unitLabel: "glasses", equivalentHint: "Drinks are easy to stack; keep portions clearly labeled" },
-      { id: "chai", name: "Infused Chai Latte", route: "/coffee", suggestedRange: "5mg per cup", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5, unitLabel: "cups", equivalentHint: "Plan 1 infused cup for every 2 guests by default" },
-      { id: "tonic", name: "THC Espresso Tonic", route: "/coffee", suggestedRange: "5mg per glass", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5, unitLabel: "glasses", equivalentHint: "Offer non-infused versions beside infused drinks" },
+      { id: "lemonade", name: "Infused Lemonade", route: "/ingredients?category=drinks&recipe=cannabis-smoothie", suggestedRange: "2.5-5mg per glass", defaultQty: 2, defaultMgEach: 3, perPersonQty: 0.5, unitLabel: "glasses", equivalentHint: "Drinks are easy to stack; keep portions clearly labeled" },
+      { id: "chai", name: "Infused Chai Latte", route: "/ingredients?category=drinks&recipe=infused-chai", suggestedRange: "5mg per cup", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5, unitLabel: "cups", equivalentHint: "Plan 1 infused cup for every 2 guests by default" },
+      { id: "tonic", name: "THC Espresso Tonic", route: "/ingredients?category=drinks&recipe=espresso-tonic", suggestedRange: "5mg per glass", defaultQty: 2, defaultMgEach: 5, perPersonQty: 0.5, unitLabel: "glasses", equivalentHint: "Offer non-infused versions beside infused drinks" },
     ],
   },
 ];
@@ -197,7 +218,7 @@ const getPerPersonDoseTone = (mgPerPerson: number) => {
 export function PartyPackPlanner() {
   const { packId = "" } = useParams();
   const pack = PACKS.find((p) => p.id === packId) ?? PACKS[0];
-  const progressStorageKey = `party-pack-progress:${pack.id}`;
+  const plannerStorageKey = `party-pack-state:${pack.id}`;
   const wingsStorageKey = `party-pack-wings:${pack.id}`;
   const wingSauceLabels: Record<string, string> = {
     "garlic-parmesan": "Garlic Parmesan",
@@ -218,7 +239,6 @@ export function PartyPackPlanner() {
       mgEach: i.defaultMgEach,
       unitLabel: i.unitLabel,
       equivalentHint: i.equivalentHint,
-      completed: false,
     }));
 
   const [items, setItems] = useState<PlannerItem[]>(buildPackItems(4));
@@ -227,6 +247,7 @@ export function PartyPackPlanner() {
   const [peopleCount, setPeopleCount] = useState<number>(4);
   const [savedWingsSplit, setSavedWingsSplit] = useState<WingsSplitState | null>(null);
   const [selectedRecipeToAdd, setSelectedRecipeToAdd] = useState<string>("");
+  const [isHydrated, setIsHydrated] = useState(false);
 
   type WingsSplitState = {
     totalWings: number;
@@ -245,14 +266,20 @@ export function PartyPackPlanner() {
   }, []);
 
   useEffect(() => {
-    setItems(buildPackItems(peopleCount));
+    const savedState = safeJsonParse<{ peopleCount: number; items: PlannerItem[]; selectedInfusionId?: string } | null>(
+      localStorage.getItem(plannerStorageKey),
+      null
+    );
+    if (savedState) {
+      setPeopleCount(Math.max(1, Number(savedState.peopleCount) || 4));
+      setItems(Array.isArray(savedState.items) && savedState.items.length > 0 ? savedState.items : buildPackItems(4));
+      if (savedState.selectedInfusionId) setSelectedInfusionId(savedState.selectedInfusionId);
+    } else {
+      setPeopleCount(4);
+      setItems(buildPackItems(4));
+    }
+    setIsHydrated(true);
   }, [pack.id]);
-
-  useEffect(() => {
-    const savedProgress = safeJsonParse<Record<string, boolean>>(localStorage.getItem(progressStorageKey), {});
-    if (Object.keys(savedProgress).length === 0) return;
-    setItems((prev) => prev.map((item) => ({ ...item, completed: !!savedProgress[item.id] })));
-  }, [progressStorageKey]);
 
   useEffect(() => {
     const saved = safeJsonParse<WingsSplitState | null>(localStorage.getItem(wingsStorageKey), null);
@@ -263,10 +290,7 @@ export function PartyPackPlanner() {
     if (!savedWingsSplit) return;
     setItems((prev) =>
       prev.map((item) => {
-        // Only preserve saved split quantities once the wings item is completed.
-        // Otherwise, a "new party" with a new guest count should re-scale to match peopleCount.
         if (item.id !== "wings") return item;
-        if (!item.completed) return item;
         return { ...item, qty: savedWingsSplit.totalWings, mgEach: savedWingsSplit.mgEach };
       })
     );
@@ -279,11 +303,23 @@ export function PartyPackPlanner() {
       return prev.map((item) => {
         const template = templateById.get(item.id);
         if (!template) return item; // Keep custom items as-is.
-        if (item.id === "wings" && savedWingsSplit && item.completed) return item;
+        if (item.id === "wings" && savedWingsSplit) return item;
         return { ...item, qty: Math.max(1, Math.ceil(peopleCount * template.perPersonQty)) };
       });
     });
   }, [peopleCount, pack.id, savedWingsSplit]);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    localStorage.setItem(
+      plannerStorageKey,
+      JSON.stringify({
+        peopleCount,
+        items,
+        selectedInfusionId,
+      })
+    );
+  }, [isHydrated, plannerStorageKey, peopleCount, items, selectedInfusionId]);
 
   const selectedInfusion = useMemo(
     () => infusions.find((i) => i.id === selectedInfusionId) ?? null,
@@ -305,7 +341,6 @@ export function PartyPackPlanner() {
         mgEach: 5,
         unitLabel: "servings",
         equivalentHint: "Use your own serving estimate",
-        completed: false,
       },
     ]);
   };
@@ -353,7 +388,6 @@ export function PartyPackPlanner() {
         mgEach: mgGuess,
         unitLabel,
         equivalentHint: `Recipe makes ${recipe.servings} ${unitLabel}.`,
-        completed: false,
       },
     ]);
     setSelectedRecipeToAdd("");
@@ -365,30 +399,11 @@ export function PartyPackPlanner() {
     );
   };
 
-  const toggleCompleted = (id: string) => {
-    setItems((prev) => {
-      const next = prev.map((item) =>
-        item.id === id ? { ...item, completed: !item.completed } : item
-      );
-      const progress = Object.fromEntries(next.map((item) => [item.id, !!item.completed]));
-      localStorage.setItem(progressStorageKey, JSON.stringify(progress));
-      return next;
-    });
-  };
-
   const removeItem = (id: string) => {
-    setItems((prev) => {
-      const next = prev.filter((item) => item.id !== id);
-      const existing = safeJsonParse<Record<string, boolean>>(localStorage.getItem(progressStorageKey), {});
-      const { [id]: _removed, ...rest } = existing;
-      localStorage.setItem(progressStorageKey, JSON.stringify(rest));
-      return next;
-    });
+    setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const nextPendingItem = items.find((item) => !item.completed);
-  const completedCount = items.filter((item) => item.completed).length;
-  const nextStepIndex = nextPendingItem ? items.findIndex((i) => i.id === nextPendingItem.id) : -1;
+  const nextBuildItem = items[0];
 
   const buildItemUrl = (item: PlannerItem) => {
     // For the main recipe builder (`/ingredients`), pass `servings` so quantities scale correctly.
@@ -403,6 +418,70 @@ export function PartyPackPlanner() {
     )}&partyPackId=${encodeURIComponent(pack.id)}&partyItemId=${encodeURIComponent(item.id)}`;
   };
 
+  const parseRecipeIdFromRoute = (route: string): string | null => {
+    if (route.startsWith("/recipes/")) return route.replace("/recipes/", "").split("?")[0] || null;
+    if (!route.startsWith("/ingredients")) return null;
+    const [, query = ""] = route.split("?");
+    const params = new URLSearchParams(query);
+    return params.get("recipe");
+  };
+
+  const categorizeIngredient = (ingredient: string): string => {
+    const i = ingredient.toLowerCase();
+    if (/(wing|chicken|beef|pork|meat|bacon)/.test(i)) return "Meat & Seafood";
+    if (/(milk|butter|cheese|cream|yogurt|egg)/.test(i)) return "Dairy & Eggs";
+    if (/(pepper|paprika|garlic powder|onion powder|cumin|chili|spice|salt|seasoning)/.test(i)) return "Spices & Seasonings";
+    if (/(flour|sugar|oil|vinegar|ketchup|bbq|honey|mustard|soy|cornstarch|rice|pasta|bread|cocoa|chips)/.test(i)) return "Pantry";
+    if (/(lemon|lime|onion|garlic|herb|parsley|cilantro|potato)/.test(i)) return "Produce";
+    if (/(coffee|tea|soda|juice|water)/.test(i)) return "Beverages";
+    return "Other";
+  };
+
+  const wingFlavorIngredients: Record<string, string[]> = {
+    "garlic-parmesan": ["Chicken wings", "Garlic", "Parmesan cheese", "Butter", "Salt", "Black pepper"],
+    "classic-buffalo": ["Chicken wings", "Hot sauce", "Butter", "Garlic powder", "Salt"],
+    "nashville-hot": ["Chicken wings", "Cayenne pepper", "Paprika", "Brown sugar", "Oil", "Garlic powder"],
+    "honey-bbq": ["Chicken wings", "BBQ sauce", "Honey", "Garlic powder", "Apple cider vinegar"],
+    "lemon-pepper": ["Chicken wings", "Lemons", "Black pepper", "Butter", "Garlic powder"],
+    "honey-mustard": ["Chicken wings", "Honey", "Mustard", "Butter", "Garlic powder"],
+  };
+
+  const printRecipes = items.map((item) => {
+    const recipeId = parseRecipeIdFromRoute(item.route);
+    const recipe = recipeId ? siteRecipes.find((r) => r.id === recipeId) : null;
+    return {
+      item,
+      recipe,
+      scale: recipe ? Math.max(item.qty / Math.max(recipe.servings, 1), 0.25) : 1,
+    };
+  });
+
+  const groceryBySection = useMemo(() => {
+    const sections = new Map<string, Set<string>>();
+    const addIngredient = (ingredient: string) => {
+      const section = categorizeIngredient(ingredient);
+      if (!sections.has(section)) sections.set(section, new Set<string>());
+      sections.get(section)!.add(ingredient);
+    };
+
+    printRecipes.forEach(({ item, recipe }) => {
+      if (item.id === "wings" && savedWingsSplit) {
+        addIngredient(`Chicken wings (${savedWingsSplit.totalWings} wings total)`);
+        savedWingsSplit.flavors.forEach((f) => {
+          (wingFlavorIngredients[f.sauceId] ?? []).forEach((ing) =>
+            addIngredient(`${ing}${ing.toLowerCase().includes("wing") ? "" : ` (${wingSauceLabels[f.sauceId] ?? f.sauceId})`}`)
+          );
+        });
+        return;
+      }
+      (recipe?.ingredients ?? []).forEach(addIngredient);
+    });
+
+    return Array.from(sections.entries())
+      .map(([section, ingredients]) => ({ section, ingredients: Array.from(ingredients.values()).sort() }))
+      .sort((a, b) => a.section.localeCompare(b.section));
+  }, [printRecipes, savedWingsSplit]);
+
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <Helmet>
@@ -413,15 +492,15 @@ export function PartyPackPlanner() {
         />
       </Helmet>
 
-      <div className="bg-gradient-to-br from-purple-900 via-indigo-900 to-gray-900 rounded-3xl p-8 text-white shadow-2xl">
+      <div className="bg-gradient-to-br from-purple-900 via-indigo-900 to-gray-900 rounded-3xl p-8 text-white shadow-2xl print:hidden">
         <h1 className="text-3xl md:text-4xl font-black mb-2">{pack.title}</h1>
         <p className="text-purple-100">{pack.subtitle}</p>
         <p className="text-purple-200 text-sm mt-2">
-          Progress: {completedCount}/{items.length} items built
+          Plan your party dose and print a kitchen-ready package.
         </p>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-5">
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 print:hidden">
         <div className="grid md:grid-cols-2 gap-4">
           <div>
             <Label className="text-sm font-bold text-gray-700">How many people?</Label>
@@ -457,17 +536,7 @@ export function PartyPackPlanner() {
         </div>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm text-blue-900">
-        <p className="font-black mb-2">Per-person quantity baseline used for auto-scaling</p>
-        <div className="grid md:grid-cols-2 gap-2">
-          <p>- Wings: 8 per person (light snack 4-6, average 6-10, game-night main 10-15)</p>
-          <p>- Fries: 0.5 order per person (1 large order serves about 2)</p>
-          <p>- Popcorn: 0.35 bowls per person (1 big bowl serves about 3-4)</p>
-          <p>- Brownies: 1 per person (rich brownies can be 0.5-1 each)</p>
-        </div>
-      </div>
-
-      <div className="space-y-3">
+      <div className="space-y-3 print:hidden">
         {items.map((item) => {
           const itemTotal = item.qty * item.mgEach;
           return (
@@ -510,11 +579,6 @@ export function PartyPackPlanner() {
                   />
                 </div>
               </div>
-              {peopleCount > 0 && (
-                <p className="text-xs text-gray-500 mt-2">
-                  Auto: ~{(item.qty / peopleCount).toFixed(1)} {item.unitLabel} per person
-                </p>
-              )}
               <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
                 <span className="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-semibold">
                   Total THC for this item: {itemTotal.toFixed(1)}mg
@@ -551,18 +615,6 @@ export function PartyPackPlanner() {
                     </Button>
                   </Link>
                 )}
-                <button
-                  type="button"
-                  onClick={() => toggleCompleted(item.id)}
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border font-semibold ${
-                    item.completed
-                      ? "bg-green-50 border-green-200 text-green-700"
-                      : "bg-gray-50 border-gray-200 text-gray-700"
-                  }`}
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  {item.completed ? "Built" : "Mark built"}
-                </button>
                 <Button
                   type="button"
                   size="sm"
@@ -579,7 +631,7 @@ export function PartyPackPlanner() {
         })}
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center print:hidden">
         <div className="flex-1">
           <Label className="text-sm font-bold text-gray-700">Add an item (from recipes)</Label>
           <Select value={selectedRecipeToAdd} onValueChange={setSelectedRecipeToAdd}>
@@ -604,7 +656,7 @@ export function PartyPackPlanner() {
         </Button>
       </div>
 
-      <div className="bg-gray-950 rounded-2xl p-5 text-white">
+      <div className="bg-gray-950 rounded-2xl p-5 text-white print:hidden">
         <h2 className="text-xl font-black mb-3">Your Dose Plan</h2>
         <div className="grid md:grid-cols-3 gap-3">
           <div className="bg-gray-900 rounded-xl p-3">
@@ -684,22 +736,20 @@ export function PartyPackPlanner() {
         )}
       </div>
 
-      {nextPendingItem && (
+      {nextBuildItem && (
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
-          <p className="text-sm text-green-800 font-semibold mb-2">
-            Step {nextStepIndex + 1} of {items.length}
-          </p>
+          <p className="text-sm text-green-800 font-semibold mb-2">Next Step</p>
           <Link
-            to={buildItemUrl(nextPendingItem)}
+            to={buildItemUrl(nextBuildItem)}
             className="inline-flex items-center gap-2 text-green-700 font-bold hover:underline"
           >
-            {nextPendingItem.id === "wings" ? "Start building your wings (main item)" : `Build ${nextPendingItem.name}`}
+            {nextBuildItem.id === "wings" ? "Start building your wings (main item)" : `Build ${nextBuildItem.name}`}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       )}
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 print:hidden">
         <Button onClick={() => window.print()} variant="outline" className="font-bold">
           <Printer className="w-4 h-4 mr-1.5" />
           Print Party Package
@@ -717,32 +767,72 @@ export function PartyPackPlanner() {
         </Link>
       </div>
 
-      {/* Grocery list for print */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-        <h2 className="text-xl font-black text-gray-900 mb-3">Party Grocery List (Wings)</h2>
-        {!savedWingsSplit ? (
-          <p className="text-sm text-gray-600">Plan your wings to generate a grocery list.</p>
-        ) : (
-          <div className="space-y-2 text-sm text-gray-800">
-            <p>
-              <span className="font-black">Chicken wings:</span> {savedWingsSplit.totalWings} wings
-            </p>
-            {savedWingsSplit.flavors.length === 0 ? (
-              <p className="text-gray-600">No wing flavors saved yet.</p>
-            ) : (
-              savedWingsSplit.flavors.map((f) => (
-                <div key={f.sauceId} className="bg-gray-50 border border-gray-100 rounded-xl p-3">
-                  <p className="font-black">
-                    {wingSauceLabels[f.sauceId] ?? f.sauceId} — {f.qtyWings} wings
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Build these flavors in the Wing Sauce planner to get exact ingredient amounts.
-                  </p>
-                </div>
-              ))
-            )}
+      <div className="hidden print:block space-y-6 text-black">
+        <div className="border-b-2 border-black pb-3">
+          <h1 className="text-3xl font-black">{pack.title} - Party Package</h1>
+          <p className="text-sm">Guests: {peopleCount} | Total THC: {totalMg.toFixed(1)}mg | Per person: {mgPerPerson.toFixed(1)}mg</p>
+          <p className="text-sm">Safety: Start low, wait 45-90 minutes, keep non-infused options clearly labeled.</p>
+        </div>
+
+        <section>
+          <h2 className="text-xl font-black mb-2">Food Plan and Dose Breakdown</h2>
+          <div className="space-y-2">
+            {items.map((item) => (
+              <div key={`print-item-${item.id}`} className="border border-black rounded-md p-2">
+                <p className="font-bold">{item.name}</p>
+                <p className="text-sm">
+                  Qty: {item.qty} {item.unitLabel} | {getDoseLabelForUnit(item.unitLabel)}: {item.mgEach}mg | Item total: {(item.qty * item.mgEach).toFixed(1)}mg
+                </p>
+              </div>
+            ))}
           </div>
-        )}
+        </section>
+
+        <section>
+          <h2 className="text-xl font-black mb-2">Scaled Recipes and Prep Notes</h2>
+          <div className="space-y-3">
+            {printRecipes.map(({ item, recipe, scale }) => (
+              <div key={`print-recipe-${item.id}`} className="border border-black rounded-md p-3">
+                <p className="font-bold">{item.name}</p>
+                <p className="text-sm mb-1">Target qty: {item.qty} {item.unitLabel} | Dose target: {item.mgEach}mg each</p>
+                {recipe ? (
+                  <>
+                    <p className="text-sm font-semibold">Ingredients (scaled ~x{scale.toFixed(2)}):</p>
+                    <ul className="list-disc pl-5 text-sm">
+                      {recipe.ingredients.map((ing) => (
+                        <li key={`${item.id}-${ing}`}>{ing}</li>
+                      ))}
+                    </ul>
+                    <p className="text-sm font-semibold mt-2">Instructions:</p>
+                    <ol className="list-decimal pl-5 text-sm">
+                      {recipe.instructions.map((step, idx) => (
+                        <li key={`${item.id}-step-${idx}`}>{step}</li>
+                      ))}
+                    </ol>
+                  </>
+                ) : (
+                  <p className="text-sm">Use the builder link for this item to finalize ingredients and instructions.</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-black mb-2">Combined Grocery List (Store Layout)</h2>
+          <div className="space-y-3">
+            {groceryBySection.map((section) => (
+              <div key={`section-${section.section}`} className="border border-black rounded-md p-2">
+                <p className="font-bold">{section.section}</p>
+                <ul className="list-disc pl-5 text-sm">
+                  {section.ingredients.map((ingredient) => (
+                    <li key={`${section.section}-${ingredient}`}>{ingredient}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
