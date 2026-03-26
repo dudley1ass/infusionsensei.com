@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, Plus, Printer, Trash2, Users } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronUp, Plus, Printer, Trash2, Users } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -218,7 +218,6 @@ const getPerPersonDoseTone = (mgPerPerson: number) => {
 export function PartyPackPlanner() {
   const { packId = "" } = useParams();
   const pack = PACKS.find((p) => p.id === packId) ?? PACKS[0];
-  const plannerStorageKey = `party-pack-state:${pack.id}`;
   const wingsStorageKey = `party-pack-wings:${pack.id}`;
   const wingSauceLabels: Record<string, string> = {
     "garlic-parmesan": "Garlic Parmesan",
@@ -247,8 +246,9 @@ export function PartyPackPlanner() {
   const [peopleCount, setPeopleCount] = useState<number>(4);
   const [savedWingsSplit, setSavedWingsSplit] = useState<WingsSplitState | null>(null);
   const [selectedRecipeToAdd, setSelectedRecipeToAdd] = useState<string>("");
-  const [isHydrated, setIsHydrated] = useState(false);
   const [savoryInfusedItemId, setSavoryInfusedItemId] = useState<string>("starch-side");
+  const [expandedItemIds, setExpandedItemIds] = useState<string[]>([]);
+  const [groceryChecks, setGroceryChecks] = useState<Record<string, boolean>>({});
 
   type WingsSplitState = {
     totalWings: number;
@@ -267,19 +267,11 @@ export function PartyPackPlanner() {
   }, []);
 
   useEffect(() => {
-    const savedState = safeJsonParse<{ peopleCount: number; items: PlannerItem[]; selectedInfusionId?: string } | null>(
-      localStorage.getItem(plannerStorageKey),
-      null
-    );
-    if (savedState) {
-      setPeopleCount(Math.max(1, Number(savedState.peopleCount) || 4));
-      setItems(Array.isArray(savedState.items) && savedState.items.length > 0 ? savedState.items : buildPackItems(4));
-      if (savedState.selectedInfusionId) setSelectedInfusionId(savedState.selectedInfusionId);
-    } else {
-      setPeopleCount(4);
-      setItems(buildPackItems(4));
-    }
-    setIsHydrated(true);
+    // Start fresh when planner is opened/switched to avoid stale values.
+    setPeopleCount(4);
+    setItems(buildPackItems(4));
+    setExpandedItemIds([]);
+    setGroceryChecks({});
   }, [pack.id]);
 
   const isSavoryPack = pack.id === "savory-dinner-pack";
@@ -308,39 +300,16 @@ export function PartyPackPlanner() {
   }, [wingsStorageKey]);
 
   useEffect(() => {
-    if (!savedWingsSplit) return;
-    setItems((prev) =>
-      prev.map((item) => {
-        if (item.id !== "wings") return item;
-        return { ...item, qty: savedWingsSplit.totalWings, mgEach: savedWingsSplit.mgEach };
-      })
-    );
-  }, [savedWingsSplit]);
-
-  useEffect(() => {
     // Auto-scale base pack quantities when guest count changes.
     setItems((prev) => {
       const templateById = new Map(pack.items.map((i) => [i.id, i]));
       return prev.map((item) => {
         const template = templateById.get(item.id);
         if (!template) return item; // Keep custom items as-is.
-        if (item.id === "wings" && savedWingsSplit) return item;
         return { ...item, qty: Math.max(1, Math.ceil(peopleCount * template.perPersonQty)) };
       });
     });
-  }, [peopleCount, pack.id, savedWingsSplit]);
-
-  useEffect(() => {
-    if (!isHydrated) return;
-    localStorage.setItem(
-      plannerStorageKey,
-      JSON.stringify({
-        peopleCount,
-        items,
-        selectedInfusionId,
-      })
-    );
-  }, [isHydrated, plannerStorageKey, peopleCount, items, selectedInfusionId]);
+  }, [peopleCount, pack.id]);
 
   const selectedInfusion = useMemo(
     () => infusions.find((i) => i.id === selectedInfusionId) ?? null,
@@ -420,11 +389,35 @@ export function PartyPackPlanner() {
     );
   };
 
+  const toggleExpandItem = (id: string) => {
+    setExpandedItemIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const applyWingsSplitToPlanner = () => {
+    if (!savedWingsSplit) return;
+    setItems((prev) =>
+      prev.map((item) => (item.id === "wings" ? { ...item, qty: savedWingsSplit.totalWings, mgEach: savedWingsSplit.mgEach } : item))
+    );
+  };
+
+  const getItemTheme = (item: PlannerItem) => {
+    const id = item.id.toLowerCase();
+    const name = item.name.toLowerCase();
+    if (id.includes("wing") || name.includes("wing")) return "bg-orange-50 border-orange-200";
+    if (id.includes("popcorn") || name.includes("popcorn")) return "bg-yellow-50 border-yellow-200";
+    if (id.includes("fries") || name.includes("fries")) return "bg-amber-50 border-amber-200";
+    if (id.includes("brownie") || id.includes("cookie") || id.includes("gummy") || name.includes("dessert")) return "bg-rose-50 border-rose-200";
+    if (id.includes("coffee") || id.includes("chai") || id.includes("tonic") || name.includes("coffee")) return "bg-stone-50 border-stone-300";
+    return "bg-white border-gray-200";
+  };
+
   const removeItem = (id: string) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   const nextBuildItem = items[0];
+  const builtCount = items.filter((item) => item.mgEach > 0 && item.qty > 0).length;
+  const progressPct = items.length > 0 ? Math.round((builtCount / items.length) * 100) : 0;
 
   const buildItemUrl = (item: PlannerItem) => {
     // For the main recipe builder (`/ingredients`), pass `servings` so quantities scale correctly.
@@ -446,6 +439,17 @@ export function PartyPackPlanner() {
     if (savoryInfusedItemId === "vegetable-side") return "Infusing the vegetable side: cook your protein and starch however you like.";
     return "Infusing the THC beverage option: keep meal items non-infused and prep them however you like.";
   }, [isSavoryPack, savoryInfusedItemId]);
+
+  const setPerPersonTarget = (targetMg: number) => {
+    if (mgPerPerson <= 0) return;
+    const ratio = targetMg / mgPerPerson;
+    setItems((prev) =>
+      prev.map((item) => {
+        if (isSavoryPack && savoryItemIds.has(item.id) && item.id !== savoryInfusedItemId) return item;
+        return { ...item, mgEach: Math.max(0, Number((item.mgEach * ratio).toFixed(1))) };
+      })
+    );
+  };
 
   const parseRecipeIdFromRoute = (route: string): string | null => {
     if (route.startsWith("/recipes/")) return route.replace("/recipes/", "").split("?")[0] || null;
@@ -545,7 +549,8 @@ export function PartyPackPlanner() {
         </p>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 print:hidden">
+      <section className="bg-white border border-gray-200 rounded-2xl p-5 print:hidden">
+        <h2 className="text-2xl font-black text-gray-900 mb-4 text-center">Setup</h2>
         <div className="grid md:grid-cols-2 gap-4">
           <div>
             <Label className="text-sm font-bold text-gray-700">How many people?</Label>
@@ -579,7 +584,7 @@ export function PartyPackPlanner() {
             )}
           </div>
         </div>
-      </div>
+      </section>
 
       {isSavoryPack && (
         <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 print:hidden">
@@ -599,72 +604,79 @@ export function PartyPackPlanner() {
         </div>
       )}
 
-      <div className="space-y-3 print:hidden">
+      <section className="space-y-3 print:hidden">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-black text-gray-900">Build Your Menu 🍗🍿🍟</h2>
+          <p className="text-sm text-gray-600">{builtCount} of {items.length} items dialed in</p>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+          <div className="bg-gradient-to-r from-orange-500 to-purple-600 h-3 transition-all" style={{ width: `${progressPct}%` }} />
+        </div>
         {items.map((item) => {
           const itemTotal = item.qty * item.mgEach;
           const canBuildThisItem = !isSavoryPack || !savoryItemIds.has(item.id) || item.id === savoryInfusedItemId;
           const isSavoryNonInfused = isSavoryPack && savoryItemIds.has(item.id) && item.id !== savoryInfusedItemId;
+          const isExpanded = expandedItemIds.includes(item.id);
           return (
             <div
               key={item.id}
-              className={`bg-white border border-gray-200 rounded-2xl p-4 ${
-                item.id === "wings" ? "border-orange-300 shadow-md ring-2 ring-orange-100" : ""
-              }`}
+              className={`border rounded-2xl p-4 shadow-sm transition-all ${getItemTheme(item)} ${item.id === "wings" ? "ring-2 ring-orange-200" : ""}`}
             >
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
-                <div className="md:col-span-6 flex flex-col">
-                  <Label className="text-xs font-bold text-gray-500">Item</Label>
-                  <Input
-                    value={item.name}
-                    onChange={(e) => updateItem(item.id, "name", e.target.value)}
-                    className="mt-1"
-                  />
-                  <p className="text-xs text-gray-500 mt-1 break-words">Suggested: {item.suggestedRange}</p>
-                  <p className="text-xs text-gray-500 mt-1 break-words">{item.equivalentHint}</p>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-lg font-black text-gray-900">{item.name}</p>
+                  <p className="text-sm text-gray-700">
+                    {item.qty} {item.unitLabel} · {item.mgEach}mg each
+                  </p>
+                  <p className="text-sm font-bold text-gray-900">Total: {itemTotal.toFixed(1)}mg</p>
+                  <p className="text-xs text-gray-500 mt-1">Recommended: {item.suggestedRange}</p>
                 </div>
-                <div className="md:col-span-3 flex flex-col">
-                  <Label className="text-xs font-bold text-gray-500 whitespace-nowrap">Qty ({item.unitLabel})</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    value={item.qty}
-                    onChange={(e) => updateItem(item.id, "qty", Math.max(1, Number(e.target.value) || 1))}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="md:col-span-3 flex flex-col">
-                  <Label className="text-xs font-bold text-gray-500 whitespace-nowrap">{getDoseLabelForUnit(item.unitLabel)}</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    step="0.5"
-                    value={item.mgEach}
-                    onChange={(e) => updateItem(item.id, "mgEach", Math.max(0, Number(e.target.value) || 0))}
-                    className="mt-1"
-                    disabled={isSavoryNonInfused}
-                  />
-                </div>
+                <Button type="button" variant="outline" size="sm" onClick={() => toggleExpandItem(item.id)}>
+                  {isExpanded ? <ChevronUp className="w-4 h-4 mr-1" /> : <ChevronDown className="w-4 h-4 mr-1" />}
+                  {isExpanded ? "Hide details" : "Customize"}
+                </Button>
               </div>
+              {isExpanded && (
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-start mt-4">
+                  <div className="md:col-span-6 flex flex-col">
+                    <Label className="text-xs font-bold text-gray-500">Item</Label>
+                    <Input
+                      value={item.name}
+                      onChange={(e) => updateItem(item.id, "name", e.target.value)}
+                      className="mt-1"
+                    />
+                    <p className="text-xs text-gray-500 mt-1 break-words">{item.equivalentHint}</p>
+                  </div>
+                  <div className="md:col-span-3 flex flex-col">
+                    <Label className="text-xs font-bold text-gray-500 whitespace-nowrap">Qty ({item.unitLabel})</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={item.qty}
+                      onChange={(e) => updateItem(item.id, "qty", Math.max(1, Number(e.target.value) || 1))}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="md:col-span-3 flex flex-col">
+                    <Label className="text-xs font-bold text-gray-500 whitespace-nowrap">{getDoseLabelForUnit(item.unitLabel)}</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      step="0.5"
+                      value={item.mgEach}
+                      onChange={(e) => updateItem(item.id, "mgEach", Math.max(0, Number(e.target.value) || 0))}
+                      className="mt-1"
+                      disabled={isSavoryNonInfused}
+                    />
+                  </div>
+                </div>
+              )}
               {isSavoryNonInfused && (
                 <p className="text-xs text-gray-600 mt-2">
                   Prepare this course as you like it (non-infused for this meal plan).
                 </p>
               )}
               <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-                <span className="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-semibold">
-                  Total THC for this item: {itemTotal.toFixed(1)}mg
-                </span>
-                <span className="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-semibold">
-                  {item.qty} {item.unitLabel}
-                </span>
-                {(() => {
-                  const details = getDoseLevelDetails(item.mgEach);
-                  return (
-                    <span className={`${details.color} border px-2 py-0.5 rounded-full font-semibold text-xs`}>
-                      Dose level: {details.label} ({details.desc})
-                    </span>
-                  );
-                })()}
                 {canBuildThisItem ? (
                   <Link
                     to={
@@ -674,9 +686,11 @@ export function PartyPackPlanner() {
                           )}&mgEach=${encodeURIComponent(item.mgEach)}`
                         : buildItemUrl(item)
                     }
-                    className="text-green-700 font-semibold hover:underline"
+                    className="inline-flex"
                   >
-                    Build this item
+                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white font-bold">
+                      Start Cooking
+                    </Button>
                   </Link>
                 ) : (
                   <span className="text-gray-500 font-semibold">Not selected for infusion</span>
@@ -686,9 +700,14 @@ export function PartyPackPlanner() {
                     item.qty
                   )}&mgEach=${encodeURIComponent(item.mgEach)}`}>
                     <Button size="sm" variant="outline" className="border-orange-200 text-orange-800 hover:bg-orange-50">
-                      Edit wing split
+                      🔥 Split Flavors
                     </Button>
                   </Link>
+                )}
+                {item.id === "wings" && savedWingsSplit && (
+                  <Button size="sm" variant="outline" className="border-purple-200 text-purple-700 hover:bg-purple-50" onClick={applyWingsSplitToPlanner}>
+                    Use Saved Wing Split
+                  </Button>
                 )}
                 <Button
                   type="button"
@@ -704,7 +723,7 @@ export function PartyPackPlanner() {
             </div>
           );
         })}
-      </div>
+      </section>
 
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center print:hidden">
         <div className="flex-1">
@@ -731,8 +750,31 @@ export function PartyPackPlanner() {
         </Button>
       </div>
 
-      <div className="bg-gray-950 rounded-2xl p-5 text-white print:hidden">
-        <h2 className="text-xl font-black mb-3">Your Dose Plan</h2>
+      <section className="bg-gray-950 rounded-2xl p-6 text-white print:hidden">
+        <h2 className="text-2xl font-black mb-4">Your Dose Plan ⚡</h2>
+        <div className="bg-gray-900 rounded-2xl p-5 mb-4 text-center border border-gray-700">
+          <p className="text-xs uppercase tracking-wide text-gray-400">Per Person</p>
+          <p className="text-5xl font-black">{mgPerPerson.toFixed(1)}mg</p>
+          {(() => {
+            const tone = getPerPersonDoseTone(mgPerPerson);
+            return (
+              <p className={`inline-flex mt-2 items-center gap-2 border rounded-full px-3 py-1 text-sm font-bold ${tone.color}`}>
+                {tone.label} — most people will feel this
+              </p>
+            );
+          })()}
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <Button size="sm" variant="outline" className="text-white border-gray-500 hover:bg-gray-800" onClick={() => setPerPersonTarget(10)}>
+              Make it lighter (10mg)
+            </Button>
+            <Button size="sm" variant="outline" className="text-white border-gray-500 hover:bg-gray-800" onClick={() => setPerPersonTarget(20)}>
+              Keep it strong
+            </Button>
+            <Button size="sm" variant="outline" className="text-white border-gray-500 hover:bg-gray-800" onClick={() => setPeopleCount((p) => p + 1)}>
+              Adjust servings
+            </Button>
+          </div>
+        </div>
         <div className="grid md:grid-cols-3 gap-3">
           <div className="bg-gray-900 rounded-xl p-3">
             <p className="text-xs text-gray-400">Total pack THC</p>
@@ -741,16 +783,6 @@ export function PartyPackPlanner() {
           <div className="bg-gray-900 rounded-xl p-3">
             <p className="text-xs text-gray-400">Per person ({peopleCount})</p>
             <p className="text-2xl font-black">{mgPerPerson.toFixed(1)}mg</p>
-            <div className="mt-2">
-              {(() => {
-                const tone = getPerPersonDoseTone(mgPerPerson);
-                return (
-                  <span className={`inline-flex items-center gap-2 border rounded-full px-3 py-1 text-xs font-bold ${tone.color}`}>
-                    🔥 {tone.label}
-                  </span>
-                );
-              })()}
-            </div>
           </div>
           <div className="bg-gray-900 rounded-xl p-3">
             <p className="text-xs text-gray-400">Safety prompt</p>
@@ -809,7 +841,7 @@ export function PartyPackPlanner() {
             Build an infusion first so we can generate exact infusion amounts for each item.
           </div>
         )}
-      </div>
+      </section>
 
       {nextBuildItem && (
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
@@ -841,6 +873,32 @@ export function PartyPackPlanner() {
           </Button>
         </Link>
       </div>
+
+      <section className="print:hidden bg-white border border-gray-200 rounded-2xl p-5">
+        <h2 className="text-2xl font-black text-gray-900 mb-3">Grocery List 🛒</h2>
+        <div className="grid md:grid-cols-2 gap-3">
+          {groceryBySection.map((section) => (
+            <div key={`grocery-${section.section}`} className="border border-gray-200 rounded-xl p-3 bg-gray-50">
+              <p className="font-black text-gray-900 mb-2">{section.section}</p>
+              <div className="space-y-2">
+                {section.ingredients.map((ingredient) => {
+                  const key = `${section.section}:${ingredient}`;
+                  return (
+                    <label key={key} className="flex items-center gap-2 text-sm text-gray-800">
+                      <input
+                        type="checkbox"
+                        checked={!!groceryChecks[key]}
+                        onChange={(e) => setGroceryChecks((prev) => ({ ...prev, [key]: e.target.checked }))}
+                      />
+                      <span className={groceryChecks[key] ? "line-through text-gray-400" : ""}>{ingredient}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <div className="hidden print:block space-y-6 text-black">
         <div className="border-b-2 border-black pb-3">
