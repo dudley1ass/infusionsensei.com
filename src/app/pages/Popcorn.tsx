@@ -357,11 +357,7 @@ export function Popcorn() {
                       </div>
                     )}
                     <Link
-                      to={`/ingredients?category=snacks&recipe=${
-                        strictDb
-                          ? builderMap[flavor.id] ?? POPCORN_TO_BUILDER_RECIPE[flavor.id] ?? "garlic-butter-popcorn"
-                          : POPCORN_TO_BUILDER_RECIPE[flavor.id] ?? builderMap[flavor.id] ?? "garlic-butter-popcorn"
-                      }`}
+                      to={`/ingredients?category=snacks&recipe=${encodeURIComponent(flavor.id)}`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
                       onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"popcorn",recipe_id:flavor.id}); }}
                     >

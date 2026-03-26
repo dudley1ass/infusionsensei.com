@@ -258,11 +258,7 @@ export function WingSauces() {
                     </div>
                     <SauceRecipe sauce={sauce} />
                     <Link
-                      to={`/ingredients?category=wings&recipe=${
-                        strictDb
-                          ? builderMap[sauce.id] ?? WING_SAUCE_TO_BUILDER_RECIPE[sauce.id] ?? "classic-buffalo-wings"
-                          : WING_SAUCE_TO_BUILDER_RECIPE[sauce.id] ?? builderMap[sauce.id] ?? "classic-buffalo-wings"
-                      }${servingsQuery}${returnQuery}`}
+                      to={`/ingredients?category=wings&recipe=${encodeURIComponent(sauce.id)}${servingsQuery}${returnQuery}`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
                       onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"wings",recipe_id:sauce.id}); }}
                     >

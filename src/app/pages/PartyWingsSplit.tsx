@@ -189,11 +189,8 @@ export function PartyWingsSplit() {
 
   const buildFlavorUrl = (sauceId: string, qtyWings: number) => {
     const servingsOverride = servingsOverrideFor(qtyWings);
-    const recipeId = strictDb
-      ? builderMap[sauceId] ?? WING_SAUCE_TO_BUILDER_RECIPE[sauceId] ?? "classic-buffalo-wings"
-      : WING_SAUCE_TO_BUILDER_RECIPE[sauceId] ?? builderMap[sauceId] ?? "classic-buffalo-wings";
     const flavorProgressKey = `flavor:${sauceId}`;
-    return `/ingredients?category=wings&recipe=${encodeURIComponent(recipeId)}&servings=${servingsOverride}&wingsQty=${encodeURIComponent(
+    return `/ingredients?category=wings&recipe=${encodeURIComponent(sauceId)}&servings=${servingsOverride}&wingsQty=${encodeURIComponent(
       qtyWings
     )}&returnToPartyPack=${encodeURIComponent(
       `/party-mode/plan/${packId}/wings?from=${encodeURIComponent(sauceId)}`

@@ -164,7 +164,7 @@ export function Fries() {
                       </ol>
                       <p className="text-xs text-gray-500 italic bg-orange-50 rounded-lg px-3 py-2 mt-2">💡 {recipe.note}</p>
                     </div>
-                    <Link to={`/ingredients?category=fries&recipe=${strictDb ? (builderMap[recipe.id] ?? FRIES_TO_BUILDER_RECIPE[recipe.id] ?? "garlic-butter-fries") : (FRIES_TO_BUILDER_RECIPE[recipe.id] ?? builderMap[recipe.id] ?? "garlic-butter-fries")}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"fries",recipe_id:recipe.id}); }}>
+                    <Link to={`/ingredients?category=fries&recipe=${encodeURIComponent(recipe.id)}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"fries",recipe_id:recipe.id}); }}>
                       <ChefHat className="w-4 h-4" /> Move to Recipe Builder
                     </Link>
                   </div>

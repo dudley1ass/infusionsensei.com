@@ -31,6 +31,12 @@ import { InfusionBase } from "../types/infusion";
 import { NutritionFactsLabel } from "../components/NutritionFactsLabel";
 import { safeJsonParse } from "../utils/storage";
 import { trackEvent } from "../utils/analytics";
+import {
+  COFFEE_TO_BUILDER_RECIPE,
+  FRIES_TO_BUILDER_RECIPE,
+  POPCORN_TO_BUILDER_RECIPE,
+  WING_SAUCE_TO_BUILDER_RECIPE,
+} from "../data/builderRecipeMaps";
 
 
 // Common ingredient library
@@ -777,13 +783,26 @@ export function CreateRecipes() {
   const partyPackId = searchParams.get("partyPackId");
   const partyItemId = searchParams.get("partyItemId");
   const partyProgressKey = partyPackId ? `party-pack-progress:${partyPackId}` : null;
+
+  const resolveRecipeIdForCategory = (category: string, recipeId: string) => {
+    const directMatch = standardRecipes[category]?.some((r) => r.id === recipeId);
+    if (directMatch) return recipeId;
+
+    if (category === "wings") return WING_SAUCE_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
+    if (category === "snacks") return POPCORN_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
+    if (category === "drinks") return COFFEE_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
+    if (category === "fries") return FRIES_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
+    return recipeId;
+  };
+
   useEffect(() => {
     const cat = searchParams.get("category");
     const rec = searchParams.get("recipe");
     if (cat && rec) {
+      const resolvedRecipeId = resolveRecipeIdForCategory(cat, rec);
       setSelectedCategory(cat);
       setRecipeType("standard");
-      setSelectedStandardRecipe(rec);
+      setSelectedStandardRecipe(resolvedRecipeId);
     }
   }, []);
 
