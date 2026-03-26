@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, CheckCircle2, Plus, Save, Trash2 } from "lucide-react";
+import { Plus, Save, Trash2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -51,8 +51,6 @@ export function PartyWingsSplit() {
   const location = useLocation();
 
   const wingsStorageKey = `party-pack-wings:${packId}`;
-  const builtPartyPackId = `wings-split:${packId}`;
-  const builtStorageKey = `party-pack-progress:${builtPartyPackId}`;
 
   const queryWingsRaw = Number(searchParams.get("wings") ?? "");
   const queryMgRaw = searchParams.get("mgEach");
@@ -92,10 +90,6 @@ export function PartyWingsSplit() {
               flavors: [{ sauceId: "garlic-parmesan", qtyWings: nextTotalWings }],
             }
       );
-      if (!shouldPreserveFlavors) {
-        // New split context: clear previous built flags so rows don't appear pre-built.
-        localStorage.removeItem(builtStorageKey);
-      }
       return;
     }
 
@@ -103,11 +97,7 @@ export function PartyWingsSplit() {
       ...saved,
       mgEach: queryMgEach ?? saved.mgEach,
     });
-  }, [wingsStorageKey, builtStorageKey, queryTotalWings, queryMgEach]);
-
-  const builtMap = useMemo(() => {
-    return safeJsonParse<Record<string, boolean>>(localStorage.getItem(builtStorageKey), {});
-  }, [builtStorageKey, location.key]);
+  }, [wingsStorageKey, queryTotalWings, queryMgEach]);
 
   const totalAllocated = useMemo(() => state.flavors.reduce((sum, f) => sum + (f.qtyWings || 0), 0), [state.flavors]);
   const remaining = state.totalWings - totalAllocated;
@@ -139,37 +129,9 @@ export function PartyWingsSplit() {
 
   const servingsOverrideFor = (qtyWings: number) => Math.max(1, Math.round(qtyWings / WINGS_PER_SERVING));
 
-  const selectedSauceIds = useMemo(() => state.flavors.map((f) => f.sauceId), [state.flavors]);
-  const allSelectedBuilt = selectedSauceIds.every((sauceId) => builtMap[`flavor:${sauceId}`]);
-
-  const markPlannerWingsCompleted = () => {
-    const plannerKey = `party-pack-progress:${packId}`;
-    const existing = safeJsonParse<Record<string, boolean>>(localStorage.getItem(plannerKey), {});
-    localStorage.setItem(plannerKey, JSON.stringify({ ...existing, wings: true }));
-  };
-
   const saveAndReturn = () => {
     localStorage.setItem(wingsStorageKey, JSON.stringify(state));
-    markPlannerWingsCompleted();
     navigate(`/party-mode/plan/${packId}`);
-  };
-
-  const resetWingProgress = () => {
-    localStorage.removeItem(builtStorageKey);
-    setState((prev) => ({
-      ...prev,
-      flavors: [{ sauceId: "garlic-parmesan", qtyWings: prev.totalWings }],
-    }));
-  };
-
-  const buildFlavorUrl = (sauceId: string, qtyWings: number) => {
-    const servingsOverride = servingsOverrideFor(qtyWings);
-    const flavorProgressKey = `flavor:${sauceId}`;
-    return `/ingredients?category=wings&recipe=${encodeURIComponent(sauceId)}&servings=${servingsOverride}&wingsQty=${encodeURIComponent(
-      qtyWings
-    )}&returnToPartyPack=${encodeURIComponent(
-      `/party-mode/plan/${packId}/wings?from=${encodeURIComponent(sauceId)}`
-    )}&partyPackId=${encodeURIComponent(builtPartyPackId)}&partyItemId=${encodeURIComponent(flavorProgressKey)}`;
   };
 
   return (
@@ -185,7 +147,7 @@ export function PartyWingsSplit() {
       <div className="bg-gradient-to-br from-orange-600 to-red-700 rounded-3xl p-8 text-white shadow-2xl">
         <h1 className="text-3xl font-black mb-2">Split Your Wings by Flavor</h1>
         <p className="text-orange-50">
-          Add up to your total wings. When you build a flavor, we pass the correct servings so the recipe scales automatically.
+          Split wings by flavor and save. You can adjust flavor recipes later from the planner.
         </p>
       </div>
 
@@ -231,11 +193,6 @@ export function PartyWingsSplit() {
           {!isAllocationExact && (
             <p className="text-xs text-amber-900 mt-1">Make the split total match exactly before you build recipes.</p>
           )}
-          {hasSelections && (
-            <p className="text-xs text-gray-600 mt-1">
-              {allSelectedBuilt ? "All selected flavors marked built." : `Built: ${selectedSauceIds.filter((s) => builtMap[`flavor:${s}`]).length}/${selectedSauceIds.length} flavors`}
-            </p>
-          )}
         </div>
       </div>
 
@@ -243,8 +200,6 @@ export function PartyWingsSplit() {
         <div className="lg:col-span-2 space-y-4">
           {state.flavors.map((f, index) => {
             const opt = WING_FLAVORS.find((o) => o.sauceId === f.sauceId);
-            const flavorProgressKey = `flavor:${f.sauceId}`;
-            const isBuilt = builtMap[flavorProgressKey];
             return (
               <div key={`${f.sauceId}-${index}`} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
                 <h3 className="text-lg font-black text-gray-900 mb-4">Wing Flavor {index + 1}</h3>
@@ -274,16 +229,9 @@ export function PartyWingsSplit() {
                     />
                   </div>
                   <div className="flex gap-2">
-                    <Link className="flex-1" to={buildFlavorUrl(f.sauceId, f.qtyWings)}>
-                      <Button
-                        className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold"
-                        disabled={!isAllocationExact || f.qtyWings <= 0}
-                        onClick={() => localStorage.setItem(wingsStorageKey, JSON.stringify(state))}
-                      >
-                        {isBuilt ? "Re-build" : "Build wings"}
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </Link>
+                    <div className="flex-1 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-md px-3 py-2">
+                      Flavor saved in split. Build or edit recipe later from planner.
+                    </div>
                     {state.flavors.length > 1 && (
                       <Button
                         type="button"
@@ -342,7 +290,7 @@ export function PartyWingsSplit() {
       <div className="flex gap-3 flex-wrap items-center">
         <Button
           onClick={saveAndReturn}
-          disabled={!isAllocationExact || !allSelectedBuilt}
+          disabled={!isAllocationExact}
           className="bg-green-600 hover:bg-green-700 text-white font-bold disabled:opacity-60"
         >
           <Save className="w-4 h-4 mr-2" />
@@ -353,20 +301,6 @@ export function PartyWingsSplit() {
           Back
         </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={resetWingProgress}
-          className="font-bold border-red-200 text-red-700 hover:bg-red-50"
-        >
-          Reset wing progress
-        </Button>
-
-        {!allSelectedBuilt && selectedSauceIds.length > 0 && (
-          <p className="text-xs text-gray-600 w-full mt-1">
-            Build all selected flavors before returning. ({selectedSauceIds.filter((s) => builtMap[`flavor:${s}`]).length}/{selectedSauceIds.length} done)
-          </p>
-        )}
       </div>
     </div>
   );
