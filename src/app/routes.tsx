@@ -44,6 +44,7 @@ import { CannabisEdibleRecipesPage } from "./pages/CannabisEdibleRecipesPage";
 import { InfusedDrinksPage } from "./pages/InfusedDrinksPage";
 import { SavoryCannabisPage } from "./pages/SavoryCannabisPage";
 import { PartyPackPlanner } from "./pages/PartyPackPlanner";
+import { PartyGroceryList } from "./pages/PartyGroceryList";
 import { ContactUs } from "./pages/ContactUs";
 
 export const router = createBrowserRouter([
@@ -96,6 +97,7 @@ export const router = createBrowserRouter([
       { path: "party-mode", Component: PartyMode },
       { path: "party-mode/plan/:packId", Component: PartyPackPlanner },
       { path: "party-mode/plan/:packId/wings", Component: PartyWingsSplit },
+      { path: "party-mode/plan/:packId/grocery", Component: PartyGroceryList },
     ],
   },
 ]);

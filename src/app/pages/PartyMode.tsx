@@ -174,9 +174,14 @@ export function PartyMode() {
           <h1 className="text-4xl md:text-5xl font-black mb-3 leading-tight">Hosting? Don&apos;t guess dosing.</h1>
           <p className="text-gray-300 text-lg max-w-2xl mb-2">Serve great food — and keep everyone in control.</p>
           <p className="text-gray-300 text-lg max-w-2xl mb-6">Pre-planned infused party packs — game night, chill night, dessert spreads, and drinks menus. Every pack comes with dosing strategy and tips for hosting a group safely.</p>
-          <div className="flex flex-wrap gap-3">
-            {["🎮 Game Night", "🛋️ Chill Night", "🍰 Dessert Pack", "🥂 Drinks Pack"].map(tag => (
-              <span key={tag} className="bg-white/10 border border-white/20 text-white text-sm font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm">{tag}</span>
+          <p className="text-xs uppercase tracking-wide text-gray-400 mb-2">Pick a party plan to start</p>
+          <div className="flex flex-wrap gap-2">
+            {BUNDLES.map((bundle) => (
+              <Link key={`hero-${bundle.id}`} to={`/party-mode/plan/${bundle.id}`}>
+                <Button size="sm" className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold">
+                  {bundle.emoji} {bundle.title.replace(" Pack", "")}
+                </Button>
+              </Link>
             ))}
           </div>
         </div>

@@ -248,7 +248,6 @@ export function PartyPackPlanner() {
   const [selectedRecipeToAdd, setSelectedRecipeToAdd] = useState<string>("");
   const [savoryInfusedItemId, setSavoryInfusedItemId] = useState<string>("starch-side");
   const [expandedItemIds, setExpandedItemIds] = useState<string[]>([]);
-  const [groceryChecks, setGroceryChecks] = useState<Record<string, boolean>>({});
 
   type WingsSplitState = {
     totalWings: number;
@@ -271,7 +270,6 @@ export function PartyPackPlanner() {
     setPeopleCount(4);
     setItems(buildPackItems(4));
     setExpandedItemIds([]);
-    setGroceryChecks({});
   }, [pack.id]);
 
   const isSavoryPack = pack.id === "savory-dinner-pack";
@@ -430,6 +428,18 @@ export function PartyPackPlanner() {
     return `${item.route}${item.route.includes("?") ? "&" : "?"}returnToPartyPack=${encodeURIComponent(
       `/party-mode/plan/${pack.id}`
     )}&partyPackId=${encodeURIComponent(pack.id)}&partyItemId=${encodeURIComponent(item.id)}`;
+  };
+
+  const saveGroceryDraft = () => {
+    localStorage.setItem(
+      `party-pack-grocery-draft:${pack.id}`,
+      JSON.stringify({
+        peopleCount,
+        items,
+        selectedInfusionId,
+        savedWingsSplit,
+      })
+    );
   };
 
   const savoryGuidance = useMemo(() => {
@@ -861,6 +871,11 @@ export function PartyPackPlanner() {
           <Printer className="w-4 h-4 mr-1.5" />
           Print Party Package
         </Button>
+        <Link to={`/party-mode/plan/${encodeURIComponent(pack.id)}/grocery`} onClick={saveGroceryDraft}>
+          <Button variant="outline" className="font-bold border-blue-300 text-blue-700 hover:bg-blue-50">
+            View Full Grocery List
+          </Button>
+        </Link>
         <Link to="/infusions">
           <Button className="bg-green-600 hover:bg-green-700 text-white font-bold">
             Build / Manage Infusions <ArrowRight className="w-4 h-4 ml-2" />
@@ -873,32 +888,6 @@ export function PartyPackPlanner() {
           </Button>
         </Link>
       </div>
-
-      <section className="print:hidden bg-white border border-gray-200 rounded-2xl p-5">
-        <h2 className="text-2xl font-black text-gray-900 mb-3">Grocery List 🛒</h2>
-        <div className="grid md:grid-cols-2 gap-3">
-          {groceryBySection.map((section) => (
-            <div key={`grocery-${section.section}`} className="border border-gray-200 rounded-xl p-3 bg-gray-50">
-              <p className="font-black text-gray-900 mb-2">{section.section}</p>
-              <div className="space-y-2">
-                {section.ingredients.map((ingredient) => {
-                  const key = `${section.section}:${ingredient}`;
-                  return (
-                    <label key={key} className="flex items-center gap-2 text-sm text-gray-800">
-                      <input
-                        type="checkbox"
-                        checked={!!groceryChecks[key]}
-                        onChange={(e) => setGroceryChecks((prev) => ({ ...prev, [key]: e.target.checked }))}
-                      />
-                      <span className={groceryChecks[key] ? "line-through text-gray-400" : ""}>{ingredient}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
       <div className="hidden print:block space-y-6 text-black">
         <div className="border-b-2 border-black pb-3">
