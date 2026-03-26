@@ -70,3 +70,18 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 
 If missing, app safely falls back to local static recipe data.
 
+## Phase 3.1 migration
+
+Run:
+
+1. `migrations/003_showcase_items.sql`
+
+This adds `showcase_items`, which powers DB-backed card metadata for:
+
+- wings sauces
+- popcorn flavors
+- coffee drinks
+- fries styles
+
+The frontend still falls back to existing local arrays if this table is empty or env vars are not set.
+

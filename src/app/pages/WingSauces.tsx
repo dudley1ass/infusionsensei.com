@@ -6,7 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
 import { WING_SAUCE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
-import { loadBuilderMapFromDb } from "../services/contentService";
+import { loadBuilderMapFromDb, loadShowcaseItemsFromDb } from "../services/contentService";
 
 type Sauce = {
   id: string;
@@ -91,6 +91,7 @@ function SweetnessBar({ level }: { level: number }) {
 export function WingSauces() {
   const [activeTag, setActiveTag] = useState("all");
   const [selectedSauce, setSelectedSauce] = useState<Sauce | null>(null);
+  const [sauces, setSauces] = useState<Sauce[]>(SAUCES);
   const [builderMap, setBuilderMap] = useState<Record<string, string>>(WING_SAUCE_TO_BUILDER_RECIPE);
   const [searchParams] = useSearchParams();
 
@@ -102,30 +103,58 @@ export function WingSauces() {
   const partyItemId = searchParams.get("partyItemId");
 
   const filtered = activeTag === "all"
-    ? SAUCES
-    : SAUCES.filter(s => s.tags.includes(activeTag));
+    ? sauces
+    : sauces.filter(s => s.tags.includes(activeTag));
 
   const filteredSections = SECTIONS.map(sec => ({
     ...sec,
-    sauces: sec.ids.map(id => SAUCES.find(s => s.id === id)!).filter(s =>
+    sauces: sec.ids.map(id => sauces.find(s => s.id === id)!).filter(s =>
       activeTag === "all" || s.tags.includes(activeTag)
     )
   })).filter(sec => sec.sauces.length > 0);
 
   useEffect(() => {
     if (!sauceIdParam) return;
-    const found = SAUCES.find((s) => s.id === sauceIdParam);
+    const found = sauces.find((s) => s.id === sauceIdParam);
     if (found) {
       setActiveTag("all");
       setSelectedSauce(found);
     }
-  }, [sauceIdParam]);
+  }, [sauceIdParam, sauces]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const fromDb = await loadBuilderMapFromDb("wings");
       if (!cancelled && fromDb) setBuilderMap(fromDb);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const fromDb = await loadShowcaseItemsFromDb("wings");
+      if (!fromDb || cancelled) return;
+      const byId = new Map(fromDb.map((item) => [item.id, item]));
+      const merged = SAUCES.map((local) => {
+        const db = byId.get(local.id);
+        if (!db) return local;
+        return {
+          ...local,
+          name: db.name || local.name,
+          type: (db.itemType as Sauce["type"]) || local.type,
+          profile: db.profile || local.profile,
+          build: db.build || local.build,
+          tags: db.tags.length > 0 ? db.tags : local.tags,
+          emoji: db.emoji || local.emoji,
+          heat: db.primaryLevel as Sauce["heat"],
+          sweetness: db.secondaryLevel as Sauce["sweetness"],
+        };
+      });
+      if (!cancelled) setSauces(merged);
     })();
     return () => {
       cancelled = true;

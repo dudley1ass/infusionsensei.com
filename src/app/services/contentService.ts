@@ -186,3 +186,79 @@ export async function loadBuilderMapFromDb(domain: "wings" | "popcorn" | "coffee
   }
 }
 
+export type ShowcaseDomain = "wings" | "popcorn" | "coffee" | "fries";
+
+export type ShowcaseItem = {
+  id: string;
+  name: string;
+  itemType: string;
+  profile: string;
+  build: string;
+  tags: string[];
+  emoji: string;
+  primaryLevel: number;
+  secondaryLevel: number;
+  sectionKey: string | null;
+  sortOrder: number;
+};
+
+const showcaseCache = new Map<ShowcaseDomain, ShowcaseItem[]>();
+
+function coerceTagList(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((v): v is string => typeof v === "string");
+  return [];
+}
+
+export async function loadShowcaseItemsFromDb(domain: ShowcaseDomain): Promise<ShowcaseItem[] | null> {
+  if (showcaseCache.has(domain)) return showcaseCache.get(domain)!;
+
+  const { url, key } = getSupabaseConfig();
+  if (!url || !key) return null;
+
+  try {
+    const res = await fetch(
+      `${url}/rest/v1/showcase_items?select=source_id,name,item_type,profile,build,tags,emoji,primary_level,secondary_level,section_key,sort_order&domain=eq.${domain}&is_active=eq.true&order=sort_order.asc`,
+      {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+        },
+      }
+    );
+    if (!res.ok) return null;
+    const rows = (await res.json()) as Array<{
+      source_id: string;
+      name: string;
+      item_type: string;
+      profile: string | null;
+      build: string | null;
+      tags: unknown;
+      emoji: string | null;
+      primary_level: number | null;
+      secondary_level: number | null;
+      section_key: string | null;
+      sort_order: number | null;
+    }>;
+    if (!Array.isArray(rows) || rows.length === 0) return null;
+
+    const normalized: ShowcaseItem[] = rows.map((row) => ({
+      id: row.source_id,
+      name: row.name,
+      itemType: row.item_type,
+      profile: row.profile || "",
+      build: row.build || "",
+      tags: coerceTagList(row.tags),
+      emoji: row.emoji || "🍽️",
+      primaryLevel: Math.max(0, Math.min(3, Number(row.primary_level) || 0)),
+      secondaryLevel: Math.max(0, Math.min(3, Number(row.secondary_level) || 0)),
+      sectionKey: row.section_key,
+      sortOrder: Number(row.sort_order) || 0,
+    }));
+
+    showcaseCache.set(domain, normalized);
+    return normalized;
+  } catch {
+    return null;
+  }
+}
+

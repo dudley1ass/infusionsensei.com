@@ -6,7 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
 import { FRIES_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
-import { loadBuilderMapFromDb } from "../services/contentService";
+import { loadBuilderMapFromDb, loadShowcaseItemsFromDb } from "../services/contentService";
 
 type FriesRecipe = { id:string; name:string; type:"Butter"|"Oil"|"Aioli"|"Glaze"|"Powder"; profile:string; build:string; tags:string[]; emoji:string; heat:0|1|2|3; sweetness:0|1|2|3; servings:string; ingredients:string[]; steps:string[]; note:string; };
 
@@ -50,26 +50,55 @@ function Dots({ level, color }: { level: number; color: string }) {
 export function Fries() {
   const [activeTag, setActiveTag] = useState("all");
   const [selected, setSelected] = useState<FriesRecipe | null>(null);
+  const [friesRecipes, setFriesRecipes] = useState<FriesRecipe[]>(RECIPES);
   const [builderMap, setBuilderMap] = useState<Record<string, string>>(FRIES_TO_BUILDER_RECIPE);
   const [searchParams] = useSearchParams();
-  const filtered = activeTag === "all" ? RECIPES : RECIPES.filter(r => r.tags.includes(activeTag));
-  const filteredSections = SECTIONS.map(sec => ({ ...sec, recipes: sec.ids.map(id => RECIPES.find(r => r.id === id)!).filter(r => activeTag === "all" || r.tags.includes(activeTag)) })).filter(sec => sec.recipes.length > 0);
+  const filtered = activeTag === "all" ? friesRecipes : friesRecipes.filter(r => r.tags.includes(activeTag));
+  const filteredSections = SECTIONS.map(sec => ({ ...sec, recipes: sec.ids.map(id => friesRecipes.find(r => r.id === id)!).filter(r => activeTag === "all" || r.tags.includes(activeTag)) })).filter(sec => sec.recipes.length > 0);
 
   useEffect(() => {
     const recipeIdParam = searchParams.get("recipe");
     if (!recipeIdParam) return;
-    const found = RECIPES.find((r) => r.id === recipeIdParam);
+    const found = friesRecipes.find((r) => r.id === recipeIdParam);
     if (found) {
       setActiveTag("all");
       setSelected(found);
     }
-  }, [searchParams]);
+  }, [searchParams, friesRecipes]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const fromDb = await loadBuilderMapFromDb("fries");
       if (!cancelled && fromDb) setBuilderMap(fromDb);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const fromDb = await loadShowcaseItemsFromDb("fries");
+      if (!fromDb || cancelled) return;
+      const byId = new Map(fromDb.map((item) => [item.id, item]));
+      const merged = RECIPES.map((local) => {
+        const db = byId.get(local.id);
+        if (!db) return local;
+        return {
+          ...local,
+          name: db.name || local.name,
+          type: (db.itemType as FriesRecipe["type"]) || local.type,
+          profile: db.profile || local.profile,
+          build: db.build || local.build,
+          tags: db.tags.length > 0 ? db.tags : local.tags,
+          emoji: db.emoji || local.emoji,
+          heat: db.primaryLevel as FriesRecipe["heat"],
+          sweetness: db.secondaryLevel as FriesRecipe["sweetness"],
+        };
+      });
+      if (!cancelled) setFriesRecipes(merged);
     })();
     return () => {
       cancelled = true;

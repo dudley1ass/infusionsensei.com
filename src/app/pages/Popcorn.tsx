@@ -6,7 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
 import { POPCORN_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
-import { loadBuilderMapFromDb } from "../services/contentService";
+import { loadBuilderMapFromDb, loadShowcaseItemsFromDb } from "../services/contentService";
 
 type PopcornFlavor = {
   id: string;
@@ -215,13 +215,14 @@ const RECIPES: Record<string, { servings: string; ingredients: string[]; steps: 
 export function Popcorn() {
   const [activeTag, setActiveTag] = useState("all");
   const [selectedFlavor, setSelectedFlavor] = useState<PopcornFlavor | null>(null);
+  const [flavors, setFlavors] = useState<PopcornFlavor[]>(FLAVORS);
   const [builderMap, setBuilderMap] = useState<Record<string, string>>(POPCORN_TO_BUILDER_RECIPE);
 
-  const filtered = activeTag === "all" ? FLAVORS : FLAVORS.filter(f => f.tags.includes(activeTag));
+  const filtered = activeTag === "all" ? flavors : flavors.filter(f => f.tags.includes(activeTag));
 
   const filteredSections = SECTIONS.map(sec => ({
     ...sec,
-    flavors: sec.ids.map(id => FLAVORS.find(f => f.id === id)!).filter(f =>
+    flavors: sec.ids.map(id => flavors.find(f => f.id === id)!).filter(f =>
       activeTag === "all" || f.tags.includes(activeTag)
     )
   })).filter(sec => sec.flavors.length > 0);
@@ -231,6 +232,34 @@ export function Popcorn() {
     (async () => {
       const fromDb = await loadBuilderMapFromDb("popcorn");
       if (!cancelled && fromDb) setBuilderMap(fromDb);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const fromDb = await loadShowcaseItemsFromDb("popcorn");
+      if (!fromDb || cancelled) return;
+      const byId = new Map(fromDb.map((item) => [item.id, item]));
+      const merged = FLAVORS.map((local) => {
+        const db = byId.get(local.id);
+        if (!db) return local;
+        return {
+          ...local,
+          name: db.name || local.name,
+          type: (db.itemType as PopcornFlavor["type"]) || local.type,
+          profile: db.profile || local.profile,
+          build: db.build || local.build,
+          tags: db.tags.length > 0 ? db.tags : local.tags,
+          emoji: db.emoji || local.emoji,
+          heat: db.primaryLevel as PopcornFlavor["heat"],
+          sweetness: db.secondaryLevel as PopcornFlavor["sweetness"],
+        };
+      });
+      if (!cancelled) setFlavors(merged);
     })();
     return () => {
       cancelled = true;
