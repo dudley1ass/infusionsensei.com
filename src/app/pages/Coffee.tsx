@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChefHat } from "lucide-react";
@@ -6,6 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
 import { COFFEE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
+import { loadBuilderMapFromDb } from "../services/contentService";
 
 type Drink = { id:string; name:string; type:"Butter"|"Oil"|"Tincture"|"Syrup"|"Cream"; profile:string; build:string; tags:string[]; emoji:string; strength:0|1|2|3; sweetness:0|1|2|3; servings:string; ingredients:string[]; steps:string[]; note:string; };
 
@@ -50,8 +51,20 @@ function Dots({ level, color }: { level: number; color: string }) {
 export function Coffee() {
   const [activeTag, setActiveTag] = useState("all");
   const [selected, setSelected] = useState<Drink | null>(null);
+  const [builderMap, setBuilderMap] = useState<Record<string, string>>(COFFEE_TO_BUILDER_RECIPE);
   const filtered = activeTag === "all" ? DRINKS : DRINKS.filter(d => d.tags.includes(activeTag));
   const filteredSections = SECTIONS.map(sec => ({ ...sec, drinks: sec.ids.map(id => DRINKS.find(d => d.id === id)!).filter(d => activeTag === "all" || d.tags.includes(activeTag)) })).filter(sec => sec.drinks.length > 0);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const fromDb = await loadBuilderMapFromDb("coffee");
+      if (!cancelled && fromDb) setBuilderMap(fromDb);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="max-w-6xl mx-auto space-y-10">
@@ -110,7 +123,7 @@ export function Coffee() {
                       </ol>
                       <p className="text-xs text-gray-500 italic bg-yellow-50 rounded-lg px-3 py-2 mt-2">💡 {drink.note}</p>
                     </div>
-                    <Link to={`/ingredients?category=drinks&recipe=${COFFEE_TO_BUILDER_RECIPE[drink.id] ?? "bulletproof-coffee"}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"coffee",recipe_id:drink.id}); }}>
+                    <Link to={`/ingredients?category=drinks&recipe=${builderMap[drink.id] ?? COFFEE_TO_BUILDER_RECIPE[drink.id] ?? "bulletproof-coffee"}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"coffee",recipe_id:drink.id}); }}>
                       <ChefHat className="w-4 h-4" /> Move to Recipe Builder
                     </Link>
                   </div>

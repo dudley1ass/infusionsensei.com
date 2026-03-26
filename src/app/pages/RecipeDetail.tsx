@@ -1,13 +1,28 @@
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
-import { getRecipeById } from "../data/recipes";
+import { getRecipeById, Recipe } from "../data/recipes";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Separator } from "../components/ui/separator";
 import { ArrowLeft, Clock, ChefHat, Leaf, AlertCircle, CheckCircle2, Lightbulb, Printer, Flame, Users } from "lucide-react";
+import { loadRecipeByIdFromDb } from "../services/contentService";
 
 export function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
-  const recipe = id ? getRecipeById(id) : undefined;
+  const fallbackRecipe = id ? getRecipeById(id) : undefined;
+  const [recipe, setRecipe] = useState<Recipe | undefined>(fallbackRecipe);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!id) return;
+    (async () => {
+      const fromDb = await loadRecipeByIdFromDb(id);
+      if (!cancelled && fromDb) setRecipe(fromDb);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
   const handlePrint = () => window.print();
 

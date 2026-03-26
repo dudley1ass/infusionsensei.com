@@ -7,6 +7,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { safeJsonParse } from "../utils/storage";
 import { WING_SAUCE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
+import { loadBuilderMapFromDb } from "../services/contentService";
 
 type WingsSplitState = {
   totalWings: number;
@@ -71,6 +72,7 @@ export function PartyWingsSplit() {
       flavors: [{ sauceId: "garlic-parmesan", qtyWings: total }],
     };
   });
+  const [builderMap, setBuilderMap] = useState<Record<string, string>>(WING_SAUCE_TO_BUILDER_RECIPE);
 
   // If user came from planner with a specific total wings, prefer query over saved.
   useEffect(() => {
@@ -109,6 +111,17 @@ export function PartyWingsSplit() {
   const builtMap = useMemo(() => {
     return safeJsonParse<Record<string, boolean>>(localStorage.getItem(builtStorageKey), {});
   }, [builtStorageKey, location.key]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const fromDb = await loadBuilderMapFromDb("wings");
+      if (!cancelled && fromDb) setBuilderMap(fromDb);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const totalAllocated = useMemo(() => state.flavors.reduce((sum, f) => sum + (f.qtyWings || 0), 0), [state.flavors]);
   const remaining = state.totalWings - totalAllocated;
@@ -175,7 +188,7 @@ export function PartyWingsSplit() {
 
   const buildFlavorUrl = (sauceId: string, qtyWings: number) => {
     const servingsOverride = servingsOverrideFor(qtyWings);
-    const recipeId = WING_SAUCE_TO_BUILDER_RECIPE[sauceId] ?? "classic-buffalo-wings";
+    const recipeId = builderMap[sauceId] ?? WING_SAUCE_TO_BUILDER_RECIPE[sauceId] ?? "classic-buffalo-wings";
     const flavorProgressKey = `flavor:${sauceId}`;
     return `/ingredients?category=wings&recipe=${encodeURIComponent(recipeId)}&servings=${servingsOverride}&wingsQty=${encodeURIComponent(
       qtyWings

@@ -6,6 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
 import { FRIES_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
+import { loadBuilderMapFromDb } from "../services/contentService";
 
 type FriesRecipe = { id:string; name:string; type:"Butter"|"Oil"|"Aioli"|"Glaze"|"Powder"; profile:string; build:string; tags:string[]; emoji:string; heat:0|1|2|3; sweetness:0|1|2|3; servings:string; ingredients:string[]; steps:string[]; note:string; };
 
@@ -49,6 +50,7 @@ function Dots({ level, color }: { level: number; color: string }) {
 export function Fries() {
   const [activeTag, setActiveTag] = useState("all");
   const [selected, setSelected] = useState<FriesRecipe | null>(null);
+  const [builderMap, setBuilderMap] = useState<Record<string, string>>(FRIES_TO_BUILDER_RECIPE);
   const [searchParams] = useSearchParams();
   const filtered = activeTag === "all" ? RECIPES : RECIPES.filter(r => r.tags.includes(activeTag));
   const filteredSections = SECTIONS.map(sec => ({ ...sec, recipes: sec.ids.map(id => RECIPES.find(r => r.id === id)!).filter(r => activeTag === "all" || r.tags.includes(activeTag)) })).filter(sec => sec.recipes.length > 0);
@@ -62,6 +64,17 @@ export function Fries() {
       setSelected(found);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const fromDb = await loadBuilderMapFromDb("fries");
+      if (!cancelled && fromDb) setBuilderMap(fromDb);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="max-w-6xl mx-auto space-y-10">
@@ -121,7 +134,7 @@ export function Fries() {
                       </ol>
                       <p className="text-xs text-gray-500 italic bg-orange-50 rounded-lg px-3 py-2 mt-2">💡 {recipe.note}</p>
                     </div>
-                    <Link to={`/ingredients?category=fries&recipe=${FRIES_TO_BUILDER_RECIPE[recipe.id] ?? "garlic-butter-fries"}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"fries",recipe_id:recipe.id}); }}>
+                    <Link to={`/ingredients?category=fries&recipe=${builderMap[recipe.id] ?? FRIES_TO_BUILDER_RECIPE[recipe.id] ?? "garlic-butter-fries"}`} className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors" onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"fries",recipe_id:recipe.id}); }}>
                       <ChefHat className="w-4 h-4" /> Move to Recipe Builder
                     </Link>
                   </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChefHat } from "lucide-react";
@@ -6,6 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
 import { POPCORN_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
+import { loadBuilderMapFromDb } from "../services/contentService";
 
 type PopcornFlavor = {
   id: string;
@@ -214,6 +215,7 @@ const RECIPES: Record<string, { servings: string; ingredients: string[]; steps: 
 export function Popcorn() {
   const [activeTag, setActiveTag] = useState("all");
   const [selectedFlavor, setSelectedFlavor] = useState<PopcornFlavor | null>(null);
+  const [builderMap, setBuilderMap] = useState<Record<string, string>>(POPCORN_TO_BUILDER_RECIPE);
 
   const filtered = activeTag === "all" ? FLAVORS : FLAVORS.filter(f => f.tags.includes(activeTag));
 
@@ -223,6 +225,17 @@ export function Popcorn() {
       activeTag === "all" || f.tags.includes(activeTag)
     )
   })).filter(sec => sec.flavors.length > 0);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const fromDb = await loadBuilderMapFromDb("popcorn");
+      if (!cancelled && fromDb) setBuilderMap(fromDb);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="max-w-6xl mx-auto space-y-10">
@@ -315,7 +328,7 @@ export function Popcorn() {
                     )}
                     <Link
                       to={`/ingredients?category=snacks&recipe=${
-                        POPCORN_TO_BUILDER_RECIPE[flavor.id] ?? "garlic-butter-popcorn"
+                        builderMap[flavor.id] ?? POPCORN_TO_BUILDER_RECIPE[flavor.id] ?? "garlic-butter-popcorn"
                       }`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
                       onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"popcorn",recipe_id:flavor.id}); }}

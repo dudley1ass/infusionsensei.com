@@ -6,6 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
 import { WING_SAUCE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
+import { loadBuilderMapFromDb } from "../services/contentService";
 
 type Sauce = {
   id: string;
@@ -90,6 +91,7 @@ function SweetnessBar({ level }: { level: number }) {
 export function WingSauces() {
   const [activeTag, setActiveTag] = useState("all");
   const [selectedSauce, setSelectedSauce] = useState<Sauce | null>(null);
+  const [builderMap, setBuilderMap] = useState<Record<string, string>>(WING_SAUCE_TO_BUILDER_RECIPE);
   const [searchParams] = useSearchParams();
 
   const sauceIdParam = searchParams.get("sauce");
@@ -118,6 +120,17 @@ export function WingSauces() {
       setSelectedSauce(found);
     }
   }, [sauceIdParam]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const fromDb = await loadBuilderMapFromDb("wings");
+      if (!cancelled && fromDb) setBuilderMap(fromDb);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const servingsQuery = servingsOverride ? `&servings=${encodeURIComponent(servingsOverride)}` : "";
   const returnQuery =
@@ -216,7 +229,7 @@ export function WingSauces() {
                     <SauceRecipe sauce={sauce} />
                     <Link
                       to={`/ingredients?category=wings&recipe=${
-                        WING_SAUCE_TO_BUILDER_RECIPE[sauce.id] ?? "classic-buffalo-wings"
+                        builderMap[sauce.id] ?? WING_SAUCE_TO_BUILDER_RECIPE[sauce.id] ?? "classic-buffalo-wings"
                       }${servingsQuery}${returnQuery}`}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
                       onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"wings",recipe_id:sauce.id}); }}
