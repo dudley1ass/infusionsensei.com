@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
@@ -8,7 +8,7 @@ import { trackEvent } from "../utils/analytics";
 
 type FriesRecipe = { id:string; name:string; type:"Butter"|"Oil"|"Aioli"|"Glaze"|"Powder"; profile:string; build:string; tags:string[]; emoji:string; heat:0|1|2|3; sweetness:0|1|2|3; servings:string; ingredients:string[]; steps:string[]; note:string; };
 
-const RECIPES: FriesRecipe[] = [
+export const RECIPES: FriesRecipe[] = [
   { id:"garlic-butter-fries", name:"Garlic Butter Fries", type:"Butter", profile:"Savory / Rich", build:"Cannabutter + garlic + parsley toss", tags:["classic","butter","garlic"], emoji:"🧄", heat:0, sweetness:0, servings:"2 servings", ingredients:["500g fries (cooked your way)","2 tbsp cannabutter","3 cloves garlic (minced)","2 tbsp fresh parsley","Salt to taste"], steps:["Cook fries using your preferred method — air fryer, oven, or deep fry.","Melt cannabutter in a pan over low heat.","Sauté garlic 1 minute until fragrant.","Toss hot fries in garlic butter, add parsley and salt."], note:"Add parsley last so it stays bright green." },
   { id:"truffle-fries", name:"Truffle Parmesan Fries", type:"Oil", profile:"Earthy / Rich", build:"Cannabis oil + truffle oil + parmesan finish", tags:["fancy","oil","garlic"], emoji:"🍄", heat:0, sweetness:0, servings:"2 servings", ingredients:["500g fries (cooked)","1 tbsp cannabis olive oil","1 tsp truffle oil","¼ cup grated parmesan","Fresh parsley","Flaky salt"], steps:["Cook fries to crispy.","Drizzle cannabis olive oil over hot fries and toss.","Add truffle oil and toss again.","Top with parmesan, parsley, and flaky salt."], note:"Add truffle oil last and serve immediately — the flavor fades fast." },
   { id:"spicy-mayo-fries", name:"Spicy Cannabis Aioli Fries", type:"Aioli", profile:"Creamy / Spicy", build:"Cannabis oil aioli + sriracha drizzle", tags:["spicy","aioli","creamy"], emoji:"🌶️", heat:2, sweetness:0, servings:"2 servings", ingredients:["500g fries","3 tbsp mayo","1 tbsp cannabis coconut oil","1 tbsp sriracha","1 tsp lemon juice","1 clove garlic (minced)"], steps:["Whisk mayo, cannabis oil, sriracha, lemon, and garlic together.","Cook fries until crispy.","Drizzle aioli over hot fries or serve as dipping sauce."], note:"Make extra aioli — it keeps in the fridge for a week." },
@@ -48,8 +48,19 @@ function Dots({ level, color }: { level: number; color: string }) {
 export function Fries() {
   const [activeTag, setActiveTag] = useState("all");
   const [selected, setSelected] = useState<FriesRecipe | null>(null);
+  const [searchParams] = useSearchParams();
   const filtered = activeTag === "all" ? RECIPES : RECIPES.filter(r => r.tags.includes(activeTag));
   const filteredSections = SECTIONS.map(sec => ({ ...sec, recipes: sec.ids.map(id => RECIPES.find(r => r.id === id)!).filter(r => activeTag === "all" || r.tags.includes(activeTag)) })).filter(sec => sec.recipes.length > 0);
+
+  useEffect(() => {
+    const recipeIdParam = searchParams.get("recipe");
+    if (!recipeIdParam) return;
+    const found = RECIPES.find((r) => r.id === recipeIdParam);
+    if (found) {
+      setActiveTag("all");
+      setSelected(found);
+    }
+  }, [searchParams]);
 
   return (
     <div className="max-w-6xl mx-auto space-y-10">

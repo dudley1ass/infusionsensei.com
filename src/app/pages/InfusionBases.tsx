@@ -807,6 +807,9 @@ export function InfusionBases() {
           <CardDescription className="text-gray-600">
             Follow the steps below to create your perfect infusion base
           </CardDescription>
+          <p className="text-sm text-green-700 font-medium">
+            If you do not want to create your own, use one of our standard infusion bases already built for you.
+          </p>
         </CardHeader>
         <CardContent className="space-y-8">
           {/* STEP 1: Choose Strain - hidden for pre-made products */}

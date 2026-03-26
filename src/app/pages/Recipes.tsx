@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { recipes, Recipe } from "../data/recipes";
+import { RECIPES as friesStyles } from "./Fries";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -12,8 +13,42 @@ export function Recipes() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
+  type DisplayRecipe = {
+    id: string;
+    name: string;
+    category: string;
+    difficulty: Recipe["difficulty"];
+    prepTime: number;
+    cookTime: number;
+    servings: number;
+    thcPerServing: string;
+    image: string;
+    description: string;
+    isNew?: boolean;
+    route: string;
+  };
+
+  const friesDisplayRecipes: DisplayRecipe[] = friesStyles.map((fries) => ({
+    id: `fries-${fries.id}`,
+    name: fries.name,
+    category: "fries",
+    difficulty: "beginner",
+    prepTime: 10,
+    cookTime: 20,
+    servings: Number(fries.servings.split(" ")[0]) || 2,
+    thcPerServing: "~3-5mg",
+    image: "/IMAGES/fries.jpg",
+    description: fries.profile,
+    route: `/fries?recipe=${encodeURIComponent(fries.id)}`,
+  }));
+
+  const allDisplayRecipes: DisplayRecipe[] = [
+    ...recipes.map((r) => ({ ...r, route: `/recipes/${r.id}` })),
+    ...friesDisplayRecipes,
+  ];
+
   // Sort: new recipes first, then rest
-  const sortedRecipes = [...recipes].sort((a, b) => {
+  const sortedRecipes = [...allDisplayRecipes].sort((a, b) => {
     if (a.isNew && !b.isNew) return -1;
     if (!a.isNew && b.isNew) return 1;
     return 0;
@@ -31,11 +66,12 @@ export function Recipes() {
   const newCount = recipes.filter((r) => r.isNew).length;
 
   const categories = [
-    { value: "all", label: "All Recipes", count: recipes.length },
+    { value: "all", label: "All Recipes", count: allDisplayRecipes.length },
     { value: "basics", label: "Basics", count: recipes.filter((r) => r.category === "basics").length },
     { value: "edibles", label: "Edibles", count: recipes.filter((r) => r.category === "edibles").length },
     { value: "drinks", label: "Drinks", count: recipes.filter((r) => r.category === "drinks").length },
     { value: "infusions", label: "Infusions", count: recipes.filter((r) => r.category === "infusions").length },
+    { value: "fries", label: "Fries Styles", count: friesDisplayRecipes.length },
   ];
 
   const getDifficultyColor = (difficulty: Recipe["difficulty"]) => {
@@ -106,7 +142,7 @@ export function Recipes() {
       {filteredRecipes.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredRecipes.map((recipe) => (
-            <Link key={recipe.id} to={`/recipes/${recipe.id}`}>
+            <Link key={recipe.id} to={recipe.route}>
               <Card className={`bg-white hover:border-green-400 transition-all hover:scale-105 overflow-hidden group h-full shadow-md hover:shadow-xl ${recipe.isNew ? "border-2 border-green-400" : "border-green-200"}`}>
                 <div className="relative h-48 overflow-hidden">
                   <img
@@ -160,12 +196,12 @@ export function Recipes() {
                   </div>
                   {/* Funnel CTA */}
                   <Link
-                    to="/ingredients"
+                    to={recipe.category === "fries" ? recipe.route : "/ingredients"}
                     onClick={(e) => e.stopPropagation()}
                     className="flex items-center justify-center gap-2 w-full bg-green-50 hover:bg-green-100 border border-green-300 hover:border-green-500 text-green-700 font-bold text-sm py-2 rounded-lg transition-all group/cta"
                   >
                     <Calculator className="w-3.5 h-3.5" />
-                    Customize THC
+                    {recipe.category === "fries" ? "Open Fries Recipe" : "Customize THC"}
                     <ArrowRight className="w-3.5 h-3.5 group-hover/cta:translate-x-0.5 transition-transform" />
                   </Link>
                 </CardContent>
