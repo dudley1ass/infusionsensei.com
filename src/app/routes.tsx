@@ -44,6 +44,7 @@ import { CannabisEdibleRecipesPage } from "./pages/CannabisEdibleRecipesPage";
 import { InfusedDrinksPage } from "./pages/InfusedDrinksPage";
 import { SavoryCannabisPage } from "./pages/SavoryCannabisPage";
 import { PartyPackPlanner } from "./pages/PartyPackPlanner";
+import { ContactUs } from "./pages/ContactUs";
 
 export const router = createBrowserRouter([
   {
@@ -66,6 +67,7 @@ export const router = createBrowserRouter([
       { path: "edible-recipes", Component: CannabisEdibleRecipesPage },
       { path: "infused-drinks", Component: InfusedDrinksPage },
       { path: "savory-cannabis", Component: SavoryCannabisPage },
+      { path: "contact-us", Component: ContactUs },
       { path: "learn", Component: Learn },
       { path: "learn/articles/beginner-guide", Component: BeginnerCookingGuide },
       { path: "learn/articles/easy-recipes", Component: EasyRecipes },

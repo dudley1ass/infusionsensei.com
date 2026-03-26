@@ -105,11 +105,19 @@ export function Layout() {
       <footer className="mt-20 border-t border-green-200 bg-green-50/50">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Leaf className="w-5 h-5 text-green-600" />
-              <p className="text-sm text-gray-700">
-                Infusion Sensei © 2026 - Cannabis Culinary Education
-              </p>
+            <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
+              <div className="flex items-center gap-2">
+                <Leaf className="w-5 h-5 text-green-600" />
+                <p className="text-sm text-gray-700">
+                  Infusion Sensei © 2026 - Cannabis Culinary Education
+                </p>
+              </div>
+              <Link
+                to="/contact-us"
+                className="text-sm font-semibold text-green-700 underline hover:text-green-800"
+              >
+                Contact Us
+              </Link>
             </div>
             <p className="text-xs text-gray-600 text-center md:text-right max-w-md">
               For educational purposes only. Know your local laws. Consume responsibly.

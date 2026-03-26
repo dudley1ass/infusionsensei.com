@@ -1,26 +1,86 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, Calculator, ChefHat, BookOpen, FlaskConical } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
 
+type Scenario = {
+  id: "brownies" | "popcorn" | "wings" | "coffee";
+  label: string;
+  emoji: string;
+  servingUnit: string;
+  defaultServings: number;
+  defaultGrams: number;
+  category: string;
+  recipeHint: string;
+};
+
+const SCENARIOS: Scenario[] = [
+  { id: "brownies", label: "Brownies", emoji: "🍪", servingUnit: "1 brownie", defaultServings: 16, defaultGrams: 7, category: "baked-goods", recipeHint: "brownies" },
+  { id: "popcorn", label: "Popcorn", emoji: "🍿", servingUnit: "1 cup popcorn", defaultServings: 12, defaultGrams: 5, category: "snacks", recipeHint: "garlic-butter-popcorn" },
+  { id: "wings", label: "Wings", emoji: "🍗", servingUnit: "1 wing", defaultServings: 32, defaultGrams: 7, category: "wings", recipeHint: "classic-buffalo-wings" },
+  { id: "coffee", label: "Coffee", emoji: "☕", servingUnit: "1 cup coffee", defaultServings: 4, defaultGrams: 3.5, category: "drinks", recipeHint: "bulletproof-coffee" },
+];
+
+const INFUSION_PRESETS = [
+  { id: "butter", label: "Butter (70%)", efficiency: 70 },
+  { id: "oil", label: "Oil (75%)", efficiency: 75 },
+  { id: "distillate", label: "Distillate (95%)", efficiency: 95 },
+  { id: "store", label: "Store edible (100%)", efficiency: 100 },
+];
 
 export function THCCalculatorPage() {
+  const [scenarioId, setScenarioId] = useState<Scenario["id"]>("brownies");
   const [thcPct, setThcPct] = useState(20);
   const [grams, setGrams] = useState(7);
   const [efficiency, setEfficiency] = useState(70);
   const [servings, setServings] = useState(16);
+  const [mode, setMode] = useState<"input" | "target">("input");
+  const [targetMg, setTargetMg] = useState(10);
+
+  const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS[0];
 
   const totalMg = grams * (thcPct / 100) * 1000 * (efficiency / 100);
   const mgPerServing = servings > 0 ? totalMg / servings : 0;
 
+  const recommendedServings = Math.max(1, Math.ceil(totalMg / Math.max(targetMg, 1)));
+  const recommendedGrams = totalMg > 0 ? (targetMg * servings) / ((thcPct / 100) * 1000 * (efficiency / 100)) : grams;
+
+  const doseCopy = useMemo(() => {
+    if (mgPerServing <= 5) {
+      return { headline: "Light / beginner friendly", sub: "Most people can start here comfortably.", firstDoseFraction: 1 };
+    }
+    if (mgPerServing <= 10) {
+      return { headline: "Good for a relaxing evening", sub: "Moderate and manageable for many users.", firstDoseFraction: 1 };
+    }
+    if (mgPerServing <= 25) {
+      return { headline: "Strong — most people will feel this", sub: "Start with a partial serving and wait.", firstDoseFraction: 2 };
+    }
+    return { headline: "Heavy — experienced users only", sub: "Very strong; most people should take a fraction only.", firstDoseFraction: 6 };
+  }, [mgPerServing]);
+
   const tier =
-    mgPerServing <= 2.5 ? { label: "Microdose", color: "text-blue-600", bg: "bg-blue-50 border-blue-200" } :
-    mgPerServing <= 5   ? { label: "Low", color: "text-green-600", bg: "bg-green-50 border-green-200" } :
-    mgPerServing <= 15  ? { label: "Moderate", color: "text-yellow-600", bg: "bg-yellow-50 border-yellow-200" } :
-    mgPerServing <= 30  ? { label: "High", color: "text-orange-600", bg: "bg-orange-50 border-orange-200" } :
-                          { label: "Very High", color: "text-red-600", bg: "bg-red-50 border-red-200" };
+    mgPerServing <= 5 ? { label: "Micro / Light", color: "text-green-600", bg: "bg-green-50 border-green-200" } :
+    mgPerServing <= 10 ? { label: "Moderate", color: "text-yellow-600", bg: "bg-yellow-50 border-yellow-200" } :
+    mgPerServing <= 25 ? { label: "Strong", color: "text-orange-600", bg: "bg-orange-50 border-orange-200" } :
+    { label: "Very Strong", color: "text-red-600", bg: "bg-red-50 border-red-200" };
+
+  const doseScalePct = Math.min(100, (mgPerServing / 50) * 100);
+
+  const applyScenario = (nextId: Scenario["id"]) => {
+    const next = SCENARIOS.find((s) => s.id === nextId);
+    if (!next) return;
+    setScenarioId(next.id);
+    setServings(next.defaultServings);
+    setGrams(next.defaultGrams);
+  };
+
+  const setDoseTarget = (mg: number) => {
+    const nextServings = Math.max(1, Math.ceil(totalMg / mg));
+    setServings(nextServings);
+    setTargetMg(mg);
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-12">
@@ -46,7 +106,44 @@ export function THCCalculatorPage() {
       {/* TOOL SECTION */}
       <section id="calculator" className="bg-white rounded-3xl border-2 border-green-200 p-8 shadow-xl">
         <h2 className="text-2xl font-black text-gray-900 mb-2">THC Edible Calculator</h2>
-        <p className="text-gray-500 text-sm mb-8">Enter your details below to calculate exact THC milligrams per serving.</p>
+        <p className="text-gray-500 text-sm mb-5">Enter your details below to calculate exact THC milligrams per serving.</p>
+
+        <div className="mb-5">
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Common scenarios</p>
+          <div className="flex flex-wrap gap-2">
+            {SCENARIOS.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => applyScenario(s.id)}
+                className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${scenarioId === s.id ? "bg-green-600 text-white border-green-600" : "bg-gray-50 text-gray-700 border-gray-200 hover:border-green-300"}`}
+              >
+                {s.emoji} {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-8 grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Infusion Type Preset</label>
+            <select
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              value={efficiency}
+              onChange={(e) => setEfficiency(Number(e.target.value))}
+            >
+              {INFUSION_PRESETS.map((p) => (
+                <option key={p.id} value={p.efficiency}>{p.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Mode</label>
+            <div className="flex gap-2">
+              <button onClick={() => setMode("input")} className={`px-3 py-2 rounded-lg text-sm font-semibold border ${mode === "input" ? "bg-green-600 text-white border-green-600" : "bg-gray-50 border-gray-300 text-gray-700"}`}>I know my inputs</button>
+              <button onClick={() => setMode("target")} className={`px-3 py-2 rounded-lg text-sm font-semibold border ${mode === "target" ? "bg-green-600 text-white border-green-600" : "bg-gray-50 border-gray-300 text-gray-700"}`}>I want X mg</button>
+            </div>
+          </div>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           <div>
@@ -84,19 +181,57 @@ export function THCCalculatorPage() {
         </div>
 
         <div className={`rounded-2xl border-2 p-6 ${tier.bg} text-center`}>
-          <p className="text-sm font-bold text-gray-600 mb-1">THC Per Serving</p>
+          <p className="text-sm font-bold text-gray-600 mb-1">THC Per Serving ({scenario.servingUnit})</p>
           <p className={`text-6xl font-black ${tier.color}`}>{mgPerServing.toFixed(1)}<span className="text-2xl ml-1">mg</span></p>
-          <p className={`font-black text-lg mt-2 ${tier.color}`}>{tier.label} Dose</p>
+          <p className={`font-black text-lg mt-2 ${tier.color}`}>{tier.label}</p>
+          <p className="text-gray-700 text-sm mt-1 font-semibold">{doseCopy.headline}</p>
+          <p className="text-gray-500 text-sm">{doseCopy.sub}</p>
           <p className="text-gray-500 text-sm mt-2">{totalMg.toFixed(0)}mg total batch · {servings} servings</p>
+
+          <div className="mt-4 text-left">
+            <p className="text-xs text-gray-500 mb-1">Dose scale</p>
+            <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-full bg-green-600" style={{ width: `${doseScalePct}%` }} />
+            </div>
+            <div className="flex justify-between text-[11px] text-gray-500 mt-1">
+              <span>5mg</span><span>10mg</span><span>25mg</span><span>50mg+</span>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-500 text-sm mb-3">Want to calculate for a specific recipe with exact ingredients?</p>
-          <Link to="/infusions">
-            <Button className="bg-green-600 hover:bg-green-700 text-white font-bold">
-              <FlaskConical className="w-4 h-4 mr-2" /> Use the Full Recipe Builder
-            </Button>
-          </Link>
+        <div className="mt-6 rounded-2xl border border-gray-200 p-4">
+          <p className="font-black text-gray-900 mb-3">What should I do next?</p>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setDoseTarget(10)} variant="outline">Make it beginner-friendly (10mg)</Button>
+            <Button onClick={() => setDoseTarget(25)} variant="outline">Make it stronger (25mg)</Button>
+            <Button onClick={() => setDoseTarget(targetMg)} variant="outline">Perfect this dose</Button>
+          </div>
+          <p className="text-sm text-gray-600 mt-3">
+            Suggested first dose: <span className="font-bold">eat 1/{doseCopy.firstDoseFraction} serving</span>, then wait 2 hours.
+          </p>
+          {mode === "target" && (
+            <div className="mt-3 grid md:grid-cols-3 gap-3 text-sm">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-1">Target mg/serving</label>
+                <Input type="number" min={1} max={100} value={targetMg} onChange={(e) => setTargetMg(Number(e.target.value) || 10)} />
+              </div>
+              <div className="rounded-lg bg-green-50 border border-green-200 px-3 py-2">
+                <p className="text-xs text-gray-500">Recommended servings</p>
+                <p className="font-black text-green-700">{recommendedServings}</p>
+              </div>
+              <div className="rounded-lg bg-blue-50 border border-blue-200 px-3 py-2">
+                <p className="text-xs text-gray-500">Grams for target (approx)</p>
+                <p className="font-black text-blue-700">{recommendedGrams.toFixed(1)}g</p>
+              </div>
+            </div>
+          )}
+          <div className="mt-4">
+            <Link to={`/ingredients?category=${encodeURIComponent(scenario.category)}&recipe=${encodeURIComponent(scenario.recipeHint)}&servings=${encodeURIComponent(servings)}`}>
+              <Button className="bg-green-600 hover:bg-green-700 text-white font-bold">
+                <FlaskConical className="w-4 h-4 mr-2" /> Turn This Into a Recipe
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -199,6 +334,7 @@ export function THCCalculatorPage() {
         <p className="text-green-200 mb-5">Free. No account. Works for any recipe.</p>
         <a href="#calculator"><Button className="bg-white text-green-800 hover:bg-green-50 font-black px-8 py-3">Calculate Now <ArrowRight className="w-4 h-4 ml-2" /></Button></a>
       </div>
+
     </div>
   );
 }
