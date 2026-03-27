@@ -1,7 +1,9 @@
+import type { InfusionBaseType } from "../types/infusion";
+
 export interface InfusionTemplate {
   id: string;
   name: string;
-  type: "butter" | "coconut-oil" | "olive-oil" | "vegetable-oil" | "tincture" | "honey";
+  type: InfusionBaseType;
   description: string;
   
   // Default amounts

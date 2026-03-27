@@ -30,6 +30,7 @@ import { InfusionComparison } from "./pages/articles/InfusionComparison";
 import { EdiblesTasteBad } from "./pages/articles/EdiblesTasteBad";
 import { BeginnerEdibleGuide } from "./pages/articles/BeginnerEdibleGuide";
 import { InfuseAnyFood } from "./pages/articles/InfuseAnyFood";
+import { InfusedPeanutButterArticle } from "./pages/articles/InfusedPeanutButterArticle";
 import { DinnerOfTheWeek } from "./pages/DinnerOfTheWeek";
 import { PartyMode } from "./pages/PartyMode";
 import { WingSauces } from "./pages/WingSauces";
@@ -99,6 +100,7 @@ export const router = createBrowserRouter([
       { path: "learn/articles/edibles-taste-bad", Component: EdiblesTasteBad },
       { path: "learn/articles/beginner-edible-guide", Component: BeginnerEdibleGuide },
       { path: "learn/articles/infuse-any-food", Component: InfuseAnyFood },
+      { path: "learn/articles/infused-peanut-butter", Component: InfusedPeanutButterArticle },
       { path: "dinner-of-the-week", Component: DinnerOfTheWeek },
       { path: "party-mode", Component: PartyMode },
       { path: "party-mode/plan/:packId", Component: PartyPackPlanner },

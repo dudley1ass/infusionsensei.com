@@ -11,17 +11,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { FlaskConical, Plus, Clock, Thermometer, Beaker, ChefHat, Cookie, Wine, UtensilsCrossed, Trash2, Save } from "lucide-react";
+import {
+  FlaskConical,
+  Plus,
+  Clock,
+  Thermometer,
+  Beaker,
+  ChefHat,
+  Cookie,
+  Wine,
+  UtensilsCrossed,
+  Trash2,
+  Save,
+  Layers,
+} from "lucide-react";
 import { toast } from "sonner";
-import { InfusionBase } from "../types/infusion";
+import {
+  InfusionBase,
+  inferInfusionBaseRole,
+  type InfusionBaseRole,
+  type InfusionBaseType,
+  type InfusionDoseContext,
+} from "../types/infusion";
 import { defaultStrains, Strain } from "../data/cannabisData";
 import { CustomStrainDialog } from "../components/CustomStrainDialog";
 import { safeJsonParse } from "../utils/storage";
 
+type InfusionRecipeBaseType = "butter" | "oil" | "syrup" | "liquid" | "chocolate" | "spread";
+
 interface InfusionRecipe {
   id: string;
   name: string;
-  baseType: "butter" | "oil" | "syrup" | "liquid";
+  baseType: InfusionRecipeBaseType;
+  baseRole: InfusionBaseRole;
   temperature: string;
   time: string;
   thcRetention: number;
@@ -29,7 +51,7 @@ interface InfusionRecipe {
   ingredients: string[];
   steps: string[];
   bestUses: string[];
-  compatibleCategories: ("cookies" | "drinks" | "savory")[];
+  compatibleCategories: string[];
 }
 
 // Pre-made commercial THC products
@@ -158,6 +180,7 @@ const infusionRecipes: InfusionRecipe[] = [
     id: "classic-cannabutter",
     name: "Classic Cannabutter",
     baseType: "butter",
+    baseRole: "cooking",
     temperature: "160-180°F (71-82°C)",
     time: "2-3 hours",
     thcRetention: 85,
@@ -182,6 +205,7 @@ const infusionRecipes: InfusionRecipe[] = [
     id: "low-temp-butter",
     name: "Low-Temp Terpene Butter",
     baseType: "butter",
+    baseRole: "cooking",
     temperature: "130-140°F (54-60°C)",
     time: "4-6 hours",
     thcRetention: 75,
@@ -202,12 +226,40 @@ const infusionRecipes: InfusionRecipe[] = [
     bestUses: ["Flavorful baked goods", "Finishing butter", "Flavor-forward cooking"],
     compatibleCategories: ["cookies", "savory"]
   },
+  {
+    id: "cannabis-ghee",
+    name: "Cannabis Ghee (Clarified Butter)",
+    baseType: "butter",
+    baseRole: "cooking",
+    temperature: "190-220°F (88-104°C)",
+    time: "2-4 hours",
+    thcRetention: 88,
+    terpeneRetention: 55,
+    ingredients: [
+      "2 cups (454g) unsalted butter (yields ~1.5 cups ghee)",
+      "7-14g decarboxylated cannabis",
+      "Heavy-bottom saucepan or slow cooker",
+      "Cheesecloth"
+    ],
+    steps: [
+      "Decarboxylate cannabis at 240°F for 40 minutes",
+      "Melt butter slowly over low heat until milk solids separate and sink",
+      "Skim foam; carefully pour off clear golden fat (ghee), leaving water and solids",
+      "Return ghee to pan on low heat, add decarbed cannabis",
+      "Maintain 190-220°F and infuse 2-4 hours without burning plant matter",
+      "Strain through cheesecloth while hot; store in glass jar",
+      "Ghee is shelf-stable longer than butter — still label potency and date"
+    ],
+    bestUses: ["High-heat sauté", "Curries", "Popcorn", "South Asian recipes", "Butter replacement when you need higher smoke point"],
+    compatibleCategories: ["savory", "cookies"]
+  },
 
   // OIL RECIPES
   {
     id: "coconut-oil",
     name: "Cannabis Coconut Oil",
     baseType: "oil",
+    baseRole: "cooking",
     temperature: "170-180°F (77-82°C)",
     time: "2-4 hours",
     thcRetention: 90,
@@ -231,6 +283,7 @@ const infusionRecipes: InfusionRecipe[] = [
     id: "olive-oil",
     name: "Cannabis Olive Oil",
     baseType: "oil",
+    baseRole: "cooking",
     temperature: "180-200°F (82-93°C)",
     time: "1.5-3 hours",
     thcRetention: 85,
@@ -256,6 +309,7 @@ const infusionRecipes: InfusionRecipe[] = [
     id: "thc-simple-syrup",
     name: "THC Simple Syrup",
     baseType: "syrup",
+    baseRole: "cooking",
     temperature: "140-160°F (60-71°C)",
     time: "30-60 minutes",
     thcRetention: 70,
@@ -281,6 +335,7 @@ const infusionRecipes: InfusionRecipe[] = [
     id: "agave-syrup",
     name: "Cannabis Agave Syrup",
     baseType: "syrup",
+    baseRole: "cooking",
     temperature: "130-150°F (54-66C)",
     time: "2-3 hours",
     thcRetention: 80,
@@ -306,6 +361,7 @@ const infusionRecipes: InfusionRecipe[] = [
     id: "alcohol-tincture",
     name: "Alcohol Tincture",
     baseType: "liquid",
+    baseRole: "cooking",
     temperature: "Room temperature",
     time: "2-6 weeks (or 3 hours quick method)",
     thcRetention: 95,
@@ -330,6 +386,7 @@ const infusionRecipes: InfusionRecipe[] = [
     id: "mct-oil-tincture",
     name: "MCT Oil Tincture",
     baseType: "liquid",
+    baseRole: "cooking",
     temperature: "160-180°F (71-82°C)",
     time: "2-3 hours",
     thcRetention: 90,
@@ -355,6 +412,7 @@ const infusionRecipes: InfusionRecipe[] = [
     id: "heavy-cream-infusion",
     name: "Cannabis Heavy Cream",
     baseType: "liquid",
+    baseRole: "cooking",
     temperature: "160-175°F (71-79°C)",
     time: "2-3 hours",
     thcRetention: 85,
@@ -381,6 +439,7 @@ const infusionRecipes: InfusionRecipe[] = [
     id: "light-cream-infusion",
     name: "Cannabis Light Cream",
     baseType: "liquid",
+    baseRole: "cooking",
     temperature: "155-170°F (68-77°C)",
     time: "2-3 hours",
     thcRetention: 78,
@@ -405,7 +464,8 @@ const infusionRecipes: InfusionRecipe[] = [
   {
     id: "dark-chocolate-infusion",
     name: "Infused Dark Chocolate",
-    baseType: "chocolate" as any,
+    baseType: "chocolate",
+    baseRole: "both",
     temperature: "115-120°F (46-49°C)",
     time: "45-60 min",
     thcRetention: 88,
@@ -431,7 +491,8 @@ const infusionRecipes: InfusionRecipe[] = [
   {
     id: "milk-chocolate-infusion",
     name: "Infused Milk Chocolate",
-    baseType: "chocolate" as any,
+    baseType: "chocolate",
+    baseRole: "both",
     temperature: "110-115°F (43-46°C)",
     time: "45-60 min",
     thcRetention: 85,
@@ -455,7 +516,8 @@ const infusionRecipes: InfusionRecipe[] = [
   {
     id: "white-chocolate-infusion",
     name: "Infused White Chocolate",
-    baseType: "chocolate" as any,
+    baseType: "chocolate",
+    baseRole: "both",
     temperature: "105-110°F (40-43°C)",
     time: "30-45 min",
     thcRetention: 82,
@@ -475,8 +537,224 @@ const infusionRecipes: InfusionRecipe[] = [
     ],
     bestUses: ["Popcorn drizzle", "Cookies & Cream coating", "Fruit dipping", "Bark"],
     compatibleCategories: ["desserts", "popcorn", "candy"]
+  },
+
+  // READY-TO-EAT / SPREAD CARRIERS (delivery layer — eat, spread, or bake with)
+  {
+    id: "infused-peanut-butter",
+    name: "Infused Peanut Butter",
+    baseType: "spread",
+    baseRole: "both",
+    temperature: "110-130°F (43-54°C)",
+    time: "1-2 hours",
+    thcRetention: 82,
+    terpeneRetention: 55,
+    ingredients: [
+      "2 cups (480g) creamy natural peanut butter (oil on top is OK)",
+      "3-10g decarboxylated cannabis (finely ground)",
+      "Double boiler or very low slow cooker"
+    ],
+    steps: [
+      "Decarboxylate cannabis at 240°F for 40 minutes",
+      "Warm peanut butter gently until stirrable and smooth — do not fry or smoke the oil",
+      "Stir in decarbed cannabis; hold 110-130°F for 1-2 hours, stirring often",
+      "Optional: blend briefly for even texture (don't aerate hot oil)",
+      "Cool slightly and jar; stir before each use — oils can separate",
+      "Label mg per tablespoon and date"
+    ],
+    bestUses: ["Toast & sandwiches", "Smoothies", "Cookies & energy balls", "Straight off a spoon (vet potency first)"],
+    compatibleCategories: ["cookies", "snacks", "breakfast"]
+  },
+  {
+    id: "infused-honey",
+    name: "Infused Honey",
+    baseType: "spread",
+    baseRole: "both",
+    temperature: "95-115°F (35-46°C)",
+    time: "4-8 hours (or overnight)",
+    thcRetention: 72,
+    terpeneRetention: 50,
+    ingredients: [
+      "2 cups (680g) runny honey",
+      "2-8g decarboxylated cannabis OR cannabis coconut oil stirred in",
+      "Jar with tight lid, warm water bath"
+    ],
+    steps: [
+      "Decarboxylate cannabis at 240°F for 40 minutes",
+      "If using flower: add to honey in jar, seal, and warm-water bath at body temp — never boil honey",
+      "Infuse low and slow 4-8 hours, shaking occasionally; strain if using flower",
+      "Alternative: stir warm liquid coconut oil infusion into honey off heat until uniform",
+      "Store at room temp; crystallized honey can be rewarmed gently in a water bath"
+    ],
+    bestUses: ["Tea & yogurt", "Drizzle on fruit", "Peanut butter & honey", "Dressings & glazes"],
+    compatibleCategories: ["drinks", "desserts", "breakfast"]
+  },
+  {
+    id: "infused-cream-cheese",
+    name: "Infused Cream Cheese",
+    baseType: "spread",
+    baseRole: "both",
+    temperature: "100-120°F (38-49°C)",
+    time: "30-90 minutes",
+    thcRetention: 78,
+    terpeneRetention: 50,
+    ingredients: [
+      "16 oz (452g) full-fat cream cheese, cubed",
+      "1-3 tbsp finished cannabis butter or MCT infusion (avoid grainy texture)",
+      "Stand mixer or food processor (optional)"
+    ],
+    steps: [
+      "Soften cream cheese until pliable — do not melt it into oil",
+      "Add measured infused fat and beat until completely smooth",
+      "If using emulsified butter, fold in slowly to avoid breaking texture",
+      "Taste is dairy-forward — potency comes from the infused fat you add",
+      "Refrigerate in airtight container; label mg per typical bagel schmear (~1 tbsp)"
+    ],
+    bestUses: ["Bagels", "Cheesecake filling", "Dips & frostings base", "Stuffed peppers"],
+    compatibleCategories: ["breakfast", "desserts", "savory"]
+  },
+  {
+    id: "infused-chocolate-spread",
+    name: "Infused Chocolate Hazelnut Spread (style)",
+    baseType: "spread",
+    baseRole: "both",
+    temperature: "105-115°F (40-46°C)",
+    time: "20-40 minutes",
+    thcRetention: 85,
+    terpeneRetention: 58,
+    ingredients: [
+      "1 cup chocolate-hazelnut spread or dark chocolate + hazelnut butter blend",
+      "2-4 tbsp cannabis coconut oil (measured, very warm but not smoking)",
+      "Pinch of salt, pinch of espresso powder (optional)"
+    ],
+    steps: [
+      "Have coconut oil infusion ready and liquid but cool enough to handle",
+      "Warm spread slowly until just stirrable; remove from heat",
+      "Whisk in oil in small additions until glossy — stop if it separates",
+      "Jar when slightly warm; refrigerate if your blend is perishable"
+    ],
+    bestUses: ["Toast", "Fruit dip", "Crepes", "Spoon dose (verify per tbsp)"],
+    compatibleCategories: ["breakfast", "desserts", "snacks"]
+  },
+  {
+    id: "infused-buttercream-frosting",
+    name: "Infused Buttercream / Frosting Base",
+    baseType: "spread",
+    baseRole: "both",
+    temperature: "Room temperature mix",
+    time: "15-20 minutes",
+    thcRetention: 85,
+    terpeneRetention: 45,
+    ingredients: [
+      "1 cup (2 sticks) unsalted butter, softened",
+      "3-4 cups powdered sugar, sifted",
+      "1-2 tbsp milk or cream",
+      "Replace part of butter with cannabutter based on your target dose"
+    ],
+    steps: [
+      "Calculate how much cannabutter you need for the batch potency; balance the rest with plain butter",
+      "Beat butters until airy, add sugar gradually, thin with milk to spread",
+      "If frosting gets warm, chill before piping — heat wastes terpenes",
+      "Always label finished cake slices with mg per serving"
+    ],
+    bestUses: ["Cupcakes", "Cake filling", "Cookie sandwiches"],
+    compatibleCategories: ["cookies", "desserts"]
+  },
+  {
+    id: "infused-soft-caramel",
+    name: "Infused Soft Caramel (spreadable)",
+    baseType: "spread",
+    baseRole: "both",
+    temperature: "240-248°F (116-120°C) sugar stage, then finish low",
+    time: "45-60 minutes",
+    thcRetention: 70,
+    terpeneRetention: 35,
+    ingredients: [
+      "1 cup heavy cream",
+      "1 cup sugar + 6 tbsp butter",
+      "Finished cannabis cream or small amount of infused butter whisked in off heat",
+      "Candy thermometer"
+    ],
+    steps: [
+      "Make caramel to a soft-ball stage using a trusted recipe — sugar work is hot",
+      "Off heat, whisk in infused cream or butter in small additions (avoid splatter)",
+      "Pour into silicone mold or jar; refrigerate to set to spreadable texture",
+      "High sugar + heat = less predictable terpenes — dose by weight of finished batch"
+    ],
+    bestUses: ["Apple dip", "Ice cream swirl", "Brownie layer", "Straight (cut small)"],
+    compatibleCategories: ["desserts", "snacks"]
   }
 ];
+
+type InfusionLayer = "none" | "cooking" | "ready-to-eat" | "premade";
+
+type BaseCategory = "none" | "butter" | "oil" | "syrup" | "liquid" | "cream" | "chocolate" | "spreads";
+
+function matchesInfusionLayer(recipe: InfusionRecipe, layer: "cooking" | "ready-to-eat"): boolean {
+  if (layer === "cooking") {
+    if (recipe.baseType === "spread") return false;
+    return recipe.baseRole === "cooking" || recipe.baseRole === "both";
+  }
+  return recipe.baseType === "spread";
+}
+
+function recipeMatchesCategory(recipe: InfusionRecipe, category: BaseCategory): boolean {
+  if (category === "none") return false;
+  if (category === "cream") return recipe.baseType === "liquid" && recipe.id.includes("cream");
+  if (category === "chocolate") return recipe.baseType === "chocolate";
+  if (category === "spreads") return recipe.baseType === "spread";
+  return recipe.baseType === category;
+}
+
+function mapRecipeToInfusionType(recipe: InfusionRecipe): InfusionBaseType {
+  switch (recipe.id) {
+    case "cannabis-ghee":
+      return "ghee";
+    case "olive-oil":
+      return "olive-oil";
+    case "coconut-oil":
+      return "coconut-oil";
+    case "thc-simple-syrup":
+      return "simple-syrup";
+    case "agave-syrup":
+      return "agave-syrup";
+    case "alcohol-tincture":
+      return "tincture";
+    case "mct-oil-tincture":
+      return "mct-oil";
+    case "heavy-cream-infusion":
+    case "light-cream-infusion":
+      return "cream";
+    case "dark-chocolate-infusion":
+    case "milk-chocolate-infusion":
+    case "white-chocolate-infusion":
+      return "chocolate";
+    case "infused-peanut-butter":
+      return "peanut-butter";
+    case "infused-honey":
+      return "honey";
+    case "infused-cream-cheese":
+      return "cream-cheese";
+    case "infused-chocolate-spread":
+      return "chocolate-spread";
+    case "infused-buttercream-frosting":
+      return "frosting";
+    case "infused-soft-caramel":
+      return "caramel";
+    default:
+      if (recipe.baseType === "butter") return "butter";
+      if (recipe.baseType === "oil") return "coconut-oil";
+      if (recipe.baseType === "syrup") return "simple-syrup";
+      if (recipe.baseType === "liquid") return "tincture";
+      if (recipe.baseType === "spread") return "peanut-butter";
+      return "butter";
+  }
+}
+
+function doseContextForRecipe(recipe: InfusionRecipe): InfusionDoseContext {
+  if (recipe.baseType === "spread") return "per-tablespoon";
+  return "per-gram";
+}
 
 export function InfusionBases() {
   const [infusionBases, setInfusionBases] = useState<InfusionBase[]>([]);
@@ -494,7 +772,8 @@ export function InfusionBases() {
   const [customThc, setCustomThc] = useState(20);
   const [customCbd, setCustomCbd] = useState(0);
   
-  const [selectedBaseType, setSelectedBaseType] = useState<"butter" | "oil" | "syrup" | "liquid" | "cream" | "chocolate" | "premade" | "none">("none");
+  const [infusionLayer, setInfusionLayer] = useState<InfusionLayer>("none");
+  const [selectedBaseType, setSelectedBaseType] = useState<BaseCategory>("none");
   const [selectedProduct, setSelectedProduct] = useState<PreMadeProduct | null>(null);
   const [productDoses, setProductDoses] = useState<number>(1);
   const [selectedRecipe, setSelectedRecipe] = useState<InfusionRecipe | null>(null);
@@ -515,6 +794,20 @@ export function InfusionBases() {
     setCustomStrains(parsed);
     setAllStrains([...defaultStrains, ...parsed]);
   }, []);
+
+  useEffect(() => {
+    if (infusionLayer === "ready-to-eat") {
+      setSelectedBaseType("spreads");
+    } else if (infusionLayer === "cooking") {
+      setSelectedBaseType((prev) => (prev === "spreads" ? "none" : prev));
+    } else if (infusionLayer === "none" || infusionLayer === "premade") {
+      setSelectedBaseType("none");
+    }
+  }, [infusionLayer]);
+
+  useEffect(() => {
+    setSelectedRecipe(null);
+  }, [infusionLayer, selectedBaseType]);
 
   // Save to localStorage
   const saveToStorage = (bases: InfusionBase[]) => {
@@ -556,12 +849,20 @@ export function InfusionBases() {
     const totalTHC = (weightInGrams * 1000 * (thcPercentage / 100)) * (retention.thcRetention / 100);
     const thcPerGram = totalTHC / baseAmount;
 
+    const doseCtx = doseContextForRecipe(selectedRecipe);
+    const roleTags =
+      selectedRecipe.baseRole === "both"
+        ? "🔧 Cooking-ready carrier · 🍯 Ready-to-eat / spreadable"
+        : selectedRecipe.baseRole === "ready-to-eat"
+          ? "🍯 Ready-to-eat"
+          : "🔧 Cooking base";
+
     const infusionBase: InfusionBase = {
       id: Date.now().toString(),
       name: isCustomStrain ? `${customStrainName} ${selectedRecipe.name}` : `${selectedStrain} ${selectedRecipe.name}`,
-      type: selectedRecipe.baseType === "butter" ? "butter" : 
-            selectedRecipe.baseType === "oil" ? "coconut-oil" :
-            selectedRecipe.baseType === "syrup" ? "agave-syrup" : "tincture",
+      type: mapRecipeToInfusionType(selectedRecipe),
+      baseRole: selectedRecipe.baseRole,
+      doseContext: doseCtx,
       createdDate: new Date().toISOString(),
       cannabisAmount,
       cannabisUnit: "grams",
@@ -571,7 +872,7 @@ export function InfusionBases() {
       baseUnit: "g",
       totalTHC: parseFloat(totalTHC.toFixed(2)),
       thcPerUnit: parseFloat(thcPerGram.toFixed(2)),
-      notes: `🌡️ ${selectedRecipe.temperature} for ${selectedRecipe.time}\n📊 THC Retention: ${selectedRecipe.thcRetention}% | Terpene Retention: ${selectedRecipe.terpeneRetention}%\n\n${selectedRecipe.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}`,
+      notes: `${roleTags}\n🌡️ ${selectedRecipe.temperature} for ${selectedRecipe.time}\n📊 THC Retention: ${selectedRecipe.thcRetention}% | Terpene Retention: ${selectedRecipe.terpeneRetention}%\n\n${selectedRecipe.steps.map((s, i) => `${i + 1}. ${s}`).join("\n")}`,
     };
 
     const updatedBases = [...infusionBases, infusionBase];
@@ -580,6 +881,7 @@ export function InfusionBases() {
 
     // Reset form
     setSelectedStrain("none");
+    setInfusionLayer("none");
     setSelectedBaseType("none");
     setSelectedRecipe(null);
     setIsCustomStrain(false);
@@ -599,7 +901,9 @@ export function InfusionBases() {
     const infusionBase: InfusionBase = {
       id: Date.now().toString(),
       name: `${selectedProduct.brand} – ${selectedProduct.name}`,
-      type: "tincture", // closest existing type for compatibility
+      type: "tincture",
+      baseRole: "ready-to-eat",
+      doseContext: "per-serving",
       createdDate: new Date().toISOString(),
       cannabisAmount: 0,
       cannabisUnit: "grams",
@@ -609,13 +913,14 @@ export function InfusionBases() {
       baseUnit: selectedProduct.doseUnit,
       totalTHC: parseFloat(totalTHC.toFixed(2)),
       thcPerUnit: selectedProduct.thcPerDose,
-      notes: `📦 ${selectedProduct.brand} | ${selectedProduct.name}\n💧 ${selectedProduct.technology}\n⏱️ Onset: ${selectedProduct.onsetTime}\n💚 ${selectedProduct.thcPerDose}mg THC per ${selectedProduct.doseUnit}\n\n${selectedProduct.dosageNote}`,
+      notes: `🛒 Store-bought · 🍯 Ready-to-eat\n📦 ${selectedProduct.brand} | ${selectedProduct.name}\n💧 ${selectedProduct.technology}\n⏱️ Onset: ${selectedProduct.onsetTime}\n💚 ${selectedProduct.thcPerDose}mg THC per ${selectedProduct.doseUnit}\n\n${selectedProduct.dosageNote}`,
     };
     const updatedBases = [...infusionBases, infusionBase];
     saveToStorage(updatedBases);
     toast.success(`${selectedProduct.name} saved to your infusions!`);
     setSelectedProduct(null);
     setProductDoses(1);
+    setInfusionLayer("none");
     setSelectedBaseType("none");
   };
 
@@ -641,9 +946,15 @@ export function InfusionBases() {
     }
   };
 
-  const filteredRecipes = selectedBaseType !== "none" && selectedBaseType !== "premade"
-    ? infusionRecipes.filter(r => selectedBaseType === "cream" ? r.baseType === "liquid" && r.id.includes("cream") : selectedBaseType === "chocolate" ? (r.baseType as string) === "chocolate" : r.baseType === selectedBaseType)
-    : [];
+  const filteredRecipes =
+    (infusionLayer === "cooking" || infusionLayer === "ready-to-eat") &&
+    selectedBaseType !== "none"
+      ? infusionRecipes.filter(
+          (r) =>
+            matchesInfusionLayer(r, infusionLayer as "cooking" | "ready-to-eat") &&
+            recipeMatchesCategory(r, selectedBaseType)
+        )
+      : [];
 
   // Calculate dynamic THC and Terpene retention based on temperature and time
   const calculateRetention = (temp: number, time: number) => {
@@ -743,9 +1054,29 @@ export function InfusionBases() {
         <div className="flex items-center gap-4 mt-4 text-sm text-green-300">
           <span>✓ Auto dose calculation</span>
           <span>✓ 20+ strain profiles</span>
-          <span>✓ Butter, oil, cream & more</span>
+          <span>✓ Cooking & ready-to-eat carriers</span>
         </div>
       </div>
+
+      <Card className="bg-amber-50/90 border-amber-200 shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-gray-900 flex items-center gap-2 text-lg">
+            <Layers className="w-6 h-6 text-amber-700" />
+            Two base types — one strain flow
+          </CardTitle>
+          <CardDescription className="text-gray-700">
+            <strong className="text-gray-900">Cooking base</strong> = goes into food.{" "}
+            <strong className="text-gray-900">Ready-to-eat base</strong> = goes onto food (or straight from the jar).
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="text-gray-800 space-y-2 text-sm pt-0">
+          <p>
+            Pick your strain (library or custom) once — it carries through whether you&apos;re making butter, oil, peanut butter,
+            or honey. Use <strong>less carrier</strong> or <strong>more cannabis</strong> for stronger batches; reverse for milder — the
+            sliders below model extraction, amounts do the rest.
+          </p>
+        </CardContent>
+      </Card>
 
       {/* Strain Manager Section */}
       <Card className="bg-white border-purple-200">
@@ -771,7 +1102,7 @@ export function InfusionBases() {
                   key={strain.name}
                   className="bg-white border border-purple-200 rounded-lg p-3"
                 >
-                  <h3 className="font-semibold text-white text-sm">{strain.name}</h3>
+                  <h3 className="font-semibold text-gray-900 text-sm">{strain.name}</h3>
                   <Badge className={
                     strain.type === "sativa" ? "bg-green-600 text-xs mt-1" :
                     strain.type === "indica" ? "bg-purple-600 text-xs mt-1" :
@@ -812,11 +1143,88 @@ export function InfusionBases() {
           </p>
         </CardHeader>
         <CardContent className="space-y-8">
-          {/* STEP 1: Choose Strain - hidden for pre-made products */}
-          {selectedBaseType !== "premade" && (
+          {/* STEP 1: Layer */}
           <div>
             <Label className="text-gray-900 text-lg font-semibold mb-3 block">
-              <span className="text-green-700">STEP 1:</span> Choose Your Strain
+              <span className="text-green-700">STEP 1:</span> What kind of base is this?
+            </Label>
+            <p className="text-sm text-gray-600 mb-4">
+              <strong className="text-gray-800">Simple rule:</strong> Cooking = goes <em>into</em> food. Ready-to-eat = goes{" "}
+              <em>onto</em> food (or eat it straight).
+            </p>
+            <div className="grid md:grid-cols-3 gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setInfusionLayer("cooking");
+                  setSelectedProduct(null);
+                }}
+                className={`text-left p-5 rounded-xl border-2 transition-all ${
+                  infusionLayer === "cooking"
+                    ? "border-amber-500 bg-amber-50"
+                    : "border-gray-200 bg-white hover:border-green-400"
+                }`}
+              >
+                <div className="text-3xl mb-2">🔧</div>
+                <div className="text-gray-900 font-bold">Cooking bases</div>
+                <p className="text-sm text-gray-600 mt-1">Butter, ghee, oil, syrups, cream, chocolate for baking.</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setInfusionLayer("ready-to-eat");
+                  setSelectedProduct(null);
+                }}
+                className={`text-left p-5 rounded-xl border-2 transition-all ${
+                  infusionLayer === "ready-to-eat"
+                    ? "border-amber-500 bg-amber-50"
+                    : "border-gray-200 bg-white hover:border-green-400"
+                }`}
+              >
+                <div className="text-3xl mb-2">🍯</div>
+                <div className="text-gray-900 font-bold">Ready-to-eat bases</div>
+                <p className="text-sm text-gray-600 mt-1">Peanut butter, honey, cream cheese, frosting, caramel, spreads.</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setInfusionLayer("premade");
+                  setSelectedRecipe(null);
+                  setSelectedStrain("none");
+                  setIsCustomStrain(false);
+                  setSelectedProduct(null);
+                }}
+                className={`text-left p-5 rounded-xl border-2 transition-all ${
+                  infusionLayer === "premade"
+                    ? "border-pink-400 bg-pink-50"
+                    : "border-gray-200 bg-white hover:border-green-400"
+                }`}
+              >
+                <div className="text-3xl mb-2">🛒</div>
+                <div className="text-gray-900 font-bold">Pre-made product</div>
+                <p className="text-sm text-gray-600 mt-1">Log store-bought squeezes, tinctures, powders.</p>
+              </button>
+            </div>
+            {infusionLayer !== "none" && infusionLayer !== "premade" && (
+              <Button
+                type="button"
+                variant="ghost"
+                className="mt-3 text-gray-600"
+                onClick={() => {
+                  setInfusionLayer("none");
+                  setSelectedRecipe(null);
+                  setSelectedBaseType("none");
+                }}
+              >
+                ← Change layer
+              </Button>
+            )}
+          </div>
+
+          {(infusionLayer === "cooking" || infusionLayer === "ready-to-eat") && (
+          <div>
+            <Label className="text-gray-900 text-lg font-semibold mb-3 block">
+              <span className="text-green-700">STEP 2:</span> Choose Your Strain
             </Label>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
@@ -870,57 +1278,82 @@ export function InfusionBases() {
               )}
             </div>
           </div>
-          )} {/* end hide strain for premade */}
+          )}
 
-          {/* STEP 2: Choose Base Type */}
+          {infusionLayer === "cooking" && (
           <div>
             <Label className="text-gray-900 text-lg font-semibold mb-3 block">
-              <span className="text-green-700">STEP 2:</span> Choose Your Base
+              <span className="text-green-700">STEP 3:</span> Pick your cooking carrier
             </Label>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
               {[
-                { value: "butter", label: "Butter", emoji: "🧈", color: "yellow" },
-                { value: "oil", label: "Oil", emoji: "🫒", color: "green" },
-                { value: "syrup", label: "Syrup", emoji: "🍯", color: "orange" },
-                { value: "liquid", label: "Liquid", emoji: "💧", color: "blue" },
-                { value: "cream", label: "Cream", emoji: "🍦", color: "pink" },
-                { value: "chocolate", label: "Chocolate", emoji: "🍫", color: "purple" },
-                { value: "premade", label: "Pre-Made Product", emoji: "🛒", color: "pink" },
+                { value: "butter" as const, label: "Butter / ghee", emoji: "🧈" },
+                { value: "oil" as const, label: "Oil", emoji: "🫒" },
+                { value: "syrup" as const, label: "Syrup", emoji: "🍯" },
+                { value: "liquid" as const, label: "Tincture / MCT", emoji: "💧" },
+                { value: "cream" as const, label: "Cream", emoji: "🍦" },
+                { value: "chocolate" as const, label: "Chocolate", emoji: "🍫" },
               ].map((base) => (
                 <button
                   key={base.value}
-                  onClick={() => setSelectedBaseType(base.value as any)}
-                  className={`p-6 rounded-xl border-2 transition-all ${
+                  type="button"
+                  onClick={() => setSelectedBaseType(base.value)}
+                  className={`p-5 rounded-xl border-2 transition-all text-left ${
                     selectedBaseType === base.value
-                      ? `border-${base.color}-500 bg-${base.color}-500/20`
-                      : "border-gray-700 bg-white hover:border-green-400"
+                      ? "border-green-500 bg-green-50"
+                      : "border-gray-200 bg-white hover:border-green-400"
                   }`}
                 >
-                  <div className="text-4xl mb-2">{base.emoji}</div>
-                  <div className="text-gray-900 font-semibold">{base.label}</div>
+                  <div className="text-3xl mb-1">{base.emoji}</div>
+                  <div className="text-gray-900 font-semibold text-sm leading-tight">{base.label}</div>
                 </button>
               ))}
             </div>
           </div>
+          )}
 
-          {/* STEP 3: Choose Recipe */}
-          {selectedBaseType !== "none" && selectedBaseType !== "premade" && (
+          {infusionLayer === "ready-to-eat" && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50/50 px-4 py-3">
+              <p className="text-gray-800 text-sm">
+                <strong className="text-gray-900">Spreads & spoon-ready bases</strong> — same strain step as cooking. Dose by{" "}
+                <strong>tablespoon or serving</strong>; you can still bake or blend with these.
+              </p>
+            </div>
+          )}
+
+          {/* STEP 4: Cooking / ready recipes */}
+          {(infusionLayer === "cooking" || infusionLayer === "ready-to-eat") &&
+            selectedBaseType !== "none" &&
+            filteredRecipes.length > 0 && (
             <div>
               <Label className="text-gray-900 text-lg font-semibold mb-3 block">
-                <span className="text-green-700">STEP 3:</span> Choose Recipe & Configure
+                <span className="text-green-700">STEP {infusionLayer === "cooking" ? "4" : "3"}:</span> Choose recipe &amp; configure
               </Label>
               <div className="grid md:grid-cols-2 gap-4">
                 {filteredRecipes.map((recipe) => (
                   <button
                     key={recipe.id}
+                    type="button"
                     onClick={() => setSelectedRecipe(recipe)}
                     className={`text-left p-4 rounded-lg border-2 transition-all ${
                       selectedRecipe?.id === recipe.id
-                        ? "border-green-500 bg-green-500/10"
-                        : "border-gray-700 bg-white hover:border-green-400"
+                        ? "border-green-500 bg-green-50"
+                        : "border-gray-200 bg-white hover:border-green-400"
                     }`}
                   >
-                    <h3 className="text-gray-900 font-semibold mb-2">{recipe.name}</h3>
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <h3 className="text-gray-900 font-semibold">{recipe.name}</h3>
+                      {recipe.baseRole === "both" ? (
+                        <>
+                          <Badge className="bg-slate-700 text-white text-xs">🍯 Ready-to-eat</Badge>
+                          <Badge className="bg-amber-700 text-white text-xs">🔧 Also for recipes</Badge>
+                        </>
+                      ) : recipe.baseRole === "cooking" ? (
+                        <Badge className="bg-slate-600 text-white text-xs">🔧 Cooking base</Badge>
+                      ) : (
+                        <Badge className="bg-amber-700 text-white text-xs">🍯 Ready-to-eat</Badge>
+                      )}
+                    </div>
                     <div className="space-y-1 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <Thermometer className="w-4 h-4 text-orange-400" />
@@ -942,7 +1375,7 @@ export function InfusionBases() {
           )}
 
           {/* PRE-MADE PRODUCT SECTION */}
-          {selectedBaseType === "premade" && (
+          {infusionLayer === "premade" && (
             <div>
               <Label className="text-gray-900 text-lg font-semibold mb-3 block">
                 <span className="text-green-700">STEP 3:</span> Choose Your Product
@@ -1060,6 +1493,22 @@ export function InfusionBases() {
             <div className="bg-white border border-green-200 rounded-xl p-6 space-y-6">
               <div>
                 <h3 className="text-gray-900 text-xl font-semibold mb-4">📖 Recipe Details: {selectedRecipe.name}</h3>
+
+                {selectedRecipe.baseType === "spread" ? (
+                  <p className="text-sm text-gray-700 mb-4 rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2">
+                    <strong className="text-gray-900">Ready-to-eat base:</strong> eat it, spread it, or bake with it. Label your jar in{" "}
+                    <strong>mg per tablespoon</strong> or <strong>per serving</strong> so accidental over-scooping is less likely.
+                  </p>
+                ) : selectedRecipe.baseType === "chocolate" ? (
+                  <p className="text-sm text-gray-700 mb-4 rounded-lg border border-purple-200 bg-purple-50/50 px-3 py-2">
+                    <strong className="text-gray-900">🔁 Both:</strong> finished chocolate you can eat as-is <em>or</em> melt into other recipes — keep pieces cool and dose by weight when you snap the bar.
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-700 mb-4 rounded-lg border border-green-200 bg-green-50/50 px-3 py-2">
+                    <strong className="text-gray-900">Cooking base:</strong> built to go <em>into</em> food — batters, sauces, sauté fat, cream bases. Plan recipes around{" "}
+                    <strong>mg per tablespoon</strong> of finished infusion.
+                  </p>
+                )}
                 
                 {/* Amounts */}
                 <div className="grid md:grid-cols-2 gap-4 mb-6">
@@ -1181,18 +1630,27 @@ export function InfusionBases() {
                 </div>
 
                 {/* THC Calculation */}
-                <div className="bg-green-900/20 border border-green-700/50 rounded-lg p-4 mb-6">
-                  <h4 className="text-green-700 font-semibold mb-2">💚 Calculated THC</h4>
-                  <div className="grid md:grid-cols-2 gap-4 text-white">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                  <h4 className="text-green-800 font-semibold mb-2">💚 Calculated THC</h4>
+                  <p className="text-xs text-gray-600 mb-3">
+                    <strong className="text-gray-800">Dial strength:</strong> more cannabis or less carrier = stronger batch; less cannabis or more carrier = milder. Sliders model heat/time extraction; the gram fields set concentration.
+                  </p>
+                  <div className="grid md:grid-cols-2 gap-4 text-gray-900">
                     <div>
-                      <div className="text-sm text-gray-600">Total THC</div>
-                      <div className="text-2xl font-bold">{totalTHC.toFixed(2)} mg</div>
+                      <div className="text-sm text-gray-600">Total THC (estimated)</div>
+                      <div className="text-2xl font-bold text-green-800">{totalTHC.toFixed(2)} mg</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-600">THC per gram</div>
-                      <div className="text-2xl font-bold">{thcPerGram.toFixed(2)} mg/g</div>
+                      <div className="text-sm text-gray-600">THC per gram of batch</div>
+                      <div className="text-2xl font-bold text-green-800">{thcPerGram.toFixed(2)} mg/g</div>
                     </div>
                   </div>
+                  <p className="text-sm text-gray-700 mt-3">
+                    ≈ <strong className="text-green-800">{(thcPerGram * 14.2).toFixed(1)} mg</strong> THC per US tablespoon (~14 g — density varies; weigh for precision).
+                    {selectedRecipe.baseType === "spread"
+                      ? " Use that when you think in spoonfuls or typical spread servings."
+                      : " Use that when substituting infused fat by the tablespoon in a recipe."}
+                  </p>
                 </div>
 
                 {/* Ingredients */}
@@ -1236,7 +1694,10 @@ export function InfusionBases() {
                         {cat === "cookies" && <Cookie className="w-5 h-5 text-yellow-400" />}
                         {cat === "drinks" && <Wine className="w-5 h-5 text-blue-400" />}
                         {cat === "savory" && <UtensilsCrossed className="w-5 h-5 text-orange-400" />}
-                        <span className="capitalize">{cat}</span>
+                        {cat !== "cookies" && cat !== "drinks" && cat !== "savory" && (
+                          <ChefHat className="w-5 h-5 text-gray-500" />
+                        )}
+                        <span className="capitalize">{cat.replace(/-/g, " ")}</span>
                       </div>
                     ))}
                   </div>
@@ -1275,10 +1736,22 @@ export function InfusionBases() {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="font-semibold text-white">{base.name}</h3>
-                      <Badge className="bg-green-600 text-xs mt-1">
-                        {base.strainName}
-                      </Badge>
+                      <h3 className="font-semibold text-gray-900 leading-tight">{base.name}</h3>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        <Badge className="bg-green-600 text-white text-xs">{base.strainName}</Badge>
+                        {inferInfusionBaseRole(base) === "cooking" && (
+                          <Badge className="bg-slate-600 text-white text-xs">🔧 Cooking</Badge>
+                        )}
+                        {inferInfusionBaseRole(base) === "ready-to-eat" && (
+                          <Badge className="bg-amber-700 text-white text-xs">🍯 Ready-to-eat</Badge>
+                        )}
+                        {inferInfusionBaseRole(base) === "both" && (
+                          <>
+                            <Badge className="bg-amber-700 text-white text-xs">🍯 Ready-to-eat</Badge>
+                            <Badge className="bg-slate-600 text-white text-xs">🔧 + recipes</Badge>
+                          </>
+                        )}
+                      </div>
                     </div>
                     <Button
                       onClick={() => handleDelete(base.id)}
