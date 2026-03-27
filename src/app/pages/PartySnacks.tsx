@@ -83,6 +83,18 @@ export function PartySnacks() {
     });
   };
 
+  const addSnackSlot = () => {
+    if (infusedSlotCount >= ITEMS.length) return;
+    syncSlotArray(infusedSlotCount + 1);
+  };
+
+  const removeSnackSlot = (index: number) => {
+    if (infusedSelections.length <= 1) return;
+    const next = infusedSelections.filter((_, i) => i !== index);
+    setInfusedSelections(next);
+    setInfusedSlotCount(next.length);
+  };
+
   const builderLink = (recipeId: string) => {
     const params = new URLSearchParams({
       category: "snacks",
@@ -173,11 +185,35 @@ export function PartySnacks() {
         </div>
 
         <div className="space-y-3">
-          <p className="text-sm font-bold text-gray-800">Choose each infused snack</p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-bold text-gray-800">Choose each infused snack</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addSnackSlot}
+              disabled={infusedSlotCount >= ITEMS.length}
+              className="font-semibold"
+            >
+              + Add snack
+            </Button>
+          </div>
           <div className="grid gap-3 md:grid-cols-2">
             {infusedSelections.map((val, idx) => (
-              <div key={idx} className="flex flex-col gap-1">
-                <Label className="text-xs text-gray-500">Infused item {idx + 1}</Label>
+              <div key={idx} className="flex flex-col gap-1 rounded-xl border border-gray-200 p-3 bg-gray-50">
+                <div className="flex items-center justify-between gap-2">
+                  <Label className="text-xs text-gray-500">Infused item {idx + 1}</Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeSnackSlot(idx)}
+                    disabled={infusedSelections.length <= 1}
+                    className="h-7 px-2 text-xs text-gray-600 hover:text-gray-900"
+                  >
+                    Remove
+                  </Button>
+                </div>
                 <Select value={val} onValueChange={(v) => setSlot(idx, v)}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select snack…" />
