@@ -249,6 +249,9 @@ const INGREDIENT_LIBRARY = [
   { name: "Lavender (culinary)",    category: "spice",      defaultAmount: 3,   defaultUnit: "g",     calories: 49,  carbs: 8.9,  protein: 3.0,  fat: 0.7,  type: "powder" },
   { name: "Allspice",               category: "spice",      defaultAmount: 2,   defaultUnit: "g",     calories: 263, carbs: 72.1, protein: 6.1,  fat: 8.7,  type: "powder" },
   { name: "Thyme",                  category: "spice",      defaultAmount: 2,   defaultUnit: "g",     calories: 276, carbs: 63.9, protein: 9.1,  fat: 7.4,  type: "powder" },
+  { name: "Oregano (dried)",        category: "spice",      defaultAmount: 3,   defaultUnit: "g",     calories: 265, carbs: 68.9, protein: 9.0,  fat: 4.3,  type: "powder" },
+  { name: "Basil (dried)",          category: "spice",      defaultAmount: 3,   defaultUnit: "g",     calories: 251, carbs: 48.1, protein: 38.0, fat: 4.0,  type: "powder" },
+  { name: "Mustard Powder",         category: "spice",      defaultAmount: 2,   defaultUnit: "g",     calories: 508, carbs: 28.1, protein: 26.0, fat: 36.0, type: "powder" },
   { name: "Rosemary",               category: "spice",      defaultAmount: 2,   defaultUnit: "g",     calories: 331, carbs: 64.1, protein: 4.9,  fat: 15.2, type: "powder" },
   { name: "Xanthan Gum",            category: "spice",      defaultAmount: 3,   defaultUnit: "g",     calories: 333, carbs: 83.3, protein: 0.0,  fat: 0.0,  type: "powder" },
   { name: "Poppy Seeds",            category: "spice",      defaultAmount: 20,  defaultUnit: "g",     calories: 525, carbs: 28.1, protein: 17.9, fat: 41.6, type: "solid" },
@@ -947,6 +950,7 @@ export function CreateRecipes() {
   const partyPackId = searchParams.get("partyPackId");
   const partyItemId = searchParams.get("partyItemId");
   const partyProgressKey = partyPackId ? `party-pack-progress:${partyPackId}` : null;
+  const targetMgPerServingRaw = searchParams.get("targetMgPerServing");
 
   const resolveRecipeIdForCategory = (category: string, recipeId: string) => {
     const directMatch = standardRecipes[category]?.some((r) => r.id === recipeId);
@@ -1085,7 +1089,7 @@ export function CreateRecipes() {
         setInstructions([...recipe.instructions]);
         
         // Build ingredients from template
-        const builtIngredients = recipe.ingredients.map((ingName: string, idx: number) => {
+        let builtIngredients = recipe.ingredients.map((ingName: string, idx: number) => {
           const libraryItem = INGREDIENT_LIBRARY.find(i => i.name === ingName);
           // Use recipe-defined unit if available, otherwise fall back to library default
           const unit = recipe.units?.[idx] || libraryItem?.defaultUnit || "g";
@@ -1124,12 +1128,30 @@ export function CreateRecipes() {
             fat: 0,
           };
         });
+
+        const targetMgVal = targetMgPerServingRaw ? Number(targetMgPerServingRaw) : NaN;
+        const srvForThc = (overrideServings ?? recipe.servings) || 1;
+        if (Number.isFinite(targetMgVal) && targetMgVal > 0 && srvForThc > 0) {
+          const totalThcPre = builtIngredients.reduce(
+            (sum, ing) =>
+              ing.isInfused && ing.thcPerUnit ? sum + ing.amount * ing.thcPerUnit : sum,
+            0
+          );
+          const curPerServing = totalThcPre / srvForThc;
+          if (curPerServing > 0) {
+            const factor = targetMgVal / curPerServing;
+            builtIngredients = builtIngredients.map((ing) =>
+              ing.isInfused && ing.thcPerUnit ? { ...ing, amount: ing.amount * factor } : ing
+            );
+          }
+        }
+
         setIngredients(builtIngredients);
         // Reset measurement system to metric since all library items use metric units by default
         setMeasurementSystem("metric");
       }
     }
-  }, [selectedStandardRecipe, selectedCategory, servingsOverrideParamRaw, wingsQtyParamRaw]);
+  }, [selectedStandardRecipe, selectedCategory, servingsOverrideParamRaw, wingsQtyParamRaw, targetMgPerServingRaw]);
 
   // Calculate total THC
   const totalTHC = ingredients.reduce((sum, ing) => {
@@ -2536,6 +2558,10 @@ export function CreateRecipes() {
           <div className="flex items-center justify-between bg-white px-4 py-3 rounded-2xl shadow-sm border border-gray-200 no-print mb-6">
             <Button
               onClick={() => {
+                if (searchParams.get("from") === "party-snacks") {
+                  navigate("/party-snacks");
+                  return;
+                }
                 // If came from URL params, go back to the source page
                 const cat = searchParams.get("category");
                 const rec = searchParams.get("recipe");
@@ -2567,7 +2593,8 @@ export function CreateRecipes() {
               variant="ghost" className="text-gray-600 hover:text-gray-900 -ml-2"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              {searchParams.get("category") === "wings" ? "← Back to Wings" :
+              {searchParams.get("from") === "party-snacks" ? "← Back to Party Snacks" :
+               searchParams.get("category") === "wings" ? "← Back to Wings" :
                (searchParams.get("category") === "snacks" && (
                  searchParams.get("recipe") === "classic-jello-shots" ||
                  searchParams.get("recipe") === "fruit-juice-jello-cubes" ||

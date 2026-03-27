@@ -1,62 +1,98 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { Label } from "../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
+
+const EMPTY = "__none__";
 
 type SnackItem = {
   id: string;
   name: string;
   emoji: string;
-  dose: string;
-  mgEach: number;
   desc: string;
 };
 
 const ITEMS: SnackItem[] = [
-  { id: "rice-krispie-treat-squares", name: "Rice Krispie Treat Squares", emoji: "🟨", dose: "~5mg per square", mgEach: 5, desc: "Single-serving bars with very easy batch math." },
-  { id: "popcorn-balls", name: "Popcorn Balls", emoji: "🍿", dose: "~4-6mg per ball", mgEach: 5, desc: "Sticky portable snack that holds infusion well." },
-  { id: "chocolate-dipped-pretzels", name: "Chocolate-Dipped Pretzels", emoji: "🥨", dose: "~3-5mg per pretzel", mgEach: 4, desc: "Make infused and non-infused trays side-by-side." },
-  { id: "mini-slider-sauce", name: "Mini Sliders (Infused Sauce)", emoji: "🍔", dose: "~4-8mg per slider", mgEach: 6, desc: "Infuse sauce only for clean mixed-party control." },
-  { id: "mini-brownie-bites", name: "Mini Brownie Bites", emoji: "🍫", dose: "~3-6mg per bite", mgEach: 4.5, desc: "Small pieces for better social-dose pacing." },
-  { id: "classic-jello-shots", name: "Jello Cubes", emoji: "🍬", dose: "~5mg per cube", mgEach: 5, desc: "Gold-standard visual dosing for beginners." },
+  { id: "rice-krispie-treat-squares", name: "Rice Krispie Treat Squares", emoji: "🟨", desc: "Single-serving bars with easy batch math." },
+  { id: "popcorn-balls", name: "Popcorn Balls", emoji: "🍿", desc: "Portable pieces you can label by the ball." },
+  { id: "chocolate-dipped-pretzels", name: "Chocolate-Dipped Pretzels", emoji: "🥨", desc: "Infused and plain trays side-by-side." },
+  { id: "mini-slider-sauce", name: "Mini Sliders (Infused Sauce)", emoji: "🍔", desc: "Infuse the sauce only for mixed parties." },
+  { id: "mini-brownie-bites", name: "Mini Brownie Bites", emoji: "🍫", desc: "Small bites for social pacing." },
+  { id: "classic-jello-shots", name: "Jello Cubes", emoji: "🍬", desc: "One cube = one dose — beginner friendly." },
 ];
 
+function buildInitialSlots(count: number): string[] {
+  const next = ITEMS.slice(0, Math.min(count, ITEMS.length)).map((i) => i.id);
+  while (next.length < count) next.push(EMPTY);
+  return next;
+}
+
 export function PartySnacks() {
-  const [infusedMap, setInfusedMap] = useState<Record<string, boolean>>(
-    Object.fromEntries(ITEMS.map((i) => [i.id, true]))
-  );
-  const [selectedMap, setSelectedMap] = useState<Record<string, boolean>>(
-    Object.fromEntries(ITEMS.map((i) => [i.id, true]))
-  );
-  const [peopleCount, setPeopleCount] = useState(8);
+  const [guestCount, setGuestCount] = useState(8);
+  const [infusedSlotCount, setInfusedSlotCount] = useState(2);
+  const [mgPerPerson, setMgPerPerson] = useState(10);
+  const [infusedSelections, setInfusedSelections] = useState<string[]>(() => buildInitialSlots(2));
 
-  const selectedItems = useMemo(() => ITEMS.filter((i) => selectedMap[i.id]), [selectedMap]);
-  const infusedCount = selectedItems.filter((i) => infusedMap[i.id]).length;
-  const nonInfusedCount = selectedItems.length - infusedCount;
-  const totalInfusedMg = selectedItems
-    .filter((i) => infusedMap[i.id])
-    .reduce((sum, i) => sum + i.mgEach * peopleCount, 0);
-  const mgPerPerson = peopleCount > 0 ? totalInfusedMg / peopleCount : 0;
-  const mixStatus =
-    infusedCount === 2 && nonInfusedCount === 3
-      ? "perfect"
-      : infusedCount > 2
-        ? "too-high"
-        : "adjust";
+  const syncSlotArray = useCallback((newCount: number) => {
+    setInfusedSlotCount(newCount);
+    setInfusedSelections((prev) => {
+      if (newCount === prev.length) return prev;
+      if (newCount < prev.length) return prev.slice(0, newCount);
+      const extra = newCount - prev.length;
+      return [...prev, ...Array.from({ length: extra }, () => EMPTY)];
+    });
+  }, []);
 
-  const applyRecommendedMix = () => {
-    const defaultInfused = new Set(["classic-jello-shots", "rice-krispie-treat-squares"]);
-    const defaultSelected = new Set([
-      "classic-jello-shots",
-      "rice-krispie-treat-squares",
-      "chocolate-dipped-pretzels",
-      "popcorn-balls",
-      "mini-slider-sauce",
-    ]);
-    setSelectedMap(Object.fromEntries(ITEMS.map((i) => [i.id, defaultSelected.has(i.id)])));
-    setInfusedMap(Object.fromEntries(ITEMS.map((i) => [i.id, defaultInfused.has(i.id)])));
+  const filledSelections = useMemo(
+    () => infusedSelections.filter((id) => id && id !== EMPTY),
+    [infusedSelections]
+  );
+
+  const uniqueInfusedIds = useMemo(() => [...new Set(filledSelections)], [filledSelections]);
+
+  const mgEachTarget =
+    uniqueInfusedIds.length > 0 ? mgPerPerson / uniqueInfusedIds.length : 0;
+
+  const hasDuplicatePicks = useMemo(() => {
+    const seen = new Set<string>();
+    for (const id of filledSelections) {
+      if (!id || id === EMPTY) continue;
+      if (seen.has(id)) return true;
+      seen.add(id);
+    }
+    return false;
+  }, [filledSelections]);
+
+  const allSlotsChosen = filledSelections.length === infusedSlotCount && !hasDuplicatePicks;
+
+  const setSlot = (index: number, value: string) => {
+    setInfusedSelections((prev) => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+  };
+
+  const builderLink = (recipeId: string) => {
+    const params = new URLSearchParams({
+      category: "snacks",
+      recipe: recipeId,
+      servings: String(Math.max(1, guestCount)),
+      targetMgPerServing: mgEachTarget > 0 ? mgEachTarget.toFixed(4) : "",
+      from: "party-snacks",
+    });
+    if (!mgEachTarget || mgEachTarget <= 0) params.delete("targetMgPerServing");
+    return `/ingredients?${params.toString()}`;
   };
 
   return (
@@ -65,122 +101,171 @@ export function PartySnacks() {
         <title>Party Snacks | Infusion Sensei</title>
         <meta
           name="description"
-          content="Build dose-controlled handheld party snacks with infused and non-infused toggles for mixed guest groups."
+          content="Plan party snacks by guest count, infused picks, and mg per person. Open tailored recipes in the builder."
         />
       </Helmet>
 
       <div className="bg-gradient-to-br from-purple-800 to-indigo-900 rounded-3xl p-8 text-white shadow-2xl">
         <h1 className="text-4xl font-black mb-2">Party Snacks 🎉</h1>
-        <p className="text-purple-100">Single-serving, dose-controlled handheld items for real-world party hosting.</p>
+        <p className="text-purple-100">
+          Set guests, how many infused types you are serving, pick each one from the list, and your mg/person goal. The recipe
+          builder opens scaled to your guest count and adjusts infused amounts toward your per-piece target.
+        </p>
         <div className="flex flex-wrap gap-2 mt-4">
-          <Badge className="bg-white/20 text-white border-white/30">1 item = 1 dose</Badge>
-          <Badge className="bg-white/20 text-white border-white/30">Infused + non-infused mix</Badge>
-          <Badge className="bg-white/20 text-white border-white/30">Planner-ready format</Badge>
+          <Badge className="bg-white/20 text-white border-white/30">Handheld portions</Badge>
+          <Badge className="bg-white/20 text-white border-white/30">mg/person targeting</Badge>
+          <Badge className="bg-white/20 text-white border-white/30">Builder-ready</Badge>
         </div>
       </div>
 
-      <section className="bg-white border border-gray-200 rounded-2xl p-5">
-        <h2 className="text-2xl font-black text-gray-900 mb-3">Build Your Party Mix</h2>
-        <div className="grid md:grid-cols-4 gap-3">
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
-            <p className="text-xs text-gray-500">Guests</p>
+      <section className="bg-white border border-gray-200 rounded-2xl p-6 space-y-6">
+        <h2 className="text-2xl font-black text-gray-900">Party plan</h2>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="space-y-1">
+            <Label htmlFor="guests" className="text-xs text-gray-500">
+              Guests
+            </Label>
             <input
+              id="guests"
               type="number"
               min={1}
-              value={peopleCount}
-              onChange={(e) => setPeopleCount(Math.max(1, Number(e.target.value) || 1))}
-              className="mt-1 w-full border border-gray-300 rounded-md px-2 py-1.5 text-sm"
+              value={guestCount}
+              onChange={(e) => setGuestCount(Math.max(1, Number(e.target.value) || 1))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
             />
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-xl p-3">
-            <p className="text-xs text-gray-500">Infused items</p>
-            <p className="text-2xl font-black text-green-700">{infusedCount}</p>
+          <div className="space-y-1">
+            <Label htmlFor="infused-count" className="text-xs text-gray-500">
+              Number of infused items
+            </Label>
+            <input
+              id="infused-count"
+              type="number"
+              min={1}
+              max={ITEMS.length}
+              value={infusedSlotCount}
+              onChange={(e) => {
+                const n = Math.min(ITEMS.length, Math.max(1, Number(e.target.value) || 1));
+                syncSlotArray(n);
+              }}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            />
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
-            <p className="text-xs text-gray-500">Non-infused items</p>
-            <p className="text-2xl font-black text-blue-700">{nonInfusedCount}</p>
-          </div>
-          <div className="bg-purple-50 border border-purple-200 rounded-xl p-3">
-            <p className="text-xs text-gray-500">Estimated mg/person</p>
-            <p className="text-2xl font-black text-purple-700">{mgPerPerson.toFixed(1)}mg</p>
+          <div className="space-y-1 sm:col-span-2 lg:col-span-2">
+            <Label htmlFor="mg-person" className="text-xs text-gray-500">
+              Target THC mg per person (from infused snacks)
+            </Label>
+            <input
+              id="mg-person"
+              type="number"
+              min={0}
+              step={0.5}
+              value={mgPerPerson}
+              onChange={(e) => setMgPerPerson(Math.max(0, Number(e.target.value) || 0))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            />
+            <p className="text-xs text-gray-500">
+              We split this evenly across each infused type you select (one portion per guest per type). Example: 10 mg/person
+              with 2 infused snacks → builder targets ~5 mg per piece for each recipe.
+            </p>
           </div>
         </div>
-        <div className="mt-3 flex flex-wrap gap-2 items-center">
-          <Button variant="outline" onClick={applyRecommendedMix} className="font-bold">
-            Apply recommended 2 infused + 3 non-infused
-          </Button>
-          {mixStatus === "perfect" ? (
-            <Badge className="bg-green-100 text-green-700 border-green-200">Perfect mix: 2 infused + 3 non-infused</Badge>
-          ) : mixStatus === "too-high" ? (
-            <Badge className="bg-red-100 text-red-700 border-red-200">Too many infused items selected - lower to 2</Badge>
+
+        <div className="space-y-3">
+          <p className="text-sm font-bold text-gray-800">Choose each infused snack</p>
+          <div className="grid gap-3 md:grid-cols-2">
+            {infusedSelections.map((val, idx) => (
+              <div key={idx} className="flex flex-col gap-1">
+                <Label className="text-xs text-gray-500">Infused item {idx + 1}</Label>
+                <Select value={val} onValueChange={(v) => setSlot(idx, v)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select snack…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY}>— Select —</SelectItem>
+                    {ITEMS.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.emoji} {item.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div
+          className={`rounded-xl border p-4 ${hasDuplicatePicks ? "bg-red-50 border-red-200" : "bg-violet-50 border-violet-200"}`}
+        >
+          {hasDuplicatePicks ? (
+            <p className="text-sm font-semibold text-red-800">Each infused slot must be a different snack.</p>
           ) : (
-            <Badge className="bg-amber-100 text-amber-800 border-amber-200">Target mix is 2 infused + 3 non-infused</Badge>
+            <>
+              <p className="text-sm text-gray-700">
+                <span className="font-black text-violet-900">{uniqueInfusedIds.length}</span> infused type
+                {uniqueInfusedIds.length !== 1 ? "s" : ""} ·{" "}
+                <span className="font-black text-violet-900">{mgEachTarget.toFixed(2)} mg</span> per piece per infused type
+                (guest goal {mgPerPerson} mg ÷ {Math.max(1, uniqueInfusedIds.length)}).
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                Recipes open with <span className="font-semibold">{guestCount}</span> servings. Infused ingredient amounts are
+                scaled in the builder to approach the per-serving target (based on your saved infusion THC/units).
+              </p>
+            </>
           )}
         </div>
       </section>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        {ITEMS.map((item) => {
-          const infused = infusedMap[item.id];
-          const selected = selectedMap[item.id];
-          return (
-            <div key={item.id} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-              <div className="flex items-center justify-between gap-3">
-                <p className="font-black text-lg text-gray-900">{item.emoji} {item.name}</p>
-                <Badge className={selected ? "bg-indigo-100 text-indigo-700 border-indigo-200" : "bg-gray-100 text-gray-700 border-gray-200"}>
-                  {selected ? "In mix" : "Not in mix"}
-                </Badge>
+      <section className="space-y-3">
+        <h3 className="text-lg font-black text-gray-900">Snack reference</h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          {ITEMS.map((item) => {
+            const picked = uniqueInfusedIds.includes(item.id);
+            return (
+              <div key={item.id} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-black text-gray-900">
+                    {item.emoji} {item.name}
+                  </p>
+                  {picked ? (
+                    <Badge className="bg-green-100 text-green-800 border-green-200">In your infused list</Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-gray-600">
+                      Not selected
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-sm text-gray-600 mt-1">{item.desc}</p>
+                <div className="mt-3">
+                  {picked && allSlotsChosen ? (
+                    <Link to={builderLink(item.id)}>
+                      <Button className="bg-green-600 hover:bg-green-700 text-white font-bold w-full sm:w-auto">
+                        <ChefHat className="w-4 h-4 mr-1.5" />
+                        Build {item.name}
+                      </Button>
+                    </Link>
+                  ) : (
+                    <p className="text-xs text-gray-500">
+                      Add this snack to your infused dropdowns (no duplicates) to enable the build button.
+                    </p>
+                  )}
+                </div>
               </div>
-              <p className="text-sm text-gray-600 mt-1">{item.desc}</p>
-              <p className="text-sm font-semibold text-gray-800 mt-2">{item.dose}</p>
-
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Button
-                  variant={selected ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedMap((prev) => ({ ...prev, [item.id]: !prev[item.id] }))}
-                >
-                  {selected ? "Included" : "Add to mix"}
-                </Button>
-                <Button
-                  variant={infused ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setInfusedMap((prev) => ({ ...prev, [item.id]: true }))}
-                >
-                  Infused version
-                </Button>
-                <Button
-                  variant={!infused ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setInfusedMap((prev) => ({ ...prev, [item.id]: false }))}
-                >
-                  Non-infused version
-                </Button>
-              </div>
-
-              <div className="mt-3">
-                {infused && selected ? (
-                  <Link to={`/ingredients?category=snacks&recipe=${encodeURIComponent(item.id)}`}>
-                    <Button className="bg-green-600 hover:bg-green-700 text-white font-bold">
-                      <ChefHat className="w-4 h-4 mr-1.5" /> Build Infused Recipe
-                    </Button>
-                  </Link>
-                ) : (
-                  <p className="text-xs text-gray-600">Non-infused or not in mix. Keep this as a regular snack item.</p>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      </section>
 
       <div className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-gray-700 font-semibold">Want precision handheld dosing like jello? Add gummies to your mix.</p>
+        <p className="text-gray-700 font-semibold">Want more precision handhelds? Open gummies.</p>
         <Link to="/gummies">
-          <Button variant="outline" className="font-bold">Open Gummies <ArrowRight className="w-4 h-4 ml-1.5" /></Button>
+          <Button variant="outline" className="font-bold">
+            Gummies <ArrowRight className="w-4 h-4 ml-1.5" />
+          </Button>
         </Link>
       </div>
     </div>
   );
 }
-
