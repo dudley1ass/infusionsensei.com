@@ -3,7 +3,7 @@ import { Badge } from "./ui/badge";
 import { useEffect, useMemo, useState } from "react";
 import {
   ChefHat, Calculator, Lightbulb, Beaker, Sparkles, Leaf, ArrowRight,
-  AlertCircle, Zap, Clock, Thermometer, Settings, Wind, Layers, Package, FlaskConical, Sandwich,
+  AlertCircle, Zap, Clock, Thermometer, Settings, Wind, Layers, Package, FlaskConical, Sandwich, Milk,
 } from "lucide-react";
 import { Link } from "react-router";
 import { loadPublishedArticlesFromDb, PublishedArticle } from "../services/contentService";
@@ -31,6 +31,7 @@ const CATEGORIES = [
     color: "blue",
     articles: [
       { title: "How to Make Infused Peanut Butter (Without Guessing Dose)", description: "Decarb, infuse oil, blend into PB, and calculate mg per tablespoon — the math most recipes skip.", badge: "Ready-to-eat base", badgeColor: "bg-amber-600", icon: Sandwich, iconColor: "text-amber-700", borderColor: "border-amber-200", hoverBorder: "hover:border-amber-400", path: "/learn/articles/infused-peanut-butter" },
+      { title: "How to Make Infused Cream Cheese (Spreads & Frosting)", description: "Blend infused fat into cream cheese, nail mg per ounce, and use it in cheesecakes, dips, and frosting without guessing.", badge: "Ready-to-eat base", badgeColor: "bg-sky-600", icon: Milk, iconColor: "text-sky-700", borderColor: "border-sky-200", hoverBorder: "hover:border-sky-400", path: "/learn/articles/infused-cream-cheese" },
       { title: "5 Easy THC Recipes You Can Make Right Now", description: "Simple recipes that don't require special equipment—just the right base ingredient.", badge: "Quick Start", badgeColor: "bg-blue-600", icon: Lightbulb, iconColor: "text-blue-600", borderColor: "border-blue-200", hoverBorder: "hover:border-blue-400", path: "/learn/articles/easy-recipes" },
       { title: "How to Turn ANY Recipe Into a THC Recipe", description: "A 4-step system to convert any regular recipe into a THC-infused version.", badge: "Advanced", badgeColor: "bg-pink-600", icon: Sparkles, iconColor: "text-pink-600", borderColor: "border-pink-200", hoverBorder: "hover:border-pink-400", path: "/learn/articles/convert-recipes" },
       { title: "How to Calculate THC Per Serving (Simple Method)", description: "The exact formula — with a live calculator — to get precise mg per serving every time.", badge: "Calculator", badgeColor: "bg-green-600", icon: Calculator, iconColor: "text-green-600", borderColor: "border-green-200", hoverBorder: "hover:border-green-400", path: "/learn/articles/thc-per-serving-calculator" },

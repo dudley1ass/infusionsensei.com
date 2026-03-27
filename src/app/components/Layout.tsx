@@ -35,21 +35,29 @@ export function Layout() {
     return location.pathname.startsWith(path);
   };
 
-  const NavLinks = ({ mobile = false }: { mobile?: boolean }) => (
+  const NavLinks = ({ mobile = false, compact = false }: { mobile?: boolean; compact?: boolean }) => (
     <>
       {navItems.map((item) => (
         <Link
           key={item.path}
           to={item.path}
-          className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors font-medium ${
+          className={`flex items-center rounded-lg transition-colors font-medium ${
+            compact && !mobile
+              ? "gap-1.5 px-2.5 py-1.5 text-sm"
+              : "gap-2 px-4 py-3"
+          } ${
             isActive(item.path)
-              ? "bg-green-600 text-white shadow-md"
+              ? "bg-green-600 text-white shadow-sm"
               : mobile
               ? "text-gray-900 bg-gray-50 hover:bg-green-100 hover:text-green-800 border border-gray-200"
               : "text-gray-800 hover:bg-green-100 hover:text-green-700"
           } ${mobile ? "w-full text-base" : ""}`}
         >
-          <item.icon className={`w-5 h-5 ${isActive(item.path) ? "text-white" : mobile ? "text-green-700" : "text-green-600"}`} />
+          <item.icon
+            className={`${mobile ? "w-5 h-5" : compact ? "w-4 h-4" : "w-5 h-5"} ${
+              isActive(item.path) ? "text-white" : mobile ? "text-green-700" : "text-green-600"
+            }`}
+          />
           <span>{item.label}</span>
         </Link>
       ))}
@@ -58,40 +66,40 @@ export function Layout() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50">
-      {/* Header */}
+      {/* Header — single compact row (~half the previous stacked layout) */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-green-200 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          {/* Logo - Centered */}
-          <Link to="/" className="flex flex-col items-center gap-1 mb-4">
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-green-100 to-green-50 p-4 rounded-full shadow-lg">
-                <Leaf className="w-8 h-8 text-green-700" />
+        <div className="container mx-auto px-3 sm:px-4 py-2">
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
+            <Link to="/" className="flex items-center gap-2 min-w-0 shrink-0 max-w-[45%] sm:max-w-none">
+              <div className="bg-gradient-to-br from-green-100 to-green-50 p-2 rounded-full shadow shrink-0">
+                <Leaf className="w-5 h-5 text-green-700" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-green-800">Infusion Sensei</h1>
+              <div className="min-w-0 leading-tight">
+                <h1 className="text-lg sm:text-xl font-bold text-green-800 truncate">Infusion Sensei</h1>
+                <p className="text-[10px] sm:text-xs text-green-700 font-semibold truncate hidden sm:block">
+                  Cannabis Culinary Creations
+                </p>
+              </div>
+            </Link>
+
+            <div className="flex items-center gap-1 min-w-0 flex-1 justify-end">
+              <nav className="hidden md:flex items-center gap-0.5 lg:gap-1 justify-end overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                <NavLinks compact />
+              </nav>
+
+              <Sheet>
+                <SheetTrigger asChild className="md:hidden">
+                  <Button variant="ghost" size="icon" className="text-green-700 h-9 w-9">
+                    <Menu className="w-5 h-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="bg-white border-green-200">
+                  <nav className="flex flex-col gap-2 mt-8">
+                    <NavLinks mobile />
+                  </nav>
+                </SheetContent>
+              </Sheet>
             </div>
-            <p className="text-sm md:text-base text-green-700 font-semibold">Cannabis Culinary Creations</p>
-          </Link>
-
-          {/* Navigation - Centered Below */}
-          <div className="flex items-center justify-center">
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-2">
-              <NavLinks />
-            </nav>
-
-            {/* Mobile Menu */}
-            <Sheet>
-              <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon" className="text-green-700">
-                  <Menu className="w-6 h-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="bg-white border-green-200">
-                <nav className="flex flex-col gap-2 mt-8">
-                  <NavLinks mobile />
-                </nav>
-              </SheetContent>
-            </Sheet>
           </div>
         </div>
       </header>

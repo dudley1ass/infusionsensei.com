@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -24,6 +24,7 @@ import {
   Trash2,
   Save,
   Layers,
+  Calculator,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -44,6 +45,8 @@ interface InfusionRecipe {
   name: string;
   baseType: InfusionRecipeBaseType;
   baseRole: InfusionBaseRole;
+  /** mix-in = stir in finished THC (oil, cannabutter, squeeze); heat-infusion = decarb + infuse into this carrier */
+  preparationMode?: "heat-infusion" | "mix-in";
   temperature: string;
   time: string;
   thcRetention: number;
@@ -545,6 +548,7 @@ const infusionRecipes: InfusionRecipe[] = [
     name: "Infused Peanut Butter",
     baseType: "spread",
     baseRole: "both",
+    preparationMode: "heat-infusion",
     temperature: "110-130°F (43-54°C)",
     time: "1-2 hours",
     thcRetention: 82,
@@ -570,6 +574,7 @@ const infusionRecipes: InfusionRecipe[] = [
     name: "Infused Honey",
     baseType: "spread",
     baseRole: "both",
+    preparationMode: "mix-in",
     temperature: "95-115°F (35-46°C)",
     time: "4-8 hours (or overnight)",
     thcRetention: 72,
@@ -594,6 +599,7 @@ const infusionRecipes: InfusionRecipe[] = [
     name: "Infused Cream Cheese",
     baseType: "spread",
     baseRole: "both",
+    preparationMode: "mix-in",
     temperature: "100-120°F (38-49°C)",
     time: "30-90 minutes",
     thcRetention: 78,
@@ -618,6 +624,7 @@ const infusionRecipes: InfusionRecipe[] = [
     name: "Infused Chocolate Hazelnut Spread (style)",
     baseType: "spread",
     baseRole: "both",
+    preparationMode: "mix-in",
     temperature: "105-115°F (40-46°C)",
     time: "20-40 minutes",
     thcRetention: 85,
@@ -641,6 +648,7 @@ const infusionRecipes: InfusionRecipe[] = [
     name: "Infused Buttercream / Frosting Base",
     baseType: "spread",
     baseRole: "both",
+    preparationMode: "mix-in",
     temperature: "Room temperature mix",
     time: "15-20 minutes",
     thcRetention: 85,
@@ -665,6 +673,7 @@ const infusionRecipes: InfusionRecipe[] = [
     name: "Infused Soft Caramel (spreadable)",
     baseType: "spread",
     baseRole: "both",
+    preparationMode: "mix-in",
     temperature: "240-248°F (116-120°C) sugar stage, then finish low",
     time: "45-60 minutes",
     thcRetention: 70,
@@ -756,6 +765,134 @@ function doseContextForRecipe(recipe: InfusionRecipe): InfusionDoseContext {
   return "per-gram";
 }
 
+function isHeatInfusionRecipe(recipe: InfusionRecipe | null): boolean {
+  if (!recipe) return true;
+  return (recipe.preparationMode ?? "heat-infusion") === "heat-infusion";
+}
+
+function infusedAmountToApproxGrams(amount: number, baseUnit: string): number {
+  const u = baseUnit.toLowerCase().trim();
+  if (u === "g" || u === "grams") return amount;
+  if (u === "ml") return amount * 0.95;
+  if (u === "oz") return amount * 28.3495;
+  if (u === "tbsp") return amount * 14.2;
+  if (u === "cup" || u === "cups") return amount * 227;
+  return 0;
+}
+
+type MixInSourceSelection = "" | `saved:${string}` | `premade:${string}` | "custom";
+
+type MixInComputeResult = {
+  totalTHC: number;
+  totalBatchGrams: number;
+  thcPerGram: number;
+  thcPerServing: number;
+  infusionUnitLabel: string;
+  strainName: string;
+  sourceDescription: string;
+  thcPercentForSave: number;
+  cannabisAmountSave: number;
+  cannabisUnitSave: "grams" | "ounces";
+  error?: string;
+};
+
+function computeMixInResult(
+  source: MixInSourceSelection,
+  infusedAmount: number,
+  plainBaseGrams: number,
+  servings: number,
+  customMgPerUnit: number,
+  bases: InfusionBase[],
+  products: PreMadeProduct[]
+): MixInComputeResult {
+  const bad = (msg: string): MixInComputeResult => ({
+    totalTHC: 0,
+    totalBatchGrams: 0,
+    thcPerGram: 0,
+    thcPerServing: 0,
+    infusionUnitLabel: "",
+    strainName: "",
+    sourceDescription: "",
+    thcPercentForSave: 0,
+    cannabisAmountSave: 0,
+    cannabisUnitSave: "grams",
+    error: msg,
+  });
+
+  if (!source) return bad("Choose a THC source from your saved infusions or the store-bought list.");
+  if (infusedAmount <= 0) return bad("Enter how much infused product you are mixing in.");
+  if (plainBaseGrams <= 0) return bad("Enter plain base weight in grams (unmedicated cream cheese, honey, etc.).");
+  if (servings <= 0) return bad("Enter number of servings in the finished batch.");
+
+  if (source === "custom") {
+    if (customMgPerUnit <= 0) return bad("Enter mg of THC per 1 unit for your custom source (e.g. mg per ml or per gram).");
+    const totalTHC = infusedAmount * customMgPerUnit;
+    const totalBatchGrams = plainBaseGrams;
+    if (totalBatchGrams <= 0) return bad("Batch weight must be greater than zero.");
+    const thcPerGram = totalTHC / totalBatchGrams;
+    const thcPerServing = totalTHC / servings;
+    return {
+      totalTHC,
+      totalBatchGrams,
+      thcPerGram,
+      thcPerServing,
+      infusionUnitLabel: "unit",
+      strainName: "Custom potency",
+      sourceDescription: `Custom: ${customMgPerUnit} mg per unit × ${infusedAmount} units`,
+      thcPercentForSave: 0,
+      cannabisAmountSave: 0,
+      cannabisUnitSave: "grams",
+    };
+  }
+
+  if (source.startsWith("premade:")) {
+    const id = source.slice(8);
+    const p = products.find((x) => x.id === id);
+    if (!p) return bad("Store product not found.");
+    const totalTHC = infusedAmount * p.thcPerDose;
+    const totalBatchGrams = plainBaseGrams;
+    const thcPerGram = totalTHC / totalBatchGrams;
+    const thcPerServing = totalTHC / servings;
+    return {
+      totalTHC,
+      totalBatchGrams,
+      thcPerGram,
+      thcPerServing,
+      infusionUnitLabel: p.doseUnit,
+      strainName: p.name,
+      sourceDescription: `${p.brand} – ${p.name} (${p.thcPerDose} mg / ${p.doseUnit})`,
+      thcPercentForSave: 0,
+      cannabisAmountSave: 0,
+      cannabisUnitSave: "grams",
+    };
+  }
+
+  if (source.startsWith("saved:")) {
+    const id = source.slice(6);
+    const b = bases.find((x) => x.id === id);
+    if (!b) return bad("That saved infusion is missing — pick another or build it in Infusions first.");
+    const totalTHC = infusedAmount * b.thcPerUnit;
+    const infusedG = infusedAmountToApproxGrams(infusedAmount, b.baseUnit);
+    const totalBatchGrams = plainBaseGrams + infusedG;
+    const thcPerGram = totalTHC / totalBatchGrams;
+    const thcPerServing = totalTHC / servings;
+    return {
+      totalTHC,
+      totalBatchGrams,
+      thcPerGram,
+      thcPerServing,
+      infusionUnitLabel: b.baseUnit,
+      strainName: b.strainName,
+      sourceDescription: `${b.name} (${b.thcPerUnit} mg / ${b.baseUnit})`,
+      thcPercentForSave: b.thcPercentage,
+      cannabisAmountSave: b.cannabisAmount,
+      cannabisUnitSave: b.cannabisUnit,
+    };
+  }
+
+  return bad("Invalid THC source.");
+}
+
 export function InfusionBases() {
   const [infusionBases, setInfusionBases] = useState<InfusionBase[]>([]);
   
@@ -784,6 +921,13 @@ export function InfusionBases() {
   const [customTemp, setCustomTemp] = useState(160);
   const [customTime, setCustomTime] = useState(2);
 
+  // Mix-in (ready-to-eat, no decarb in carrier)
+  const [mixInSource, setMixInSource] = useState<MixInSourceSelection>("");
+  const [mixInInfusedAmount, setMixInInfusedAmount] = useState(28);
+  const [mixInPlainBaseGrams, setMixInPlainBaseGrams] = useState(452);
+  const [mixInServings, setMixInServings] = useState(16);
+  const [mixInCustomMgPerUnit, setMixInCustomMgPerUnit] = useState(10);
+
   // Load from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("infusionBases");
@@ -809,6 +953,16 @@ export function InfusionBases() {
     setSelectedRecipe(null);
   }, [infusionLayer, selectedBaseType]);
 
+  useEffect(() => {
+    if (selectedRecipe?.preparationMode === "mix-in") {
+      setMixInSource("");
+      setMixInInfusedAmount(28);
+      setMixInPlainBaseGrams(452);
+      setMixInServings(16);
+      setMixInCustomMgPerUnit(10);
+    }
+  }, [selectedRecipe?.id]);
+
   // Save to localStorage
   const saveToStorage = (bases: InfusionBase[]) => {
     localStorage.setItem("infusionBases", JSON.stringify(bases));
@@ -830,24 +984,23 @@ export function InfusionBases() {
   };
 
   const handleSaveInfusion = () => {
-    if (selectedStrain === "none") {
-      toast.error("Please select a strain");
-      return;
-    }
     if (!selectedRecipe) {
       toast.error("Please select an infusion recipe");
       return;
     }
-    if (isCustomStrain && !customStrainName.trim()) {
-      toast.error("Please enter a custom strain name");
-      return;
-    }
 
-    // Calculate THC
-    const thcPercentage = customThc;
-    const weightInGrams = cannabisAmount;
-    const totalTHC = (weightInGrams * 1000 * (thcPercentage / 100)) * (retention.thcRetention / 100);
-    const thcPerGram = totalTHC / baseAmount;
+    const isMixIn = selectedRecipe.preparationMode === "mix-in";
+
+    if (!isMixIn) {
+      if (selectedStrain === "none") {
+        toast.error("Please select a strain");
+        return;
+      }
+      if (isCustomStrain && !customStrainName.trim()) {
+        toast.error("Please enter a custom strain name");
+        return;
+      }
+    }
 
     const doseCtx = doseContextForRecipe(selectedRecipe);
     const roleTags =
@@ -857,23 +1010,63 @@ export function InfusionBases() {
           ? "🍯 Ready-to-eat"
           : "🔧 Cooking base";
 
-    const infusionBase: InfusionBase = {
-      id: Date.now().toString(),
-      name: isCustomStrain ? `${customStrainName} ${selectedRecipe.name}` : `${selectedStrain} ${selectedRecipe.name}`,
-      type: mapRecipeToInfusionType(selectedRecipe),
-      baseRole: selectedRecipe.baseRole,
-      doseContext: doseCtx,
-      createdDate: new Date().toISOString(),
-      cannabisAmount,
-      cannabisUnit: "grams",
-      strainName: isCustomStrain ? customStrainName : selectedStrain,
-      thcPercentage,
-      baseAmount,
-      baseUnit: "g",
-      totalTHC: parseFloat(totalTHC.toFixed(2)),
-      thcPerUnit: parseFloat(thcPerGram.toFixed(2)),
-      notes: `${roleTags}\n🌡️ ${selectedRecipe.temperature} for ${selectedRecipe.time}\n📊 THC Retention: ${selectedRecipe.thcRetention}% | Terpene Retention: ${selectedRecipe.terpeneRetention}%\n\n${selectedRecipe.steps.map((s, i) => `${i + 1}. ${s}`).join("\n")}`,
-    };
+    let infusionBase: InfusionBase;
+
+    if (isMixIn) {
+      const mix = computeMixInResult(
+        mixInSource,
+        mixInInfusedAmount,
+        mixInPlainBaseGrams,
+        mixInServings,
+        mixInCustomMgPerUnit,
+        infusionBases,
+        preMadeProducts
+      );
+      if (mix.error) {
+        toast.error(mix.error);
+        return;
+      }
+      infusionBase = {
+        id: Date.now().toString(),
+        name: `${mix.strainName} · ${selectedRecipe.name}`,
+        type: mapRecipeToInfusionType(selectedRecipe),
+        baseRole: selectedRecipe.baseRole,
+        doseContext: doseCtx,
+        createdDate: new Date().toISOString(),
+        cannabisAmount: mix.cannabisAmountSave,
+        cannabisUnit: mix.cannabisUnitSave,
+        strainName: mix.strainName,
+        thcPercentage: mix.thcPercentForSave,
+        baseAmount: parseFloat(mix.totalBatchGrams.toFixed(1)),
+        baseUnit: "g",
+        totalTHC: parseFloat(mix.totalTHC.toFixed(2)),
+        thcPerUnit: parseFloat(mix.thcPerGram.toFixed(3)),
+        notes: `${roleTags}\n🍯 Mix-in — no decarb in this carrier step\n${mix.sourceDescription}\nMixed in: ${mixInInfusedAmount} ${mix.infusionUnitLabel}\nPlain base: ${mixInPlainBaseGrams} g\nEstimated batch: ${mix.totalBatchGrams.toFixed(0)} g · ${mixInServings} servings → ${mix.thcPerServing.toFixed(2)} mg THC each\n\n${selectedRecipe.steps.map((s, i) => `${i + 1}. ${s}`).join("\n")}`,
+      };
+    } else {
+      const thcPercentage = customThc;
+      const weightInGrams = cannabisAmount;
+      const totalTHC = (weightInGrams * 1000 * (thcPercentage / 100)) * (retention.thcRetention / 100);
+      const thcPerGram = totalTHC / baseAmount;
+
+      infusionBase = {
+        id: Date.now().toString(),
+        name: isCustomStrain ? `${customStrainName} ${selectedRecipe.name}` : `${selectedStrain} ${selectedRecipe.name}`,
+        type: mapRecipeToInfusionType(selectedRecipe),
+        baseRole: selectedRecipe.baseRole,
+        doseContext: doseCtx,
+        createdDate: new Date().toISOString(),
+        cannabisAmount,
+        cannabisUnit: "grams",
+        strainName: isCustomStrain ? customStrainName : selectedStrain,
+        thcPercentage,
+        baseAmount,
+        baseUnit: "g",
+        totalTHC: parseFloat(totalTHC.toFixed(2)),
+        thcPerUnit: parseFloat(thcPerGram.toFixed(2)),
+        notes: `${roleTags}\n🌡️ ${selectedRecipe.temperature} for ${selectedRecipe.time}\n📊 THC Retention: ${selectedRecipe.thcRetention}% | Terpene Retention: ${selectedRecipe.terpeneRetention}%\n\n${selectedRecipe.steps.map((s, i) => `${i + 1}. ${s}`).join("\n")}`,
+      };
+    }
 
     const updatedBases = [...infusionBases, infusionBase];
     saveToStorage(updatedBases);
@@ -890,6 +1083,11 @@ export function InfusionBases() {
     setCustomCbd(0);
     setCannabisAmount(7);
     setBaseAmount(227);
+    setMixInSource("");
+    setMixInInfusedAmount(28);
+    setMixInPlainBaseGrams(452);
+    setMixInServings(16);
+    setMixInCustomMgPerUnit(10);
   };
 
   const handleSaveProduct = () => {
@@ -1034,7 +1232,7 @@ export function InfusionBases() {
   const retention = calculateRetention(customTemp, customTime);
 
   const calculateTHC = () => {
-    if (!selectedRecipe) return { totalTHC: 0, thcPerGram: 0 };
+    if (!selectedRecipe || selectedRecipe.preparationMode === "mix-in") return { totalTHC: 0, thcPerGram: 0 };
     const weightInGrams = cannabisAmount;
     const totalTHC = (weightInGrams * 1000 * (customThc / 100)) * (retention.thcRetention / 100);
     const thcPerGram = totalTHC / baseAmount;
@@ -1042,6 +1240,52 @@ export function InfusionBases() {
   };
 
   const { totalTHC, thcPerGram } = calculateTHC();
+
+  const mixInPreview = useMemo(() => {
+    if (!selectedRecipe || selectedRecipe.preparationMode !== "mix-in") return null;
+    return computeMixInResult(
+      mixInSource,
+      mixInInfusedAmount,
+      mixInPlainBaseGrams,
+      mixInServings,
+      mixInCustomMgPerUnit,
+      infusionBases,
+      preMadeProducts
+    );
+  }, [
+    selectedRecipe?.id,
+    selectedRecipe?.preparationMode,
+    mixInSource,
+    mixInInfusedAmount,
+    mixInPlainBaseGrams,
+    mixInServings,
+    mixInCustomMgPerUnit,
+    infusionBases,
+  ]);
+
+  const mixInAmountLabel = useMemo(() => {
+    if (!mixInSource || mixInSource === "custom") {
+      return {
+        title: "How much infused product?",
+        hint: "Match the unit you chose for “mg per unit” below (ml, g, tbsp, etc.).",
+      };
+    }
+    if (mixInSource.startsWith("premade:")) {
+      const p = preMadeProducts.find((x) => x.id === mixInSource.slice(8));
+      return {
+        title: `How many ${p?.doseUnit ?? "doses"}?`,
+        hint: `Listed strength: ${p?.thcPerDose ?? "—"} mg THC per ${p?.doseUnit ?? "dose"}.`,
+      };
+    }
+    if (mixInSource.startsWith("saved:")) {
+      const b = infusionBases.find((x) => x.id === mixInSource.slice(6));
+      return {
+        title: `Infused amount (${b?.baseUnit ?? "units"})`,
+        hint: `This save is ${b?.thcPerUnit ?? "—"} mg THC per ${b?.baseUnit ?? "unit"}.`,
+      };
+    }
+    return { title: "Amount", hint: "" };
+  }, [mixInSource, infusionBases]);
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -1071,9 +1315,9 @@ export function InfusionBases() {
         </CardHeader>
         <CardContent className="text-gray-800 space-y-2 text-sm pt-0">
           <p>
-            Pick your strain (library or custom) once — it carries through whether you&apos;re making butter, oil, peanut butter,
-            or honey. Use <strong>less carrier</strong> or <strong>more cannabis</strong> for stronger batches; reverse for milder — the
-            sliders below model extraction, amounts do the rest.
+            Pick your strain (library or custom) when you&apos;re doing a <strong>heat infusion</strong> (butter, oil, or spreads like
+            peanut butter where flower cooks in). For <strong>mix-in</strong> spreads (cream cheese, honey with oil, frosting, etc.) you&apos;ll
+            choose a <strong>finished THC source</strong> and use the blend calculator instead — no temp/time sliders.
           </p>
         </CardContent>
       </Card>
@@ -1221,7 +1465,9 @@ export function InfusionBases() {
             )}
           </div>
 
-          {(infusionLayer === "cooking" || infusionLayer === "ready-to-eat") && (
+          {(infusionLayer === "cooking" ||
+            (infusionLayer === "ready-to-eat" &&
+              (!selectedRecipe || isHeatInfusionRecipe(selectedRecipe)))) && (
           <div>
             <Label className="text-gray-900 text-lg font-semibold mb-3 block">
               <span className="text-green-700">STEP 2:</span> Choose Your Strain
@@ -1315,8 +1561,9 @@ export function InfusionBases() {
           {infusionLayer === "ready-to-eat" && (
             <div className="rounded-xl border border-amber-200 bg-amber-50/50 px-4 py-3">
               <p className="text-gray-800 text-sm">
-                <strong className="text-gray-900">Spreads & spoon-ready bases</strong> — same strain step as cooking. Dose by{" "}
-                <strong>tablespoon or serving</strong>; you can still bake or blend with these.
+                <strong className="text-gray-900">Spreads & spoon-ready bases</strong> — some recipes infuse with heat (e.g.
+                peanut butter); others only mix in <strong>finished</strong> oil, butter, or a store product — use the blend
+                calculator for those (no temperature sliders).
               </p>
             </div>
           )}
@@ -1354,20 +1601,27 @@ export function InfusionBases() {
                         <Badge className="bg-amber-700 text-white text-xs">🍯 Ready-to-eat</Badge>
                       )}
                     </div>
-                    <div className="space-y-1 text-sm text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <Thermometer className="w-4 h-4 text-orange-400" />
-                        {recipe.temperature}
+                    {isHeatInfusionRecipe(recipe) ? (
+                      <div className="space-y-1 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <Thermometer className="w-4 h-4 text-orange-400" />
+                          {recipe.temperature}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-blue-400" />
+                          {recipe.time}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Beaker className="w-4 h-4 text-green-700" />
+                          THC: {recipe.thcRetention}% | Terpenes: {recipe.terpeneRetention}%
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-blue-400" />
-                        {recipe.time}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Beaker className="w-4 h-4 text-green-700" />
-                        THC: {recipe.thcRetention}% | Terpenes: {recipe.terpeneRetention}%
-                      </div>
-                    </div>
+                    ) : (
+                      <p className="text-sm font-medium text-amber-800 flex items-center gap-2">
+                        <Calculator className="w-4 h-4 shrink-0" />
+                        Mix-in: blend calculator — finished THC + plain base, mg per serving
+                      </p>
+                    )}
                   </button>
                 ))}
               </div>
@@ -1494,7 +1748,13 @@ export function InfusionBases() {
               <div>
                 <h3 className="text-gray-900 text-xl font-semibold mb-4">📖 Recipe Details: {selectedRecipe.name}</h3>
 
-                {selectedRecipe.baseType === "spread" ? (
+                {selectedRecipe.preparationMode === "mix-in" ? (
+                  <p className="text-sm text-gray-700 mb-4 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2">
+                    <strong className="text-gray-900">Mix-in (no flower cook step):</strong> you blend{" "}
+                    <strong>already-active</strong> THC — cannabutter, infused oil, tincture you logged, or a store squeeze — into
+                    plain base. Use the calculator below; temperature and time sliders don&apos;t apply.
+                  </p>
+                ) : selectedRecipe.baseType === "spread" ? (
                   <p className="text-sm text-gray-700 mb-4 rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2">
                     <strong className="text-gray-900">Ready-to-eat base:</strong> eat it, spread it, or bake with it. Label your jar in{" "}
                     <strong>mg per tablespoon</strong> or <strong>per serving</strong> so accidental over-scooping is less likely.
@@ -1509,149 +1769,295 @@ export function InfusionBases() {
                     <strong>mg per tablespoon</strong> of finished infusion.
                   </p>
                 )}
-                
-                {/* Amounts */}
-                <div className="grid md:grid-cols-2 gap-4 mb-6">
-                  <div>
-                    <Label className="text-gray-800 text-sm mb-2 block">Cannabis Amount (grams)</Label>
-                    <Input
-                      type="number"
-                      value={cannabisAmount}
-                      onChange={(e) => setCannabisAmount(parseFloat(e.target.value) || 0)}
-                      className="bg-white border-green-300 text-gray-900"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-800 text-sm mb-2 block">Base Amount (grams)</Label>
-                    <Input
-                      type="number"
-                      value={baseAmount}
-                      onChange={(e) => setBaseAmount(parseFloat(e.target.value) || 0)}
-                      className="bg-white border-green-300 text-gray-900"
-                    />
-                  </div>
-                </div>
 
-                {/* Temperature and Time Controls */}
-                <div className="mb-6 bg-orange-50 border-2 border-orange-300 rounded-xl p-5">
-                  <h4 className="text-orange-400 font-semibold mb-4 flex items-center gap-2">
-                    <Thermometer className="w-5 h-5" />
-                    🌡️ Temperature & Time Control
-                  </h4>
-                  
-                  <div className="grid md:grid-cols-2 gap-6 mb-4">
-                    {/* Temperature Slider */}
+                {selectedRecipe.preparationMode === "mix-in" ? (
+                  <div className="mb-6 rounded-xl border-2 border-amber-200 bg-amber-50/50 p-5 space-y-5">
+                    <h4 className="text-amber-900 font-semibold flex items-center gap-2">
+                      <Calculator className="w-5 h-5" />
+                      Blend calculator
+                    </h4>
+                    <p className="text-sm text-gray-700">
+                      Choose a <strong>saved infusion</strong> from this device, a <strong>reference store product</strong> (same
+                      list as Pre-made), or <strong>custom</strong> potency. Plain base = unmedicated weight only (cream cheese,
+                      honey, frosting sugar phase, etc.). Batch weight adds infused g/ml when your save uses those units.
+                    </p>
+
                     <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <Label className="text-gray-800 text-sm">Infusion Temperature (°F)</Label>
-                        <span className="text-gray-900 font-bold text-lg">{customTemp}°F</span>
+                      <Label className="text-gray-800 text-sm mb-2 block">THC you&apos;re mixing in</Label>
+                      <Select
+                        value={mixInSource === "" ? "__pick__" : mixInSource}
+                        onValueChange={(v) => setMixInSource(v === "__pick__" ? "" : (v as MixInSourceSelection))}
+                      >
+                        <SelectTrigger className="bg-white border-amber-300 text-gray-900">
+                          <SelectValue placeholder="Choose source…" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white max-h-[320px]">
+                          <SelectItem value="__pick__" className="text-gray-600">
+                            — Choose source —
+                          </SelectItem>
+                          {infusionBases.length > 0 && (
+                            <>
+                              <div className="px-2 py-1.5 text-xs font-bold text-gray-500 uppercase tracking-wide">
+                                My saved infusions
+                              </div>
+                              {infusionBases.map((b) => (
+                                <SelectItem key={b.id} value={`saved:${b.id}`} className="text-gray-900">
+                                  {b.name} ({b.thcPerUnit} mg / {b.baseUnit})
+                                </SelectItem>
+                              ))}
+                            </>
+                          )}
+                          <div className="px-2 py-1.5 text-xs font-bold text-gray-500 uppercase tracking-wide">
+                            Store reference products
+                          </div>
+                          {preMadeProducts.map((p) => (
+                            <SelectItem key={p.id} value={`premade:${p.id}`} className="text-gray-900">
+                              {p.emoji} {p.brand} – {p.name} ({p.thcPerDose} mg/{p.doseUnit})
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="custom" className="text-gray-900">
+                            Custom — I&apos;ll enter mg per unit
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {mixInSource === "custom" && (
+                      <div>
+                        <Label className="text-gray-800 text-sm mb-2 block">mg THC per 1 unit (e.g. per ml, per g, per tbsp)</Label>
+                        <Input
+                          type="number"
+                          min={0}
+                          step={0.1}
+                          value={mixInCustomMgPerUnit}
+                          onChange={(e) => setMixInCustomMgPerUnit(parseFloat(e.target.value) || 0)}
+                          className="bg-white border-amber-300 text-gray-900"
+                        />
                       </div>
-                      <input
-                        type="range"
-                        min="80"
-                        max="280"
-                        step="5"
-                        value={customTemp}
-                        onChange={(e) => setCustomTemp(parseInt(e.target.value))}
-                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                      />
-                      <div className="flex justify-between text-xs text-gray-500 mt-1">
-                        <span>80°F</span>
-                        <span>180°F</span>
-                        <span>280°F</span>
+                    )}
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-gray-800 text-sm mb-2 block">{mixInAmountLabel.title}</Label>
+                        <Input
+                          type="number"
+                          min={0}
+                          step={0.1}
+                          value={mixInInfusedAmount}
+                          onChange={(e) => setMixInInfusedAmount(parseFloat(e.target.value) || 0)}
+                          className="bg-white border-amber-300 text-gray-900"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">{mixInAmountLabel.hint}</p>
+                      </div>
+                      <div>
+                        <Label className="text-gray-800 text-sm mb-2 block">Plain base (grams)</Label>
+                        <Input
+                          type="number"
+                          min={0}
+                          step={1}
+                          value={mixInPlainBaseGrams}
+                          onChange={(e) => setMixInPlainBaseGrams(parseFloat(e.target.value) || 0)}
+                          className="bg-white border-amber-300 text-gray-900"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Unmedicated carrier only. Example: 452 g cream cheese, 680 g honey, etc.
+                        </p>
                       </div>
                     </div>
 
-                    {/* Time Slider */}
                     <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <Label className="text-gray-800 text-sm">Infusion Time (hours)</Label>
-                        <span className="text-gray-900 font-bold text-lg">{customTime}h</span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0.5"
-                        max="8"
-                        step="0.5"
-                        value={customTime}
-                        onChange={(e) => setCustomTime(parseFloat(e.target.value))}
-                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                      <Label className="text-gray-800 text-sm mb-2 block">Servings in finished batch</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        step={1}
+                        value={mixInServings}
+                        onChange={(e) => setMixInServings(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                        className="bg-white border-amber-300 text-gray-900 max-w-xs"
                       />
-                      <div className="flex justify-between text-xs text-gray-500 mt-1">
-                        <span>30min</span>
-                        <span>4h</span>
-                        <span>8h</span>
-                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        How you’ll portion it (slices, sandwiches, tbsp — your definition of one serving).
+                      </p>
+                    </div>
+
+                    <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+                      <h5 className="text-green-900 font-semibold mb-2">Result</h5>
+                      {mixInPreview?.error ? (
+                        <p className="text-sm text-red-700">{mixInPreview.error}</p>
+                      ) : (
+                        <div className="grid sm:grid-cols-2 gap-3 text-sm text-gray-800">
+                          <div>
+                            <span className="text-gray-600">Total THC in blend</span>
+                            <p className="text-xl font-bold text-green-800">{mixInPreview ? mixInPreview.totalTHC.toFixed(2) : "—"} mg</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">THC per serving</span>
+                            <p className="text-xl font-bold text-green-800">
+                              {mixInPreview ? `${mixInPreview.thcPerServing.toFixed(2)} mg` : "—"}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">Est. batch weight</span>
+                            <p className="font-semibold text-gray-900">
+                              {mixInPreview ? `${mixInPreview.totalBatchGrams.toFixed(0)} g` : "—"}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">mg per gram (whole jar)</span>
+                            <p className="font-semibold text-gray-900">
+                              {mixInPreview ? `${mixInPreview.thcPerGram.toFixed(3)} mg/g` : "—"}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  {/* Warning Message */}
-                  <div className={`p-4 rounded-lg border-2 ${
-                    retention.warningColor === "red" ? "bg-red-900/30 border-red-500" :
-                    retention.warningColor === "orange" ? "bg-orange-900/30 border-orange-500" :
-                    retention.warningColor === "yellow" ? "bg-yellow-900/30 border-yellow-500" :
-                    retention.warningColor === "green" ? "bg-green-900/30 border-green-500" :
-                    retention.warningColor === "cyan" ? "bg-cyan-900/30 border-cyan-500" :
-                    "bg-blue-900/30 border-blue-500"
-                  } mb-4`}>
-                    <p className="text-gray-900 font-medium whitespace-pre-line">{retention.warning}</p>
-                  </div>
-
-                  {/* Retention Display */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="bg-green-900/30 border border-green-600/50 rounded-lg p-4">
-                      <div className="text-sm text-green-300 mb-1">THC Retention</div>
-                      <div className="flex items-end gap-2">
-                        <span className="text-3xl font-bold text-green-700">{retention.thcRetention.toFixed(0)}%</span>
-                        <span className="text-green-300 text-sm mb-1">of cannabinoids</span>
+                ) : (
+                  <>
+                    {/* Amounts */}
+                    <div className="grid md:grid-cols-2 gap-4 mb-6">
+                      <div>
+                        <Label className="text-gray-800 text-sm mb-2 block">Cannabis Amount (grams)</Label>
+                        <Input
+                          type="number"
+                          value={cannabisAmount}
+                          onChange={(e) => setCannabisAmount(parseFloat(e.target.value) || 0)}
+                          className="bg-white border-green-300 text-gray-900"
+                        />
                       </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
-                        <div 
-                          className="bg-green-500 h-2 rounded-full transition-all"
-                          style={{ width: `${retention.thcRetention}%` }}
+                      <div>
+                        <Label className="text-gray-800 text-sm mb-2 block">Base Amount (grams)</Label>
+                        <Input
+                          type="number"
+                          value={baseAmount}
+                          onChange={(e) => setBaseAmount(parseFloat(e.target.value) || 0)}
+                          className="bg-white border-green-300 text-gray-900"
                         />
                       </div>
                     </div>
 
-                    <div className="bg-purple-900/30 border border-purple-600/50 rounded-lg p-4">
-                      <div className="text-sm text-purple-300 mb-1">Terpene Retention</div>
-                      <div className="flex items-end gap-2">
-                        <span className="text-3xl font-bold text-purple-400">{retention.terpeneRetention.toFixed(0)}%</span>
-                        <span className="text-purple-300 text-sm mb-1">flavor/aroma</span>
-                      </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
-                        <div 
-                          className="bg-purple-500 h-2 rounded-full transition-all"
-                          style={{ width: `${retention.terpeneRetention}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                    {/* Temperature and Time Controls */}
+                    <div className="mb-6 bg-orange-50 border-2 border-orange-300 rounded-xl p-5">
+                      <h4 className="text-orange-400 font-semibold mb-4 flex items-center gap-2">
+                        <Thermometer className="w-5 h-5" />
+                        🌡️ Temperature & Time Control
+                      </h4>
+                      
+                      <div className="grid md:grid-cols-2 gap-6 mb-4">
+                        {/* Temperature Slider */}
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <Label className="text-gray-800 text-sm">Infusion Temperature (°F)</Label>
+                            <span className="text-gray-900 font-bold text-lg">{customTemp}°F</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="80"
+                            max="280"
+                            step="5"
+                            value={customTemp}
+                            onChange={(e) => setCustomTemp(parseInt(e.target.value))}
+                            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          />
+                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>80°F</span>
+                            <span>180°F</span>
+                            <span>280°F</span>
+                          </div>
+                        </div>
 
-                {/* THC Calculation */}
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                  <h4 className="text-green-800 font-semibold mb-2">💚 Calculated THC</h4>
-                  <p className="text-xs text-gray-600 mb-3">
-                    <strong className="text-gray-800">Dial strength:</strong> more cannabis or less carrier = stronger batch; less cannabis or more carrier = milder. Sliders model heat/time extraction; the gram fields set concentration.
-                  </p>
-                  <div className="grid md:grid-cols-2 gap-4 text-gray-900">
-                    <div>
-                      <div className="text-sm text-gray-600">Total THC (estimated)</div>
-                      <div className="text-2xl font-bold text-green-800">{totalTHC.toFixed(2)} mg</div>
+                        {/* Time Slider */}
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <Label className="text-gray-800 text-sm">Infusion Time (hours)</Label>
+                            <span className="text-gray-900 font-bold text-lg">{customTime}h</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.5"
+                            max="8"
+                            step="0.5"
+                            value={customTime}
+                            onChange={(e) => setCustomTime(parseFloat(e.target.value))}
+                            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          />
+                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>30min</span>
+                            <span>4h</span>
+                            <span>8h</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Warning Message */}
+                      <div className={`p-4 rounded-lg border-2 ${
+                        retention.warningColor === "red" ? "bg-red-900/30 border-red-500" :
+                        retention.warningColor === "orange" ? "bg-orange-900/30 border-orange-500" :
+                        retention.warningColor === "yellow" ? "bg-yellow-900/30 border-yellow-500" :
+                        retention.warningColor === "green" ? "bg-green-900/30 border-green-500" :
+                        retention.warningColor === "cyan" ? "bg-cyan-900/30 border-cyan-500" :
+                        "bg-blue-900/30 border-blue-500"
+                      } mb-4`}>
+                        <p className="text-gray-900 font-medium whitespace-pre-line">{retention.warning}</p>
+                      </div>
+
+                      {/* Retention Display */}
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="bg-green-900/30 border border-green-600/50 rounded-lg p-4">
+                          <div className="text-sm text-green-300 mb-1">THC Retention</div>
+                          <div className="flex items-end gap-2">
+                            <span className="text-3xl font-bold text-green-700">{retention.thcRetention.toFixed(0)}%</span>
+                            <span className="text-green-300 text-sm mb-1">of cannabinoids</span>
+                          </div>
+                          <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+                            <div 
+                              className="bg-green-500 h-2 rounded-full transition-all"
+                              style={{ width: `${retention.thcRetention}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="bg-purple-900/30 border border-purple-600/50 rounded-lg p-4">
+                          <div className="text-sm text-purple-300 mb-1">Terpene Retention</div>
+                          <div className="flex items-end gap-2">
+                            <span className="text-3xl font-bold text-purple-400">{retention.terpeneRetention.toFixed(0)}%</span>
+                            <span className="text-purple-300 text-sm mb-1">flavor/aroma</span>
+                          </div>
+                          <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+                            <div 
+                              className="bg-purple-500 h-2 rounded-full transition-all"
+                              style={{ width: `${retention.terpeneRetention}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-sm text-gray-600">THC per gram of batch</div>
-                      <div className="text-2xl font-bold text-green-800">{thcPerGram.toFixed(2)} mg/g</div>
+
+                    {/* THC Calculation */}
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                      <h4 className="text-green-800 font-semibold mb-2">💚 Calculated THC</h4>
+                      <p className="text-xs text-gray-600 mb-3">
+                        <strong className="text-gray-800">Dial strength:</strong> more cannabis or less carrier = stronger batch; less cannabis or more carrier = milder. Sliders model heat/time extraction; the gram fields set concentration.
+                      </p>
+                      <div className="grid md:grid-cols-2 gap-4 text-gray-900">
+                        <div>
+                          <div className="text-sm text-gray-600">Total THC (estimated)</div>
+                          <div className="text-2xl font-bold text-green-800">{totalTHC.toFixed(2)} mg</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-600">THC per gram of batch</div>
+                          <div className="text-2xl font-bold text-green-800">{thcPerGram.toFixed(2)} mg/g</div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-700 mt-3">
+                        ≈ <strong className="text-green-800">{(thcPerGram * 14.2).toFixed(1)} mg</strong> THC per US tablespoon (~14 g — density varies; weigh for precision).
+                        {selectedRecipe.baseType === "spread"
+                          ? " Use that when you think in spoonfuls or typical spread servings."
+                          : " Use that when substituting infused fat by the tablespoon in a recipe."}
+                      </p>
                     </div>
-                  </div>
-                  <p className="text-sm text-gray-700 mt-3">
-                    ≈ <strong className="text-green-800">{(thcPerGram * 14.2).toFixed(1)} mg</strong> THC per US tablespoon (~14 g — density varies; weigh for precision).
-                    {selectedRecipe.baseType === "spread"
-                      ? " Use that when you think in spoonfuls or typical spread servings."
-                      : " Use that when substituting infused fat by the tablespoon in a recipe."}
-                  </p>
-                </div>
+                  </>
+                )}
 
                 {/* Ingredients */}
                 <div className="mb-6">
