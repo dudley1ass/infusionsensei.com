@@ -36,6 +36,7 @@ import { WingSauces } from "./pages/WingSauces";
 import { Popcorn } from "./pages/Popcorn";
 import { Coffee } from "./pages/Coffee";
 import { Fries } from "./pages/Fries";
+import { Jello } from "./pages/Jello";
 import { PartyWingsSplit } from "./pages/PartyWingsSplit";
 import { UTMBuilder } from "./pages/UTMBuilder";
 import { THCCalculatorPage } from "./pages/THCCalculatorPage";
@@ -62,6 +63,7 @@ export const router = createBrowserRouter([
       { path: "popcorn", Component: Popcorn },
       { path: "coffee", Component: Coffee },
       { path: "fries", Component: Fries },
+      { path: "jello", Component: Jello },
       { path: "utm", Component: UTMBuilder },
       { path: "thc-calculator", Component: THCCalculatorPage },
       { path: "edible-potency-guide", Component: EdiblePotencyGuide },
