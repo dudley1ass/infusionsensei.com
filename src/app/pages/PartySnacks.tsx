@@ -8,7 +8,9 @@ import { Label } from "../components/ui/label";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
@@ -20,19 +22,79 @@ type SnackItem = {
   name: string;
   emoji: string;
   desc: string;
+  /** Default `snacks`; wings use the wings builder category. */
+  builderCategory?: "snacks" | "wings";
 };
 
-const ITEMS: SnackItem[] = [
-  { id: "rice-krispie-treat-squares", name: "Rice Krispie Treat Squares", emoji: "🟨", desc: "Single-serving bars with easy batch math." },
-  { id: "popcorn-balls", name: "Popcorn Balls", emoji: "🍿", desc: "Portable pieces you can label by the ball." },
-  { id: "chocolate-dipped-pretzels", name: "Chocolate-Dipped Pretzels", emoji: "🥨", desc: "Infused and plain trays side-by-side." },
-  { id: "mini-slider-sauce", name: "Mini Sliders (Infused Sauce)", emoji: "🍔", desc: "Infuse the sauce only for mixed parties." },
-  { id: "mini-brownie-bites", name: "Mini Brownie Bites", emoji: "🍫", desc: "Small bites for social pacing." },
-  { id: "classic-jello-shots", name: "Jello Cubes", emoji: "🍬", desc: "One cube = one dose — beginner friendly." },
+const SNACK_GROUPS: { title: string; items: SnackItem[] }[] = [
+  {
+    title: "Core treats & handhelds",
+    items: [
+      { id: "rice-krispie-treat-squares", name: "Rice Krispie Treats", emoji: "🟨", desc: "Grid-cut squares — easy per-piece math." },
+      { id: "popcorn-balls", name: "Popcorn Balls", emoji: "🍿", desc: "Sticky balls you can label by piece." },
+      { id: "mini-brownie-bites", name: "Brownie Bites", emoji: "🍫", desc: "Mini muffin format for parties." },
+      { id: "blondie-squares", name: "Blondie Squares", emoji: "🟫", desc: "Buttery blonde bars, dose by square." },
+      { id: "chocolate-dipped-pretzels", name: "Chocolate-Dipped Pretzels", emoji: "🥨", desc: "Run infused and plain trays side-by-side." },
+      { id: "marshmallow-pops", name: "Marshmallow Pops", emoji: "🍡", desc: "Stick + dip — great for displays." },
+      { id: "mini-cupcakes-infused-frosting", name: "Mini Cupcakes (infused frosting)", emoji: "🧁", desc: "Infuse frosting only; keep cake straightforward." },
+      { id: "cookie-sandwiches-infused-filling", name: "Cookie Sandwiches (infused filling)", emoji: "🍪", desc: "Tiny sandwich cookies with infused buttercream." },
+      { id: "churro-bites", name: "Churro Bites (infused cinnamon sugar)", emoji: "🟤", desc: "Fry bites; toss in infused sugar." },
+      { id: "funnel-cake-bites", name: "Funnel Cake Bites", emoji: "🎪", desc: "Fair-style bites + infused drizzle." },
+    ],
+  },
+  {
+    title: "Snackable / crunchy",
+    items: [
+      { id: "chex-mix-infused", name: "Chex Mix", emoji: "🥣", desc: "Baked cereal mix with cannabutter." },
+      { id: "infused-nuts", name: "Infused Nuts", emoji: "🥜", desc: "Roasted glazed nut mix." },
+      { id: "caramel-popcorn", name: "Caramel Corn", emoji: "🍯", desc: "Baked caramel corn (builder template)." },
+      { id: "kettle-corn-infused", name: "Kettle Corn", emoji: "🍿", desc: "Sweet-salt popcorn finish." },
+      { id: "snack-mix-party", name: "Snack Mix", emoji: "🧂", desc: "Pretzels + cereal + popcorn + nuts." },
+      { id: "cheese-crackers-infused-dust", name: "Cheese Crackers (infused dust)", emoji: "🧀", desc: "Parmesan-garlic butter bake." },
+      { id: "garlic-parmesan-pretzels", name: "Garlic Parmesan Pretzels", emoji: "🥨", desc: "Warm pretzels, infused butter toss." },
+    ],
+  },
+  {
+    title: "Savory party bites (infuse dips / sauces)",
+    items: [
+      { id: "mini-slider-sauce", name: "Mini Sliders (infused sauce)", emoji: "🍔", desc: "Sauce-only infusion for mixed parties." },
+      { id: "chicken-tenders-infused-dip", name: "Chicken Tenders (infused dip)", emoji: "🍗", desc: "Breaded tenders + labeled dip bowl." },
+      { id: "classic-buffalo-wings", name: "Wings (Buffalo starter)", emoji: "🍗", desc: "Opens wing builder — add flavors from Wings too.", builderCategory: "wings" },
+      { id: "meatballs-infused-glaze", name: "Meatballs (infused glaze)", emoji: "🍖", desc: "Bake balls; toss in infused glaze." },
+      { id: "sausage-bites-honey-mustard", name: "Sausage Bites (infused honey mustard)", emoji: "🌭", desc: "Cocktail links + labeled sauce." },
+      { id: "mini-hot-dogs-infused-condiments", name: "Mini Hot Dogs (infused ketchup/mustard)", emoji: "🌭", desc: "Infuse condiments, not the franks." },
+      { id: "queso-dip-infused", name: "Queso Dip", emoji: "🫕", desc: "Cheese dip with cannabutter in the base." },
+      { id: "spinach-artichoke-dip-infused", name: "Spinach Artichoke Dip", emoji: "🥬", desc: "Classic dip; infusion in the creamy base." },
+    ],
+  },
+  {
+    title: "Dips & sauces (goldmine)",
+    items: [
+      { id: "buffalo-dip-infused", name: "Buffalo Dip", emoji: "🔥", desc: "Creamy hot dip for chips and veg." },
+      { id: "ranch-dip-infused", name: "Ranch Dip", emoji: "🌿", desc: "Cool ranch with infused oil whisked in." },
+      { id: "honey-mustard-dip-infused", name: "Honey Mustard", emoji: "🍯", desc: "Sweet-tang dip for pretzels and tenders." },
+      { id: "garlic-aioli-infused", name: "Garlic Aioli", emoji: "🧄", desc: "Sandwich and slider spread." },
+      { id: "bbq-sauce-infused-party", name: "BBQ Sauce", emoji: "🍖", desc: "Brush-on or dip — label jar." },
+      { id: "sweet-chili-sauce-infused", name: "Sweet Chili Sauce", emoji: "🌶️", desc: "Sticky dip for fries and apps." },
+      { id: "cheese-sauce-infused", name: "Cheese Sauce", emoji: "🧀", desc: "Pourable cheddar for nachos and fries." },
+    ],
+  },
+  {
+    title: "Fun party items",
+    items: [
+      { id: "classic-jello-shots", name: "Jello Cubes", emoji: "🍬", desc: "One cube ≈ one dose — beginner friendly." },
+      { id: "gummy-clusters", name: "Gummy Clusters", emoji: "🍇", desc: "Gummy chunks coated in chocolate." },
+      { id: "chocolate-bark-infused", name: "Chocolate Bark", emoji: "🍫", desc: "Snap bark pieces; easy to label." },
+      { id: "candy-coated-popcorn", name: "Candy-Coated Popcorn", emoji: "🎀", desc: "Crunchy candy shell popcorn." },
+      { id: "skewered-snack-bites-party", name: "Skewered Snack Bites", emoji: "🍢", desc: "Mix-and-match picks + infused chocolate." },
+    ],
+  },
 ];
 
+const ALL_PARTY_SNACK_ITEMS = SNACK_GROUPS.flatMap((g) => g.items);
+
 function buildInitialSlots(count: number): string[] {
-  const next = ITEMS.slice(0, Math.min(count, ITEMS.length)).map((i) => i.id);
+  const next = ALL_PARTY_SNACK_ITEMS.slice(0, Math.min(count, ALL_PARTY_SNACK_ITEMS.length)).map((i) => i.id);
   while (next.length < count) next.push(EMPTY);
   return next;
 }
@@ -84,7 +146,7 @@ export function PartySnacks() {
   };
 
   const addSnackSlot = () => {
-    if (infusedSlotCount >= ITEMS.length) return;
+    if (infusedSlotCount >= ALL_PARTY_SNACK_ITEMS.length) return;
     syncSlotArray(infusedSlotCount + 1);
   };
 
@@ -95,9 +157,9 @@ export function PartySnacks() {
     setInfusedSlotCount(next.length);
   };
 
-  const builderLink = (recipeId: string) => {
+  const builderLink = (recipeId: string, category: "snacks" | "wings" = "snacks") => {
     const params = new URLSearchParams({
-      category: "snacks",
+      category,
       recipe: recipeId,
       servings: String(Math.max(1, guestCount)),
       targetMgPerServing: mgEachTarget > 0 ? mgEachTarget.toFixed(4) : "",
@@ -155,10 +217,10 @@ export function PartySnacks() {
               id="infused-count"
               type="number"
               min={1}
-              max={ITEMS.length}
+              max={ALL_PARTY_SNACK_ITEMS.length}
               value={infusedSlotCount}
               onChange={(e) => {
-                const n = Math.min(ITEMS.length, Math.max(1, Number(e.target.value) || 1));
+                const n = Math.min(ALL_PARTY_SNACK_ITEMS.length, Math.max(1, Number(e.target.value) || 1));
                 syncSlotArray(n);
               }}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
@@ -192,7 +254,7 @@ export function PartySnacks() {
               variant="outline"
               size="sm"
               onClick={addSnackSlot}
-              disabled={infusedSlotCount >= ITEMS.length}
+              disabled={infusedSlotCount >= ALL_PARTY_SNACK_ITEMS.length}
               className="font-semibold"
             >
               + Add snack
@@ -220,10 +282,15 @@ export function PartySnacks() {
                   </SelectTrigger>
                   <SelectContent className="bg-white border border-gray-200 shadow-xl">
                     <SelectItem value={EMPTY}>— Select —</SelectItem>
-                    {ITEMS.map((item) => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.emoji} {item.name}
-                      </SelectItem>
+                    {SNACK_GROUPS.map((group) => (
+                      <SelectGroup key={group.title}>
+                        <SelectLabel className="text-xs font-bold text-gray-600 px-2 py-1.5">{group.title}</SelectLabel>
+                        {group.items.map((item) => (
+                          <SelectItem key={item.id} value={item.id}>
+                            {item.emoji} {item.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
                     ))}
                   </SelectContent>
                 </Select>
@@ -254,44 +321,53 @@ export function PartySnacks() {
         </div>
       </section>
 
-      <section className="space-y-3">
+      <section className="space-y-6">
         <h3 className="text-lg font-black text-gray-900">Snack reference</h3>
-        <div className="grid md:grid-cols-2 gap-4">
-          {ITEMS.map((item) => {
-            const picked = uniqueInfusedIds.includes(item.id);
-            return (
-              <div key={item.id} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="font-black text-gray-900">
-                    {item.emoji} {item.name}
-                  </p>
-                  {picked ? (
-                    <Badge className="bg-green-100 text-green-800 border-green-200">In your infused list</Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-gray-600">
-                      Not selected
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-sm text-gray-600 mt-1">{item.desc}</p>
-                <div className="mt-3">
-                  {picked && allSlotsChosen ? (
-                    <Link to={builderLink(item.id)}>
-                      <Button className="bg-green-600 hover:bg-green-700 text-white font-bold w-full sm:w-auto">
-                        <ChefHat className="w-4 h-4 mr-1.5" />
-                        Build {item.name}
-                      </Button>
-                    </Link>
-                  ) : (
-                    <p className="text-xs text-gray-500">
-                      Add this snack to your infused dropdowns (no duplicates) to enable the build button.
-                    </p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {SNACK_GROUPS.map((group) => (
+          <div key={group.title} className="space-y-3">
+            <p className="text-sm font-black text-indigo-900 border-b border-indigo-100 pb-1">{group.title}</p>
+            <div className="grid md:grid-cols-2 gap-4">
+              {group.items.map((item) => {
+                const picked = uniqueInfusedIds.includes(item.id);
+                const cat = item.builderCategory ?? "snacks";
+                return (
+                  <div key={item.id} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-black text-gray-900">
+                        {item.emoji} {item.name}
+                      </p>
+                      {picked ? (
+                        <Badge className="bg-green-100 text-green-800 border-green-200">In your infused list</Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-gray-600">
+                          Not selected
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">{item.desc}</p>
+                    {cat === "wings" && (
+                      <p className="text-xs text-amber-800 mt-1 font-semibold">Opens in Wings builder (buffalo base).</p>
+                    )}
+                    <div className="mt-3">
+                      {picked && allSlotsChosen ? (
+                        <Link to={builderLink(item.id, cat)}>
+                          <Button className="bg-green-600 hover:bg-green-700 text-white font-bold w-full sm:w-auto">
+                            <ChefHat className="w-4 h-4 mr-1.5" />
+                            Build {item.name}
+                          </Button>
+                        </Link>
+                      ) : (
+                        <p className="text-xs text-gray-500">
+                          Add this snack to your infused dropdowns (no duplicates) to enable the build button.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </section>
 
       <div className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-3">
