@@ -502,7 +502,7 @@ export const recipes: Recipe[] = [
     cookTime: 10,
     servings: 24,
     thcPerServing: "~5mg",
-    image: "/IMAGES/gummies.jpg",
+    image: "/IMAGES/jello-shots.png",
     description: "The easiest precision-dose party edible. One cube equals one serving for clean control.",
     ingredients: [
       "1 box flavored gelatin",
@@ -535,7 +535,7 @@ export const recipes: Recipe[] = [
     cookTime: 10,
     servings: 24,
     thcPerServing: "~2.5-5mg",
-    image: "/IMAGES/gummies.jpg",
+    image: "/IMAGES/jello-shots.png",
     description: "Fruit-forward low-dose cubes that are beginner-friendly and easy to pre-portion.",
     ingredients: [
       "1 box flavored gelatin",
@@ -566,7 +566,7 @@ export const recipes: Recipe[] = [
     cookTime: 15,
     servings: 24,
     thcPerServing: "~5mg",
-    image: "/IMAGES/gummies.jpg",
+    image: "/IMAGES/jello-shots.png",
     description: "Visual two-layer cubes that look premium and still keep exact dose per piece.",
     ingredients: [
       "1 box lime gelatin",

@@ -751,10 +751,16 @@ const toTitleFromId = (value: string) =>
     .replace(/-/g, " ")
     .replace(/\b\w/g, (m) => m.toUpperCase());
 
+const formatSnackAliasName = (sourceId: string) => {
+  const baseName = toTitleFromId(sourceId);
+  return `${baseName} - Popcorn, Chex Mix, or Nuts (you choose the coating)`;
+};
+
 const ensureAliasTemplates = (
   categoryId: string,
   map: Record<string, string>,
-  fallbackTemplateId: string
+  fallbackTemplateId: string,
+  nameResolver?: (sourceId: string) => string
 ) => {
   const categoryRecipes = standardRecipes[categoryId] ?? [];
   const byId = new Map(categoryRecipes.map((r) => [r.id, r]));
@@ -768,7 +774,7 @@ const ensureAliasTemplates = (
     const aliasRecipe = {
       ...base,
       id: sourceId,
-      name: toTitleFromId(sourceId),
+      name: nameResolver ? nameResolver(sourceId) : toTitleFromId(sourceId),
       instructions: [
         `Built from ${base.name} template for ${toTitleFromId(sourceId)}.`,
         ...base.instructions,
@@ -783,7 +789,7 @@ const ensureAliasTemplates = (
 
 // Ensure Create Recipe lists all routable IDs used by pages.
 ensureAliasTemplates("wings", WING_SAUCE_TO_BUILDER_RECIPE, "classic-buffalo-wings");
-ensureAliasTemplates("snacks", POPCORN_TO_BUILDER_RECIPE, "garlic-butter-popcorn");
+ensureAliasTemplates("snacks", POPCORN_TO_BUILDER_RECIPE, "garlic-butter-popcorn", formatSnackAliasName);
 ensureAliasTemplates("drinks", COFFEE_TO_BUILDER_RECIPE, "bulletproof-coffee");
 ensureAliasTemplates("fries", FRIES_TO_BUILDER_RECIPE, "garlic-butter-fries");
 
@@ -2452,8 +2458,15 @@ export function CreateRecipes() {
                 // If came from URL params, go back to the source page
                 const cat = searchParams.get("category");
                 const rec = searchParams.get("recipe");
+                const isJelloRecipe =
+                  rec === "classic-jello-shots" ||
+                  rec === "fruit-juice-jello-cubes" ||
+                  rec === "layered-jello-shots" ||
+                  rec === "sour-jello-bites";
                 if (cat === "wings") {
                   navigate("/wings");
+                } else if (cat === "snacks" && isJelloRecipe) {
+                  navigate("/jello");
                 } else if (cat === "popcorn" || cat === "snacks") {
                   navigate("/popcorn");
                 } else if (cat === "fries") {
@@ -2468,6 +2481,12 @@ export function CreateRecipes() {
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               {searchParams.get("category") === "wings" ? "← Back to Wings" :
+               (searchParams.get("category") === "snacks" && (
+                 searchParams.get("recipe") === "classic-jello-shots" ||
+                 searchParams.get("recipe") === "fruit-juice-jello-cubes" ||
+                 searchParams.get("recipe") === "layered-jello-shots" ||
+                 searchParams.get("recipe") === "sour-jello-bites"
+               )) ? "← Back to Jello" :
                searchParams.get("category") === "popcorn" ? "← Back to Popcorn" :
                searchParams.get("category") === "drinks" ? "← Back to Coffee" :
                searchParams.get("category") === "fries" ? "← Back to Fries" :
