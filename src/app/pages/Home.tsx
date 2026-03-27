@@ -44,6 +44,8 @@ export function Home() {
               { emoji: "☕", label: "Coffee", sub: "Start here", to: "/coffee", img: "/IMAGES/coffee.jpg", highlight: false },
               { emoji: "🍟", label: "Fries", sub: "Start here", to: "/fries", img: "/IMAGES/fries.jpg", highlight: false },
               { emoji: "🍬", label: "Jello", sub: "Dose-controlled cubes", to: "/jello", img: "/IMAGES/jello-shots.png", highlight: true },
+              { emoji: "🧸", label: "Gummies", sub: "Single-piece dosing", to: "/gummies", img: "/IMAGES/gummies.jpg", highlight: true },
+              { emoji: "🎉", label: "Party Snacks", sub: "Handheld + controllable", to: "/party-snacks", img: "/IMAGES/popcorn.webp", highlight: true },
               { emoji: "🍽️", label: "Dinner of the Week", sub: "New this week", to: "/dinner-of-the-week", img: ["/IMAGES/steakalfredo.jpg", "/IMAGES/steakalfredo.jpeg", "/IMAGES/steakalfredo.png", "/IMAGES/steakalfredo.webp"], highlight: true },
               { emoji: "🎉", label: "Party Mode", sub: "Hosting? Start here", to: "/party-mode", img: ["/IMAGES/partynight.jpg", "/IMAGES/partynight.jpeg", "/IMAGES/partynight.png", "/IMAGES/partynight.webp"], highlight: true },
             ].map(({ emoji, label, sub, to, img, highlight }) => (

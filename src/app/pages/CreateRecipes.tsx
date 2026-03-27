@@ -637,6 +637,78 @@ const standardRecipes: Record<string, any[]> = {
       instructions: ["Combine jello mix, gelatin, and water in saucepan.","Bloom 5 minutes then heat gently until dissolved.","Remove from heat and stir in tincture and corn syrup.","Pour into silicone molds.","Refrigerate until firm.","Optional: dust lightly with citric acid + sugar blend for sour finish."],
     },
     {
+      id: "rice-krispie-treat-squares",
+      name: "Infused Rice Krispie Treat Squares",
+      servings: 16,
+      ingredients: ["Cannabutter","Marshmallows","Rice Cereal","Vanilla Extract","Salt"],
+      amounts: [56,280,150,5,1],
+      units: ["g","g","g","ml","g"],
+      instructions: ["Melt cannabutter over low heat.","Stir in marshmallows until smooth.","Add vanilla and salt.","Fold in rice cereal until coated.","Press into lined pan and cool fully.","Cut into 16 equal squares."],
+    },
+    {
+      id: "popcorn-balls",
+      name: "Infused Popcorn Balls",
+      servings: 12,
+      ingredients: ["Popcorn Kernels","Cannabutter","Corn Syrup","Granulated Sugar","Salt"],
+      amounts: [120,42,120,100,2],
+      units: ["g","g","ml","g","g"],
+      instructions: ["Pop popcorn and place in a large bowl.","Heat cannabutter, corn syrup, sugar, and salt until dissolved.","Pour over popcorn and toss quickly.","When cool enough to touch, shape into 12 balls.","Set on parchment until firm."],
+    },
+    {
+      id: "chocolate-dipped-pretzels",
+      name: "Infused Chocolate-Dipped Pretzels",
+      servings: 20,
+      ingredients: ["Dark Chocolate Chips","Cannabis Coconut Oil","Pretzels","Salt"],
+      amounts: [170,15,20,1],
+      units: ["g","ml","pieces","g"],
+      instructions: ["Melt chocolate chips with cannabis coconut oil.","Dip pretzels halfway and place on parchment.","Add salt or sprinkles.","Chill until set."],
+    },
+    {
+      id: "mini-slider-sauce",
+      name: "Mini Sliders (Infused Sauce Method)",
+      servings: 12,
+      ingredients: ["Cannabis Olive Oil","Mayonnaise","Granulated Sugar","Salt","Black Pepper"],
+      amounts: [15,120,2,2,1],
+      units: ["ml","g","g","g","g"],
+      instructions: ["Whisk cannabis olive oil into mayo until smooth.","Season lightly with salt, pepper, and a touch of sugar.","Apply infused sauce only to the infused slider batch.","Label infused and non-infused trays clearly."],
+    },
+    {
+      id: "mini-brownie-bites",
+      name: "Mini Brownie Bites",
+      servings: 24,
+      ingredients: ["Cannabutter","Granulated Sugar","Whole Egg (large)","Cocoa Powder","All-Purpose Flour","Salt"],
+      amounts: [56,180,2,40,70,2],
+      units: ["g","g","large","g","g","g"],
+      instructions: ["Preheat oven to 350°F and prep mini muffin tin.","Whisk melted cannabutter, sugar, and eggs.","Fold in cocoa, flour, and salt.","Portion into mini cavities.","Bake 14-18 minutes and cool fully.","Serve as 24 equal bites."],
+    },
+    {
+      id: "classic-gummies",
+      name: "Classic Infused Gummies",
+      servings: 40,
+      ingredients: ["THC Tincture","Gelatin (unflavored)","Flavored Jello Mix","Water","Corn Syrup"],
+      amounts: [20,20,85,120,30],
+      units: ["ml","g","g","ml","ml"],
+      instructions: ["Combine gelatin and jello with water and bloom 5 minutes.","Warm on low until dissolved.","Stir in tincture and corn syrup off heat.","Pour into molds and refrigerate until firm."],
+    },
+    {
+      id: "fruit-gummies",
+      name: "Fruit Juice Gummies",
+      servings: 40,
+      ingredients: ["THC Tincture","Gelatin (unflavored)","Flavored Jello Mix","Water","Cannabis Honey"],
+      amounts: [16,20,85,120,20],
+      units: ["ml","g","g","ml","g"],
+      instructions: ["Bloom gelatin and jello in water.","Warm until smooth, then remove from heat.","Stir in tincture and honey.","Mold and chill 2 hours."],
+    },
+    {
+      id: "sour-gummies",
+      name: "Sour Infused Gummies",
+      servings: 40,
+      ingredients: ["THC Tincture","Gelatin (unflavored)","Flavored Jello Mix","Water","Corn Syrup"],
+      amounts: [20,20,85,120,30],
+      units: ["ml","g","g","ml","ml"],
+      instructions: ["Prepare gelatin base over low heat.","Mix in tincture and corn syrup off heat.","Fill molds and chill until set.","Coat lightly in sour sugar blend before serving."],
+    },
+    {
       id: "protein-bites",
       name: "Infused Protein Bites",
       servings: 12,
@@ -753,7 +825,7 @@ const toTitleFromId = (value: string) =>
 
 const formatSnackAliasName = (sourceId: string) => {
   const baseName = toTitleFromId(sourceId);
-  return `${baseName} - Popcorn, Chex Mix, or Nuts (you choose the coating)`;
+  return `${baseName} - Popcorn, Chex Mix, or Nuts (you chose what to coat)`;
 };
 
 const ensureAliasTemplates = (
@@ -2463,10 +2535,16 @@ export function CreateRecipes() {
                   rec === "fruit-juice-jello-cubes" ||
                   rec === "layered-jello-shots" ||
                   rec === "sour-jello-bites";
+                const isGummyRecipe =
+                  rec === "classic-gummies" ||
+                  rec === "fruit-gummies" ||
+                  rec === "sour-gummies";
                 if (cat === "wings") {
                   navigate("/wings");
                 } else if (cat === "snacks" && isJelloRecipe) {
                   navigate("/jello");
+                } else if (cat === "snacks" && isGummyRecipe) {
+                  navigate("/gummies");
                 } else if (cat === "popcorn" || cat === "snacks") {
                   navigate("/popcorn");
                 } else if (cat === "fries") {
@@ -2487,6 +2565,11 @@ export function CreateRecipes() {
                  searchParams.get("recipe") === "layered-jello-shots" ||
                  searchParams.get("recipe") === "sour-jello-bites"
                )) ? "← Back to Jello" :
+               (searchParams.get("category") === "snacks" && (
+                 searchParams.get("recipe") === "classic-gummies" ||
+                 searchParams.get("recipe") === "fruit-gummies" ||
+                 searchParams.get("recipe") === "sour-gummies"
+               )) ? "← Back to Gummies" :
                searchParams.get("category") === "popcorn" ? "← Back to Popcorn" :
                searchParams.get("category") === "drinks" ? "← Back to Coffee" :
                searchParams.get("category") === "fries" ? "← Back to Fries" :

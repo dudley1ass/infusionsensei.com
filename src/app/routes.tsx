@@ -37,6 +37,8 @@ import { Popcorn } from "./pages/Popcorn";
 import { Coffee } from "./pages/Coffee";
 import { Fries } from "./pages/Fries";
 import { Jello } from "./pages/Jello";
+import { Gummies } from "./pages/Gummies";
+import { PartySnacks } from "./pages/PartySnacks";
 import { PartyWingsSplit } from "./pages/PartyWingsSplit";
 import { UTMBuilder } from "./pages/UTMBuilder";
 import { THCCalculatorPage } from "./pages/THCCalculatorPage";
@@ -64,6 +66,8 @@ export const router = createBrowserRouter([
       { path: "coffee", Component: Coffee },
       { path: "fries", Component: Fries },
       { path: "jello", Component: Jello },
+      { path: "gummies", Component: Gummies },
+      { path: "party-snacks", Component: PartySnacks },
       { path: "utm", Component: UTMBuilder },
       { path: "thc-calculator", Component: THCCalculatorPage },
       { path: "edible-potency-guide", Component: EdiblePotencyGuide },
