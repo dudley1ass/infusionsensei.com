@@ -215,10 +215,10 @@ export function PartySnacks() {
                   </Button>
                 </div>
                 <Select value={val} onValueChange={(v) => setSlot(idx, v)}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full bg-white">
                     <SelectValue placeholder="Select snack…" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white border border-gray-200 shadow-xl">
                     <SelectItem value={EMPTY}>— Select —</SelectItem>
                     {ITEMS.map((item) => (
                       <SelectItem key={item.id} value={item.id}>
