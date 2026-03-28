@@ -50,7 +50,7 @@ export function Recipes() {
     cookTime: 15,
     servings: Number(dip.servings.split(" ")[0]) || 8,
     thcPerServing: "~2-5mg",
-    image: "/IMAGES/fries.jpg",
+    image: "/IMAGES/spreadsdips.jpg",
     description: dip.profile,
     route: `/spreads-dips?recipe=${encodeURIComponent(dip.id)}`,
   }));

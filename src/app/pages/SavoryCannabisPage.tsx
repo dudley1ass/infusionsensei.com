@@ -26,7 +26,7 @@ export function SavoryCannabisPage() {
         <div className="grid md:grid-cols-2 gap-5">
           {[
             { name:"Infused Wing Sauces", desc:"20 cannabis wing sauce recipes — Buffalo, Korean Gochujang, Honey BBQ, Nashville Hot and more. Cook wings your way. We handle the infused sauce.", emoji:"🍗", to:"/wings", count:"20 sauces" },
-            { name:"Spreads & Dips", desc:"Queso, spinach-artichoke, ranch, buffalo dip, aioli, and more — open any style in the recipe builder with exact mg per serving.", emoji:"🥣", to:"/spreads-dips", count:"9 dips" },
+            { name:"Spreads & Dips", desc:"Nut butters, cream cheese spreads, queso, spinach-artichoke, ranch, buffalo dip, aioli, and more — open any style in the recipe builder with exact mg per serving.", emoji:"🥣", to:"/spreads-dips", count:"14 spreads & dips" },
             { name:"Infused Pizza Sauce", desc:"Cannabis olive oil in homemade pizza sauce. The secret is in the sauce — not the dough. THC disperses evenly through every slice.", emoji:"🍕", to:"/recipes/infused-pizza-sauce", count:"Classic recipe" },
             { name:"Infused Pasta", desc:"Garlic infused pasta and cannabis alfredo — two savory meals with exact THC per serving built into the recipe builder.", emoji:"🍝", to:"/ingredients?category=savory-meals&recipe=alfredo", count:"Builder ready" },
             { name:"Infused Butter for Cooking", desc:"Cannabutter is the most versatile tool in cannabis cooking. Use it anywhere you'd use regular butter — finishing steaks, sautéing vegetables, making sauces.", emoji:"🧈", to:"/infusions", count:"Build yours" },

@@ -71,6 +71,11 @@ export const COFFEE_TO_BUILDER_RECIPE: Record<string, string> = {
 
 /** Builder templates for Spreads & Dips — map showcase / alias IDs to canonical builder recipe id */
 export const SPREADS_DIPS_TO_BUILDER_RECIPE: Record<string, string> = {
+  "infused-peanut-butter-spread": "infused-peanut-butter-spread",
+  "infused-almond-butter-spread": "infused-almond-butter-spread",
+  "infused-cream-cheese-whipped": "infused-cream-cheese-whipped",
+  "sweet-honey-cream-cheese-spread-infused": "sweet-honey-cream-cheese-spread-infused",
+  "herb-garlic-cream-cheese-spread-infused": "herb-garlic-cream-cheese-spread-infused",
   "queso-dip-infused": "queso-dip-infused",
   "spinach-artichoke-dip-infused": "spinach-artichoke-dip-infused",
   "buffalo-dip-infused": "buffalo-dip-infused",

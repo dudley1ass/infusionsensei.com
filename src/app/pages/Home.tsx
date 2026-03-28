@@ -42,7 +42,7 @@ export function Home() {
               { emoji: "🍗", label: "Wings", sub: "Start here", to: "/wings", img: "/IMAGES/chickenwings.jpg", highlight: false },
               { emoji: "🍿", label: "Popcorn", sub: "Start here", to: "/popcorn", img: "/IMAGES/popcorn.webp", highlight: false },
               { emoji: "☕", label: "Coffee", sub: "Start here", to: "/coffee", img: "/IMAGES/coffee.jpg", highlight: false },
-              { emoji: "🥣", label: "Spreads & Dips", sub: "Dips + party sauces", to: "/spreads-dips", img: "/IMAGES/fries.jpg", highlight: false },
+              { emoji: "🥣", label: "Spreads & Dips", sub: "Dips + party sauces", to: "/spreads-dips", img: ["/IMAGES/spreadsdips.jpg", "/images/spreadsdips.jpg", "/IMAGES/fries.jpg"], highlight: false },
               { emoji: "🍬", label: "Jello", sub: "Dose-controlled cubes", to: "/jello", img: "/IMAGES/jello-shots.png", highlight: true },
               { emoji: "🧸", label: "Gummies", sub: "Single-piece dosing", to: "/gummies", img: "/IMAGES/gummies.jpg", highlight: true },
               { emoji: "🎉", label: "Party Snacks", sub: "Handheld + controllable", to: "/party-snacks", img: "/IMAGES/popcorn.webp", highlight: true },

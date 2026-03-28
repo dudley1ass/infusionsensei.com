@@ -10,7 +10,7 @@ import { loadShowcaseItemsFromDb } from "../services/contentService";
 export type SpreadDipRecipe = {
   id: string;
   name: string;
-  type: "Cheesy" | "Creamy" | "Spicy" | "Sweet" | "Savory";
+  type: "Cheesy" | "Creamy" | "Spicy" | "Sweet" | "Savory" | "Nutty";
   profile: string;
   build: string;
   tags: string[];
@@ -24,6 +24,103 @@ export type SpreadDipRecipe = {
 };
 
 export const RECIPES: SpreadDipRecipe[] = [
+  {
+    id: "infused-peanut-butter-spread",
+    name: "Infused Peanut Butter",
+    type: "Nutty",
+    profile: "Spread / toast & apples",
+    build: "Cannabis coconut oil folded into peanut butter",
+    tags: ["nut-butter", "spread", "classic"],
+    emoji: "🥜",
+    heat: 0,
+    sweetness: 1,
+    servings: "16 servings (about 1 tbsp each)",
+    ingredients: ["Peanut butter", "Cannabis coconut oil", "Salt", "Honey (optional)"],
+    steps: [
+      "Soften peanut butter slightly so it mixes easily (room temp or gentle warm).",
+      "Fold in cannabis coconut oil until completely smooth — no streaks.",
+      "Season with a tiny pinch of salt; add honey if you want it sweeter.",
+      "Transfer to a labeled jar; chill if you prefer a firmer spread.",
+    ],
+    note: "Dose the full jar, then divide by tablespoons. Oil stays blended best if you don’t overheat the peanut butter.",
+  },
+  {
+    id: "infused-almond-butter-spread",
+    name: "Infused Almond Butter",
+    type: "Nutty",
+    profile: "Spread / smoothies & toast",
+    build: "Cannabis coconut oil folded into almond butter",
+    tags: ["nut-butter", "spread", "creamy"],
+    emoji: "🌰",
+    heat: 0,
+    sweetness: 0,
+    servings: "16 servings (about 1 tbsp each)",
+    ingredients: ["Almond butter", "Cannabis coconut oil", "Salt", "Cinnamon (optional)"],
+    steps: [
+      "Stir almond butter well if oil has separated.",
+      "Fold in cannabis coconut oil until uniform.",
+      "Pinch of salt; cinnamon optional. Mix thoroughly.",
+      "Store in a labeled container.",
+    ],
+    note: "Same dosing idea as peanut butter — calculate mg for the whole batch, then per spoonful.",
+  },
+  {
+    id: "infused-cream-cheese-whipped",
+    name: "Whipped Infused Cream Cheese",
+    type: "Creamy",
+    profile: "Bagel spread / base for mixes",
+    build: "Room-temp cream cheese + cannabutter, whipped smooth",
+    tags: ["cream-cheese", "spread", "classic"],
+    emoji: "🧈",
+    heat: 0,
+    sweetness: 0,
+    servings: "8 servings",
+    ingredients: ["Cream cheese", "Cannabutter", "Salt"],
+    steps: [
+      "Bring cream cheese to room temperature.",
+      "Beat cream cheese with cannabutter until fluffy and no lumps.",
+      "Season lightly with salt. Chill in a labeled dish.",
+    ],
+    note: "Use as-is or split the batch and flavor one half sweet, one savory.",
+  },
+  {
+    id: "sweet-honey-cream-cheese-spread-infused",
+    name: "Sweet Honey Cream Cheese",
+    type: "Sweet",
+    profile: "Dessert-style / fruit dip",
+    build: "Cream cheese + cannabutter + honey & powdered sugar",
+    tags: ["cream-cheese", "sweet", "spread"],
+    emoji: "🍯",
+    heat: 0,
+    sweetness: 3,
+    servings: "10 servings",
+    ingredients: ["Cream cheese", "Cannabutter", "Honey", "Powdered sugar", "Vanilla extract", "Salt"],
+    steps: [
+      "Soften cream cheese; beat with cannabutter until smooth.",
+      "Add honey, powdered sugar, vanilla, and a pinch of salt; beat until fluffy.",
+      "Chill; serve with fruit or graham crackers — label the bowl.",
+    ],
+    note: "Sweeter spreads hide cannabis flavor well; still dose by total batch weight or portions.",
+  },
+  {
+    id: "herb-garlic-cream-cheese-spread-infused",
+    name: "Herb & Garlic Cream Cheese",
+    type: "Savory",
+    profile: "Bagels / crackers / veggie dip",
+    build: "Whipped cream cheese + cannabutter + herbs & garlic",
+    tags: ["cream-cheese", "savory", "spread"],
+    emoji: "🌿",
+    heat: 0,
+    sweetness: 0,
+    servings: "8 servings",
+    ingredients: ["Cream cheese", "Cannabutter", "Garlic powder", "Italian seasoning", "Salt", "Black pepper"],
+    steps: [
+      "Beat soft cream cheese with cannabutter until smooth.",
+      "Mix in garlic powder, Italian seasoning, salt, and pepper.",
+      "Rest 30 minutes in the fridge so flavors meld. Label clearly.",
+    ],
+    note: "Scoop with a consistent spoon size so guests can estimate portions.",
+  },
   {
     id: "spinach-artichoke-dip-infused",
     name: "Spinach Artichoke Dip",
@@ -161,7 +258,7 @@ export const RECIPES: SpreadDipRecipe[] = [
   },
 ];
 
-const TAGS = ["all", "classic", "cheesy", "spicy", "sweet", "creamy", "party", "savory", "dip", "baked"] as const;
+const TAGS = ["all", "classic", "cheesy", "spicy", "sweet", "creamy", "party", "savory", "dip", "baked", "nut-butter", "cream-cheese", "spread"] as const;
 const TAG_LABELS: Record<string, string> = {
   all: "All",
   classic: "Classic",
@@ -173,6 +270,9 @@ const TAG_LABELS: Record<string, string> = {
   savory: "Savory",
   dip: "Dips",
   baked: "Baked",
+  "nut-butter": "Nut butters",
+  "cream-cheese": "Cream cheese",
+  spread: "Spreads",
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -181,7 +281,10 @@ const TYPE_COLORS: Record<string, string> = {
   Spicy: "bg-red-100 text-red-800",
   Sweet: "bg-pink-100 text-pink-800",
   Savory: "bg-green-100 text-green-800",
+  Nutty: "bg-yellow-100 text-yellow-900",
 };
+
+const SPREADS_HERO_IMAGES = ["/IMAGES/spreadsdips.jpg", "/images/spreadsdips.jpg", "/IMAGES/fries.jpg"] as const;
 
 function Dots({ level, color }: { level: number; color: string }) {
   return (
@@ -197,6 +300,7 @@ export function SpreadsDips() {
   const [activeTag, setActiveTag] = useState("all");
   const [selected, setSelected] = useState<SpreadDipRecipe | null>(null);
   const [list, setList] = useState<SpreadDipRecipe[]>(RECIPES);
+  const [heroImgIndex, setHeroImgIndex] = useState(0);
   const [searchParams] = useSearchParams();
 
   const filtered = activeTag === "all" ? list : list.filter((r) => r.tags.includes(activeTag));
@@ -245,13 +349,18 @@ export function SpreadsDips() {
         <title>Infused Spreads & Dips (Easy THC Dosing) | Infusion Sensei</title>
         <meta
           name="description"
-          content="Make cannabis queso, ranch dip, spinach-artichoke dip, and aioli with exact mg per serving. Open any recipe in the builder and use your saved infusion bases."
+          content="Make infused peanut butter, almond butter, cream cheese spreads, plus queso, ranch dip, spinach-artichoke, and aioli — exact mg per serving. Open any recipe in the builder with your saved infusion bases."
         />
         <link rel="canonical" href="https://infusionsensei.com/spreads-dips" />
       </Helmet>
 
       <div className="relative rounded-3xl overflow-hidden shadow-2xl min-h-[260px]">
-        <img src="/IMAGES/fries.jpg" alt="Infused dips and spreads" className="absolute inset-0 w-full h-full object-cover" />
+        <img
+          src={SPREADS_HERO_IMAGES[heroImgIndex]}
+          alt="Infused dips and spreads"
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={() => setHeroImgIndex((i) => Math.min(i + 1, SPREADS_HERO_IMAGES.length - 1))}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent" />
         <div className="relative z-10 px-6 py-12 text-center text-white">
           <div className="text-5xl mb-2">🥣</div>
