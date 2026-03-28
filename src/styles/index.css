@@ -1,1 +1,39 @@
 @import "tailwindcss";
+
+/*
+ * Print layouts must not rely on Tailwind's `print:` variant alone — production CSS
+ * ordering can leave screen UI visible. These rules use !important so they always win.
+ */
+@media print {
+  html,
+  body {
+    background: white !important;
+  }
+
+  /* Let print layouts use full width (Tailwind container can constrain) */
+  main.container {
+    max-width: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+
+  .app-print-hide {
+    display: none !important;
+  }
+
+  .party-print-only,
+  .grocery-print-only {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Recipe builder fallback (CreateRecipes also injects rules; this mirrors them) */
+  .screen-only {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}

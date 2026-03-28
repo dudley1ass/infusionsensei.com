@@ -162,7 +162,7 @@ export function PartyGroceryList() {
           @page { margin: 0.55in; size: letter; }
         }
       `}</style>
-      <div className="print:hidden max-w-5xl mx-auto space-y-6">
+      <div className="app-print-hide max-w-5xl mx-auto space-y-6">
         <Helmet>
           <title>{PACK_LABELS[packId] ?? "Party"} Grocery List | Infusion Sensei</title>
         </Helmet>

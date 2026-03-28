@@ -541,7 +541,7 @@ export function PartyPackPlanner() {
           .party-print-recipe { page-break-inside: avoid; }
         }
       `}</style>
-      <div className="print:hidden max-w-5xl mx-auto space-y-8">
+      <div className="app-print-hide max-w-5xl mx-auto space-y-8">
       <Helmet>
         <title>{pack.title} | Infusion Sensei</title>
         <meta
@@ -550,7 +550,7 @@ export function PartyPackPlanner() {
         />
       </Helmet>
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-4 print:hidden">
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 app-print-hide">
         <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Party Planner Packs</p>
         <div className="flex flex-wrap gap-2">
           {PACKS.map((p) => (
@@ -566,7 +566,7 @@ export function PartyPackPlanner() {
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-purple-900 via-indigo-900 to-gray-900 rounded-3xl p-8 text-white shadow-2xl print:hidden">
+      <div className="bg-gradient-to-br from-purple-900 via-indigo-900 to-gray-900 rounded-3xl p-8 text-white shadow-2xl app-print-hide">
         <h1 className="text-3xl md:text-4xl font-black mb-2">{pack.title}</h1>
         <p className="text-purple-100">{pack.subtitle}</p>
         <p className="text-purple-200 text-sm mt-2">
@@ -574,7 +574,7 @@ export function PartyPackPlanner() {
         </p>
       </div>
 
-      <section className="bg-white border border-gray-200 rounded-2xl p-5 print:hidden">
+      <section className="bg-white border border-gray-200 rounded-2xl p-5 app-print-hide">
         <h2 className="text-2xl font-black text-gray-900 mb-4 text-center">Setup</h2>
         <div className="grid md:grid-cols-2 gap-4">
           <div>
@@ -612,7 +612,7 @@ export function PartyPackPlanner() {
       </section>
 
       {isSavoryPack && (
-        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 print:hidden">
+        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 app-print-hide">
           <Label className="text-sm font-bold text-orange-900">Which dinner item should be infused with THC?</Label>
           <Select value={savoryInfusedItemId} onValueChange={setSavoryInfusedItemId}>
             <SelectTrigger className="mt-2 bg-white">
@@ -629,7 +629,7 @@ export function PartyPackPlanner() {
         </div>
       )}
 
-      <section className="space-y-3 print:hidden">
+      <section className="space-y-3 app-print-hide">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-black text-gray-900">Build Your Menu 🍗🍿🍟</h2>
           <p className="text-sm text-gray-600">{builtCount} of {items.length} items dialed in</p>
@@ -754,7 +754,7 @@ export function PartyPackPlanner() {
         })}
       </section>
 
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center print:hidden">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center app-print-hide">
         <div className="flex-1">
           <Label className="text-sm font-bold text-gray-700">Add an item (from recipes)</Label>
           <Select value={selectedRecipeToAdd} onValueChange={setSelectedRecipeToAdd}>
@@ -779,7 +779,7 @@ export function PartyPackPlanner() {
         </Button>
       </div>
 
-      <section className="bg-gray-950 rounded-2xl p-6 text-white print:hidden">
+      <section className="bg-gray-950 rounded-2xl p-6 text-white app-print-hide">
         <h2 className="text-2xl font-black mb-4">Your Dose Plan ⚡</h2>
         <div className="bg-gray-900 rounded-2xl p-5 mb-4 text-center border border-gray-700">
           <p className="text-xs uppercase tracking-wide text-gray-400">Per Person</p>
@@ -885,7 +885,7 @@ export function PartyPackPlanner() {
         </div>
       )}
 
-      <div className="flex flex-wrap gap-3 print:hidden">
+      <div className="flex flex-wrap gap-3 app-print-hide">
         <Button onClick={() => window.print()} variant="outline" className="font-bold">
           <Printer className="w-4 h-4 mr-1.5" />
           Print Party Package
