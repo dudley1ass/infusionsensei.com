@@ -102,6 +102,43 @@ const ALL_PARTY_SNACK_ITEMS = SNACK_GROUPS.flatMap((g) => g.items);
 
 const GROCERY_MODE_STORAGE_KEY = "party-snack-grocery-measure";
 
+/** Persists guest count, slots, mg goal, and each dropdown so leaving for a recipe doesn’t reset picks. */
+const PARTY_SNACKS_PLAN_KEY = "party-snacks-plan-v1";
+
+function clamp(n: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, n));
+}
+
+function loadPartySnacksPlan(): {
+  guestCount: number;
+  infusedSlotCount: number;
+  mgPerPerson: number;
+  infusedSelections: string[];
+} | null {
+  try {
+    const raw = localStorage.getItem(PARTY_SNACKS_PLAN_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as Record<string, unknown>;
+    if (!p || typeof p !== "object") return null;
+    const validIds = new Set(ALL_PARTY_SNACK_ITEMS.map((i) => i.id));
+    const slotCount = clamp(Math.round(Number(p.infusedSlotCount)) || 2, 1, ALL_PARTY_SNACK_ITEMS.length);
+    const rawSel = Array.isArray(p.infusedSelections) ? (p.infusedSelections as string[]) : [];
+    const infusedSelections: string[] = [];
+    for (let i = 0; i < slotCount; i++) {
+      const id = rawSel[i];
+      infusedSelections.push(id === EMPTY || validIds.has(id) ? id : EMPTY);
+    }
+    return {
+      guestCount: clamp(Math.round(Number(p.guestCount)) || 8, 1, 500),
+      infusedSlotCount: slotCount,
+      mgPerPerson: Math.max(0, Number(p.mgPerPerson) || 10),
+      infusedSelections,
+    };
+  } catch {
+    return null;
+  }
+}
+
 function loadGroceryMeasureMode(): GroceryMeasureMode {
   try {
     const s = localStorage.getItem(GROCERY_MODE_STORAGE_KEY);
@@ -119,10 +156,29 @@ function buildInitialSlots(count: number): string[] {
 }
 
 export function PartySnacks() {
-  const [guestCount, setGuestCount] = useState(8);
-  const [infusedSlotCount, setInfusedSlotCount] = useState(2);
-  const [mgPerPerson, setMgPerPerson] = useState(10);
-  const [infusedSelections, setInfusedSelections] = useState<string[]>(() => buildInitialSlots(2));
+  const savedPlan = typeof window !== "undefined" ? loadPartySnacksPlan() : null;
+  const [guestCount, setGuestCount] = useState(savedPlan?.guestCount ?? 8);
+  const [infusedSlotCount, setInfusedSlotCount] = useState(savedPlan?.infusedSlotCount ?? 2);
+  const [mgPerPerson, setMgPerPerson] = useState(savedPlan?.mgPerPerson ?? 10);
+  const [infusedSelections, setInfusedSelections] = useState<string[]>(
+    () => savedPlan?.infusedSelections ?? buildInitialSlots(2)
+  );
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        PARTY_SNACKS_PLAN_KEY,
+        JSON.stringify({
+          guestCount,
+          infusedSlotCount,
+          mgPerPerson,
+          infusedSelections,
+        })
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [guestCount, infusedSlotCount, mgPerPerson, infusedSelections]);
 
   const syncSlotArray = useCallback((newCount: number) => {
     setInfusedSlotCount(newCount);
@@ -446,7 +502,8 @@ export function PartySnacks() {
               <p className="text-xs font-bold text-indigo-900 uppercase tracking-wide">Combined shopping (deduplicated)</p>
               <p className="text-xs text-indigo-800">
                 If the same ingredient appears in multiple snacks, amounts are added. Buy infused butter / oil / tincture using
-                your builder targets — not only these gram totals.
+                your builder targets — not only these gram totals. <strong>Store:</strong> lines below translate into typical
+                boxes (12 oz cereal), 10 oz marshmallow bags, butter sticks, etc. — round up at the store.
               </p>
               <div className="space-y-4">
                 {combinedByStoreSection.map(({ section, lines }) => (
@@ -464,8 +521,16 @@ export function PartySnacks() {
                               className="mt-1 rounded border-gray-300 print:hidden shrink-0"
                               aria-label={`Got ${line.name}`}
                             />
-                            <span>
-                              <span className="font-semibold">{groceryLineDisplay(line, groceryMeasureMode)}</span> {line.name}
+                            <span className="flex flex-col gap-0.5">
+                              <span>
+                                <span className="font-semibold">{groceryLineDisplay(line, groceryMeasureMode)}</span>{" "}
+                                {line.name}
+                              </span>
+                              {line.storeHint && (
+                                <span className="text-xs text-gray-500 pl-0 leading-snug print:text-gray-600">
+                                  {line.storeHint}
+                                </span>
+                              )}
                             </span>
                           </li>
                         );
@@ -489,11 +554,16 @@ export function PartySnacks() {
                     </p>
                     <ul className="text-xs text-gray-700 space-y-1">
                       {sec.lines.map((line) => (
-                        <li key={`${sec.recipeId}-${line.name}-${line.unit}`}>
-                          <span className="font-semibold text-gray-900">
-                            {groceryLineDisplay(line, groceryMeasureMode)}
-                          </span>{" "}
-                          {line.name}
+                        <li key={`${sec.recipeId}-${line.name}-${line.unit}`} className="space-y-0.5">
+                          <div>
+                            <span className="font-semibold text-gray-900">
+                              {groceryLineDisplay(line, groceryMeasureMode)}
+                            </span>{" "}
+                            {line.name}
+                          </div>
+                          {line.storeHint && (
+                            <p className="text-[11px] text-gray-500 leading-snug pl-0">{line.storeHint}</p>
+                          )}
                         </li>
                       ))}
                     </ul>

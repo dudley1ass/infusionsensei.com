@@ -10,6 +10,8 @@ export type GroceryIngredientLine = {
   displayAmount: string;
   displayMetric: string;
   displayUs: string;
+  /** Grocery-store buying guide (cups + boxes, bags, sticks, marshmallow counts) */
+  storeHint?: string;
 };
 
 export type RecipeGrocerySection = {
@@ -74,6 +76,13 @@ const GRAMS_PER_CUP: Record<string, number> = {
 };
 
 const US_CUP_ML = 236.5882365;
+/** Typical US retail box of puffed rice cereal (12 oz). */
+const CEREAL_BOX_12OZ_G = 12 * 28.3495;
+/** Standard 10 oz marshmallow bag (minis or regular). */
+const MARSHMALLOW_BAG_10OZ_G = 10 * 28.3495;
+/** US ¼ lb butter stick. */
+const BUTTER_STICK_G = 113.5;
+const G_PER_MEDIUM_MARSHMALLOW = 7.5;
 
 function gramsPerCupFor(name: string): number | null {
   if (GRAMS_PER_CUP[name] != null) return GRAMS_PER_CUP[name];
@@ -283,6 +292,106 @@ export function groceryLineDisplay(line: GroceryIngredientLine, mode: GroceryMea
   return mode === "metric" ? line.displayMetric : line.displayUs;
 }
 
+function lineToCanonicalGramsMl(line: GroceryIngredientLine): { g: number; ml: number } {
+  const { name, amount, unit } = line;
+  if (unit === "ml" || unit === "L") {
+    return { g: 0, ml: unit === "L" ? amount * 1000 : amount };
+  }
+  if (unit === "pieces" || unit === "cloves" || isEggUnit(unit)) return { g: 0, ml: 0 };
+  return { g: amountToGrams(amount, unit, name), ml: 0 };
+}
+
+/**
+ * What to grab at the store: cereal boxes, marshmallow bags, butter sticks, etc.
+ */
+export function computeStorePurchaseHint(name: string, grams: number, ml: number): string | undefined {
+  const n = name.toLowerCase();
+
+  if (ml > 0 && grams === 0) {
+    if (/\bmilk\b/i.test(name) && !/coconut|condensed|evaporated|powdered/i.test(n)) {
+      const gal = 3785.41;
+      const q = ml / gal;
+      if (q >= 0.4) return `Store: ≈ ${roundSmart(q, 2)} gallon milk (1 gal ≈ 3.8 L) — buy ${Math.ceil(q)} gallon(s) or jugs to cover`;
+      return `Store: ≈ ${roundSmart(ml / US_CUP_ML, 1)} cups / ${formatMetricVolume(ml)} — common: half-gallon or quart cartons`;
+    }
+    if (/oil|olive|coconut oil|cannabis olive oil/i.test(name)) {
+      return `Store: ≈ ${roundSmart(ml / 500, 2)} × 500 ml bottles (or ${roundSmart(ml / US_CUP_ML, 1)} cups) — round up`;
+    }
+    if (/ketchup|mustard|mayo|sauce|vinegar|honey|syrup|bbq|hot sauce/i.test(n) && ml > 30) {
+      return `Store: ≈ ${roundSmart(ml / US_CUP_ML, 1)} cups (${formatMetricVolume(ml)}) — grab enough squeeze bottles / jars`;
+    }
+    return undefined;
+  }
+
+  if (grams <= 0) return undefined;
+
+  if (/rice cereal|rice krisp/i.test(n)) {
+    const gpc = 28;
+    const cups = grams / gpc;
+    const boxes = grams / CEREAL_BOX_12OZ_G;
+    const buy = Math.max(1, Math.ceil(boxes - 1e-9));
+    return `Store: ≈ ${roundSmart(cups, 1)} cups · ~${roundSmart(boxes, 1)} × 12 oz boxes of puffed rice cereal — buy ${buy} box${buy !== 1 ? "es" : ""} (sizes vary; 12 oz is common)`;
+  }
+
+  if (n.includes("chex")) {
+    const gpc = 40;
+    const cups = grams / gpc;
+    const boxes = grams / CEREAL_BOX_12OZ_G;
+    const buy = Math.max(1, Math.ceil(boxes - 1e-9));
+    return `Store: ≈ ${roundSmart(cups, 1)} cups Chex-style cereal · ~${roundSmart(boxes, 1)} × 12 oz boxes — buy ${buy} box${buy !== 1 ? "es" : ""} (or one large box)`;
+  }
+
+  if (/popcorn kernel/i.test(n)) {
+    const gpc = 30;
+    const cups = grams / gpc;
+    return `Store: ≈ ${roundSmart(cups, 1)} cups unpopped kernels (${formatMetricWeight(grams)}) — typical jars/bags are 28–32 oz`;
+  }
+
+  if (/marshmallow/i.test(n)) {
+    const bags = grams / MARSHMALLOW_BAG_10OZ_G;
+    const buy = Math.max(1, Math.ceil(bags - 1e-9));
+    const mediumCount = Math.round(grams / G_PER_MEDIUM_MARSHMALLOW);
+    return `Store: ~${roundSmart(bags, 1)} × 10 oz bags — buy ${buy} bag${buy !== 1 ? "s" : ""} · ~${mediumCount} medium marshmallows (~${G_PER_MEDIUM_MARSHMALLOW} g each; minis sold by same 10 oz weight)`;
+  }
+
+  if (isButterLike(name)) {
+    const sticks = grams / BUTTER_STICK_G;
+    const tbsp = grams / 14.2;
+    return `Store: ≈ ${roundSmart(sticks, 2)} sticks (8 tbsp each) · ~${roundSmart(tbsp, 1)} tbsp total — for cannabutter, match your infusion plan`;
+  }
+
+  if (/granulated sugar|powdered sugar|brown sugar/i.test(n)) {
+    const gpc = n.includes("powdered") ? 120 : n.includes("brown") ? 220 : 200;
+    const cups = grams / gpc;
+    return `Store: ≈ ${roundSmart(cups, 1)} cups (${formatMetricWeight(grams)}) — 4 lb sugar bag ≈ 1814 g if you buy bulk`;
+  }
+
+  if (/all-purpose flour|bread flour|cake flour/i.test(n)) {
+    const gpc = 125;
+    const cups = grams / gpc;
+    return `Store: ≈ ${roundSmart(cups, 1)} cups flour (${formatMetricWeight(grams)}) — 5 lb bag ≈ 2.27 kg`;
+  }
+
+  if (/dark chocolate chip|chocolate chip/i.test(n)) {
+    const bagG = 12 * 28.3495;
+    const bags = grams / bagG;
+    const buy = Math.max(1, Math.ceil(bags - 1e-9));
+    return `Store: ~${roundSmart(bags, 1)} × 12 oz bags chocolate chips — buy ${buy} bag${buy !== 1 ? "s" : ""}`;
+  }
+
+  if (/(cheddar|mozzarella|parmesan)/i.test(n) && grams > 60 && !/cracker|sauce/i.test(n)) {
+    return `Store: ${formatUsWeightOzLb(grams)} — shredded bags often 8 oz / 16 oz; block cheese OK to grate`;
+  }
+
+  return undefined;
+}
+
+function enrichLineWithStoreHint(line: GroceryIngredientLine): GroceryIngredientLine {
+  const { g, ml } = lineToCanonicalGramsMl(line);
+  const storeHint = computeStorePurchaseHint(line.name, g, ml);
+  return storeHint ? { ...line, storeHint } : line;
+}
+
 export function buildPartySnackGrocery(
   standardRecipes: Record<string, TemplateRecipe[]>,
   recipeIds: string[],
@@ -329,7 +438,7 @@ export function buildPartySnackGrocery(
         displayAmount: metric,
       };
       addMerge(name, amount, unit);
-      return line;
+      return enrichLineWithStoreHint(line);
     });
 
     sections.push({ recipeId, recipeName: recipe.name, lines });
@@ -371,7 +480,7 @@ export function buildPartySnackGrocery(
           displayAmount: metric,
         };
       }
-      return line;
+      return enrichLineWithStoreHint(line);
     })
     .sort((a, b) => a.name.localeCompare(b.name));
 
