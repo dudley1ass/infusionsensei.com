@@ -1,9 +1,14 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChefHat, ListChecks, Printer } from "lucide-react";
 import { standardRecipes } from "./CreateRecipes";
-import { buildPartySnackGrocery, grocerySectionForIngredient } from "../utils/partySnackGrocery";
+import {
+  buildPartySnackGrocery,
+  groceryLineDisplay,
+  grocerySectionForIngredient,
+  type GroceryMeasureMode,
+} from "../utils/partySnackGrocery";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
@@ -95,6 +100,18 @@ const SNACK_GROUPS: { title: string; items: SnackItem[] }[] = [
 
 const ALL_PARTY_SNACK_ITEMS = SNACK_GROUPS.flatMap((g) => g.items);
 
+const GROCERY_MODE_STORAGE_KEY = "party-snack-grocery-measure";
+
+function loadGroceryMeasureMode(): GroceryMeasureMode {
+  try {
+    const s = localStorage.getItem(GROCERY_MODE_STORAGE_KEY);
+    if (s === "metric" || s === "us") return s;
+  } catch {
+    /* ignore */
+  }
+  return "us";
+}
+
 function buildInitialSlots(count: number): string[] {
   const next = ALL_PARTY_SNACK_ITEMS.slice(0, Math.min(count, ALL_PARTY_SNACK_ITEMS.length)).map((i) => i.id);
   while (next.length < count) next.push(EMPTY);
@@ -165,6 +182,17 @@ export function PartySnacks() {
   }, [groceryData]);
 
   const [groceryChecked, setGroceryChecked] = useState<Record<string, boolean>>({});
+  const [groceryMeasureMode, setGroceryMeasureMode] = useState<GroceryMeasureMode>(() =>
+    typeof window !== "undefined" ? loadGroceryMeasureMode() : "us"
+  );
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(GROCERY_MODE_STORAGE_KEY, groceryMeasureMode);
+    } catch {
+      /* ignore */
+    }
+  }, [groceryMeasureMode]);
 
   const toggleGroceryLine = (key: string) => {
     setGroceryChecked((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -368,18 +396,42 @@ export function PartySnacks() {
                 Totals scale to <span className="font-semibold">{guestCount} guests</span> (one portion per guest per infused
                 snack). Matches the recipe builder batch math — adjust in the builder after you set THC.
               </p>
+              <p className="text-xs text-gray-500 mt-1 max-w-xl">
+                Choose how amounts are shown: <strong>US</strong> uses cups / tablespoons / fl oz where it helps (densities are
+                typical — not every brand matches). <strong>Metric</strong> uses grams and milliliters from the same scaled
+                batch math.
+              </p>
             </div>
           </div>
-          {groceryData && (
-            <Button
-              type="button"
-              variant="outline"
-              className="font-bold gap-2 print:hidden"
-              onClick={() => window.print()}
-            >
-              <Printer className="w-4 h-4" /> Print / Save PDF
-            </Button>
-          )}
+          <div className="flex flex-wrap gap-2 justify-end items-center print:hidden">
+            {groceryData && (
+              <>
+                <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 shadow-sm" role="group" aria-label="Grocery amount units">
+                  <button
+                    type="button"
+                    onClick={() => setGroceryMeasureMode("us")}
+                    className={`px-3 py-2 text-xs font-bold rounded-md transition-colors ${
+                      groceryMeasureMode === "us" ? "bg-white text-indigo-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    US (cups & spoons)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGroceryMeasureMode("metric")}
+                    className={`px-3 py-2 text-xs font-bold rounded-md transition-colors ${
+                      groceryMeasureMode === "metric" ? "bg-white text-indigo-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    Metric (g & ml)
+                  </button>
+                </div>
+                <Button type="button" variant="outline" className="font-bold gap-2" onClick={() => window.print()}>
+                  <Printer className="w-4 h-4" /> Print / Save PDF
+                </Button>
+              </>
+            )}
+          </div>
         </div>
 
         {!uniqueInfusedIds.length ? (
@@ -402,9 +454,9 @@ export function PartySnacks() {
                     <p className="text-xs font-black text-gray-700 mb-2">{section}</p>
                     <ul className="space-y-1.5">
                       {lines.map((line) => {
-                        const key = `${line.name}|${line.unit}`;
+                        const key = line.name;
                         return (
-                          <li key={key} className="flex items-start gap-2 text-sm text-gray-800">
+                          <li key={`${line.name}|${line.unit}`} className="flex items-start gap-2 text-sm text-gray-800">
                             <input
                               type="checkbox"
                               checked={!!groceryChecked[key]}
@@ -413,7 +465,7 @@ export function PartySnacks() {
                               aria-label={`Got ${line.name}`}
                             />
                             <span>
-                              <span className="font-semibold">{line.displayAmount}</span> {line.name}
+                              <span className="font-semibold">{groceryLineDisplay(line, groceryMeasureMode)}</span> {line.name}
                             </span>
                           </li>
                         );
@@ -438,7 +490,10 @@ export function PartySnacks() {
                     <ul className="text-xs text-gray-700 space-y-1">
                       {sec.lines.map((line) => (
                         <li key={`${sec.recipeId}-${line.name}-${line.unit}`}>
-                          <span className="font-semibold text-gray-900">{line.displayAmount}</span> {line.name}
+                          <span className="font-semibold text-gray-900">
+                            {groceryLineDisplay(line, groceryMeasureMode)}
+                          </span>{" "}
+                          {line.name}
                         </li>
                       ))}
                     </ul>
