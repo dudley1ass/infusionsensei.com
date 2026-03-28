@@ -97,7 +97,7 @@ export function EdiblesTasteBad() {
             <div className="grid md:grid-cols-3 gap-4">
               {[
                 { title:"Infused Wing Sauces", desc:"20 sauces — buffalo, Nashville hot, Korean gochujang. Cannabis taste is undetectable.", to:"/wings", emoji:"🍗" },
-                { title:"Infused Fries", desc:"Garlic butter, truffle, cajun. Strong flavors mask everything.", to:"/fries", emoji:"🍟" },
+                { title:"Spreads & Dips", desc:"Cheese dips, ranch, buffalo — strong flavors mask everything.", to:"/spreads-dips", emoji:"🥣" },
                 { title:"Infused Pasta", desc:"Alfredo and garlic pasta — cheese and garlic dominate.", to:"/ingredients?category=savory-meals&recipe=alfredo", emoji:"🍝" },
               ].map(({ title, desc, to, emoji }) => (
                 <Link key={title} to={to} className="bg-green-50 border border-green-200 rounded-2xl p-4 hover:border-green-400 transition-all group">

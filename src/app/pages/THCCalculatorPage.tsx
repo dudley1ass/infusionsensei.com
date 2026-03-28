@@ -86,7 +86,7 @@ export function THCCalculatorPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-12">
       <Helmet>
-        <title>THC Dosage Calculator (Edibles, Butter, Oil - Instant Results)</title>
+        <title>THC Edible Calculator — How Strong Is Your Batch? (Free)</title>
         <meta name="description" content="Calculate exact THC dosage for edibles, cannabutter, and oil. Get precise potency instantly - no math required." />
         <link rel="canonical" href="https://infusionsensei.com/thc-calculator" />
       </Helmet>

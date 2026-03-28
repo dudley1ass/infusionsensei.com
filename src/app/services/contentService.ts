@@ -163,7 +163,7 @@ export async function loadRecipeByIdFromDb(id: string): Promise<Recipe | null> {
 
 const builderMapCache = new Map<string, Record<string, string>>();
 
-export async function loadBuilderMapFromDb(domain: "wings" | "popcorn" | "coffee" | "fries"): Promise<Record<string, string> | null> {
+export async function loadBuilderMapFromDb(domain: "wings" | "popcorn" | "coffee" | "fries" | "spreads-dips"): Promise<Record<string, string> | null> {
   if (builderMapCache.has(domain)) return builderMapCache.get(domain)!;
 
   const { url, key } = getSupabaseConfig();
@@ -190,7 +190,7 @@ export async function loadBuilderMapFromDb(domain: "wings" | "popcorn" | "coffee
   }
 }
 
-export type ShowcaseDomain = "wings" | "popcorn" | "coffee" | "fries";
+export type ShowcaseDomain = "wings" | "popcorn" | "coffee" | "fries" | "spreads-dips";
 
 export type ShowcaseItem = {
   id: string;

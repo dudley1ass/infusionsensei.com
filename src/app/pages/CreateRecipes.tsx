@@ -33,8 +33,9 @@ import { safeJsonParse } from "../utils/storage";
 import { trackEvent } from "../utils/analytics";
 import {
   COFFEE_TO_BUILDER_RECIPE,
-  FRIES_TO_BUILDER_RECIPE,
+  LEGACY_FRIES_RECIPE_TO_SPREADS_DIP,
   POPCORN_TO_BUILDER_RECIPE,
+  SPREADS_DIPS_TO_BUILDER_RECIPE,
   WING_SAUCE_TO_BUILDER_RECIPE,
 } from "../data/builderRecipeMaps";
 
@@ -315,7 +316,7 @@ const INGREDIENT_LIBRARY = [
 const recipeCategories = [
   { id: "baked-goods",     name: "🍪 Baked Goods",       emoji: "🍪", description: "Cookies, brownies, cakes" },
   { id: "wings",           name: "🍗 Wings",              emoji: "🍗", description: "Buffalo, garlic parm, Nashville hot" },
-  { id: "fries",           name: "🍟 Fries",              emoji: "🍟", description: "Garlic butter, cajun, truffle" },
+  { id: "spreads-dips",    name: "🥣 Spreads & Dips",     emoji: "🥣", description: "Dips, spreads & party sauces" },
   { id: "snacks",          name: "🍿 Snacks & Candy",     emoji: "🍿", description: "Popcorn, gummies, protein bars" },
   { id: "drinks",          name: "🥤 Drinks & Coffee",    emoji: "🥤", description: "Coffee, smoothies, cocktails" },
   { id: "savory-meals",    name: "🍝 Savory & Meals",     emoji: "🍝", description: "Pasta, pizza, steak" },
@@ -536,51 +537,87 @@ const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way. We're here for the sauce.","Blend chopped parsley, garlic, vinegar, and herbs into chimichurri.","Whisk cannabis olive oil into the sauce off heat.","Toss hot wings in chimichurri right before serving.","Finish with extra herbs and flaky salt."],
     },
   ],
-  "fries": [
+  "spreads-dips": [
     {
-      id: "garlic-butter-fries",
-      name: "Garlic Butter Fries",
-      servings: 2,
-      ingredients: ["French Fries","Cannabutter","Garlic Powder","Salt","Black Pepper"],
-      amounts: [500,28,3,3,1],
-      units: ["g","g","g","g","g"],
-      instructions: ["Cook fries your way — oven (425°F/20 min), air fryer (400°F/15 min), or deep fry. We're here for the sauce.","Melt cannabutter in a small saucepan over low heat.","Stir garlic powder into melted butter.","Toss hot fries in garlic butter immediately.","Season with salt and pepper. Serve right away."],
+      id: "queso-dip-infused",
+      name: "Infused Queso Dip",
+      servings: 8,
+      ingredients: ["Cheddar Cheese","Whole Milk","Cornstarch","Cannabutter","Salt","Garlic Powder"],
+      amounts: [220,300,18,40,4,2],
+      units: ["g","ml","g","g","g","g"],
+      instructions: ["Toss cheese with cornstarch.","Heat milk with cannabutter; add cheese gradually whisking until smooth.","Season; keep warm; label mg per oz."],
     },
     {
-      id: "cajun-fries",
-      name: "Cajun Cannabis Fries",
-      servings: 2,
-      ingredients: ["French Fries","Cannabis Coconut Oil","Cajun Seasoning","Garlic Powder","Salt"],
-      amounts: [500,20,5,2,2],
+      id: "spinach-artichoke-dip-infused",
+      name: "Spinach Artichoke Dip (Infused)",
+      servings: 8,
+      ingredients: ["Cream Cheese","Sour Cream","Cannabutter","Spinach (frozen)","Artichoke Hearts","Garlic Powder","Parmesan Cheese","Salt","Black Pepper"],
+      amounts: [220,140,40,150,200,3,50,3,2],
+      units: ["g","g","g","g","g","g","g","g","g"],
+      instructions: ["Warm cream cheese, sour cream, and cannabutter until smooth.","Stir in spinach, artichokes, garlic, parmesan, salt, and pepper.","Bake at 375°F 20 minutes until bubbly. Label serving spoon."],
+    },
+    {
+      id: "buffalo-dip-infused",
+      name: "Buffalo Chicken Dip (Infused)",
+      servings: 10,
+      ingredients: ["Cream Cheese","Sour Cream","Hot Sauce","Cannabutter","Cheddar Cheese","Garlic Powder","Salt"],
+      amounts: [200,120,80,35,120,2,2],
+      units: ["g","g","ml","g","g","g","g"],
+      instructions: ["Combine all ingredients in oven-safe dish.","Bake at 375°F until melted and bubbly; stir.","Serve with labeled chips/crackers on separate tray."],
+    },
+    {
+      id: "ranch-dip-infused",
+      name: "Ranch Dip (Infused)",
+      servings: 8,
+      ingredients: ["Sour Cream","Mayonnaise","Cannabis Olive Oil","Ranch Seasoning","Salt","Black Pepper"],
+      amounts: [200,120,20,12,2,1],
+      units: ["g","g","ml","g","g","g"],
+      instructions: ["Whisk all ingredients until smooth.","Chill 30 minutes for flavor. Label bowl clearly."],
+    },
+    {
+      id: "honey-mustard-dip-infused",
+      name: "Honey Mustard Dip (Infused)",
+      servings: 8,
+      ingredients: ["Honey","Mustard (yellow)","Mayonnaise","Cannabis Olive Oil","Salt"],
+      amounts: [90,45,120,18,1],
+      units: ["g","ml","g","ml","g"],
+      instructions: ["Whisk until emulsified.","Taste and adjust sweetness. Label infused dip."],
+    },
+    {
+      id: "garlic-aioli-infused",
+      name: "Garlic Aioli (Infused)",
+      servings: 6,
+      ingredients: ["Mayonnaise","Garlic","Lemon Juice","Cannabis Olive Oil","Salt","Black Pepper"],
+      amounts: [180,3,15,22,2,1],
+      units: ["g","cloves","ml","ml","g","g"],
+      instructions: ["Whisk finely minced garlic with mayonnaise and lemon.","Slowly whisk in cannabis olive oil until smooth. Chill and label."],
+    },
+    {
+      id: "bbq-sauce-infused-party",
+      name: "BBQ Sauce (Infused)",
+      servings: 12,
+      ingredients: ["Ketchup","Brown Sugar (Light)","Apple Cider Vinegar","Cannabis Olive Oil","Garlic Powder","Salt","Black Pepper"],
+      amounts: [240,80,30,25,4,4,2],
+      units: ["ml","g","ml","ml","g","g","g"],
+      instructions: ["Simmer all ingredients 10 minutes until slightly thickened. Cool.","Brush on proteins after cooking or serve as labeled dip."],
+    },
+    {
+      id: "sweet-chili-sauce-infused",
+      name: "Sweet Chili Sauce (Infused)",
+      servings: 10,
+      ingredients: ["Water","Granulated Sugar","Rice Vinegar","Garlic Powder","Cayenne Pepper","Cannabis Olive Oil","Salt"],
+      amounts: [120,150,45,3,2,20,2],
+      units: ["ml","g","ml","g","g","ml","g"],
+      instructions: ["Simmer water and sugar until dissolved.","Add vinegar, garlic, cayenne, and salt; simmer 5 minutes.","Off heat, whisk in cannabis olive oil. Label."],
+    },
+    {
+      id: "cheese-sauce-infused",
+      name: "Cheese Sauce (Infused)",
+      servings: 8,
+      ingredients: ["Cheddar Cheese","Whole Milk","Cannabutter","Cornstarch","Salt"],
+      amounts: [200,280,35,16,3],
       units: ["g","ml","g","g","g"],
-      instructions: ["Cook fries your way until very crispy. We're here for the sauce.","Toss hot fries in cannabis coconut oil.","Immediately shake on Cajun seasoning and garlic powder.","Toss vigorously — seasoning settles fast.","Season with extra salt to taste."],
-    },
-    {
-      id: "truffle-fries",
-      name: "Truffle Parmesan Fries",
-      servings: 2,
-      ingredients: ["French Fries","Cannabis Olive Oil","Parmesan Cheese","Salt","Black Pepper"],
-      amounts: [500,20,30,2,1],
-      units: ["g","ml","g","g","g"],
-      instructions: ["Cook fries until golden and crispy. We're here for the sauce.","Drizzle cannabis olive oil over hot fries and toss.","Top with freshly grated parmesan.","Finish with flaky salt and serve immediately."],
-    },
-    {
-      id: "buffalo-fries",
-      name: "Buffalo Fries",
-      servings: 2,
-      ingredients: ["French Fries","Cannabutter","Hot Sauce","Garlic Powder","Salt"],
-      amounts: [500,28,30,2,2],
-      units: ["g","g","ml","g","g"],
-      instructions: ["Cook fries your way until crispy.","Melt cannabutter and whisk in hot sauce and garlic powder.","Toss fries in buffalo butter.","Serve with ranch dipping sauce."],
-    },
-    {
-      id: "nashville-hot-fries",
-      name: "Nashville Hot Fries",
-      servings: 2,
-      ingredients: ["French Fries","Cannabis Coconut Oil","Cayenne Pepper","Garlic Powder","Salt"],
-      amounts: [500,20,5,2,2],
-      units: ["g","ml","g","g","g"],
-      instructions: ["Cook fries your way until very crispy.","Warm cannabis coconut oil and whisk in cayenne and garlic powder.","Toss fries in Nashville hot oil immediately.","Serve with pickles."],
+      instructions: ["Toss cheese with cornstarch.","Warm milk and cannabutter; add cheese slowly whisking.","Use immediately on fries or nachos; label."],
     },
   ],
   "snacks": [
@@ -1153,7 +1190,7 @@ const ensureAliasTemplates = (
 ensureAliasTemplates("wings", WING_SAUCE_TO_BUILDER_RECIPE, "classic-buffalo-wings");
 ensureAliasTemplates("snacks", POPCORN_TO_BUILDER_RECIPE, "garlic-butter-popcorn", formatSnackAliasName);
 ensureAliasTemplates("drinks", COFFEE_TO_BUILDER_RECIPE, "bulletproof-coffee");
-ensureAliasTemplates("fries", FRIES_TO_BUILDER_RECIPE, "garlic-butter-fries");
+ensureAliasTemplates("spreads-dips", SPREADS_DIPS_TO_BUILDER_RECIPE, "spinach-artichoke-dip-infused");
 
 
 type Ingredient = {
@@ -1262,7 +1299,7 @@ export function CreateRecipes() {
   const [availableRecipes, setAvailableRecipes] = useState<any[]>([]);
 
   // Auto-load recipe from URL params: /ingredients?category=savory-meals&recipe=classic-buffalo-wings
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
   const servingsOverrideParamRaw = searchParams.get("servings");
@@ -1282,7 +1319,8 @@ export function CreateRecipes() {
     if (category === "wings") return WING_SAUCE_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
     if (category === "snacks") return POPCORN_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
     if (category === "drinks") return COFFEE_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
-    if (category === "fries") return FRIES_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
+    if (category === "spreads-dips") return SPREADS_DIPS_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
+    if (category === "fries") return LEGACY_FRIES_RECIPE_TO_SPREADS_DIP[recipeId] ?? "spinach-artichoke-dip-infused";
     return recipeId;
   };
 
@@ -1294,13 +1332,22 @@ export function CreateRecipes() {
 
   useEffect(() => {
     const cat = searchParams.get("category");
+    if (cat === "fries") {
+      const rec = searchParams.get("recipe") || "";
+      const nextId = LEGACY_FRIES_RECIPE_TO_SPREADS_DIP[rec] ?? "spinach-artichoke-dip-infused";
+      const next = new URLSearchParams(searchParams);
+      next.set("category", "spreads-dips");
+      next.set("recipe", nextId);
+      setSearchParams(next, { replace: true });
+      return;
+    }
     const rec = searchParams.get("recipe");
     if (cat && rec) {
       setSelectedCategory(cat);
       setRecipeType("standard");
       setSelectedStandardRecipe(rec);
     }
-  }, []);
+  }, [searchParams, setSearchParams]);
 
   const handleReturnToPartyPack = () => {
     if (!returnToPartyPack || !partyProgressKey || !partyItemId) {
@@ -1406,7 +1453,7 @@ export function CreateRecipes() {
       const directRecipe = standardRecipes[selectedCategory]?.find(r => r.id === resolvedRecipeId);
       const fallbackByCategory: Record<string, string> = {
         wings: "classic-buffalo-wings",
-        fries: "garlic-butter-fries",
+        "spreads-dips": "spinach-artichoke-dip-infused",
         snacks: "garlic-butter-popcorn",
         drinks: "bulletproof-coffee",
       };
@@ -2007,7 +2054,7 @@ export function CreateRecipes() {
       recipeName.toLowerCase().includes("waffle") ||
       recipeName.toLowerCase().includes("crepe") ||
       selectedStandardRecipe === "pancakes";
-    const isSavoryStyle = selectedCategory === "wings" || selectedCategory === "fries" || selectedCategory === "savory-meals";
+    const isSavoryStyle = selectedCategory === "wings" || selectedCategory === "spreads-dips" || selectedCategory === "savory-meals";
     const isDrinkStyle = selectedCategory === "drinks";
 
     // Check if recipe has real structural flour (not just cocoa/chocolate)
@@ -2739,7 +2786,7 @@ export function CreateRecipes() {
       infused: "🧪", flour: "🌾", fat: "🧈", sugar: "🍬",
       dairy: "🥛", liquid: "💧", protein: "🥩", spice: "🌶️",
       chocolate: "🍫", egg: "🥚", leavening: "🧂", other: "📦",
-      fruit: "🍓", nuts: "🥜", flavoring: "🌸", filling: "🍯", savory: "🍝", wings: "🍗", fries: "🍟", snacks: "🍿",
+      fruit: "🍓", nuts: "🥜", flavoring: "🌸", filling: "🍯", savory: "🍝", wings: "🍗", "spreads-dips": "🥣", snacks: "🍿",
     };
 
     const infusedIngredients = ingredients.filter(i => i.isInfused && i.thcPerUnit);
@@ -3024,8 +3071,8 @@ export function CreateRecipes() {
                   navigate("/gummies");
                 } else if (cat === "popcorn" || cat === "snacks") {
                   navigate("/popcorn");
-                } else if (cat === "fries") {
-                  navigate("/fries");
+                } else if (cat === "spreads-dips") {
+                  navigate("/spreads-dips");
                 } else if (cat === "drinks") {
                   navigate("/coffee");
                 } else {
@@ -3050,7 +3097,7 @@ export function CreateRecipes() {
                )) ? "← Back to Gummies" :
                searchParams.get("category") === "popcorn" ? "← Back to Popcorn" :
                searchParams.get("category") === "drinks" ? "← Back to Coffee" :
-               searchParams.get("category") === "fries" ? "← Back to Fries" :
+               searchParams.get("category") === "spreads-dips" ? "← Back to Spreads & Dips" :
                "Back"}
             </Button>
             <div className="flex items-center gap-2">

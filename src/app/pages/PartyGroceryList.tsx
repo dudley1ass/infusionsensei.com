@@ -35,7 +35,7 @@ const PACK_LABELS: Record<string, string> = {
 const FALLBACK_ITEMS: Record<string, PlannerItem[]> = {
   "game-night": [
     { id: "wings", name: "Infused Wings", route: "/wings", suggestedRange: "2-3mg each", qty: 32, mgEach: 2.5, unitLabel: "wings", equivalentHint: "" },
-    { id: "fries", name: "Garlic Butter Fries", route: "/fries", suggestedRange: "3-5mg", qty: 2, mgEach: 4, unitLabel: "fry orders", equivalentHint: "" },
+    { id: "spreads-dips", name: "Spinach Artichoke Dip", route: "/spreads-dips", suggestedRange: "3-5mg", qty: 1, mgEach: 4, unitLabel: "dip batch", equivalentHint: "" },
     { id: "popcorn", name: "Caramel Popcorn", route: "/popcorn", suggestedRange: "2-3mg", qty: 2, mgEach: 2.5, unitLabel: "big bowls", equivalentHint: "" },
     { id: "brownie", name: "Cannabis Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg", qty: 4, mgEach: 7.5, unitLabel: "brownie pieces", equivalentHint: "" },
   ],

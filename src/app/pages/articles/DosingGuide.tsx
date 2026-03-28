@@ -3,9 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
 import { Calculator, ArrowRight, AlertTriangle, CheckCircle, Clock, Beaker, Scale, ChefHat } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 export function DosingGuide() {
+  const location = useLocation();
+  const isSafeDoseSlug = location.pathname.endsWith("/how-to-dose-edibles-safely");
+  const pageTitle = isSafeDoseSlug
+    ? "How to Dose Edibles Safely (Beginner Guide) | Infusion Sensei"
+    : "How to Dose THC Edibles Correctly — Stop Guessing | Infusion Sensei";
+  const canonicalPath = isSafeDoseSlug ? "/learn/articles/how-to-dose-edibles-safely" : "/learn/articles/dosing-guide";
+
   const relatedArticles = [
     { title: "Beginner Cooking Guide", path: "/learn/articles/beginner-guide" },
     { title: "4 Types of THC Edibles", path: "/learn/articles/edible-types" },
@@ -15,11 +22,11 @@ export function DosingGuide() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <Helmet>
-        <title>How to Dose THC Edibles Correctly — Stop Guessing | Infusion Sensei</title>
+        <title>{pageTitle}</title>
         <meta name="description" content="The standard THC dose guide from 1mg to 100mg, how to calculate exact mg per serving, and the 7 most common dosing mistakes." />
-        <meta property="og:title" content="How to Dose THC Edibles Correctly — Stop Guessing | Infusion Sensei" />
+        <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content="The standard THC dose guide from 1mg to 100mg, how to calculate exact mg per serving, and the 7 most common dosing mistakes." />
-        <link rel="canonical" href="https://infusionsensei.com/learn/articles/dosing-guide" />
+        <link rel="canonical" href={`https://infusionsensei.com${canonicalPath}`} />
       </Helmet>
       <div className="text-sm text-gray-600">
         <Link to="/learn" className="hover:text-green-600">Learn</Link> / <span className="text-gray-900">Dosing Guide</span>

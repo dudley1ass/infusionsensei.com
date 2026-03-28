@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate } from "react-router";
 import { Home } from "./pages/Home";
 import { Recipes } from "./pages/Recipes";
 import { CreateRecipes } from "./pages/CreateRecipes";
@@ -32,12 +32,13 @@ import { BeginnerEdibleGuide } from "./pages/articles/BeginnerEdibleGuide";
 import { InfuseAnyFood } from "./pages/articles/InfuseAnyFood";
 import { InfusedPeanutButterArticle } from "./pages/articles/InfusedPeanutButterArticle";
 import InfusedCreamCheeseArticle from "./pages/articles/InfusedCreamCheese";
+import { BestEdibleBasesBeginners } from "./pages/articles/BestEdibleBasesBeginners";
 import { DinnerOfTheWeek } from "./pages/DinnerOfTheWeek";
 import { PartyMode } from "./pages/PartyMode";
 import { WingSauces } from "./pages/WingSauces";
 import { Popcorn } from "./pages/Popcorn";
 import { Coffee } from "./pages/Coffee";
-import { Fries } from "./pages/Fries";
+import { SpreadsDips } from "./pages/SpreadsDips";
 import { Jello } from "./pages/Jello";
 import { Gummies } from "./pages/Gummies";
 import { PartySnacks } from "./pages/PartySnacks";
@@ -51,6 +52,10 @@ import { SavoryCannabisPage } from "./pages/SavoryCannabisPage";
 import { PartyPackPlanner } from "./pages/PartyPackPlanner";
 import { PartyGroceryList } from "./pages/PartyGroceryList";
 import { ContactUs } from "./pages/ContactUs";
+
+function RedirectFriesToSpreadsDips() {
+  return <Navigate to="/spreads-dips" replace />;
+}
 
 export const router = createBrowserRouter([
   {
@@ -66,7 +71,8 @@ export const router = createBrowserRouter([
       { path: "wings", Component: WingSauces },
       { path: "popcorn", Component: Popcorn },
       { path: "coffee", Component: Coffee },
-      { path: "fries", Component: Fries },
+      { path: "spreads-dips", Component: SpreadsDips },
+      { path: "fries", Component: RedirectFriesToSpreadsDips },
       { path: "jello", Component: Jello },
       { path: "gummies", Component: Gummies },
       { path: "party-snacks", Component: PartySnacks },
@@ -103,6 +109,9 @@ export const router = createBrowserRouter([
       { path: "learn/articles/infuse-any-food", Component: InfuseAnyFood },
       { path: "learn/articles/infused-peanut-butter", Component: InfusedPeanutButterArticle },
       { path: "learn/articles/infused-cream-cheese", Component: InfusedCreamCheeseArticle },
+      { path: "learn/articles/best-edible-bases-beginners", Component: BestEdibleBasesBeginners },
+      { path: "learn/articles/how-to-dose-edibles-safely", Component: DosingGuide },
+      { path: "learn/articles/why-edibles-hit-harder", Component: WhyEdiblesHitTooHard },
       { path: "dinner-of-the-week", Component: DinnerOfTheWeek },
       { path: "party-mode", Component: PartyMode },
       { path: "party-mode/plan/:packId", Component: PartyPackPlanner },

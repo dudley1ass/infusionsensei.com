@@ -69,27 +69,40 @@ export const COFFEE_TO_BUILDER_RECIPE: Record<string, string> = {
   "vanilla-latte": "cannabis-tea",
 };
 
-// Builder currently has 5 fries templates; map each fries style to the closest base.
-export const FRIES_TO_BUILDER_RECIPE: Record<string, string> = {
-  "garlic-butter-fries": "garlic-butter-fries",
-  "truffle-fries": "truffle-fries",
-  "spicy-mayo-fries": "buffalo-fries",
-  "cajun-fries": "cajun-fries",
-  "buffalo-fries": "buffalo-fries",
-  "cheese-fries": "garlic-butter-fries",
-  "pesto-fries": "truffle-fries",
-  "honey-sriracha-fries": "buffalo-fries",
-  "lemon-herb-fries": "truffle-fries",
-  "korean-fries": "cajun-fries",
-  "parmesan-rosemary-fries": "truffle-fries",
-  "Nashville-hot-fries": "nashville-hot-fries",
-  "ranch-fries": "garlic-butter-fries",
-  "miso-butter-fries": "truffle-fries",
-  poutine: "garlic-butter-fries",
-  "al-pastor-fries": "cajun-fries",
-  "loaded-fries": "garlic-butter-fries",
-  "katsu-fries": "cajun-fries",
-  "za-atar-fries": "truffle-fries",
-  "chili-cheese-fries": "buffalo-fries",
+/** Builder templates for Spreads & Dips — map showcase / alias IDs to canonical builder recipe id */
+export const SPREADS_DIPS_TO_BUILDER_RECIPE: Record<string, string> = {
+  "queso-dip-infused": "queso-dip-infused",
+  "spinach-artichoke-dip-infused": "spinach-artichoke-dip-infused",
+  "buffalo-dip-infused": "buffalo-dip-infused",
+  "ranch-dip-infused": "ranch-dip-infused",
+  "honey-mustard-dip-infused": "honey-mustard-dip-infused",
+  "garlic-aioli-infused": "garlic-aioli-infused",
+  "bbq-sauce-infused-party": "bbq-sauce-infused-party",
+  "sweet-chili-sauce-infused": "sweet-chili-sauce-infused",
+  "cheese-sauce-infused": "cheese-sauce-infused",
+};
+
+/** Old `/fries` recipe URLs → closest dip template (category is migrated to spreads-dips) */
+export const LEGACY_FRIES_RECIPE_TO_SPREADS_DIP: Record<string, string> = {
+  "garlic-butter-fries": "ranch-dip-infused",
+  "truffle-fries": "garlic-aioli-infused",
+  "spicy-mayo-fries": "buffalo-dip-infused",
+  "cajun-fries": "buffalo-dip-infused",
+  "buffalo-fries": "buffalo-dip-infused",
+  "cheese-fries": "queso-dip-infused",
+  "pesto-fries": "spinach-artichoke-dip-infused",
+  "honey-sriracha-fries": "sweet-chili-sauce-infused",
+  "lemon-herb-fries": "ranch-dip-infused",
+  "korean-fries": "sweet-chili-sauce-infused",
+  "parmesan-rosemary-fries": "garlic-aioli-infused",
+  "Nashville-hot-fries": "buffalo-dip-infused",
+  "ranch-fries": "ranch-dip-infused",
+  "miso-butter-fries": "spinach-artichoke-dip-infused",
+  poutine: "cheese-sauce-infused",
+  "al-pastor-fries": "sweet-chili-sauce-infused",
+  "loaded-fries": "queso-dip-infused",
+  "katsu-fries": "sweet-chili-sauce-infused",
+  "za-atar-fries": "ranch-dip-infused",
+  "chili-cheese-fries": "queso-dip-infused",
 };
 

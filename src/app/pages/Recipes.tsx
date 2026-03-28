@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { recipes, Recipe } from "../data/recipes";
-import { RECIPES as friesStyles } from "./Fries";
+import { RECIPES as spreadsDipsStyles } from "./SpreadsDips";
 import { isContentDbStrictMode, loadPublishedRecipesFromDb } from "../services/contentService";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -41,18 +41,18 @@ export function Recipes() {
     route: string;
   };
 
-  const friesDisplayRecipes: DisplayRecipe[] = friesStyles.map((fries) => ({
-    id: `fries-${fries.id}`,
-    name: fries.name,
-    category: "fries",
+  const spreadsDipsDisplayRecipes: DisplayRecipe[] = spreadsDipsStyles.map((dip) => ({
+    id: `spreads-dips-${dip.id}`,
+    name: dip.name,
+    category: "spreads-dips",
     difficulty: "beginner",
     prepTime: 10,
-    cookTime: 20,
-    servings: Number(fries.servings.split(" ")[0]) || 2,
-    thcPerServing: "~3-5mg",
+    cookTime: 15,
+    servings: Number(dip.servings.split(" ")[0]) || 8,
+    thcPerServing: "~2-5mg",
     image: "/IMAGES/fries.jpg",
-    description: fries.profile,
-    route: `/fries?recipe=${encodeURIComponent(fries.id)}`,
+    description: dip.profile,
+    route: `/spreads-dips?recipe=${encodeURIComponent(dip.id)}`,
   }));
 
   const strictDb = isContentDbStrictMode();
@@ -60,7 +60,7 @@ export function Recipes() {
 
   const allDisplayRecipes: DisplayRecipe[] = [
     ...recipeSource.map((r) => ({ ...r, route: `/recipes/${r.id}` })),
-    ...friesDisplayRecipes,
+    ...spreadsDipsDisplayRecipes,
   ];
 
   // Sort: new recipes first, then rest
@@ -87,7 +87,7 @@ export function Recipes() {
     { value: "edibles", label: "Edibles", count: recipeSource.filter((r) => r.category === "edibles").length },
     { value: "drinks", label: "Drinks", count: recipeSource.filter((r) => r.category === "drinks").length },
     { value: "infusions", label: "Infusions", count: recipeSource.filter((r) => r.category === "infusions").length },
-    { value: "fries", label: "Fries Styles", count: friesDisplayRecipes.length },
+    { value: "spreads-dips", label: "Spreads & Dips", count: spreadsDipsDisplayRecipes.length },
   ];
 
   const getDifficultyColor = (difficulty: Recipe["difficulty"]) => {
@@ -212,12 +212,12 @@ export function Recipes() {
                   </div>
                   {/* Funnel CTA */}
                   <Link
-                    to={recipe.category === "fries" ? recipe.route : "/ingredients"}
+                    to={recipe.category === "spreads-dips" ? recipe.route : "/ingredients"}
                     onClick={(e) => e.stopPropagation()}
                     className="flex items-center justify-center gap-2 w-full bg-green-50 hover:bg-green-100 border border-green-300 hover:border-green-500 text-green-700 font-bold text-sm py-2 rounded-lg transition-all group/cta"
                   >
                     <Calculator className="w-3.5 h-3.5" />
-                    {recipe.category === "fries" ? "Open Fries Recipe" : "Customize THC"}
+                    {recipe.category === "spreads-dips" ? "Open Spreads & Dips" : "Customize THC"}
                     <ArrowRight className="w-3.5 h-3.5 group-hover/cta:translate-x-0.5 transition-transform" />
                   </Link>
                 </CardContent>

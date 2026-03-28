@@ -83,10 +83,10 @@ const PACKS: PackTemplate[] = [
   {
     id: "game-night",
     title: "Game Night Pack Planner",
-    subtitle: "Wings, fries, popcorn, and dessert with controlled dosing.",
+    subtitle: "Wings, spreads & dips, popcorn, and dessert with controlled dosing.",
     items: [
       { id: "wings", name: "Infused Wings", route: "/wings", suggestedRange: "2-3mg each", defaultQty: 32, defaultMgEach: 2.5, perPersonQty: 8, unitLabel: "wings", equivalentHint: "~8-10 wings per person is average party sizing" },
-      { id: "fries", name: "Garlic Butter Fries", route: "/fries", suggestedRange: "3-5mg per serving", defaultQty: 2, defaultMgEach: 4, perPersonQty: 0.5, unitLabel: "fry orders", equivalentHint: "1 large fast-food fry order serves ~2 people" },
+      { id: "spreads-dips", name: "Spinach Artichoke Dip", route: "/spreads-dips", suggestedRange: "3-5mg per serving", defaultQty: 1, defaultMgEach: 4, perPersonQty: 0.25, unitLabel: "dip batches", equivalentHint: "One batch serves a crowd — portion by tablespoon" },
       { id: "popcorn", name: "Caramel Popcorn", route: "/popcorn", suggestedRange: "2-3mg per bowl", defaultQty: 2, defaultMgEach: 2.5, perPersonQty: 0.35, unitLabel: "big bowls", equivalentHint: "1 big bowl serves ~3-4 people (~10-12 cups)" },
       { id: "brownie", name: "Cannabis Brownie", route: "/ingredients?category=baked-goods&recipe=brownies", suggestedRange: "5-10mg each", defaultQty: 4, defaultMgEach: 7.5, perPersonQty: 1, unitLabel: "brownie pieces", equivalentHint: "1 pan usually yields 9-16 brownie pieces" },
     ],
@@ -429,7 +429,7 @@ export function PartyPackPlanner() {
     const name = item.name.toLowerCase();
     if (id.includes("wing") || name.includes("wing")) return "bg-orange-50 border-orange-200";
     if (id.includes("popcorn") || name.includes("popcorn")) return "bg-yellow-50 border-yellow-200";
-    if (id.includes("fries") || name.includes("fries")) return "bg-amber-50 border-amber-200";
+    if (id.includes("spreads-dips") || name.includes("dip")) return "bg-amber-50 border-amber-200";
     if (id.includes("brownie") || id.includes("cookie") || id.includes("gummy") || name.includes("dessert")) return "bg-rose-50 border-rose-200";
     if (id.includes("coffee") || id.includes("chai") || id.includes("tonic") || name.includes("coffee")) return "bg-stone-50 border-stone-300";
     return "bg-white border-gray-200";

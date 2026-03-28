@@ -13,8 +13,8 @@ export function Home() {
   return (
     <div className="space-y-14">
       <Helmet>
-        <title>The Ultimate Cannabis Infusion Toolkit | THC Calculator + Recipe Builder</title>
-        <meta name="description" content="Calculate THC, build recipes, and create perfect edibles every time. Free tools for dosage, infusions, and custom cannabis recipes." />
+        <title>Make Cannabis Edibles at Home — Dosing & Recipes That Don’t Guess | Infusion Sensei</title>
+        <meta name="description" content="I want to make something edible — with clear mg per serving. Infuse bases, pick dips, brownies, or drinks, and build recipes with your real THC potency." />
         <link rel="canonical" href="https://infusionsensei.com/" />
       </Helmet>
 
@@ -25,15 +25,15 @@ export function Home() {
         <div className="relative z-10 max-w-5xl mx-auto">
           <div className="text-center mb-3">
             <Badge className="bg-green-900/70 text-green-200 border border-green-600/50 mb-4 text-sm px-4 py-1.5 inline-flex">
-              <Zap className="w-3.5 h-3.5 mr-1.5" /> Free Cannabis Cooking Tool
+              <Zap className="w-3.5 h-3.5 mr-1.5" /> Free edible maker + dose tools
             </Badge>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-3 leading-tight">
-              Get Perfect THC Dosing Every Time
+              I want to make something edible — with real THC math
             </h1>
             <p className="text-green-300 text-base font-semibold mb-6">
-              Calculate THC, build recipes, and never guess again.
+              Start from a cannabutter, oil, or tincture base, then build dips, brownies, drinks, and party snacks with mg per serving you can trust.
             </p>
-            <p className="text-green-400 text-sm mb-6">No login. No guesswork. Just accurate dosing.</p>
+            <p className="text-green-400 text-sm mb-6">No login. No guesswork. Just answers → then the builder.</p>
           </div>
 
           {/* Image-based snack cards */}
@@ -42,7 +42,7 @@ export function Home() {
               { emoji: "🍗", label: "Wings", sub: "Start here", to: "/wings", img: "/IMAGES/chickenwings.jpg", highlight: false },
               { emoji: "🍿", label: "Popcorn", sub: "Start here", to: "/popcorn", img: "/IMAGES/popcorn.webp", highlight: false },
               { emoji: "☕", label: "Coffee", sub: "Start here", to: "/coffee", img: "/IMAGES/coffee.jpg", highlight: false },
-              { emoji: "🍟", label: "Fries", sub: "Start here", to: "/fries", img: "/IMAGES/fries.jpg", highlight: false },
+              { emoji: "🥣", label: "Spreads & Dips", sub: "Dips + party sauces", to: "/spreads-dips", img: "/IMAGES/fries.jpg", highlight: false },
               { emoji: "🍬", label: "Jello", sub: "Dose-controlled cubes", to: "/jello", img: "/IMAGES/jello-shots.png", highlight: true },
               { emoji: "🧸", label: "Gummies", sub: "Single-piece dosing", to: "/gummies", img: "/IMAGES/gummies.jpg", highlight: true },
               { emoji: "🎉", label: "Party Snacks", sub: "Handheld + controllable", to: "/party-snacks", img: "/IMAGES/popcorn.webp", highlight: true },
@@ -88,11 +88,11 @@ export function Home() {
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link
-              to="/thc-calculator"
-              onClick={() => trackEvent("homepage_primary_cta_click", { location: "hero", target: "thc-calculator" })}
+              to="/spreads-dips"
+              onClick={() => trackEvent("homepage_primary_cta_click", { location: "hero", target: "spreads-dips" })}
             >
               <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-base px-8 py-5 shadow-xl rounded-xl transition-transform hover:scale-105">
-                <Calculator className="w-4 h-4 mr-2" /> Calculate THC
+                Make a dip or spread <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
             <Link
@@ -100,7 +100,7 @@ export function Home() {
               onClick={() => trackEvent("homepage_secondary_cta_click", { location: "hero", target: "infusions" })}
             >
               <Button size="lg" variant="outline" className="border-2 border-white/40 text-white hover:bg-white/10 font-bold text-base px-8 py-5 rounded-xl">
-                Build Recipe <ArrowRight className="w-5 h-5 ml-2" />
+                <Calculator className="w-4 h-4 mr-2" /> Calculate THC & bases
               </Button>
             </Link>
           </div>

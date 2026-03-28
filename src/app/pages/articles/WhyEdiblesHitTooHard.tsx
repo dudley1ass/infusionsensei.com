@@ -3,9 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
 import { Zap, ArrowRight, CheckCircle } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 export function WhyEdiblesHitTooHard() {
+  const location = useLocation();
+  const isHitHarderSlug = location.pathname.endsWith("/why-edibles-hit-harder");
+  const pageTitle = isHitHarderSlug
+    ? "Why Edibles Hit Harder Than Smoking (What to Expect) | Infusion Sensei"
+    : "Why Edibles Hit Too Hard — The Science Explained | Infusion Sensei";
+  const canonicalPath = isHitHarderSlug ? "/learn/articles/why-edibles-hit-harder" : "/learn/articles/why-edibles-hit-too-hard";
+
   const relatedArticles = [
     { title: "How to Fix Edibles That Are Too Strong", path: "/learn/articles/fix-too-strong-edibles" },
     { title: "How to Dose THC Edibles Correctly", path: "/learn/articles/dosing-guide" },
@@ -15,11 +22,11 @@ export function WhyEdiblesHitTooHard() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
       <Helmet>
-        <title>Why Edibles Hit Too Hard — The Science Explained | Infusion Sensei</title>
+        <title>{pageTitle}</title>
         <meta name="description" content="Liver conversion to 11-hydroxy-THC, dose stacking, and fat absorption. Why edibles overwhelm you and what to do if you took too much." />
-        <meta property="og:title" content="Why Edibles Hit Too Hard — The Science Explained | Infusion Sensei" />
+        <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content="Liver conversion to 11-hydroxy-THC, dose stacking, and fat absorption. Why edibles overwhelm you and what to do if you took too much." />
-        <link rel="canonical" href="https://infusionsensei.com/learn/articles/why-edibles-hit-too-hard" />
+        <link rel="canonical" href={`https://infusionsensei.com${canonicalPath}`} />
       </Helmet>
       <div className="text-sm text-gray-600">
         <Link to="/learn" className="hover:text-green-600">Learn</Link> / <span className="text-gray-900">Why Edibles Hit Too Hard</span>

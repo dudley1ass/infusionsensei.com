@@ -7,17 +7,17 @@ export function SavoryCannabisPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-12">
       <Helmet>
-        <title>Savory Cannabis Recipes – Pizza, Wings, Fries, Sauces & More</title>
-        <meta name="description" content="Cannabis-infused savory recipes — pizza sauce, chicken wings, fries, pasta, and more. Exact THC per serving calculated automatically. The best infused savory food recipes online." />
+        <title>Savory Cannabis Recipes – Pizza, Wings, Spreads & Dips, Sauces & More</title>
+        <meta name="description" content="Cannabis-infused savory recipes — pizza sauce, chicken wings, dips and spreads, pasta, and more. Exact THC per serving calculated automatically." />
         <link rel="canonical" href="https://infusionsensei.com/savory-cannabis" />
       </Helmet>
 
       <div className="bg-gradient-to-br from-red-700 to-orange-700 rounded-3xl p-8 md:p-12 text-white">
-        <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">Savory Cannabis Recipes<br/><span className="text-red-200">Wings, Fries, Pizza & More</span></h1>
+        <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">Savory Cannabis Recipes<br/><span className="text-red-200">Wings, Spreads & Dips, Pizza & More</span></h1>
         <p className="text-red-100 text-lg max-w-2xl mb-6">Not everything has to be a brownie. Cannabis infuses beautifully into savory food — and these are some of the best-tasting edibles you'll ever make.</p>
         <div className="flex flex-wrap gap-3">
           <Link to="/wings"><Button className="bg-white text-red-700 hover:bg-red-50 font-black px-6 py-3">🍗 Wing Sauces <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
-          <Link to="/fries"><Button variant="outline" className="border-white/40 text-white hover:bg-white/10 font-bold px-6 py-3">🍟 Fries</Button></Link>
+          <Link to="/spreads-dips"><Button variant="outline" className="border-white/40 text-white hover:bg-white/10 font-bold px-6 py-3">🥣 Spreads & Dips</Button></Link>
         </div>
       </div>
 
@@ -26,7 +26,7 @@ export function SavoryCannabisPage() {
         <div className="grid md:grid-cols-2 gap-5">
           {[
             { name:"Infused Wing Sauces", desc:"20 cannabis wing sauce recipes — Buffalo, Korean Gochujang, Honey BBQ, Nashville Hot and more. Cook wings your way. We handle the infused sauce.", emoji:"🍗", to:"/wings", count:"20 sauces" },
-            { name:"Infused Fries", desc:"20 cannabis fries styles — garlic butter, truffle parmesan, cajun, buffalo, poutine and more. Every style uses cannabutter or cannabis oil.", emoji:"🍟", to:"/fries", count:"20 styles" },
+            { name:"Spreads & Dips", desc:"Queso, spinach-artichoke, ranch, buffalo dip, aioli, and more — open any style in the recipe builder with exact mg per serving.", emoji:"🥣", to:"/spreads-dips", count:"9 dips" },
             { name:"Infused Pizza Sauce", desc:"Cannabis olive oil in homemade pizza sauce. The secret is in the sauce — not the dough. THC disperses evenly through every slice.", emoji:"🍕", to:"/recipes/infused-pizza-sauce", count:"Classic recipe" },
             { name:"Infused Pasta", desc:"Garlic infused pasta and cannabis alfredo — two savory meals with exact THC per serving built into the recipe builder.", emoji:"🍝", to:"/ingredients?category=savory-meals&recipe=alfredo", count:"Builder ready" },
             { name:"Infused Butter for Cooking", desc:"Cannabutter is the most versatile tool in cannabis cooking. Use it anywhere you'd use regular butter — finishing steaks, sautéing vegetables, making sauces.", emoji:"🧈", to:"/infusions", count:"Build yours" },

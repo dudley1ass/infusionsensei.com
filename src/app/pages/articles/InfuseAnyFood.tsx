@@ -96,7 +96,7 @@ export function InfuseAnyFood() {
                 title:"🍟 Fries & Finger Foods",
                 color:"bg-yellow-50 border-yellow-200",
                 tip:"Always add infused fat to finished fries — not to the cooking fat. This gives you precise control over dose.",
-                recipes:[{ name:"20 Infused Fries Styles", path:"/fries" },{ name:"Garlic Butter Fries", path:"/ingredients?category=fries&recipe=garlic-butter-fries" }],
+                recipes:[{ name:"Spreads & Dips", path:"/spreads-dips" },{ name:"Spinach Artichoke Dip", path:"/ingredients?category=spreads-dips&recipe=spinach-artichoke-dip-infused" }],
                 best:"Cannabutter or cannabis olive oil",
                 add:"Drizzle or toss after cooking, while still hot",
               },
@@ -154,7 +154,7 @@ export function InfuseAnyFood() {
         <CardContent><div className="grid md:grid-cols-2 gap-3">
           {[
             { title:"🍗 20 Infused Wing Sauces", path:"/wings" },
-            { title:"🍟 20 Infused Fries Styles", path:"/fries" },
+            { title:"🥣 Spreads & Dips", path:"/spreads-dips" },
             { title:"☕ 20 Infused Coffee Drinks", path:"/coffee" },
             { title:"🍿 Infused Popcorn", path:"/popcorn" },
           ].map(a => (

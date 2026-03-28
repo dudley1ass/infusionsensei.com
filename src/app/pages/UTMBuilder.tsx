@@ -7,7 +7,7 @@ const PAGES = [
   { label: "🍗 Wing Sauces", path: "/wings" },
   { label: "🍿 Popcorn", path: "/popcorn" },
   { label: "☕ Coffee", path: "/coffee" },
-  { label: "🍟 Fries", path: "/fries" },
+  { label: "🥣 Spreads & Dips", path: "/spreads-dips" },
   { label: "📖 Recipes", path: "/recipes" },
   { label: "🧪 My Infusions", path: "/infusions" },
   { label: "🔧 Create Recipe", path: "/ingredients" },
