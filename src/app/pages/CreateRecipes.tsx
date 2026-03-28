@@ -324,8 +324,8 @@ const recipeCategories = [
   { id: "breads-breakfast",name: "🍞 Breads & Breakfast", emoji: "🍞", description: "Muffins, pancakes, breakfast" },
 ];
 
-// Standard Recipe Templates
-const standardRecipes: Record<string, any[]> = {
+// Standard Recipe Templates (exported for Party Snacks grocery list & tooling)
+export const standardRecipes: Record<string, any[]> = {
   "baked-goods": [
     {
       id: "brownies",
@@ -752,9 +752,17 @@ const standardRecipes: Record<string, any[]> = {
       name: "Infused Rice Krispie Treat Squares",
       servings: 16,
       ingredients: ["Cannabutter","Marshmallows","Rice Cereal","Vanilla Extract","Salt"],
-      amounts: [56,280,150,5,1],
+      amounts: [42,283,168,5,1],
       units: ["g","g","g","ml","g"],
-      instructions: ["Melt cannabutter over low heat.","Stir in marshmallows until smooth.","Add vanilla and salt.","Fold in rice cereal until coated.","Press into lined pan and cool fully.","Cut into 16 equal squares."],
+      instructions: [
+        "Classic ratio: 6 cups cereal · 10 oz marshmallows · 3 tbsp butter — cannabutter replaces the butter for infusion.",
+        "Melt cannabutter over low heat.",
+        "Stir in marshmallows until smooth.",
+        "Add vanilla and salt.",
+        "Remove from heat, fold in rice cereal until coated.",
+        "Press into a parchment-lined pan and cool fully.",
+        "Cut into equal squares for your serving count — one square ≈ one portion when planning by guests.",
+      ],
     },
     {
       id: "popcorn-balls",
@@ -1362,7 +1370,8 @@ export function CreateRecipes() {
     if (directMatch) return recipeId;
 
     if (category === "wings") return WING_SAUCE_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
-    if (category === "snacks") return POPCORN_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
+    // Only remap known Popcorn showcase flavor IDs — leave party snacks / gummies / rice treats IDs unchanged.
+    if (category === "snacks" && recipeId in POPCORN_TO_BUILDER_RECIPE) return POPCORN_TO_BUILDER_RECIPE[recipeId];
     if (category === "drinks") return COFFEE_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
     if (category === "spreads-dips") return SPREADS_DIPS_TO_BUILDER_RECIPE[recipeId] ?? recipeId;
     if (category === "fries") return LEGACY_FRIES_RECIPE_TO_SPREADS_DIP[recipeId] ?? "spinach-artichoke-dip-infused";
@@ -1592,7 +1601,14 @@ export function CreateRecipes() {
         setMeasurementSystem("metric");
       }
     }
-  }, [selectedStandardRecipe, selectedCategory, servingsOverrideParamRaw, wingsQtyParamRaw, targetMgPerServingRaw]);
+  }, [
+    selectedStandardRecipe,
+    selectedCategory,
+    servingsOverrideParamRaw,
+    servingsOverrideParam,
+    wingsQtyParamRaw,
+    targetMgPerServingRaw,
+  ]);
 
   // Calculate total THC
   const totalTHC = ingredients.reduce((sum, ing) => {

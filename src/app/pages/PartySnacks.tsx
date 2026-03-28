@@ -1,7 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, ChefHat } from "lucide-react";
+import { ArrowRight, ChefHat, ListChecks, Printer } from "lucide-react";
+import { standardRecipes } from "./CreateRecipes";
+import { buildPartySnackGrocery, grocerySectionForIngredient } from "../utils/partySnackGrocery";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
@@ -22,7 +24,7 @@ type SnackItem = {
   name: string;
   emoji: string;
   desc: string;
-  /** Default `snacks`; wings use the wings builder category. */
+  /** Default `snacks`; wings use the wings builder category; dips live under spreads in the builder too, but templates resolve from shared IDs. */
   builderCategory?: "snacks" | "wings";
 };
 
@@ -136,6 +138,37 @@ export function PartySnacks() {
   }, [filledSelections]);
 
   const allSlotsChosen = filledSelections.length === infusedSlotCount && !hasDuplicatePicks;
+
+  const snackNameById = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const item of ALL_PARTY_SNACK_ITEMS) m.set(item.id, item.name);
+    return m;
+  }, []);
+
+  const groceryData = useMemo(() => {
+    if (uniqueInfusedIds.length === 0 || hasDuplicatePicks) return null;
+    return buildPartySnackGrocery(standardRecipes, uniqueInfusedIds, guestCount);
+  }, [uniqueInfusedIds, guestCount, hasDuplicatePicks]);
+
+  const combinedByStoreSection = useMemo(() => {
+    if (!groceryData?.combined.length) return [];
+    const m = new Map<string, typeof groceryData.combined>();
+    for (const line of groceryData.combined) {
+      const sec = grocerySectionForIngredient(line.name);
+      if (!m.has(sec)) m.set(sec, []);
+      m.get(sec)!.push(line);
+    }
+    const bumpInfusionLast = (s: string) => (s.startsWith("Infusion") ? "\uFFFF" + s : s);
+    return Array.from(m.entries())
+      .sort(([a], [b]) => bumpInfusionLast(a).localeCompare(bumpInfusionLast(b)))
+      .map(([section, lines]) => ({ section, lines }));
+  }, [groceryData]);
+
+  const [groceryChecked, setGroceryChecked] = useState<Record<string, boolean>>({});
+
+  const toggleGroceryLine = (key: string) => {
+    setGroceryChecked((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const setSlot = (index: number, value: string) => {
     setInfusedSelections((prev) => {
@@ -313,12 +346,108 @@ export function PartySnacks() {
                 (guest goal {mgPerPerson} mg ÷ {Math.max(1, uniqueInfusedIds.length)}).
               </p>
               <p className="text-xs text-gray-600 mt-1">
-                Recipes open with <span className="font-semibold">{guestCount}</span> servings. Infused ingredient amounts are
-                scaled in the builder to approach the per-serving target (based on your saved infusion THC/units).
+                Recipes open with <span className="font-semibold">{guestCount}</span> servings (one portion per guest for that
+                treat). All ingredients scale together from the template batch size. Infused amounts are then adjusted toward
+                your mg-per-piece target (based on your saved infusion THC/units).
               </p>
             </>
           )}
         </div>
+      </section>
+
+      <section
+        id="party-snacks-grocery"
+        className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5 print:shadow-none print:border-gray-300"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <ListChecks className="w-7 h-7 text-indigo-600" />
+            <div>
+              <h2 className="text-2xl font-black text-gray-900">Grocery list</h2>
+              <p className="text-sm text-gray-600">
+                Totals scale to <span className="font-semibold">{guestCount} guests</span> (one portion per guest per infused
+                snack). Matches the recipe builder batch math — adjust in the builder after you set THC.
+              </p>
+            </div>
+          </div>
+          {groceryData && (
+            <Button
+              type="button"
+              variant="outline"
+              className="font-bold gap-2 print:hidden"
+              onClick={() => window.print()}
+            >
+              <Printer className="w-4 h-4" /> Print / Save PDF
+            </Button>
+          )}
+        </div>
+
+        {!uniqueInfusedIds.length ? (
+          <p className="text-sm text-gray-500">Pick at least one infused snack above to generate a shopping list.</p>
+        ) : hasDuplicatePicks ? (
+          <p className="text-sm text-amber-800 font-semibold">Fix duplicate snack picks to show a combined grocery list.</p>
+        ) : !groceryData?.sections.length ? (
+          <p className="text-sm text-gray-500">Could not load templates for the selected snacks.</p>
+        ) : (
+          <>
+            <div className="rounded-xl border border-indigo-100 bg-indigo-50/80 p-4 space-y-3">
+              <p className="text-xs font-bold text-indigo-900 uppercase tracking-wide">Combined shopping (deduplicated)</p>
+              <p className="text-xs text-indigo-800">
+                If the same ingredient appears in multiple snacks, amounts are added. Buy infused butter / oil / tincture using
+                your builder targets — not only these gram totals.
+              </p>
+              <div className="space-y-4">
+                {combinedByStoreSection.map(({ section, lines }) => (
+                  <div key={section}>
+                    <p className="text-xs font-black text-gray-700 mb-2">{section}</p>
+                    <ul className="space-y-1.5">
+                      {lines.map((line) => {
+                        const key = `${line.name}|${line.unit}`;
+                        return (
+                          <li key={key} className="flex items-start gap-2 text-sm text-gray-800">
+                            <input
+                              type="checkbox"
+                              checked={!!groceryChecked[key]}
+                              onChange={() => toggleGroceryLine(key)}
+                              className="mt-1 rounded border-gray-300 print:hidden shrink-0"
+                              aria-label={`Got ${line.name}`}
+                            />
+                            <span>
+                              <span className="font-semibold">{line.displayAmount}</span> {line.name}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-sm font-black text-gray-900">By recipe (for prep)</p>
+              <div className="grid gap-3 md:grid-cols-2">
+                {groceryData.sections.map((sec) => (
+                  <div
+                    key={sec.recipeId}
+                    className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-2"
+                  >
+                    <p className="font-black text-gray-900 text-sm">
+                      {snackNameById.get(sec.recipeId) ?? sec.recipeName}
+                    </p>
+                    <ul className="text-xs text-gray-700 space-y-1">
+                      {sec.lines.map((line) => (
+                        <li key={`${sec.recipeId}-${line.name}-${line.unit}`}>
+                          <span className="font-semibold text-gray-900">{line.displayAmount}</span> {line.name}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </section>
 
       <section className="space-y-6">
