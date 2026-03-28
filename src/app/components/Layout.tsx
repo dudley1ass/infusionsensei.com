@@ -67,7 +67,7 @@ export function Layout() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50">
       {/* Header — single compact row (~half the previous stacked layout) */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-green-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-green-200 shadow-sm print:hidden">
         <div className="container mx-auto px-3 sm:px-4 py-2">
           <div className="flex items-center justify-between gap-2 sm:gap-3">
             <Link to="/" className="flex items-center gap-2 min-w-0 shrink-0 max-w-[45%] sm:max-w-none">
@@ -105,12 +105,12 @@ export function Layout() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 print:py-0 print:px-0 print:max-w-none">
         <Outlet />
       </main>
 
       {/* Footer */}
-      <footer className="mt-20 border-t border-green-200 bg-green-50/50">
+      <footer className="mt-20 border-t border-green-200 bg-green-50/50 print:hidden">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">

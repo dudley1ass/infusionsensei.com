@@ -15,6 +15,12 @@ import {
 import { InfusionBase } from "../types/infusion";
 import { safeJsonParse } from "../utils/storage";
 import { recipes as siteRecipes } from "../data/recipes";
+import {
+  resolvePlannerRecipes,
+  buildAggregatedGroceryLines,
+  formatScaledTemplateLine,
+  scaleSiteRecipeIngredientLine,
+} from "../utils/partyPlannerPrint";
 
 type PlannerItem = {
   id: string;
@@ -491,25 +497,6 @@ export function PartyPackPlanner() {
     );
   };
 
-  const parseRecipeIdFromRoute = (route: string): string | null => {
-    if (route.startsWith("/recipes/")) return route.replace("/recipes/", "").split("?")[0] || null;
-    if (!route.startsWith("/ingredients")) return null;
-    const [, query = ""] = route.split("?");
-    const params = new URLSearchParams(query);
-    return params.get("recipe");
-  };
-
-  const categorizeIngredient = (ingredient: string): string => {
-    const i = ingredient.toLowerCase();
-    if (/(wing|chicken|beef|pork|meat|bacon)/.test(i)) return "Meat & Seafood";
-    if (/(milk|butter|cheese|cream|yogurt|egg)/.test(i)) return "Dairy & Eggs";
-    if (/(pepper|paprika|garlic powder|onion powder|cumin|chili|spice|salt|seasoning)/.test(i)) return "Spices & Seasonings";
-    if (/(flour|sugar|oil|vinegar|ketchup|bbq|honey|mustard|soy|cornstarch|rice|pasta|bread|cocoa|chips)/.test(i)) return "Pantry";
-    if (/(lemon|lime|onion|garlic|herb|parsley|cilantro|potato)/.test(i)) return "Produce";
-    if (/(coffee|tea|soda|juice|water)/.test(i)) return "Beverages";
-    return "Other";
-  };
-
   const wingFlavorIngredients: Record<string, string[]> = {
     "garlic-parmesan": ["Chicken wings", "Garlic", "Parmesan cheese", "Butter", "Salt", "Black pepper"],
     "classic-buffalo": ["Chicken wings", "Hot sauce", "Butter", "Garlic powder", "Salt"],
@@ -519,44 +506,42 @@ export function PartyPackPlanner() {
     "honey-mustard": ["Chicken wings", "Honey", "Mustard", "Butter", "Garlic powder"],
   };
 
-  const printRecipes = items.map((item) => {
-    const recipeId = parseRecipeIdFromRoute(item.route);
-    const recipe = recipeId ? siteRecipes.find((r) => r.id === recipeId) : null;
+  const resolvedPlannerRecipes = useMemo(() => resolvePlannerRecipes(items), [items]);
+
+  const wingGroceryExtras = useMemo(() => {
+    if (!savedWingsSplit) return null;
     return {
-      item,
-      recipe,
-      scale: recipe ? Math.max(item.qty / Math.max(recipe.servings, 1), 0.25) : 1,
+      wingsLabel: `Chicken wings — ${savedWingsSplit.totalWings} wings total`,
+      wingIngredientLines: savedWingsSplit.flavors.flatMap((f) => {
+        const ings = wingFlavorIngredients[f.sauceId] ?? [];
+        return ings.map((ing) =>
+          ing.toLowerCase().includes("wing")
+            ? ing
+            : `${ing} (${wingSauceLabels[f.sauceId] ?? f.sauceId})`
+        );
+      }),
     };
-  });
+  }, [savedWingsSplit]);
 
-  const groceryBySection = useMemo(() => {
-    const sections = new Map<string, Set<string>>();
-    const addIngredient = (ingredient: string) => {
-      const section = categorizeIngredient(ingredient);
-      if (!sections.has(section)) sections.set(section, new Set<string>());
-      sections.get(section)!.add(ingredient);
-    };
-
-    printRecipes.forEach(({ item, recipe }) => {
-      if (item.id === "wings" && savedWingsSplit) {
-        addIngredient(`Chicken wings (${savedWingsSplit.totalWings} wings total)`);
-        savedWingsSplit.flavors.forEach((f) => {
-          (wingFlavorIngredients[f.sauceId] ?? []).forEach((ing) =>
-            addIngredient(`${ing}${ing.toLowerCase().includes("wing") ? "" : ` (${wingSauceLabels[f.sauceId] ?? f.sauceId})`}`)
-          );
-        });
-        return;
-      }
-      (recipe?.ingredients ?? []).forEach(addIngredient);
-    });
-
-    return Array.from(sections.entries())
-      .map(([section, ingredients]) => ({ section, ingredients: Array.from(ingredients.values()).sort() }))
-      .sort((a, b) => a.section.localeCompare(b.section));
-  }, [printRecipes, savedWingsSplit]);
+  const groceryBySection = useMemo(
+    () => buildAggregatedGroceryLines(resolvedPlannerRecipes, wingGroceryExtras),
+    [resolvedPlannerRecipes, wingGroceryExtras]
+  );
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <>
+      <style>{`
+        .party-print-only { display: none !important; }
+        @media print {
+          .party-print-only { display: block !important; }
+          @page { margin: 0.55in; size: letter; }
+          .party-print-page { page-break-after: always; break-after: page; }
+          .party-print-page:last-of-type { page-break-after: auto; }
+          .party-print-grocery { page-break-before: always; break-before: page; }
+          .party-print-recipe { page-break-inside: avoid; }
+        }
+      `}</style>
+      <div className="print:hidden max-w-5xl mx-auto space-y-8">
       <Helmet>
         <title>{pack.title} | Infusion Sensei</title>
         <meta
@@ -923,73 +908,88 @@ export function PartyPackPlanner() {
         </Link>
       </div>
 
-      <div className="hidden print:block space-y-6 text-black">
-        <div className="border-b-2 border-black pb-3">
-          <h1 className="text-3xl font-black">{pack.title} - Party Package</h1>
-          <p className="text-sm">Guests: {peopleCount} | Total THC: {totalMg.toFixed(1)}mg | Per person: {mgPerPerson.toFixed(1)}mg</p>
-          <p className="text-sm">Safety: Start low, wait 45-90 minutes, keep non-infused options clearly labeled.</p>
+      </div>
+
+      {/* Print-only: one recipe per page + grocery list (not the screen layout) */}
+      <div className="party-print-only text-black" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+        <div className="party-print-page border-b-2 border-black pb-4">
+          <h1 className="text-2xl font-black">{pack.title}</h1>
+          <p className="text-sm mt-2">Guests: {peopleCount} · Total THC: {totalMg.toFixed(1)}mg · Per person: {mgPerPerson.toFixed(1)}mg</p>
+          <p className="text-sm mt-2">Safety: Start low, wait 45–90 minutes. Keep non-infused options clearly labeled.</p>
         </div>
 
-        <section>
-          <h2 className="text-xl font-black mb-2">Food Plan and Dose Breakdown</h2>
-          <div className="space-y-2">
-            {items.map((item) => (
-              <div key={`print-item-${item.id}`} className="border border-black rounded-md p-2">
-                <p className="font-bold">{item.name}</p>
-                <p className="text-sm">
-                  Qty: {item.qty} {item.unitLabel} | {getDoseLabelForUnit(item.unitLabel)}: {item.mgEach}mg | Item total: {(item.qty * item.mgEach).toFixed(1)}mg
-                </p>
-              </div>
-            ))}
+        {resolvedPlannerRecipes.map(({ item, template, siteRecipe, scale }) => (
+          <div key={`pp-print-${item.id}`} className="party-print-page party-print-recipe">
+            <h2 className="text-xl font-black border-b border-black pb-2 mb-3">{item.name}</h2>
+            <p className="text-sm mb-3">
+              Target: {item.qty} {item.unitLabel} · {getDoseLabelForUnit(item.unitLabel)}: {item.mgEach}mg · Item total:{" "}
+              {(item.qty * item.mgEach).toFixed(1)}mg THC
+            </p>
+            {template ? (
+              <>
+                <h3 className="text-sm font-bold uppercase tracking-wide mb-2">Ingredients (scaled for your party)</h3>
+                <ul className="list-disc pl-5 text-sm space-y-1 mb-4">
+                  {template.ingredients.map((name, i) => {
+                    const amt = template.amounts[i] ?? 0;
+                    const unit = template.units[i] ?? "g";
+                    if (amt === 0) return null;
+                    return (
+                      <li key={`${item.id}-ing-${i}`}>{formatScaledTemplateLine(name, amt, unit, scale)}</li>
+                    );
+                  })}
+                </ul>
+                <h3 className="text-sm font-bold uppercase tracking-wide mb-2">Instructions</h3>
+                <ol className="list-decimal pl-5 text-sm space-y-2">
+                  {template.instructions.map((step, idx) => (
+                    <li key={`${item.id}-st-${idx}`}>{step}</li>
+                  ))}
+                </ol>
+              </>
+            ) : siteRecipe ? (
+              <>
+                <h3 className="text-sm font-bold uppercase tracking-wide mb-2">Ingredients (scaled)</h3>
+                <ul className="list-disc pl-5 text-sm space-y-1 mb-4">
+                  {siteRecipe.ingredients.map((line, i) => (
+                    <li key={`${item.id}-si-${i}`}>{scaleSiteRecipeIngredientLine(line, scale)}</li>
+                  ))}
+                </ul>
+                <h3 className="text-sm font-bold uppercase tracking-wide mb-2">Instructions</h3>
+                <ol className="list-decimal pl-5 text-sm space-y-2">
+                  {siteRecipe.instructions.map((step, idx) => (
+                    <li key={`${item.id}-sinst-${idx}`}>{step}</li>
+                  ))}
+                </ol>
+              </>
+            ) : (
+              <p className="text-sm text-gray-800">
+                Open this item in the recipe builder to load full ingredients and steps.{" "}
+                <span className="font-mono text-xs">Route: {item.route}</span>
+              </p>
+            )}
           </div>
-        </section>
+        ))}
 
-        <section>
-          <h2 className="text-xl font-black mb-2">Scaled Recipes and Prep Notes</h2>
+        <div className="party-print-grocery party-print-page">
+          <h2 className="text-xl font-black border-b-2 border-black pb-2 mb-3">Master grocery list</h2>
+          <p className="text-xs text-gray-700 mb-4">
+            Amounts are scaled for your party settings. Retail hints (e.g. cereal boxes) are estimates — verify weights on
+            packages.
+          </p>
           <div className="space-y-3">
-            {printRecipes.map(({ item, recipe, scale }) => (
-              <div key={`print-recipe-${item.id}`} className="border border-black rounded-md p-3">
-                <p className="font-bold">{item.name}</p>
-                <p className="text-sm mb-1">Target qty: {item.qty} {item.unitLabel} | Dose target: {item.mgEach}mg each</p>
-                {recipe ? (
-                  <>
-                    <p className="text-sm font-semibold">Ingredients (scaled ~x{scale.toFixed(2)}):</p>
-                    <ul className="list-disc pl-5 text-sm">
-                      {recipe.ingredients.map((ing) => (
-                        <li key={`${item.id}-${ing}`}>{ing}</li>
-                      ))}
-                    </ul>
-                    <p className="text-sm font-semibold mt-2">Instructions:</p>
-                    <ol className="list-decimal pl-5 text-sm">
-                      {recipe.instructions.map((step, idx) => (
-                        <li key={`${item.id}-step-${idx}`}>{step}</li>
-                      ))}
-                    </ol>
-                  </>
-                ) : (
-                  <p className="text-sm">Use the builder link for this item to finalize ingredients and instructions.</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-black mb-2">Combined Grocery List (Store Layout)</h2>
-          <div className="space-y-3">
-            {groceryBySection.map((section) => (
-              <div key={`section-${section.section}`} className="border border-black rounded-md p-2">
-                <p className="font-bold">{section.section}</p>
-                <ul className="list-disc pl-5 text-sm">
-                  {section.ingredients.map((ingredient) => (
-                    <li key={`${section.section}-${ingredient}`}>{ingredient}</li>
+            {groceryBySection.map((sec) => (
+              <div key={`gsec-${sec.section}`} className="border border-black rounded p-2">
+                <p className="font-bold text-sm">{sec.section}</p>
+                <ul className="list-disc pl-5 text-sm mt-1">
+                  {sec.lines.map((line) => (
+                    <li key={`${sec.section}-${line}`}>{line}</li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
-        </section>
+          <p className="text-xs text-center mt-8 text-gray-600">Infusion Sensei · infusionsensei.com</p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

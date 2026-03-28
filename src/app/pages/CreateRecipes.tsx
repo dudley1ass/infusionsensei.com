@@ -25,7 +25,8 @@ import {
   Printer,
   Copy,
   Share2,
-  CheckCheck
+  CheckCheck,
+  LayoutGrid,
 } from "lucide-react";
 import { InfusionBase } from "../types/infusion";
 import { NutritionFactsLabel } from "../components/NutritionFactsLabel";
@@ -1345,7 +1346,9 @@ export function CreateRecipes() {
   const [showWhatCanIMake, setShowWhatCanIMake] = useState(false);
   const [measurementSystem, setMeasurementSystem] = useState<"metric" | "imperial">("metric");
   const [copied, setCopied] = useState(false);
-  
+  /** Controls which print layout is shown when the print dialog opens. */
+  const [printTarget, setPrintTarget] = useState<"full" | "buffet">("full");
+
   // What Can I Make - Ingredient Selection
   const [selectedPantryItems, setSelectedPantryItems] = useState<string[]>([]);
   const [selectedInfusionType, setSelectedInfusionType] = useState<string>("none");
@@ -1402,6 +1405,20 @@ export function CreateRecipes() {
       setSelectedStandardRecipe(rec);
     }
   }, [searchParams, setSearchParams]);
+
+  useEffect(() => {
+    const onAfterPrint = () => setPrintTarget("full");
+    window.addEventListener("afterprint", onAfterPrint);
+    return () => window.removeEventListener("afterprint", onAfterPrint);
+  }, []);
+
+  const runPrint = (target: "full" | "buffet") => {
+    setPrintTarget(target);
+    requestAnimationFrame(() => {
+      window.print();
+      trackEvent(target === "full" ? "print_recipe" : "print_buffet_labels");
+    });
+  };
 
   const handleReturnToPartyPack = () => {
     if (!returnToPartyPack || !partyProgressKey || !partyItemId) {
@@ -1918,6 +1935,25 @@ export function CreateRecipes() {
     return totals;
   };
 
+  /**
+   * For templates that list cake + frosting in one recipe (e.g. mini cupcakes), powdered sugar is mostly frosting.
+   * Excluding it from sugar÷flour keeps ratios meaningful for the actual cake batter.
+   */
+  const sugarForBakingRatio = (totalSugarGrams: number): number => {
+    const keys = ingredients.map((i) => ingredientLibraryKey(i));
+    if (!keys.some((k) => k.includes("Cream Cheese")) || !keys.some((k) => k.includes("Powdered Sugar"))) {
+      return totalSugarGrams;
+    }
+    let powdered = 0;
+    for (const ing of ingredients) {
+      const k = ingredientLibraryKey(ing);
+      if (!k.includes("Powdered Sugar")) continue;
+      const l = INGREDIENT_LIBRARY.find((lib) => lib.name === k);
+      if (l?.category === "sugar") powdered += toGramsIng(ing);
+    }
+    return Math.max(0, totalSugarGrams - powdered);
+  };
+
   // ── Per-ingredient warnings (cookie-science ratio engine) ──
   const getIngredientWarning = (ing: Ingredient, _servings: number) => {
     const lib = INGREDIENT_LIBRARY.find(i => i.name === ingredientLibraryKey(ing));
@@ -1937,6 +1973,7 @@ export function CreateRecipes() {
     const flour    = totals['flour']    ?? 0;
     const fat      = totals['fat']      ?? 0;
     const sugar    = totals['sugar']    ?? 0;
+    const sugarBalanced = sugarForBakingRatio(sugar);
     const egg      = totals['egg']      ?? 0;
     const liquid   = totals['liquid']   ?? 0;
     const dairy    = totals['dairy']    ?? 0;
@@ -1945,10 +1982,16 @@ export function CreateRecipes() {
     const lowerNames = ingredients.map(i => i.name.toLowerCase());
     const isBrownieStyle =
       selectedStandardRecipe === "brownies" ||
+      selectedStandardRecipe === "mini-brownie-bites" ||
       recipeName.toLowerCase().includes("brownie") ||
       (lowerNames.some(n => n.includes("cocoa")) &&
        lowerNames.some(n => n.includes("all-purpose flour") || n.includes("flour")) &&
        lowerNames.some(n => n.includes("chocolate")));
+    const isBlondieStyle =
+      /blondie/i.test(recipeName.toLowerCase()) || selectedStandardRecipe === "blondie-squares";
+    const isCakeStyle =
+      /\b(cupcake|cupcakes|layer cake|birthday cake|sponge|chiffon|muffin)\b/i.test(recipeName) ||
+      selectedStandardRecipe === "mini-cupcakes-infused-frosting";
     const isPancakeStyle =
       recipeName.toLowerCase().includes("pancake") ||
       recipeName.toLowerCase().includes("waffle") ||
@@ -1999,7 +2042,6 @@ export function CreateRecipes() {
     }
 
     if (cat === 'sugar') {
-      const sugarToFlour = sugar / Math.max(flour, 1);
       // Only warn on the biggest sugar contributor to avoid duplicate warnings
       const thisSugarGrams = toGramsIng(ing);
       const isLargestSugar = !ingredients.some(other => {
@@ -2009,15 +2051,16 @@ export function CreateRecipes() {
         return toGramsIng(other) > thisSugarGrams;
       });
       if (isLargestSugar) {
-        const sugarProblemThreshold = isBrownieStyle ? 3.2 : 1.2;
-        const sugarWarningThreshold = isBrownieStyle ? 2.4 : 0.95;
-        if (sugarToFlour > sugarProblemThreshold) {
+        const sugarToFlourBal = sugarBalanced / Math.max(flour, 1);
+        const sugarProblemThreshold = isBrownieStyle ? 3.2 : isBlondieStyle ? 2.6 : 1.2;
+        const sugarWarningThreshold = isBrownieStyle ? 2.4 : isBlondieStyle ? 2.0 : 0.95;
+        if (sugarToFlourBal > sugarProblemThreshold) {
           warning = 'Total sugar is very high — baked goods will be overly sweet, thin, and burn easily.';
           color = 'red';
-        } else if (sugarToFlour > sugarWarningThreshold) {
+        } else if (sugarToFlourBal > sugarWarningThreshold) {
           warning = 'Total sugar is high — expect more spread and browning. Watch bake time carefully.';
           color = 'yellow';
-        } else if (sugarToFlour < 0.2 && flour > 100) {
+        } else if (sugarToFlourBal < 0.2 && flour > 100) {
           warning = 'Low sugar — result may be pale, bland, and dense.';
           color = 'yellow';
         }
@@ -2049,12 +2092,15 @@ export function CreateRecipes() {
     if (cat === 'liquid' || cat === 'dairy') {
       // Skip liquid warnings for batter-style recipes (pancakes, waffles, crepes)
       // where high liquid is intentional — identified by leavening + dairy + no fat-heavy mix
+      // Cake/cupcake batters are legitimately wetter than cookie dough (~1.0–1.3 moisture vs flour).
       if (!isHighLiquidRecipe) {
         const liquidToFlour = totalMoisture / Math.max(flour, 1);
-        if (liquidToFlour > 1.1) {
+        const problemL = isCakeStyle ? 1.45 : 1.1;
+        const warnL = isCakeStyle ? 1.28 : 0.7;
+        if (liquidToFlour > problemL) {
           warning = 'Way too much liquid — batter will not hold shape and won\'t bake properly.';
           color = 'red';
-        } else if (liquidToFlour > 0.7) {
+        } else if (liquidToFlour > warnL) {
           warning = 'High moisture content — dough will be very soft. Chill well before baking or add more flour.';
           color = 'yellow';
         }
@@ -2093,6 +2139,7 @@ export function CreateRecipes() {
     const flour    = totals['flour']    ?? 0;
     const fat      = totals['fat']      ?? 0;
     const sugar    = totals['sugar']    ?? 0;
+    const sugarBalanced = sugarForBakingRatio(sugar);
     const egg      = totals['egg']      ?? 0;
     const liquid   = totals['liquid']   ?? 0;
     const dairy    = totals['dairy']    ?? 0;
@@ -2106,10 +2153,16 @@ export function CreateRecipes() {
     const lowerNames = ingredients.map(i => i.name.toLowerCase());
     const isBrownieStyle =
       selectedStandardRecipe === "brownies" ||
+      selectedStandardRecipe === "mini-brownie-bites" ||
       recipeName.toLowerCase().includes("brownie") ||
       (lowerNames.some(n => n.includes("cocoa")) &&
        lowerNames.some(n => n.includes("all-purpose flour") || n.includes("flour")) &&
        lowerNames.some(n => n.includes("chocolate")));
+    const isBlondieStyle =
+      /blondie/i.test(recipeName.toLowerCase()) || selectedStandardRecipe === "blondie-squares";
+    const isCakeStyle =
+      /\b(cupcake|cupcakes|layer cake|birthday cake|sponge|chiffon|muffin)\b/i.test(recipeName) ||
+      selectedStandardRecipe === "mini-cupcakes-infused-frosting";
     const isPancakeStyle =
       recipeName.toLowerCase().includes("pancake") ||
       recipeName.toLowerCase().includes("waffle") ||
@@ -2175,15 +2228,16 @@ export function CreateRecipes() {
     const eggRatio = egg / Math.max(realFlourOnly || flour, 1);
 
     const fatRatio      = fat      / flour;
-    const sugarRatio    = sugar    / flour;
+    const sugarRatio    = sugarBalanced / flour;
     const moistureRatio = totalMoisture / flour;
     const leavenerRatio = leavener / flour;
 
     const issues: string[] = [];
     let severity: 'good' | 'warning' | 'problem' = 'good';
 
-    // Way too much liquid — bail early (but only if not an intentional batter)
-    if (moistureRatio > 1.1 && !isHighLiquidRecipe && !isBrownieStyle) {
+    const moistureProblemThreshold = isCakeStyle ? 1.45 : 1.1;
+    // Way too much liquid — bail early (but only if not an intentional batter or cake batter)
+    if (moistureRatio > moistureProblemThreshold && !isHighLiquidRecipe && !isBrownieStyle) {
       return {
         headline: '💧 This will not bake properly',
         description: 'The liquid content is far too high relative to flour. This batter will not hold shape — it will spread into a puddle. Dramatically reduce milk/liquid or add much more flour.',
@@ -2194,8 +2248,8 @@ export function CreateRecipes() {
     }
 
     // Diagnose each ratio
-    const sugarProblemThreshold = isBrownieStyle ? 3.8 : 1.2;
-    const sugarWarningThreshold = isBrownieStyle ? 3.0 : 1.05;
+    const sugarProblemThreshold = isBrownieStyle ? 3.8 : isBlondieStyle ? 2.6 : 1.2;
+    const sugarWarningThreshold = isBrownieStyle ? 3.0 : isBlondieStyle ? 2.0 : 1.05;
     if (sugarRatio > sugarProblemThreshold)       { issues.push('sugar is very high — expect thin, sweet, fast-browning results'); tags.push({ label: 'Too much sugar', color: 'red' }); severity = 'problem'; }
     else if (sugarRatio > sugarWarningThreshold)  { issues.push('sugar is elevated — baked goods will spread more and brown faster'); tags.push({ label: 'High sugar', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
@@ -2210,7 +2264,7 @@ export function CreateRecipes() {
     if (eggRatio > eggProblemThreshold)          { issues.push('too many eggs for this flour — result will be very puffy and cakey'); tags.push({ label: 'Too many eggs', color: 'red' }); severity = 'problem'; }
     else if (eggRatio > eggWarningThreshold)     { issues.push('high egg ratio — will lean soft and cakey. Great for fudgy bakes'); tags.push({ label: 'High eggs', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    if (moistureRatio > 0.9 && !isHighLiquidRecipe && !isBrownieStyle) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
+    if (moistureRatio > 0.9 && !isHighLiquidRecipe && !isBrownieStyle && !isCakeStyle) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
     if (leavenerRatio > 0.12)   { issues.push('leavener is very high — may taste bitter or soapy'); tags.push({ label: 'Too much leavener', color: 'red' }); severity = 'problem'; }
     else if (leavenerRatio > 0.08) { issues.push('leavener is elevated — fine for pancakes/quick breads, watch for cakes'); tags.push({ label: 'High leavener', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
@@ -2870,6 +2924,11 @@ export function CreateRecipes() {
             /* Show the print layout */
             .print-only { display: block !important; }
 
+            /* Full recipe vs. buffet tent labels (mutually exclusive) */
+            .print-mode-full .print-buffet-sheet { display: none !important; }
+            .print-mode-buffet .print-page { display: none !important; }
+            .print-mode-buffet .print-buffet-sheet { display: block !important; }
+
             /* Reset page */
             body, html {
               background: white !important;
@@ -3002,11 +3061,93 @@ export function CreateRecipes() {
               margin: 0.5in 0.75in;
               size: letter;
             }
+
+            /* ── Buffet / table-tent labels (folded cards) ───────── */
+            .print-buffet-sheet {
+              font-family: system-ui, "Segoe UI", Arial, Helvetica, sans-serif !important;
+              padding: 0 !important;
+            }
+            .print-buffet-intro {
+              font-size: 9pt !important;
+              color: #444 !important;
+              margin-bottom: 10pt !important;
+              text-align: center !important;
+              page-break-after: avoid !important;
+            }
+            .print-buffet-grid {
+              display: grid !important;
+              grid-template-columns: 1fr 1fr !important;
+              gap: 0.18in !important;
+            }
+            .buffet-tent {
+              border: 1.5pt solid #111 !important;
+              border-radius: 2pt !important;
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+              background: #fff !important;
+            }
+            .buffet-tent-panel {
+              padding: 0.14in 0.16in 0.12in 0.16in !important;
+              display: flex !important;
+              flex-direction: column !important;
+              align-items: center !important;
+              justify-content: center !important;
+              text-align: center !important;
+              min-height: 1.05in !important;
+            }
+            .buffet-fold {
+              border-top: 0.75pt dashed #888 !important;
+              font-size: 6.5pt !important;
+              letter-spacing: 0.06em !important;
+              text-transform: uppercase !important;
+              color: #666 !important;
+              padding: 2pt 4pt !important;
+              text-align: center !important;
+              background: #fafafa !important;
+            }
+            .buffet-title {
+              font-size: 12.5pt !important;
+              font-weight: 900 !important;
+              line-height: 1.15 !important;
+              color: #000 !important;
+            }
+            .buffet-dose {
+              font-size: 20pt !important;
+              font-weight: 900 !important;
+              line-height: 1 !important;
+              margin-top: 5pt !important;
+              color: #000 !important;
+            }
+            .buffet-dose-sub {
+              font-size: 8pt !important;
+              font-weight: 600 !important;
+              color: #333 !important;
+              margin-top: 2pt !important;
+            }
+            .buffet-batch {
+              font-size: 7.5pt !important;
+              color: #555 !important;
+              margin-top: 5pt !important;
+            }
+            .buffet-warn {
+              font-size: 8.5pt !important;
+              font-weight: 800 !important;
+              line-height: 1.3 !important;
+              margin-top: 6pt !important;
+              color: #111 !important;
+              max-width: 2.6in !important;
+            }
+            .buffet-brand {
+              font-size: 6.5pt !important;
+              letter-spacing: 0.04em !important;
+              color: #777 !important;
+              margin-top: 7pt !important;
+            }
           }
         `}</style>
 
-        {/* ── PRINT-ONLY KITCHEN RECIPE ──────────────── */}
-        <div className="print-only">
+        {/* ── PRINT-ONLY: full recipe OR buffet tent labels ─ */}
+        <div className={`print-only print-target-wrap ${printTarget === "buffet" ? "print-mode-buffet" : "print-mode-full"}`}>
           <div className="print-page">
 
             {/* Title */}
@@ -3099,6 +3240,40 @@ export function CreateRecipes() {
             </div>
 
           </div>
+
+          {/* Buffet table tents: cut along outer border, fold on dashed line, stand on table */}
+          <div className="print-buffet-sheet">
+            <p className="print-buffet-intro">
+              Cut out each card along the border, fold on the dashed line so both sides show the same message, and place at the buffet.
+            </p>
+            <div className="print-buffet-grid">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <div key={idx} className="buffet-tent">
+                  <div className="buffet-tent-panel">
+                    <div className="buffet-title">{recipeName || "Infused dish"}</div>
+                    <div className="buffet-dose">{thcPerServing.toFixed(1)} mg</div>
+                    <div className="buffet-dose-sub">THC per serving</div>
+                    <div className="buffet-batch">
+                      {servings} serving{servings === 1 ? "" : "s"} · {totalTHC.toFixed(0)} mg total batch
+                    </div>
+                    <div className="buffet-warn">Infused food — contains cannabis. Eat wisely.</div>
+                    <div className="buffet-brand">Infusion Sensei</div>
+                  </div>
+                  <div className="buffet-fold">Fold here — same text on both sides</div>
+                  <div className="buffet-tent-panel">
+                    <div className="buffet-title">{recipeName || "Infused dish"}</div>
+                    <div className="buffet-dose">{thcPerServing.toFixed(1)} mg</div>
+                    <div className="buffet-dose-sub">THC per serving</div>
+                    <div className="buffet-batch">
+                      {servings} serving{servings === 1 ? "" : "s"} · {totalTHC.toFixed(0)} mg total batch
+                    </div>
+                    <div className="buffet-warn">Infused food — contains cannabis. Eat wisely.</div>
+                    <div className="buffet-brand">Infusion Sensei</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* ── SCREEN VERSION ─────────────────────────────── */}
@@ -3176,9 +3351,13 @@ export function CreateRecipes() {
                     : "Back to Party Pack"}
                 </Button>
               )}
-              <Button onClick={() => { window.print(); trackEvent('print_recipe'); }} variant="outline" size="sm"
+              <Button onClick={() => runPrint("full")} variant="outline" size="sm"
                 className="border-green-300 text-green-700 hover:bg-green-50 gap-1.5">
                 <Printer className="w-4 h-4" /> Print
+              </Button>
+              <Button onClick={() => runPrint("buffet")} variant="outline" size="sm"
+                className="border-amber-300 text-amber-900 hover:bg-amber-50 gap-1.5">
+                <LayoutGrid className="w-4 h-4" /> Buffet labels
               </Button>
             </div>
           </div>
@@ -3347,7 +3526,7 @@ export function CreateRecipes() {
           </div>
 
           {/* ── NUTRITION + PRINT ROW ─────────────────────────── */}
-          <div className="grid sm:grid-cols-2 gap-4 no-print">
+          <div className="grid sm:grid-cols-3 gap-4 no-print">
             <button
               onClick={() => setShowNutritionLabel(!showNutritionLabel)}
               className="bg-white border-2 border-blue-200 hover:border-blue-400 rounded-2xl p-5 text-left transition-all shadow-sm hover:shadow-md group"
@@ -3376,7 +3555,7 @@ export function CreateRecipes() {
             </button>
 
             <button
-              onClick={() => window.print()}
+              onClick={() => runPrint("full")}
               className="bg-white border-2 border-green-200 hover:border-green-500 rounded-2xl p-5 text-left transition-all shadow-sm hover:shadow-md group"
             >
               <div className="flex items-center gap-3 mb-2">
@@ -3385,10 +3564,26 @@ export function CreateRecipes() {
                 </div>
                 <div>
                   <p className="font-bold text-gray-900">Print Recipe</p>
-                  <p className="text-xs text-gray-500">Clean printout with all details</p>
+                  <p className="text-xs text-gray-500">Kitchen sheet · full details</p>
                 </div>
               </div>
-              <p className="text-sm text-gray-600 mt-2">Includes ingredients, instructions, and exact THC per serving.</p>
+              <p className="text-sm text-gray-600 mt-2">Ingredients, instructions, and THC per serving.</p>
+            </button>
+
+            <button
+              onClick={() => runPrint("buffet")}
+              className="bg-white border-2 border-amber-200 hover:border-amber-500 rounded-2xl p-5 text-left transition-all shadow-sm hover:shadow-md group"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center group-hover:bg-amber-200 transition-colors">
+                  <LayoutGrid className="w-5 h-5 text-amber-800" />
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">Buffet tent labels</p>
+                  <p className="text-xs text-gray-500">Folded table cards</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mt-2">Dish name, dose, infused warning, and Infusion Sensei — ready to cut and fold.</p>
             </button>
           </div>
 
@@ -3504,13 +3699,14 @@ export function CreateRecipes() {
                   </div>
 
                   {/* Action strip */}
-                  <div className="bg-black/20 px-4 py-3 border-t border-white/10 grid grid-cols-3 gap-2">
+                  <div className="bg-black/20 px-4 py-3 border-t border-white/10 grid grid-cols-2 gap-2">
                     {[
-                      { icon: <Copy className="w-4 h-4" />, label: copied ? "Copied!" : "Copy", action: () => { const s = `${recipeName || "My Recipe"}\n${thcPerServing.toFixed(1)}mg THC per serving\n${totalTHC.toFixed(0)}mg total\n${servings} servings\n\ninfusionsensei.com`; navigator.clipboard.writeText(s); trackEvent("recipe_copied", { recipe_name: recipeName || "My Recipe", servings, thc_per_serving: Number(thcPerServing.toFixed(1)) }); setCopied(true); setTimeout(() => setCopied(false), 2000); } },
-                      { icon: <Printer className="w-4 h-4" />, label: "Print", action: () => window.print() },
-                      { icon: <Share2 className="w-4 h-4" />, label: "Share", action: () => { if (navigator.share) navigator.share({ title: "Infusion Sensei", text: `${recipeName}: ${thcPerServing.toFixed(1)}mg THC per serving`, url: "https://infusionsensei.com" }); } },
-                    ].map(({ icon, label, action }) => (
-                      <button key={label} onClick={action}
+                      { key: "copy", icon: <Copy className="w-4 h-4" />, label: copied ? "Copied!" : "Copy", action: () => { const s = `${recipeName || "My Recipe"}\n${thcPerServing.toFixed(1)}mg THC per serving\n${totalTHC.toFixed(0)}mg total\n${servings} servings\n\ninfusionsensei.com`; navigator.clipboard.writeText(s); trackEvent("recipe_copied", { recipe_name: recipeName || "My Recipe", servings, thc_per_serving: Number(thcPerServing.toFixed(1)) }); setCopied(true); setTimeout(() => setCopied(false), 2000); } },
+                      { key: "print", icon: <Printer className="w-4 h-4" />, label: "Print", action: () => runPrint("full") },
+                      { key: "labels", icon: <LayoutGrid className="w-4 h-4" />, label: "Labels", action: () => runPrint("buffet") },
+                      { key: "share", icon: <Share2 className="w-4 h-4" />, label: "Share", action: () => { if (navigator.share) navigator.share({ title: "Infusion Sensei", text: `${recipeName}: ${thcPerServing.toFixed(1)}mg THC per serving`, url: "https://infusionsensei.com" }); } },
+                    ].map(({ key, icon, label, action }) => (
+                      <button key={key} type="button" onClick={action}
                         className="flex flex-col items-center gap-1 bg-white/10 hover:bg-white/20 rounded-xl py-2 text-white transition-all border border-white/10">
                         {icon}
                         <span className="text-xs font-semibold">{label}</span>
