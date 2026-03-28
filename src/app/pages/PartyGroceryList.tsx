@@ -124,6 +124,17 @@ export function PartyGroceryList() {
     return next;
   }, [resolvedPlannerRecipes, wingGroceryExtras, extraItems]);
 
+  const groupedQuickShop = useMemo(() => {
+    const base = buildAggregatedGroceryLines(resolvedPlannerRecipes, wingGroceryExtras, { quickShop: true });
+    if (extraItems.length === 0) return base;
+    const extraSection = "Extras";
+    const next = base.map((s) => ({ ...s }));
+    const idx = next.findIndex((s) => s.section === extraSection);
+    if (idx === -1) next.push({ section: extraSection, lines: [...extraItems] });
+    else next[idx] = { section: extraSection, lines: [...next[idx].lines, ...extraItems] };
+    return next;
+  }, [resolvedPlannerRecipes, wingGroceryExtras, extraItems]);
+
   const byRecipeDetail = useMemo(() => {
     return resolvedPlannerRecipes.map((r) => {
       const { item, template, siteRecipe, scale } = r;
@@ -275,17 +286,28 @@ export function PartyGroceryList() {
       </div>
 
       <div className="grocery-print-only text-black px-2" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
-        <h1 className="text-2xl font-black border-b-2 border-black pb-2 mb-3">{PACK_LABELS[packId] ?? "Party"} — Grocery list</h1>
+        <style>{`
+          @media print {
+            .grocery-print-quick li { font-size: 13pt !important; line-height: 1.45 !important; margin: 0.35em 0 !important; }
+          }
+        `}</style>
+        <h1 className="text-2xl font-black border-b-2 border-black pb-2 mb-2">{PACK_LABELS[packId] ?? "Party"} — Quick shop</h1>
         <p className="text-sm mb-4">
-          {peopleCount} guests · {items.length} infused items · ~{totalMg.toFixed(1)}mg THC total
+          {peopleCount} guests · {items.length} infused items · ~{totalMg.toFixed(1)} mg THC total · boxes/bags are rounded up
         </p>
-        <div className="space-y-3">
-          {grouped.map((sec) => (
+        <p className="text-xs text-gray-700 mb-4">
+          Check the screen for full measurements and prep notes. This page is for the store aisle only.
+        </p>
+        <div className="space-y-4 grocery-print-quick">
+          {groupedQuickShop.map((sec) => (
             <div key={`p-${sec.section}`}>
-              <p className="font-bold text-sm">{sec.section}</p>
-              <ul className="list-disc pl-5 text-sm">
+              <p className="font-black text-sm border-b border-gray-400 pb-1 mb-2">{sec.section}</p>
+              <ul className="list-none pl-0">
                 {sec.lines.map((line) => (
-                  <li key={`p-${sec.section}-${line}`}>{line}</li>
+                  <li key={`p-${sec.section}-${line}`} className="flex gap-2">
+                    <span className="shrink-0">□</span>
+                    <span>{line}</span>
+                  </li>
                 ))}
               </ul>
             </div>

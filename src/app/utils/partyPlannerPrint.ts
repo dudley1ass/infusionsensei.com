@@ -1,6 +1,7 @@
 import { standardRecipes } from "../pages/CreateRecipes";
 import { COFFEE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
 import { recipes as siteRecipes, type Recipe } from "../data/recipes";
+import { quickShopFromGrams, templateAmountToGrams } from "./partySnackGrocery";
 
 export type PlannerItemLike = {
   id: string;
@@ -184,11 +185,29 @@ function categorizeIngredientLine(ingredient: string): string {
   return "Other";
 }
 
+function quickLineForScaledIngredient(name: string, amount: number, unit: string, scale: number): string {
+  const scaled = amount * scale;
+  if (unit === "pieces" || unit === "cloves") {
+    return `${Math.round(scaled)} ${unit} ${name}`;
+  }
+  if (unit === "large" || unit === "medium" || unit === "small") {
+    return `${Math.round(scaled)} large eggs`;
+  }
+  if (unit === "ml" || unit === "L") {
+    const ml = unit === "L" ? scaled * 1000 : scaled;
+    return quickShopFromGrams(name, 0, ml);
+  }
+  const g = templateAmountToGrams(scaled, unit, name);
+  return quickShopFromGrams(name, g, 0);
+}
+
 /** Scaled grocery lines grouped for store shopping */
 export function buildAggregatedGroceryLines(
   resolved: ResolvedPlannerRecipe[],
-  wingExtras?: { wingsLabel: string; wingIngredientLines: string[] } | null
+  wingExtras?: { wingsLabel: string; wingIngredientLines: string[] } | null,
+  options?: { quickShop?: boolean }
 ): { section: string; lines: string[] }[] {
+  const quickShop = options?.quickShop === true;
   const linesBySection = new Map<string, Set<string>>();
   const push = (section: string, line: string) => {
     if (!linesBySection.has(section)) linesBySection.set(section, new Set());
@@ -214,7 +233,9 @@ export function buildAggregatedGroceryLines(
         const amt = template.amounts[i] ?? 0;
         const unit = template.units[i] ?? "g";
         if (amt === 0) return;
-        const line = formatScaledTemplateLine(name, amt, unit, scale);
+        const line = quickShop
+          ? quickLineForScaledIngredient(name, amt, unit, scale)
+          : formatScaledTemplateLine(name, amt, unit, scale);
         push(categorizeIngredientLine(name), line);
       });
       return;

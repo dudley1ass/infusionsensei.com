@@ -112,8 +112,16 @@ function findStandardRecipe(
   return null;
 }
 
+/** Resolve a template for Party Snacks / print (instructions, etc.). */
+export function getStandardRecipeById(
+  standardRecipes: Record<string, TemplateRecipe[]>,
+  recipeId: string
+): TemplateRecipe | null {
+  return findStandardRecipe(standardRecipes, recipeId);
+}
+
 /** Convert template amount to grams where possible (matches builder nutrition logic). */
-function amountToGrams(amount: number, unit: string, ingName: string): number {
+export function templateAmountToGrams(amount: number, unit: string, ingName: string): number {
   const gpc = gramsPerCupFor(ingName);
   switch (unit) {
     case "g":
@@ -255,7 +263,7 @@ function buildDisplayStrings(
     return { metric, us };
   }
 
-  const grams = amountToGrams(amount, unit, name);
+  const grams = templateAmountToGrams(amount, unit, name);
 
   const metric = formatMetricWeight(grams);
 
@@ -292,13 +300,112 @@ export function groceryLineDisplay(line: GroceryIngredientLine, mode: GroceryMea
   return mode === "metric" ? line.displayMetric : line.displayUs;
 }
 
+/**
+ * One-line “quick shop” text for the grocery store (boxes, bags, sticks — minimal reading).
+ */
+export function quickShopFromGrams(name: string, g: number, ml: number): string {
+  const n = name.toLowerCase();
+  if (/(cannabutter|cannabis|thc tincture|thc |infused)/i.test(name) && !/cracker/i.test(n)) {
+    if (g > 0) return `Infusion — plan your batch (${Math.round(g)} g ${name})`;
+    if (ml > 0) return `Infusion — plan your batch (${Math.round(ml)} ml ${name})`;
+  }
+  if (ml > 0 && g === 0) {
+    if (/\bmilk\b/i.test(name) && !/coconut|condensed|evaporated|powdered/i.test(n)) {
+      const gal = 3785.41;
+      if (ml >= gal * 0.35) {
+        const x = Math.max(1, Math.ceil(ml / gal - 1e-9));
+        return `${x} gal milk`;
+      }
+      const half = 1892;
+      if (ml >= 400) {
+        const x = Math.max(1, Math.ceil(ml / half - 1e-9));
+        return `${x} half-gallon${x !== 1 ? "s" : ""} milk`;
+      }
+      return `${roundSmart(ml / US_CUP_ML, 1)} cups milk`;
+    }
+    if (/oil|olive|coconut oil/i.test(name) && !/cannabis/i.test(n)) {
+      const bottles = Math.max(1, Math.ceil(ml / 500 - 1e-9));
+      return `${bottles} × 500 ml bottles oil`;
+    }
+    return `${roundSmart(ml / US_CUP_ML, 1)} cups ${name}`;
+  }
+  if (g <= 0) return name;
+
+  if (/rice cereal|rice krisp/i.test(n)) {
+    const boxes = Math.max(1, Math.ceil(g / CEREAL_BOX_12OZ_G - 1e-9));
+    return `${boxes} × 12 oz boxes puffed rice cereal`;
+  }
+  if (n.includes("chex")) {
+    const boxes = Math.max(1, Math.ceil(g / CEREAL_BOX_12OZ_G - 1e-9));
+    return `${boxes} × 12 oz boxes Chex / cereal`;
+  }
+  if (/marshmallow/i.test(n)) {
+    const bags = Math.max(1, Math.ceil(g / MARSHMALLOW_BAG_10OZ_G - 1e-9));
+    return `${bags} × 10 oz bags marshmallows`;
+  }
+  if (isButterLike(name)) {
+    const sticks = Math.max(1, Math.ceil(g / BUTTER_STICK_G - 0.05));
+    return `${sticks} stick${sticks !== 1 ? "s" : ""} butter`;
+  }
+  if (/dark chocolate chip|chocolate chip/i.test(n)) {
+    const bagG = 12 * 28.3495;
+    const bags = Math.max(1, Math.ceil(g / bagG - 1e-9));
+    return `${bags} × 12 oz bags chocolate chips`;
+  }
+  if (/granulated sugar|powdered sugar|brown sugar/i.test(n)) {
+    const gpc = n.includes("powdered") ? 120 : n.includes("brown") ? 220 : 200;
+    const cups = g / gpc;
+    return `~${roundSmart(cups, 1)} cups ${n.includes("brown") ? "brown sugar" : n.includes("powdered") ? "powdered sugar" : "sugar"}`;
+  }
+  if (/all-purpose flour|bread flour|cake flour/i.test(n)) {
+    const cups = g / 125;
+    return `~${roundSmart(cups, 1)} cups flour`;
+  }
+  if (/(cheddar|parmesan|mozzarella)/i.test(n) && !/cracker|sauce/i.test(n)) {
+    const oz = g / 28.35;
+    if (oz >= 6) return `${roundSmart(oz / 8, 1)} × 8 oz bags shredded cheese (or ${Math.round(oz)} oz)`;
+    return `${roundSmart(oz, 1)} oz cheese`;
+  }
+  if (/popcorn kernel/i.test(n)) {
+    return `1 jar popcorn kernels (~${roundSmart(g / 453, 2)} lb)`;
+  }
+  if (/pretzel/i.test(n) && g > 50) {
+    return `${roundSmart(g / 453, 2)} lb bag pretzels`;
+  }
+  return `${Math.round(g)} g ${name}`;
+}
+
+export function formatQuickShopLine(line: GroceryIngredientLine): string {
+  const { name, amount, unit } = line;
+  if (unit === "pieces" || unit === "cloves") {
+    const n = Math.round(amount);
+    return `${n} ${unit} ${name}`;
+  }
+  if (isEggUnit(unit)) {
+    const n = Math.round(amount);
+    return `${n} large eggs`;
+  }
+  const { g, ml } = groceryLineToGramsMl(line);
+  return quickShopFromGrams(name, g, ml);
+}
+
+function groceryLineToGramsMl(line: GroceryIngredientLine): { g: number; ml: number } {
+  const { name, amount, unit } = line;
+  if (unit === "ml" || unit === "L") {
+    return { g: 0, ml: unit === "L" ? amount * 1000 : amount };
+  }
+  if (unit === "pieces" || unit === "cloves") return { g: 0, ml: 0 };
+  if (isEggUnit(unit)) return { g: 0, ml: 0 };
+  return { g: templateAmountToGrams(amount, unit, name), ml: 0 };
+}
+
 function lineToCanonicalGramsMl(line: GroceryIngredientLine): { g: number; ml: number } {
   const { name, amount, unit } = line;
   if (unit === "ml" || unit === "L") {
     return { g: 0, ml: unit === "L" ? amount * 1000 : amount };
   }
   if (unit === "pieces" || unit === "cloves" || isEggUnit(unit)) return { g: 0, ml: 0 };
-  return { g: amountToGrams(amount, unit, name), ml: 0 };
+  return { g: templateAmountToGrams(amount, unit, name), ml: 0 };
 }
 
 /**
@@ -416,7 +523,7 @@ export function buildPartySnackGrocery(
       m.pieces += amount;
       m.pieceUnit = "large";
     } else {
-      m.grams += amountToGrams(amount, unit, name);
+      m.grams += templateAmountToGrams(amount, unit, name);
     }
   };
 

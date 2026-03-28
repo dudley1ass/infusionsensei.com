@@ -5,6 +5,8 @@ import { ArrowRight, ChefHat, ListChecks, Printer } from "lucide-react";
 import { standardRecipes } from "./CreateRecipes";
 import {
   buildPartySnackGrocery,
+  formatQuickShopLine,
+  getStandardRecipeById,
   groceryLineDisplay,
   grocerySectionForIngredient,
   type GroceryMeasureMode,
@@ -101,6 +103,19 @@ const SNACK_GROUPS: { title: string; items: SnackItem[] }[] = [
 const ALL_PARTY_SNACK_ITEMS = SNACK_GROUPS.flatMap((g) => g.items);
 
 const GROCERY_MODE_STORAGE_KEY = "party-snack-grocery-measure";
+
+/** Print: store-aisle order for quick shop */
+const GROCERY_PRINT_SECTION_ORDER: string[] = [
+  "Meat & proteins",
+  "Dairy & eggs",
+  "Produce & frozen",
+  "Bakery & dry goods",
+  "Pantry & sweet",
+  "Spices & seasonings",
+  "Beverages",
+  "Infusion (plan separately)",
+  "Other",
+];
 
 /** Persists guest count, slots, mg goal, and each dropdown so leaving for a recipe doesn’t reset picks. */
 const PARTY_SNACKS_PLAN_KEY = "party-snacks-plan-v1";
@@ -236,6 +251,14 @@ export function PartySnacks() {
       .sort(([a], [b]) => bumpInfusionLast(a).localeCompare(bumpInfusionLast(b)))
       .map(([section, lines]) => ({ section, lines }));
   }, [groceryData]);
+
+  const combinedByStoreSectionPrintOrder = useMemo(() => {
+    const rank = (s: string) => {
+      const i = GROCERY_PRINT_SECTION_ORDER.indexOf(s);
+      return i === -1 ? 999 : i;
+    };
+    return [...combinedByStoreSection].sort((a, b) => rank(a.section) - rank(b.section));
+  }, [combinedByStoreSection]);
 
   const [groceryChecked, setGroceryChecked] = useState<Record<string, boolean>>({});
   const [groceryMeasureMode, setGroceryMeasureMode] = useState<GroceryMeasureMode>(() =>
@@ -638,72 +661,109 @@ export function PartySnacks() {
       </div>
 
       {showPrintSheet && (
-        <div
-          className="snacks-print-only text-black max-w-4xl mx-auto"
-          style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-        >
-          <header className="border-b-2 border-black pb-4 mb-6">
-            <h1 className="text-2xl font-black">Party Snacks</h1>
-            <p className="text-sm mt-2">
-              Guests: {guestCount} · Party goal: {mgPerPerson} mg THC per person from infused snacks · Builder target:{" "}
-              <span className="font-bold">{mgEachTarget.toFixed(2)} mg</span> per portion per infused type
-            </p>
-            <p className="text-xs text-gray-800 mt-2">
-              Start low, wait 45–90 minutes. Keep infused and non-infused trays separate. Infusion Sensei
-            </p>
-          </header>
-
-          <section className="mb-8">
-            <h2 className="text-lg font-black border-b border-black pb-1 mb-4">Snack labels (name + dose)</h2>
-            <p className="text-xs text-gray-700 mb-4">
-              Cut out each card. Place at the buffet or on the tray so guests see the snack name and THC per portion.
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              {uniqueInfusedIds.map((id) => (
-                <div
-                  key={`snack-label-${id}`}
-                  className="border-2 border-black rounded-lg p-4"
-                  style={{ breakInside: "avoid", pageBreakInside: "avoid" }}
-                >
-                  <p className="text-lg font-black leading-tight">{snackNameById.get(id) ?? id}</p>
-                  <p className="text-3xl font-black mt-2 tabular-nums">{mgEachTarget.toFixed(1)} mg</p>
-                  <p className="text-xs text-gray-800">THC per portion (one serving)</p>
-                  <p className="text-sm font-semibold mt-4 border-t border-gray-400 pt-3">
-                    Infused food — contains cannabis. Eat wisely.
-                  </p>
-                  <p className="text-[10px] text-gray-700 mt-3 font-semibold">Infusion Sensei</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {groceryData && combinedByStoreSection.length > 0 && (
-            <section>
-              <h2 className="text-lg font-black border-b border-black pb-1 mb-4">Combined grocery list</h2>
-              <p className="text-xs text-gray-700 mb-4">
-                Amounts for {guestCount} guests (one portion per guest per infused snack). Units:{" "}
-                {groceryMeasureMode === "metric" ? "metric (g & ml)" : "US (cups & spoons)"}.
+        <>
+          <style>{`
+            @media print {
+              .snacks-print-root { font-size: 11pt !important; color: #000 !important; }
+              .snacks-print-quick li { font-size: 13pt !important; line-height: 1.45 !important; margin: 0.35em 0 !important; }
+              .snacks-print-label-card {
+                border: 3px solid #000 !important;
+                padding: 14pt !important;
+                min-height: 120pt !important;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+              }
+              .snacks-print-break { break-before: page !important; page-break-before: always !important; }
+            }
+          `}</style>
+          <div
+            className="snacks-print-only snacks-print-root text-black max-w-4xl mx-auto"
+            style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+          >
+            {/* Page 1 — quick shop only */}
+            <header className="border-b-2 border-black pb-3 mb-4">
+              <h1 className="text-2xl font-black">Party snacks — quick shop</h1>
+              <p className="text-sm mt-1">
+                {guestCount} guests · ~{mgEachTarget.toFixed(1)} mg THC per portion per snack · Infusion Sensei
               </p>
-              <div className="space-y-5">
-                {combinedByStoreSection.map(({ section, lines }) => (
-                  <div key={`print-sec-${section}`}>
-                    <p className="text-sm font-black mb-2">{section}</p>
-                    <ul className="space-y-1.5 text-sm">
+            </header>
+
+            {groceryData && combinedByStoreSectionPrintOrder.length > 0 && (
+              <section className="mb-2">
+                <p className="text-xs font-bold uppercase tracking-wide text-gray-700 mb-2">
+                  Grab these at the store (short list — check boxes in the app for detail)
+                </p>
+                {combinedByStoreSectionPrintOrder.map(({ section, lines }) => (
+                  <div key={`print-q-${section}`} className="mb-4">
+                    <p className="text-sm font-black border-b border-gray-400 mb-2">{section}</p>
+                    <ul className="snacks-print-quick list-none pl-0 space-y-0">
                       {lines.map((line) => (
-                        <li key={`${line.name}|${line.unit}|${section}`}>
-                          <span className="font-semibold">{groceryLineDisplay(line, groceryMeasureMode)}</span> {line.name}
-                          {line.storeHint ? (
-                            <span className="block text-xs text-gray-600 pl-0">{line.storeHint}</span>
-                          ) : null}
+                        <li key={`${line.name}|${line.unit}|${section}|q`} className="flex gap-2">
+                          <span className="shrink-0 w-4">□</span>
+                          <span>{formatQuickShopLine(line)}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                 ))}
+              </section>
+            )}
+
+            {/* Labels — new page */}
+            <section className="snacks-print-break mt-8 pt-4">
+              <h2 className="text-xl font-black border-b-2 border-black pb-2 mb-3">Buffet labels (cut & fold)</h2>
+              <p className="text-xs text-gray-800 mb-4">
+                One card per infused snack — set by the tray. Fold so the dose shows on both sides if you like.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {uniqueInfusedIds.map((id) => (
+                  <div key={`snack-label-${id}`} className="snacks-print-label-card rounded-md">
+                    <p className="text-base font-black leading-tight">{snackNameById.get(id) ?? id}</p>
+                    <p className="text-3xl font-black mt-2 tabular-nums">{mgEachTarget.toFixed(1)} mg THC</p>
+                    <p className="text-xs mt-1">per portion</p>
+                    <p className="text-sm font-bold mt-4 pt-3 border-t-2 border-black">
+                      Infused — eat wisely.
+                    </p>
+                    <p className="text-[10px] mt-2 font-semibold">Infusion Sensei</p>
+                  </div>
+                ))}
               </div>
             </section>
-          )}
-        </div>
+
+            {/* Prep instructions — new page */}
+            <section className="snacks-print-break mt-8 pt-4">
+              <h2 className="text-xl font-black border-b-2 border-black pb-2 mb-3">Kitchen prep (from templates)</h2>
+              <p className="text-xs text-gray-700 mb-4">
+                Builder scales amounts to your guest count; follow infusion steps in the app for exact THC in butter/oil.
+              </p>
+              <div className="space-y-6">
+                {uniqueInfusedIds.map((id) => {
+                  const tpl = getStandardRecipeById(standardRecipes, id);
+                  if (!tpl?.instructions?.length) {
+                    return (
+                      <div key={`inst-${id}`}>
+                        <p className="font-black text-sm">{snackNameById.get(id) ?? id}</p>
+                        <p className="text-sm text-gray-700">Open this snack in the recipe builder for full steps.</p>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={`inst-${id}`} className="break-inside-avoid">
+                      <p className="font-black text-base border-b border-gray-400 pb-1 mb-2">{tpl.name}</p>
+                      <ol className="list-decimal pl-5 text-sm space-y-1.5">
+                        {tpl.instructions.map((step, idx) => (
+                          <li key={`${id}-step-${idx}`}>{step}</li>
+                        ))}
+                      </ol>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            <p className="text-xs text-center mt-8 text-gray-600">Infusion Sensei · infusionsensei.com</p>
+          </div>
+        </>
       )}
     </>
   );

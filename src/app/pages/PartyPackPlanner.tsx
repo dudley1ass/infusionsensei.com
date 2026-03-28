@@ -523,8 +523,8 @@ export function PartyPackPlanner() {
     };
   }, [savedWingsSplit]);
 
-  const groceryBySection = useMemo(
-    () => buildAggregatedGroceryLines(resolvedPlannerRecipes, wingGroceryExtras),
+  const groceryBySectionQuick = useMemo(
+    () => buildAggregatedGroceryLines(resolvedPlannerRecipes, wingGroceryExtras, { quickShop: true }),
     [resolvedPlannerRecipes, wingGroceryExtras]
   );
 
@@ -539,6 +539,7 @@ export function PartyPackPlanner() {
           .party-print-page:last-of-type { page-break-after: auto; }
           .party-print-grocery { page-break-before: always; break-before: page; }
           .party-print-recipe { page-break-inside: avoid; }
+          .party-print-quickshop li { font-size: 12pt !important; line-height: 1.45 !important; margin: 0.3em 0 !important; }
         }
       `}</style>
       <div className="app-print-hide max-w-5xl mx-auto space-y-8">
@@ -918,6 +919,28 @@ export function PartyPackPlanner() {
           <p className="text-sm mt-2">Safety: Start low, wait 45–90 minutes. Keep non-infused options clearly labeled.</p>
         </div>
 
+        <div className="party-print-page party-print-quickshop">
+          <h2 className="text-xl font-black border-b-2 border-black pb-2 mb-3">Quick shop (store aisle)</h2>
+          <p className="text-xs text-gray-800 mb-4">
+            Short list — boxes, bags, gallons. Use the following pages for full recipe amounts and instructions.
+          </p>
+          <div className="space-y-3">
+            {groceryBySectionQuick.map((sec) => (
+              <div key={`pq-${sec.section}`}>
+                <p className="font-black text-sm border-b border-gray-400 pb-1 mb-2">{sec.section}</p>
+                <ul className="list-none pl-0">
+                  {sec.lines.map((line) => (
+                    <li key={`${sec.section}-${line}`} className="flex gap-2">
+                      <span className="shrink-0">□</span>
+                      <span>{line}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {resolvedPlannerRecipes.map(({ item, template, siteRecipe, scale }) => (
           <div key={`pp-print-${item.id}`} className="party-print-page party-print-recipe">
             <h2 className="text-xl font-black border-b border-black pb-2 mb-3">{item.name}</h2>
@@ -969,26 +992,7 @@ export function PartyPackPlanner() {
           </div>
         ))}
 
-        <div className="party-print-grocery party-print-page">
-          <h2 className="text-xl font-black border-b-2 border-black pb-2 mb-3">Master grocery list</h2>
-          <p className="text-xs text-gray-700 mb-4">
-            Amounts are scaled for your party settings. Retail hints (e.g. cereal boxes) are estimates — verify weights on
-            packages.
-          </p>
-          <div className="space-y-3">
-            {groceryBySection.map((sec) => (
-              <div key={`gsec-${sec.section}`} className="border border-black rounded p-2">
-                <p className="font-bold text-sm">{sec.section}</p>
-                <ul className="list-disc pl-5 text-sm mt-1">
-                  {sec.lines.map((line) => (
-                    <li key={`${sec.section}-${line}`}>{line}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <p className="text-xs text-center mt-8 text-gray-600">Infusion Sensei · infusionsensei.com</p>
-        </div>
+        <p className="text-xs text-center mt-8 mb-2 text-gray-600">Infusion Sensei · infusionsensei.com</p>
       </div>
     </>
   );
