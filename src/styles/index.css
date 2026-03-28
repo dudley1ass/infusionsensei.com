@@ -1,39 +1,51 @@
 @import "tailwindcss";
 
 /*
- * Print layouts must not rely on Tailwind's `print:` variant alone — production CSS
- * ordering can leave screen UI visible. These rules use !important so they always win.
+ * Print: do not rely on Tailwind `print:` alone. Use !important where needed.
+ * Note: route content renders inside <Outlet /> — print roots are nested under main, not direct children.
  */
 @media print {
   html,
   body {
     background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
-  /* Let print layouts use full width (Tailwind container can constrain) */
   main.container {
     max-width: none !important;
     width: 100% !important;
     padding: 0 !important;
-    margin: 0 auto !important;
+    margin: 0 !important;
   }
 
   .app-print-hide {
     display: none !important;
   }
 
+  /* Nested under Outlet — use descendant selectors, not main > … */
+  main .screen-only {
+    display: none !important;
+  }
+  main .print-only {
+    display: block !important;
+  }
+
   .party-print-only,
-  .grocery-print-only {
+  .grocery-print-only,
+  .snacks-print-only {
     display: block !important;
     width: 100% !important;
     max-width: 100% !important;
   }
+}
 
-  /* Recipe builder fallback (CreateRecipes also injects rules; this mirrors them) */
-  .screen-only {
+/* Screen only — do not apply outside screen or nested .print-only stays hidden in print */
+@media screen {
+  .print-only,
+  .party-print-only,
+  .grocery-print-only,
+  .snacks-print-only {
     display: none !important;
-  }
-  .print-only {
-    display: block !important;
   }
 }

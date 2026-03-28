@@ -1,4 +1,5 @@
 import { useState, useEffect, Fragment } from "react";
+import { flushSync } from "react-dom";
 import { useSearchParams, useNavigate, useLocation } from "react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -710,7 +711,7 @@ export const standardRecipes: Record<string, any[]> = {
       ingredients: ["THC Tincture","Gelatin (unflavored)","Flavored Jello Mix","Water","Corn Syrup"],
       amounts: [30,28,85,120,60],
       units: ["ml","g","g","ml","ml"],
-      instructions: ["Combine gelatin, jello mix, and water in a small saucepan.","Let sit 5 minutes to bloom — do not stir yet.","Heat over low heat, stirring gently until fully dissolved.","Remove from heat and let cool 2 minutes.","Stir in corn syrup and THC tincture thoroughly.","Pour carefully into silicone gummy molds.","Refrigerate 2-3 hours until firm.","Pop out and store in an airtight container. Label with THC per piece."],
+      instructions: ["Follow the flavored gelatin / jello package (or manufacturer) instructions for water amounts, bloom times, and set times if they differ — we only add infusion and dosing below.","Combine gelatin, jello mix, and water in a small saucepan.","Let sit 5 minutes to bloom — do not stir yet.","Heat over low heat, stirring gently until fully dissolved.","Remove from heat and let cool 2 minutes.","Stir in corn syrup and THC tincture thoroughly.","Pour carefully into silicone gummy molds.","Refrigerate 2-3 hours until firm.","Pop out and store in an airtight container. Label with THC per piece."],
     },
     {
       id: "classic-jello-shots",
@@ -719,7 +720,7 @@ export const standardRecipes: Record<string, any[]> = {
       ingredients: ["Flavored Jello Mix","Gelatin (unflavored)","Water","THC Tincture","Corn Syrup"],
       amounts: [85,14,360,24,30],
       units: ["g","g","ml","ml","ml"],
-      instructions: ["Whisk flavored jello mix and unflavored gelatin together in a saucepan.","Add water and let bloom for 5 minutes.","Warm on low heat, stirring until fully dissolved — do not boil.","Remove from heat and cool 2 minutes.","Stir in THC tincture and corn syrup until uniform.","Pour into tray molds (24 portions).","Refrigerate 2-3 hours until set.","Label each cube with mg per piece before serving."],
+      instructions: ["Follow the flavored gelatin / jello package (or manufacturer) instructions for water amounts, bloom times, and set times if they differ — we only add infusion and dosing below.","Whisk flavored jello mix and unflavored gelatin together in a saucepan.","Add water and let bloom for 5 minutes.","Warm on low heat, stirring until fully dissolved — do not boil.","Remove from heat and cool 2 minutes.","Stir in THC tincture and corn syrup until uniform.","Pour into tray molds (24 portions).","Refrigerate 2-3 hours until set.","Label each cube with mg per piece before serving."],
     },
     {
       id: "fruit-juice-jello-cubes",
@@ -728,7 +729,7 @@ export const standardRecipes: Record<string, any[]> = {
       ingredients: ["Flavored Jello Mix","Gelatin (unflavored)","Fruit Juice","THC Tincture","Granulated Sugar"],
       amounts: [85,14,300,20,20],
       units: ["g","g","ml","ml","g"],
-      instructions: ["Mix jello powder, unflavored gelatin, and sugar in a saucepan.","Add water and bloom for 5 minutes.","Heat gently while whisking until smooth.","Remove from heat and stir in tincture.","Pour into a flat tray and chill until firm.","Cut into 24 equal cubes for consistent dosing."],
+      instructions: ["Follow the flavored gelatin / jello package (or manufacturer) instructions for liquid amounts, bloom times, and set times if they differ — we only add infusion and dosing below.","Mix jello powder, unflavored gelatin, and sugar in a saucepan.","Add juice (or water per your package) and bloom for 5 minutes.","Heat gently while whisking until smooth.","Remove from heat and stir in tincture.","Pour into a flat tray and chill until firm.","Cut into 24 equal cubes for consistent dosing."],
     },
     {
       id: "layered-jello-shots",
@@ -737,7 +738,7 @@ export const standardRecipes: Record<string, any[]> = {
       ingredients: ["Flavored Jello Mix","Gelatin (unflavored)","Water","Whole Milk","THC Tincture"],
       amounts: [85,14,320,80,24],
       units: ["g","g","ml","ml","ml"],
-      instructions: ["Prepare first jello layer: dissolve half the mix and gelatin in hot water.","Pour half into tray and chill until just set.","Prepare second creamy layer using remaining mix, gelatin, and milk.","Stir in tincture after removing from heat.","Pour second layer on top and chill fully.","Cut into 24 equal cubes."],
+      instructions: ["Follow the flavored gelatin / jello package (or manufacturer) instructions for water amounts, bloom times, and set times if they differ — we only add infusion and dosing below.","Prepare first jello layer: dissolve half the mix and gelatin in hot water.","Pour half into tray and chill until just set.","Prepare second creamy layer using remaining mix, gelatin, and milk.","Stir in tincture after removing from heat.","Pour second layer on top and chill fully.","Cut into 24 equal cubes."],
     },
     {
       id: "sour-jello-bites",
@@ -746,7 +747,7 @@ export const standardRecipes: Record<string, any[]> = {
       ingredients: ["Flavored Jello Mix","Gelatin (unflavored)","Water","THC Tincture","Corn Syrup"],
       amounts: [85,14,320,24,30],
       units: ["g","g","ml","ml","ml"],
-      instructions: ["Combine jello mix, gelatin, and water in saucepan.","Bloom 5 minutes then heat gently until dissolved.","Remove from heat and stir in tincture and corn syrup.","Pour into silicone molds.","Refrigerate until firm.","Optional: dust lightly with citric acid + sugar blend for sour finish."],
+      instructions: ["Follow the flavored gelatin / jello package (or manufacturer) instructions for water amounts, bloom times, and set times if they differ — we only add infusion and dosing below.","Combine jello mix, gelatin, and water in saucepan.","Bloom 5 minutes then heat gently until dissolved.","Remove from heat and stir in tincture and corn syrup.","Pour into silicone molds.","Refrigerate until firm.","Optional: dust lightly with citric acid + sugar blend for sour finish."],
     },
     {
       id: "rice-krispie-treat-squares",
@@ -1304,6 +1305,47 @@ function ingredientLibraryKey(ing: Ingredient): string {
   return ing.gramsLookupName ?? ing.name;
 }
 
+/** True for AP/coconut/cocoa structural flour — not cornstarch (sauces) or chocolate chips. */
+function isStructuralBakingFlourKey(name: string): boolean {
+  const l = INGREDIENT_LIBRARY.find((lib) => lib.name === name);
+  if (l?.category !== "flour") return false;
+  const kl = name.toLowerCase();
+  if (kl.includes("chocolate") && !kl.includes("cocoa")) return false;
+  if (name === "Cornstarch" || name === "Tapioca Starch" || name === "Arrowroot Powder") return false;
+  return true;
+}
+
+function hasStructuralBakingFlour(ingredients: Ingredient[]): boolean {
+  return ingredients.some((i) => isStructuralBakingFlourKey(ingredientLibraryKey(i)));
+}
+
+/** When switching templates (e.g. tea → latte), keep saved infusion rows so THC dosing carries over. */
+function mergePreservedInfusionRows(prev: Ingredient[], built: Ingredient[]): Ingredient[] {
+  if (!prev.length) return built;
+  return built.map((ing) => {
+    const k = ingredientLibraryKey(ing);
+    const match =
+      prev.find((p) => p.infusionBaseId && ingredientLibraryKey(p) === k) ||
+      prev.find((p) => p.infusionBaseId && (p.gramsLookupName === k || (!p.gramsLookupName && p.name === k)));
+    if (!match?.infusionBaseId) return ing;
+    return {
+      ...ing,
+      name: match.name,
+      amount: match.amount,
+      unit: match.unit,
+      thcPerUnit: match.thcPerUnit,
+      isInfused: true,
+      infusionBaseId: match.infusionBaseId,
+      gramsLookupName: match.gramsLookupName ?? ing.gramsLookupName,
+      calories: match.calories,
+      carbs: match.carbs,
+      protein: match.protein,
+      fat: match.fat,
+      type: match.type,
+    };
+  });
+}
+
 // Available units for measurement
 const UNIT_OPTIONS = [
   // Metric
@@ -1413,10 +1455,15 @@ export function CreateRecipes() {
   }, []);
 
   const runPrint = (target: "full" | "buffet") => {
-    setPrintTarget(target);
+    // Commit state, then wait for paint — print dialog can open before layout updates otherwise.
+    flushSync(() => {
+      setPrintTarget(target);
+    });
     requestAnimationFrame(() => {
-      window.print();
-      trackEvent(target === "full" ? "print_recipe" : "print_buffet_labels");
+      requestAnimationFrame(() => {
+        window.print();
+        trackEvent(target === "full" ? "print_recipe" : "print_buffet_labels");
+      });
     });
   };
 
@@ -1613,7 +1660,7 @@ export function CreateRecipes() {
           }
         }
 
-        setIngredients(builtIngredients);
+        setIngredients((prev) => mergePreservedInfusionRows(prev, builtIngredients));
         // Reset measurement system to metric since all library items use metric units by default
         setMeasurementSystem("metric");
       }
@@ -1989,6 +2036,11 @@ export function CreateRecipes() {
        lowerNames.some(n => n.includes("chocolate")));
     const isBlondieStyle =
       /blondie/i.test(recipeName.toLowerCase()) || selectedStandardRecipe === "blondie-squares";
+    const isCookieStyle =
+      selectedStandardRecipe === "chocolate-chip-cookies" ||
+      selectedStandardRecipe === "sugar-cookies" ||
+      selectedStandardRecipe === "cookie-sandwiches-infused-filling" ||
+      /\b(chocolate chip cookie|sugar cookie)\b/i.test(recipeName);
     const isCakeStyle =
       /\b(cupcake|cupcakes|layer cake|birthday cake|sponge|chiffon|muffin)\b/i.test(recipeName) ||
       selectedStandardRecipe === "mini-cupcakes-infused-frosting";
@@ -2001,15 +2053,8 @@ export function CreateRecipes() {
     let warning = '';
     let color = '';
 
-    // Only run baking-science warnings if recipe has real structural flour
-    // (not just cocoa powder or chocolate which are mapped to flour category)
-    const hasRealFlour = ingredients.some(i => {
-      const k = ingredientLibraryKey(i);
-      const l = INGREDIENT_LIBRARY.find(lib => lib.name === k);
-      return l?.category === 'flour' && !k.toLowerCase().includes('cocoa') && !k.toLowerCase().includes('chocolate');
-    });
-
-    if (flour === 0 || !hasRealFlour) return { warning, color };
+    // Only run baking-science warnings for structural flour (not cornstarch-thickened sauces)
+    if (!hasStructuralBakingFlour(ingredients)) return { warning, color };
 
     // High liquid ratio is expected for batters (pancakes/waffles/crepes), not brownies
     const isHighLiquidRecipe = isPancakeStyle && totalMoisture > flour * 0.8;
@@ -2052,8 +2097,8 @@ export function CreateRecipes() {
       });
       if (isLargestSugar) {
         const sugarToFlourBal = sugarBalanced / Math.max(flour, 1);
-        const sugarProblemThreshold = isBrownieStyle ? 3.2 : isBlondieStyle ? 2.6 : 1.2;
-        const sugarWarningThreshold = isBrownieStyle ? 2.4 : isBlondieStyle ? 2.0 : 0.95;
+        const sugarProblemThreshold = isBrownieStyle ? 5.0 : isBlondieStyle ? 2.6 : isCookieStyle ? 1.55 : 1.2;
+        const sugarWarningThreshold = isBrownieStyle ? 3.9 : isBlondieStyle ? 2.0 : isCookieStyle ? 1.28 : 0.95;
         if (sugarToFlourBal > sugarProblemThreshold) {
           warning = 'Total sugar is very high — baked goods will be overly sweet, thin, and burn easily.';
           color = 'red';
@@ -2160,6 +2205,11 @@ export function CreateRecipes() {
        lowerNames.some(n => n.includes("chocolate")));
     const isBlondieStyle =
       /blondie/i.test(recipeName.toLowerCase()) || selectedStandardRecipe === "blondie-squares";
+    const isCookieStyle =
+      selectedStandardRecipe === "chocolate-chip-cookies" ||
+      selectedStandardRecipe === "sugar-cookies" ||
+      selectedStandardRecipe === "cookie-sandwiches-infused-filling" ||
+      /\b(chocolate chip cookie|sugar cookie)\b/i.test(recipeName);
     const isCakeStyle =
       /\b(cupcake|cupcakes|layer cake|birthday cake|sponge|chiffon|muffin)\b/i.test(recipeName) ||
       selectedStandardRecipe === "mini-cupcakes-infused-frosting";
@@ -2171,21 +2221,16 @@ export function CreateRecipes() {
     const isSavoryStyle = selectedCategory === "wings" || selectedCategory === "spreads-dips" || selectedCategory === "savory-meals";
     const isDrinkStyle = selectedCategory === "drinks";
 
-    // Check if recipe has real structural flour (not just cocoa/chocolate)
-    const hasRealFlour = ingredients.some(i => {
-      const k = ingredientLibraryKey(i);
-      const l = INGREDIENT_LIBRARY.find(lib => lib.name === k);
-      return l?.category === 'flour' && !k.toLowerCase().includes('cocoa') && !k.toLowerCase().includes('chocolate');
-    });
+    const structuralFlour = hasStructuralBakingFlour(ingredients);
 
     // High liquid intentional recipes (pancakes, waffles, crepes, batters)
-    const isHighLiquidRecipe = hasRealFlour && isPancakeStyle && totalMoisture > flour * 0.8;
+    const isHighLiquidRecipe = structuralFlour && isPancakeStyle && totalMoisture > flour * 0.8;
 
     const tags: { label: string; color: string }[] = [];
     if (hasInfused) tags.push({ label: '🧪 Cannabis Infused', color: 'purple' });
 
-    // No real flour — beverage / sauce / no-bake
-    if (!hasRealFlour) {
+    // No structural baking flour — beverage / sauce / no-bake / starch-thickened cheese sauce
+    if (!structuralFlour) {
       if (liquid > 0 || dairy > 0) {
         return {
           headline: '🥤 Beverage or Sauce Recipe',
@@ -2248,8 +2293,8 @@ export function CreateRecipes() {
     }
 
     // Diagnose each ratio
-    const sugarProblemThreshold = isBrownieStyle ? 3.8 : isBlondieStyle ? 2.6 : 1.2;
-    const sugarWarningThreshold = isBrownieStyle ? 3.0 : isBlondieStyle ? 2.0 : 1.05;
+    const sugarProblemThreshold = isBrownieStyle ? 5.0 : isBlondieStyle ? 2.6 : isCookieStyle ? 1.55 : 1.2;
+    const sugarWarningThreshold = isBrownieStyle ? 3.9 : isBlondieStyle ? 2.0 : isCookieStyle ? 1.28 : 1.05;
     if (sugarRatio > sugarProblemThreshold)       { issues.push('sugar is very high — expect thin, sweet, fast-browning results'); tags.push({ label: 'Too much sugar', color: 'red' }); severity = 'problem'; }
     else if (sugarRatio > sugarWarningThreshold)  { issues.push('sugar is elevated — baked goods will spread more and brown faster'); tags.push({ label: 'High sugar', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 

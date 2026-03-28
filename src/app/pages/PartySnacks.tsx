@@ -286,8 +286,11 @@ export function PartySnacks() {
     return `/ingredients?${params.toString()}`;
   };
 
+  const showPrintSheet = uniqueInfusedIds.length > 0 && !hasDuplicatePicks;
+
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <>
+      <div className="app-print-hide max-w-6xl mx-auto space-y-8">
       <Helmet>
         <title>Party Snacks | Infusion Sensei</title>
         <meta
@@ -441,7 +444,7 @@ export function PartySnacks() {
 
       <section
         id="party-snacks-grocery"
-        className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5 print:shadow-none print:border-gray-300"
+        className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5"
       >
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -459,7 +462,7 @@ export function PartySnacks() {
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 justify-end items-center print:hidden">
+          <div className="flex flex-wrap gap-2 justify-end items-center app-print-hide">
             {groceryData && (
               <>
                 <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 shadow-sm" role="group" aria-label="Grocery amount units">
@@ -518,7 +521,7 @@ export function PartySnacks() {
                               type="checkbox"
                               checked={!!groceryChecked[key]}
                               onChange={() => toggleGroceryLine(key)}
-                              className="mt-1 rounded border-gray-300 print:hidden shrink-0"
+                              className="mt-1 rounded border-gray-300 app-print-hide shrink-0"
                               aria-label={`Got ${line.name}`}
                             />
                             <span className="flex flex-col gap-0.5">
@@ -527,7 +530,7 @@ export function PartySnacks() {
                                 {line.name}
                               </span>
                               {line.storeHint && (
-                                <span className="text-xs text-gray-500 pl-0 leading-snug print:text-gray-600">
+                                <span className="text-xs text-gray-500 pl-0 leading-snug">
                                   {line.storeHint}
                                 </span>
                               )}
@@ -632,6 +635,76 @@ export function PartySnacks() {
           </Button>
         </Link>
       </div>
-    </div>
+      </div>
+
+      {showPrintSheet && (
+        <div
+          className="snacks-print-only text-black max-w-4xl mx-auto"
+          style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+        >
+          <header className="border-b-2 border-black pb-4 mb-6">
+            <h1 className="text-2xl font-black">Party Snacks</h1>
+            <p className="text-sm mt-2">
+              Guests: {guestCount} · Party goal: {mgPerPerson} mg THC per person from infused snacks · Builder target:{" "}
+              <span className="font-bold">{mgEachTarget.toFixed(2)} mg</span> per portion per infused type
+            </p>
+            <p className="text-xs text-gray-800 mt-2">
+              Start low, wait 45–90 minutes. Keep infused and non-infused trays separate. Infusion Sensei
+            </p>
+          </header>
+
+          <section className="mb-8">
+            <h2 className="text-lg font-black border-b border-black pb-1 mb-4">Snack labels (name + dose)</h2>
+            <p className="text-xs text-gray-700 mb-4">
+              Cut out each card. Place at the buffet or on the tray so guests see the snack name and THC per portion.
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              {uniqueInfusedIds.map((id) => (
+                <div
+                  key={`snack-label-${id}`}
+                  className="border-2 border-black rounded-lg p-4"
+                  style={{ breakInside: "avoid", pageBreakInside: "avoid" }}
+                >
+                  <p className="text-lg font-black leading-tight">{snackNameById.get(id) ?? id}</p>
+                  <p className="text-3xl font-black mt-2 tabular-nums">{mgEachTarget.toFixed(1)} mg</p>
+                  <p className="text-xs text-gray-800">THC per portion (one serving)</p>
+                  <p className="text-sm font-semibold mt-4 border-t border-gray-400 pt-3">
+                    Infused food — contains cannabis. Eat wisely.
+                  </p>
+                  <p className="text-[10px] text-gray-700 mt-3 font-semibold">Infusion Sensei</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {groceryData && combinedByStoreSection.length > 0 && (
+            <section>
+              <h2 className="text-lg font-black border-b border-black pb-1 mb-4">Combined grocery list</h2>
+              <p className="text-xs text-gray-700 mb-4">
+                Amounts for {guestCount} guests (one portion per guest per infused snack). Units:{" "}
+                {groceryMeasureMode === "metric" ? "metric (g & ml)" : "US (cups & spoons)"}.
+              </p>
+              <div className="space-y-5">
+                {combinedByStoreSection.map(({ section, lines }) => (
+                  <div key={`print-sec-${section}`}>
+                    <p className="text-sm font-black mb-2">{section}</p>
+                    <ul className="space-y-1.5 text-sm">
+                      {lines.map((line) => (
+                        <li key={`${line.name}|${line.unit}|${section}`}>
+                          <span className="font-semibold">{groceryLineDisplay(line, groceryMeasureMode)}</span> {line.name}
+                          {line.storeHint ? (
+                            <span className="block text-xs text-gray-600 pl-0">{line.storeHint}</span>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+      )}
+    </>
   );
 }
