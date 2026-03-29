@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router";
+import { createBrowserRouter, Navigate, useLocation } from "react-router";
 import { Home } from "./pages/Home";
 import { Recipes } from "./pages/Recipes";
 import { CreateRecipes } from "./pages/CreateRecipes";
@@ -57,6 +57,12 @@ function RedirectFriesToSpreadsDips() {
   return <Navigate to="/spreads-dips" replace />;
 }
 
+/** Legacy SEO URL — consolidate to /edibles-calculator */
+function RedirectThcToEdiblesCalculator() {
+  const { search } = useLocation();
+  return <Navigate to={`/edibles-calculator${search}`} replace />;
+}
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -77,7 +83,8 @@ export const router = createBrowserRouter([
       { path: "gummies", Component: Gummies },
       { path: "party-snacks", Component: PartySnacks },
       { path: "utm", Component: UTMBuilder },
-      { path: "thc-calculator", Component: THCCalculatorPage },
+      { path: "edibles-calculator", Component: THCCalculatorPage },
+      { path: "thc-calculator", Component: RedirectThcToEdiblesCalculator },
       { path: "edible-potency-guide", Component: EdiblePotencyGuide },
       { path: "edible-recipes", Component: CannabisEdibleRecipesPage },
       { path: "infused-drinks", Component: InfusedDrinksPage },

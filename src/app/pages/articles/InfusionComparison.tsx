@@ -139,7 +139,7 @@ export function InfusionComparison() {
             <p className="text-gray-600 mb-4 text-sm">Choose your base, set your potency, and calculate exact THC per serving for any recipe.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/infusions"><button className="bg-orange-600 hover:bg-orange-700 text-white font-black px-6 py-3 rounded-xl transition-colors flex items-center gap-2">Start My Infusion <ArrowRight className="w-4 h-4" /></button></Link>
-              <Link to="/thc-calculator"><button className="border-2 border-orange-600 text-orange-700 font-black px-6 py-3 rounded-xl hover:bg-orange-50 transition-colors">THC Calculator</button></Link>
+              <Link to="/edibles-calculator"><button className="border-2 border-orange-600 text-orange-700 font-black px-6 py-3 rounded-xl hover:bg-orange-50 transition-colors">THC Calculator</button></Link>
             </div>
           </div>
 

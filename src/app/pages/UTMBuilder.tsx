@@ -30,7 +30,7 @@ const SOURCES = [
 
 const PRESET_CAMPAIGNS = [
   "wing-sauces-launch", "popcorn-launch", "coffee-launch", "fries-launch",
-  "thc-calculator", "recipe-builder", "weekly-post", "viral-content"
+  "edibles-calculator", "thc-calculator", "recipe-builder", "weekly-post", "viral-content"
 ];
 
 export function UTMBuilder() {
@@ -167,7 +167,7 @@ export function UTMBuilder() {
             { post: "TikTok bio link → Homepage", url: `https://infusionsensei.com/?utm_source=tiktok&utm_medium=social&utm_campaign=bio-link` },
             { post: "TikTok video → Wing Sauces", url: `https://infusionsensei.com/wings?utm_source=tiktok&utm_medium=social&utm_campaign=wing-sauces-launch` },
             { post: "Reddit post → Popcorn", url: `https://infusionsensei.com/popcorn?utm_source=reddit&utm_medium=social&utm_campaign=popcorn-launch` },
-            { post: "Instagram story → THC Calculator", url: `https://infusionsensei.com/ingredients?utm_source=instagram&utm_medium=social&utm_campaign=thc-calculator` },
+            { post: "Instagram story → Edibles Calculator", url: `https://infusionsensei.com/edibles-calculator?utm_source=instagram&utm_medium=social&utm_campaign=edibles-calculator` },
             { post: "Pinterest pin → Recipe page", url: `https://infusionsensei.com/recipes?utm_source=pinterest&utm_medium=social&utm_campaign=recipe-pins` },
           ].map(({post, url}) => (
             <div key={post} className="bg-gray-50 rounded-xl p-3">

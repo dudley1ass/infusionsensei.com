@@ -147,8 +147,8 @@ export function Home() {
             Infusion Sensei gives you control —<br className="hidden md:block" />so every batch hits exactly how you want.
           </p>
           <Link
-            to="/thc-calculator"
-            onClick={() => trackEvent("homepage_primary_cta_click", { location: "problem_section", target: "thc-calculator" })}
+            to="/edibles-calculator"
+            onClick={() => trackEvent("homepage_primary_cta_click", { location: "problem_section", target: "edibles-calculator" })}
           >
             <Button size="lg" className="bg-green-500 hover:bg-green-400 text-white font-black text-lg px-10 py-6 rounded-xl shadow-lg transition-transform hover:scale-105">
               Calculate THC Now <ArrowRight className="w-5 h-5 ml-2" />

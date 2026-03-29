@@ -18,7 +18,7 @@ export function CannabisEdibleRecipesPage() {
         <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">Cannabis Edible Recipes<br/><span className="text-orange-200">for Beginners</span></h1>
         <p className="text-orange-100 text-lg max-w-2xl mb-6">These recipes are designed to work with our THC dosage calculator — so you know the exact milligrams per serving before you eat a single bite.</p>
         <div className="flex flex-wrap gap-3">
-          <Link to="/thc-calculator"><Button className="bg-white text-orange-700 hover:bg-orange-50 font-black px-6 py-3">Calculate My Dose <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+          <Link to="/edibles-calculator"><Button className="bg-white text-orange-700 hover:bg-orange-50 font-black px-6 py-3">Calculate My Dose <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
           <Link to="/recipes"><Button variant="outline" className="border-white/40 text-white hover:bg-white/10 font-bold px-6 py-3">Browse All Recipes</Button></Link>
         </div>
       </div>
@@ -91,7 +91,7 @@ export function CannabisEdibleRecipesPage() {
         <div className="text-4xl mb-3">🧮</div>
         <h2 className="text-2xl font-black mb-2">Calculate Your Exact Dose</h2>
         <p className="text-green-200 mb-5">Use our free THC calculator with any of these recipes to get exact milligrams per serving.</p>
-        <Link to="/thc-calculator"><Button className="bg-white text-green-800 hover:bg-green-50 font-black px-8 py-3">Open THC Calculator <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+        <Link to="/edibles-calculator"><Button className="bg-white text-green-800 hover:bg-green-50 font-black px-8 py-3">Open THC Calculator <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
       </div>
     </div>
   );

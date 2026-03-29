@@ -116,7 +116,7 @@ export function EdibleStrengthGuide() {
             <Calculator className="w-10 h-10 text-blue-600 mx-auto mb-3" />
             <h3 className="text-xl font-black text-gray-900 mb-2">Use the Calculator Instead of Guessing</h3>
             <p className="text-gray-600 mb-4 text-sm">Enter your flower's THC%, amount used, and servings — get exact mg THC per serving instantly.</p>
-            <Link to="/thc-calculator"><button className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-3 rounded-xl transition-colors flex items-center gap-2 mx-auto">Open THC Calculator <ArrowRight className="w-4 h-4" /></button></Link>
+            <Link to="/edibles-calculator"><button className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-3 rounded-xl transition-colors flex items-center gap-2 mx-auto">Open THC Calculator <ArrowRight className="w-4 h-4" /></button></Link>
           </div>
 
         </CardContent>

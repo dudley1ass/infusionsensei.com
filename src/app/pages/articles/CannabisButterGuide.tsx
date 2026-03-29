@@ -74,7 +74,7 @@ export function CannabisButterGuide() {
                 </div>
               ))}
             </div>
-            <p className="text-gray-500 text-sm">These are estimates — actual potency depends on your flower's THC%, decarb efficiency, and infusion time. Use our <Link to="/thc-calculator" className="text-green-700 font-semibold underline">THC Calculator</Link> for exact numbers.</p>
+            <p className="text-gray-500 text-sm">These are estimates — actual potency depends on your flower's THC%, decarb efficiency, and infusion time. Use our <Link to="/edibles-calculator" className="text-green-700 font-semibold underline">THC Calculator</Link> for exact numbers.</p>
           </div>
 
           <div className="space-y-4">
@@ -137,7 +137,7 @@ export function CannabisButterGuide() {
             <h3 className="text-xl font-black text-gray-900 mb-2">Calculate Your Exact Potency</h3>
             <p className="text-gray-600 mb-4 text-sm">Enter your flower's THC% and batch size — get exact mg per tablespoon instantly.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to="/thc-calculator"><button className="bg-green-600 hover:bg-green-700 text-white font-black px-6 py-3 rounded-xl transition-colors flex items-center gap-2">Calculate Potency <ArrowRight className="w-4 h-4" /></button></Link>
+              <Link to="/edibles-calculator"><button className="bg-green-600 hover:bg-green-700 text-white font-black px-6 py-3 rounded-xl transition-colors flex items-center gap-2">Calculate Potency <ArrowRight className="w-4 h-4" /></button></Link>
               <Link to="/infusions"><button className="border-2 border-green-600 text-green-700 hover:bg-green-50 font-black px-6 py-3 rounded-xl transition-colors">Build My Infusion</button></Link>
             </div>
           </div>

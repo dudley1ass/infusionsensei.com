@@ -101,8 +101,8 @@ export function WhyEdiblesHitTooHard() {
               <p className="font-black text-green-900 text-lg">🧮 Calculate Your Exact THC Per Serving</p>
               <p className="text-green-700 text-sm mt-0.5">Enter your strain and recipe — get precise mg per serving in under 60 seconds.</p>
             </div>
-            <Link to="/infusions" className="flex-shrink-0 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm whitespace-nowrap">
-              Try It Free →
+            <Link to="/edibles-calculator" className="flex-shrink-0 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm whitespace-nowrap">
+              Open calculator →
             </Link>
           </div>
 
@@ -132,17 +132,22 @@ export function WhyEdiblesHitTooHard() {
           <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl p-6 text-white">
             <p className="text-lg font-bold mb-2">📏 Know Your Dose Before You Eat It</p>
             <p className="text-orange-100 mb-4 text-sm">Use Infusion Sensei to calculate the exact mg THC per serving of every recipe. No more surprises.</p>
-            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-orange-700 font-semibold px-4 py-2 rounded-lg hover:bg-orange-50 transition-colors text-sm">
-              Calculate My Dose <ArrowRight className="w-4 h-4" />
+            <Link to="/edibles-calculator" className="inline-flex items-center gap-2 bg-white text-orange-700 font-semibold px-4 py-2 rounded-lg hover:bg-orange-50 transition-colors text-sm">
+              Open edibles calculator <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           {/* Internal CTA */}
           <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
             <p className="text-lg font-bold mb-1">🧮 Calculate Your Exact THC Per Serving</p>
             <p className="text-green-100 text-sm mb-4">Use Infusion Sensei's free THC dosage calculator — enter your strain, base type, and recipe to get precise mg per serving instantly.</p>
-            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
-              Build My Infusion — Free <ArrowRight className="w-4 h-4" />
-            </Link>
+            <div className="flex flex-wrap gap-2 justify-center">
+              <Link to="/edibles-calculator" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+                Edibles calculator <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link to="/infusions" className="inline-flex items-center gap-2 bg-green-800 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-green-900 transition-colors text-sm border border-white/20">
+                Build infusion <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
 
 

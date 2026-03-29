@@ -255,7 +255,7 @@ export function InfusedPeanutButterArticle() {
 
             <p className="mb-6 text-[#c8a87a]">You can run this math manually every time — or let the calculator do it in seconds.</p>
             <Link
-              to="/thc-calculator"
+              to="/edibles-calculator"
               className="inline-flex items-center gap-2.5 rounded-md bg-[#c8924a] px-6 py-3.5 text-[0.92rem] font-semibold tracking-wide text-[#1c1710] transition-colors hover:bg-[#9e6b2c] hover:text-white"
             >
               <span>Use the Infusion Sensei calculator</span>
@@ -368,7 +368,7 @@ export function InfusedPeanutButterArticle() {
               spoonful.
             </p>
             <Link
-              to="/thc-calculator"
+              to="/edibles-calculator"
               className="inline-flex items-center gap-2.5 rounded-md bg-[#c8924a] px-8 py-4 text-base font-bold tracking-wide text-[#1c1710] transition-all hover:bg-[#d99e58] hover:-translate-y-px"
             >
               <span>Open the dosing calculator</span>

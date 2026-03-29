@@ -94,8 +94,8 @@ export function THCPerServingCalculator() {
               <p className="font-black text-green-900 text-lg">🧮 Calculate Your Exact THC Per Serving</p>
               <p className="text-green-700 text-sm mt-0.5">Enter your strain and recipe — get precise mg per serving in under 60 seconds.</p>
             </div>
-            <Link to="/infusions" className="flex-shrink-0 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm whitespace-nowrap">
-              Try It Free →
+            <Link to="/edibles-calculator" className="flex-shrink-0 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm whitespace-nowrap">
+              Full edibles calculator →
             </Link>
           </div>
 

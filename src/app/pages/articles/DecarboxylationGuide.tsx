@@ -272,7 +272,7 @@ export function DecarboxylationGuide() {
                   Build My Infusion <ArrowRight className="w-4 h-4" />
                 </button>
               </Link>
-              <Link to="/thc-calculator">
+              <Link to="/edibles-calculator">
                 <button className="border-2 border-green-600 text-green-700 hover:bg-green-50 font-black px-6 py-3 rounded-xl transition-colors">
                   THC Calculator
                 </button>

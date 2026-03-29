@@ -86,16 +86,29 @@ export function THCCalculatorPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-12">
       <Helmet>
-        <title>THC Edible Calculator — How Strong Is Your Batch? (Free)</title>
-        <meta name="description" content="Calculate exact THC dosage for edibles, cannabutter, and oil. Get precise potency instantly - no math required." />
-        <link rel="canonical" href="https://infusionsensei.com/thc-calculator" />
+        <title>Edibles Calculator — THC Dosage Calculator (mg per Serving) | Infusion Sensei</title>
+        <meta
+          name="description"
+          content="Free edibles calculator: exact THC mg per serving for cannabutter, cannabis oil, and whole batches. How to calculate THC in edibles, common mistakes, and a beginner-friendly dosage chart — no guesswork."
+        />
+        <meta name="keywords" content="edibles calculator, THC dosage calculator, THC per serving, homemade edibles, cannabutter calculator, edible potency" />
+        <link rel="canonical" href="https://infusionsensei.com/edibles-calculator" />
+        <meta property="og:title" content="Edibles Calculator — Exact THC mg per Serving | Infusion Sensei" />
+        <meta property="og:description" content="Free THC calculator for homemade edibles. Get mg per serving for butter, oil, and full batches in seconds." />
+        <meta property="og:url" content="https://infusionsensei.com/edibles-calculator" />
+        <meta property="og:type" content="website" />
       </Helmet>
 
       {/* HERO */}
       <section className="bg-gradient-to-br from-green-700 to-green-900 rounded-3xl p-8 md:p-12 text-white text-center shadow-2xl">
         <div className="text-5xl mb-4">🧮</div>
-        <h1 className="text-4xl md:text-5xl font-black mb-3 leading-tight">Never Guess Your Edible Dosage Again</h1>
-        <p className="text-green-100 text-lg max-w-2xl mx-auto mb-6">Calculate exact THC per serving in seconds. Works for cannabutter, cannabis oil, flour, and any recipe.</p>
+        <h1 className="text-4xl md:text-5xl font-black mb-3 leading-tight">Edibles Calculator</h1>
+        <p className="text-xl md:text-2xl font-bold text-green-50 max-w-2xl mx-auto mb-3">
+          Get exact THC mg per serving in seconds — stop guessing your homemade edibles.
+        </p>
+        <p className="text-green-100 text-lg max-w-2xl mx-auto mb-6">
+          Works for cannabutter, cannabis oil, distillate-style infusions, and full batches. Free, no account.
+        </p>
         <a href="#calculator">
           <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-lg px-10 py-6 rounded-xl shadow-lg">
             Start Calculating <ArrowRight className="w-5 h-5 ml-2" />
@@ -106,8 +119,8 @@ export function THCCalculatorPage() {
 
       {/* TOOL SECTION */}
       <section id="calculator" className="bg-white rounded-3xl border-2 border-green-200 p-8 shadow-xl">
-        <h2 className="text-2xl font-black text-gray-900 mb-2">THC Edible Calculator</h2>
-        <p className="text-gray-500 text-sm mb-5">Enter your details below to calculate exact THC milligrams per serving.</p>
+        <h2 className="text-2xl font-black text-gray-900 mb-2">THC dosage calculator</h2>
+        <p className="text-gray-500 text-sm mb-5">Enter your flower THC%, amount, efficiency, and servings — see exact milligrams per portion below.</p>
 
         <div className="mb-5">
           <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Common scenarios</p>
@@ -236,9 +249,35 @@ export function THCCalculatorPage() {
         </div>
       </section>
 
+      {/* COMMON MISTAKES — supports “edibles calculator” / dosing intent */}
+      <section id="common-mistakes" className="bg-white rounded-3xl border border-amber-200 p-8 shadow-sm">
+        <h2 className="text-2xl font-black text-gray-900 mb-2">Common mistakes when dosing edibles</h2>
+        <p className="text-gray-600 text-sm mb-5">
+          Most bad experiences come from math or patience — not the recipe. Avoid these:
+        </p>
+        <ul className="space-y-3 text-sm text-gray-800">
+          <li className="flex gap-2">
+            <span className="font-black text-amber-600">1.</span>
+            <span><strong className="text-gray-900">Skipping decarb or ignoring efficiency.</strong> If THC never fully activated or your butter only captures part of it, “7g in 16 brownies” math will lie.</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="font-black text-amber-600">2.</span>
+            <span><strong className="text-gray-900">Confusing total mg with mg per serving.</strong> Always divide total infused THC by <em>portions</em>, not pan size by eye.</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="font-black text-amber-600">3.</span>
+            <span><strong className="text-gray-900">Uneven mixing.</strong> Hotspots in batter mean one brownie can be 3× stronger than the next — stir thoroughly.</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="font-black text-amber-600">4.</span>
+            <span><strong className="text-gray-900">Re-dosing too soon.</strong> Wait at least 2 hours before eating more; onset is slow.</span>
+          </li>
+        </ul>
+      </section>
+
       {/* TRUST SECTION */}
       <section className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
-        <h2 className="text-2xl font-black text-gray-900 mb-2">Why This Calculator Works</h2>
+        <h2 className="text-2xl font-black text-gray-900 mb-2">Why this edibles calculator works</h2>
         <p className="text-gray-500 text-sm mb-6">Built on real cannabis science — not guesswork.</p>
         <div className="grid md:grid-cols-3 gap-6">
           {[
@@ -256,8 +295,8 @@ export function THCCalculatorPage() {
       </section>
 
       {/* EDUCATION SECTION */}
-      <section className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
-        <h2 className="text-2xl font-black text-gray-900 mb-2">How to Calculate THC in Edibles</h2>
+      <section id="how-to-calculate-thc" className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
+        <h2 className="text-2xl font-black text-gray-900 mb-2">How to calculate THC per serving</h2>
         <p className="text-gray-600 mb-6">The math is simple once you break it down. Here's the formula and a real example.</p>
 
         <div className="bg-gray-50 rounded-2xl p-6 mb-6 font-mono text-center border border-gray-200">
@@ -288,8 +327,8 @@ export function THCCalculatorPage() {
       </section>
 
       {/* SAFETY SECTION */}
-      <section className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
-        <h2 className="text-2xl font-black text-gray-900 mb-2">Safe THC Dosage Guide for Edibles</h2>
+      <section id="dosage-chart" className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
+        <h2 className="text-2xl font-black text-gray-900 mb-2">THC dosage chart (edibles)</h2>
         <p className="text-gray-500 text-sm mb-6">Use this as your target when calculating — edibles affect everyone differently. Always start low.</p>
         <div className="space-y-3">
           {[
@@ -316,9 +355,9 @@ export function THCCalculatorPage() {
         <h2 className="text-xl font-black text-gray-900 mb-4">Related Tools & Guides</h2>
         <div className="grid md:grid-cols-3 gap-4">
           {[
-            { title: "Infused Butter Calculator", desc: "Calculate cannabutter potency from scratch", to: "/infusions", emoji: "🧈" },
-            { title: "Cannabis Edible Recipes", desc: "20+ recipes with exact mg per serving", to: "/recipes", emoji: "🍪" },
-            { title: "Learn Infusion Basics", desc: "Beginner guides to cannabis cooking", to: "/learn", emoji: "📚" },
+            { title: "Recipe builder & mg per serving", desc: "Scale batches and align infusion to your target dose", to: "/ingredients", emoji: "🧪" },
+            { title: "Cannabis edible recipes", desc: "Browse ideas — then plug servings into this calculator", to: "/edible-recipes", emoji: "🍪" },
+            { title: "Learn dosing & infusion", desc: "Guides that pair with the calculator", to: "/learn", emoji: "📚" },
           ].map(({ title, desc, to, emoji }) => (
             <Link key={title} to={to} className="bg-white rounded-2xl border-2 border-gray-200 hover:border-green-400 p-5 transition-all hover:shadow-md group">
               <div className="text-3xl mb-2">{emoji}</div>

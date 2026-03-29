@@ -144,7 +144,7 @@ export function DinnerOfTheWeek() {
               <p className="text-green-400 font-black text-3xl">{THIS_WEEK.doses[selectedDose].mg}</p>
               <p className="text-gray-500 text-xs mt-1">Use cannabutter to hit this target</p>
             </div>
-            <Link to="/thc-calculator" className="block">
+            <Link to="/edibles-calculator" className="block">
               <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-black mb-2">
                 Calculate Exact THC <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
@@ -177,7 +177,7 @@ export function DinnerOfTheWeek() {
         <p className="text-green-200 mb-5">Adjust the cannabutter amount in the recipe builder to hit your exact target dose.</p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link to="/infusions"><Button className="bg-white text-green-800 hover:bg-green-50 font-black px-8 py-3">Build My Cannabutter <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
-          <Link to="/thc-calculator"><Button variant="outline" className="border-white/40 text-white hover:bg-white/10 font-bold px-8 py-3">THC Calculator</Button></Link>
+          <Link to="/edibles-calculator"><Button variant="outline" className="border-white/40 text-white hover:bg-white/10 font-bold px-8 py-3">THC Calculator</Button></Link>
         </div>
       </div>
     </div>

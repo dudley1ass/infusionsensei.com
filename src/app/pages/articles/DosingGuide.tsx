@@ -253,9 +253,14 @@ export function DosingGuide() {
           <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
             <p className="text-lg font-bold mb-1">🧮 Calculate Your Exact THC Per Serving</p>
             <p className="text-green-100 text-sm mb-4">Use Infusion Sensei's free THC dosage calculator — enter your strain, base type, and recipe to get precise mg per serving instantly.</p>
-            <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
-              Build My Infusion — Free <ArrowRight className="w-4 h-4" />
-            </Link>
+            <div className="flex flex-wrap gap-2 justify-center">
+              <Link to="/edibles-calculator" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+                Open edibles calculator <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link to="/infusions" className="inline-flex items-center gap-2 bg-green-800 text-white font-bold px-5 py-2.5 rounded-lg hover:bg-green-900 transition-colors text-sm border border-white/20">
+                Build my infusion <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
 
           <div className="space-y-3">

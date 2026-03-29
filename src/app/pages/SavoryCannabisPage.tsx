@@ -68,7 +68,7 @@ export function SavoryCannabisPage() {
         <div className="text-4xl mb-3">🧮</div>
         <h2 className="text-2xl font-black mb-2">Calculate Exact THC Per Serving</h2>
         <p className="text-green-200 mb-5">Every savory recipe works with our recipe builder — get exact milligrams per wing, per serving, per portion.</p>
-        <Link to="/thc-calculator"><Button className="bg-white text-green-800 hover:bg-green-50 font-black px-8 py-3">Open THC Calculator <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+        <Link to="/edibles-calculator"><Button className="bg-white text-green-800 hover:bg-green-50 font-black px-8 py-3">Open THC Calculator <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
       </div>
     </div>
   );

@@ -5,6 +5,10 @@ services:
     buildCommand: pnpm install --node-linker=hoisted; pnpm run build
     staticPublishPath: dist
     routes:
+      # 301 so crawlers and bookmarks consolidate on /edibles-calculator (must be before the SPA rewrite)
+      - type: redirect
+        source: /thc-calculator
+        destination: /edibles-calculator
       - type: rewrite
         source: /*
         destination: /index.html

@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router";
-import { Leaf, BookOpen, FlaskConical, Home, Menu, Package } from "lucide-react";
+import { Leaf, BookOpen, FlaskConical, Home, Menu, Package, Calculator } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { useEffect } from "react";
@@ -26,6 +26,7 @@ export function Layout() {
     { path: "/infusions", label: "My Infusions", icon: FlaskConical },
     { path: "/ingredients", label: "Create Recipe", icon: Package },
     { path: "/learn", label: "Learn", icon: Leaf },
+    { path: "/edibles-calculator", label: "Calculator", icon: Calculator },
   ];
 
   const isActive = (path: string) => {

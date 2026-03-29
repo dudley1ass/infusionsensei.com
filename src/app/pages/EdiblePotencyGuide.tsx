@@ -15,7 +15,7 @@ export function EdiblePotencyGuide() {
       <div className="bg-gradient-to-br from-purple-700 to-purple-900 rounded-3xl p-8 md:p-12 text-white">
         <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">How to Calculate Edible Potency<br/><span className="text-purple-200">(MG Per Serving Explained)</span></h1>
         <p className="text-purple-100 text-lg max-w-2xl mb-6">If you've ever made edibles too strong — or too weak — this guide fixes that. The math is simpler than you think.</p>
-        <Link to="/thc-calculator"><Button className="bg-white text-purple-800 hover:bg-purple-50 font-black px-8 py-3">Skip to the Calculator <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+        <Link to="/edibles-calculator"><Button className="bg-white text-purple-800 hover:bg-purple-50 font-black px-8 py-3">Skip to the Calculator <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
       </div>
 
       <div className="prose prose-lg max-w-none">
@@ -97,14 +97,14 @@ export function EdiblePotencyGuide() {
           <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6 text-center">
             <h2 className="text-xl font-black text-gray-900 mb-2">Use the Calculator Instead</h2>
             <p className="text-gray-600 mb-4">Skip the math — our free THC calculator does all of this automatically for any recipe.</p>
-            <Link to="/thc-calculator"><Button className="bg-green-600 hover:bg-green-700 text-white font-black px-8 py-3">Open THC Calculator <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
+            <Link to="/edibles-calculator"><Button className="bg-green-600 hover:bg-green-700 text-white font-black px-8 py-3">Open THC Calculator <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
           </div>
         </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">
         {[
-          { title:"THC Calculator", desc:"Calculate exact mg per serving", to:"/thc-calculator", emoji:"🧮" },
+          { title:"THC Calculator", desc:"Calculate exact mg per serving", to:"/edibles-calculator", emoji:"🧮" },
           { title:"Cannabis Recipes", desc:"Recipes with exact dosing", to:"/recipes", emoji:"🍪" },
           { title:"My Infusions", desc:"Build cannabutter & oils", to:"/infusions", emoji:"🧈" },
         ].map(({ title, desc, to, emoji }) => (
