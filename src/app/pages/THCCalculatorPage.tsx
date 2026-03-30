@@ -28,7 +28,9 @@ const PRODUCT_PRESETS: ProductPreset[] = [
 const INFUSION_PRESETS = [
   { id: "butter", label: "Butter (70%)", efficiency: 70 },
   { id: "oil", label: "Oil (75%)", efficiency: 75 },
-  { id: "distillate", label: "Distillate (95%)", efficiency: 95 },
+  { id: "honey", label: "Honey (65%)", efficiency: 65 },
+  { id: "sugar", label: "Sugar (60%)", efficiency: 60 },
+  { id: "alcohol", label: "Alcohol tincture (85%)", efficiency: 85 },
 ];
 
 export function THCCalculatorPage() {
@@ -46,6 +48,7 @@ export function THCCalculatorPage() {
   const mgPerTbsp = totalInfusionAmount > 0 ? totalInfusionMg / totalInfusionAmount : 0;
   const recipeMg = mgPerTbsp * selectedProduct.baseInfusionTbsp;
   const mgPerServing = servingsOverride > 0 ? recipeMg / servingsOverride : 0;
+  const infusionTbspPerServing = servingsOverride > 0 ? selectedProduct.baseInfusionTbsp / servingsOverride : 0;
 
   const doseCopy = useMemo(() => {
     if (mgPerServing <= 5) {
@@ -167,6 +170,9 @@ export function THCCalculatorPage() {
                   <FlaskConical className="w-4 h-4 mr-2" /> Open {selectedProduct.label} Recipe
                 </Button>
               </Link>
+              <p className="text-xs text-amber-700 mt-2">
+                Note: if infused amount is very high, the recipe builder may show a warning.
+              </p>
             </div>
           </div>
 
@@ -179,6 +185,9 @@ export function THCCalculatorPage() {
               <p className="text-gray-500 text-sm">{doseCopy.sub}</p>
               <p className="text-gray-600 text-xs mt-3">
                 {totalInfusionMg.toFixed(0)}mg total in infusion • {mgPerTbsp.toFixed(1)}mg per tbsp • {recipeMg.toFixed(0)}mg in this {selectedProduct.label.toLowerCase()} batch
+              </p>
+              <p className="text-gray-500 text-xs mt-1">
+                Base recipe infusion per serving: {infusionTbspPerServing.toFixed(3)} tbsp
               </p>
 
               <div className="mt-4 text-left">
