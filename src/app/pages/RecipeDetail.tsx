@@ -6,6 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { Separator } from "../components/ui/separator";
 import { ArrowLeft, Clock, ChefHat, Leaf, AlertCircle, CheckCircle2, Lightbulb, Printer, Flame, Users } from "lucide-react";
 import { loadRecipeByIdFromDb } from "../services/contentService";
+import { Helmet } from "react-helmet-async";
 
 export function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
@@ -72,9 +73,26 @@ export function RecipeDetail() {
     advanced:     { color: "bg-red-100 text-red-800 border-red-200",       dot: "bg-red-500" },
   };
   const diff = difficultyConfig[recipe.difficulty] ?? difficultyConfig.beginner;
+  const canonicalUrl = `https://infusionsensei.com/recipes/${recipe.id}`;
+  const pageTitle =
+    recipe.id === "canna-gummies"
+      ? "Cannabis Gummies Recipe (With THC Per Serving Guide) | Infusion Sensei"
+      : `${recipe.name} | Infusion Sensei`;
+  const pageDescription =
+    recipe.id === "canna-gummies"
+      ? "Make consistent canna gummies with clear potency steps. Includes dosage tips and links to calculate exact THC per gummy."
+      : recipe.description;
 
   return (
     <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:url" content={canonicalUrl} />
+      </Helmet>
       {/* ── PRINT STYLES ──────────────────────────────────── */}
       <style>{`
         .print-only { display: none !important; }

@@ -14,10 +14,10 @@ export function ConvertRecipes() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <Helmet>
-        <title>How to Turn ANY Recipe Into a THC Recipe | Infusion Sensei</title>
-        <meta name="description" content="A 4-step system to convert any regular recipe into a cannabis-infused version with accurate dosing every time." />
-        <meta property="og:title" content="How to Turn ANY Recipe Into a THC Recipe | Infusion Sensei" />
-        <meta property="og:description" content="A 4-step system to convert any regular recipe into a cannabis-infused version with accurate dosing every time." />
+        <title>Convert Any Recipe to Cannabis Edibles (Step by Step) | Infusion Sensei</title>
+        <meta name="description" content="Turn regular recipes into infused versions without ruining texture or dose. Includes butter/oil swaps and potency guidance." />
+        <meta property="og:title" content="Convert Any Recipe to Cannabis Edibles (Step by Step) | Infusion Sensei" />
+        <meta property="og:description" content="Turn regular recipes into infused versions without ruining texture or dose. Includes butter/oil swaps and potency guidance." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/convert-recipes" />
       </Helmet>
       <div className="text-sm text-gray-600">

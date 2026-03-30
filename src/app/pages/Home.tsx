@@ -13,8 +13,8 @@ export function Home() {
   return (
     <div className="space-y-14">
       <Helmet>
-        <title>Make Cannabis Edibles at Home — Dosing & Recipes That Don’t Guess | Infusion Sensei</title>
-        <meta name="description" content="I want to make something edible — with clear mg per serving. Infuse bases, pick dips, brownies, or drinks, and build recipes with your real THC potency." />
+        <title>Infusion Sensei: Edibles Calculator, Dosing, and Recipes</title>
+        <meta name="description" content="Calculate THC dosage, learn safe edible dosing, and cook better cannabis recipes with clear step-by-step guides." />
         <link rel="canonical" href="https://infusionsensei.com/" />
       </Helmet>
 

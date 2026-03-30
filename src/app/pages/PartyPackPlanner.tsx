@@ -108,6 +108,17 @@ const PACKS: PackTemplate[] = [
     ],
   },
   {
+    id: "final-four-week",
+    title: "Final Four Week Pack Planner",
+    subtitle: "Regional game-day snacks with low-to-moderate dosing for long watch parties.",
+    items: [
+      { id: "maple-popcorn", name: "Husky Northeast Maple Popcorn", route: "/popcorn", suggestedRange: "2-3mg per handful", defaultQty: 3, defaultMgEach: 2.5, perPersonQty: 0.4, unitLabel: "big bowls", equivalentHint: "Portion into cups so guests can pace by handful." },
+      { id: "pizza-bites", name: "Illini Deep Dish Pizza Bites", route: "/recipes/infused-pizza-sauce", suggestedRange: "4-8mg per 1-2 bites", defaultQty: 8, defaultMgEach: 5, perPersonQty: 1, unitLabel: "slices", equivalentHint: "Use infused sauce or dough, but keep cheese/toppings non-infused." },
+      { id: "desert-heat-mix", name: "Desert Heat Spicy Snack Mix", route: "/party-snacks", suggestedRange: "3-5mg per bowl", defaultQty: 2, defaultMgEach: 4, perPersonQty: 0.3, unitLabel: "big bowls", equivalentHint: "Mix once, portion into small bowls, and label by serving." },
+      { id: "caramel-apple-dip", name: "Great Lakes Caramel Apple Dip", route: "/spreads-dips", suggestedRange: "1-3mg per dip serving", defaultQty: 2, defaultMgEach: 2, perPersonQty: 0.25, unitLabel: "dip batches", equivalentHint: "Microdose-friendly: set dip spoons and apple slice counts per guest." },
+    ],
+  },
+  {
     id: "dessert-pack",
     title: "Dessert Pack Planner",
     subtitle: "Dessert-heavy dosing where overconsumption risk is highest.",

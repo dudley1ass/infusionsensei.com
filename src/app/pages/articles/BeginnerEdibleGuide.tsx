@@ -8,8 +8,8 @@ export function BeginnerEdibleGuide() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <Helmet>
-        <title>The Complete Beginner's First Edible Guide – Start Here | Infusion Sensei</title>
-        <meta name="description" content="Your first cannabis edible guide — everything you need to know before you start. What to buy, how to decarb, how to dose, what to expect, and how to stay safe." />
+        <title>Beginner Edibles Guide: Dose, Timing, and Safety | Infusion Sensei</title>
+        <meta name="description" content="New to edibles? Start with safe dose ranges, onset timing, and common mistakes to avoid for a better first experience." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/beginner-edible-guide" />
       </Helmet>
       <div className="text-sm text-gray-600">

@@ -15,10 +15,10 @@ export function WhyEdiblesDontWork() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
       <Helmet>
-        <title>Why Your Edibles Aren't Working (And How to Fix It) | Infusion Sensei</title>
-        <meta name="description" content="The 5 real reasons cannabis edibles don't work — metabolism, bad infusion, wrong dose, timing, and tolerance. Exact fixes for each." />
-        <meta property="og:title" content="Why Your Edibles Aren't Working (And How to Fix It) | Infusion Sensei" />
-        <meta property="og:description" content="The 5 real reasons cannabis edibles don't work — metabolism, bad infusion, wrong dose, timing, and tolerance. Exact fixes for each." />
+        <title>Why Your Edibles Aren't Working (Or Hit Too Hard) | Infusion Sensei</title>
+        <meta name="description" content="The most common reasons edibles feel too weak or way too strong: decarb mistakes, uneven mixing, bad dose math, and timing errors." />
+        <meta property="og:title" content="Why Your Edibles Aren't Working (Or Hit Too Hard) | Infusion Sensei" />
+        <meta property="og:description" content="The most common reasons edibles feel too weak or way too strong: decarb mistakes, uneven mixing, bad dose math, and timing errors." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/why-edibles-dont-work" />
       </Helmet>
       <div className="text-sm text-gray-600">
@@ -29,8 +29,8 @@ export function WhyEdiblesDontWork() {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <Badge className="bg-red-600 text-white mb-3">Troubleshooting • 8 min read</Badge>
-              <CardTitle className="text-3xl md:text-4xl text-gray-900 mb-3">Why Your Edibles Aren't Working (And How to Fix It)</CardTitle>
-              <p className="text-lg text-gray-600">You ate the brownie an hour ago. Nothing. You ate another one. Still nothing. Then both hit at once at 2am. Sound familiar? Here's exactly why this happens and how to prevent it.</p>
+              <CardTitle className="text-3xl md:text-4xl text-gray-900 mb-3">Why Your Edibles Aren't Working (Or Hit Too Hard)</CardTitle>
+              <p className="text-lg text-gray-600">This usually comes down to four things: decarb quality, mixing, dose math, and timing. Fix those and your batches become predictable.</p>
             </div>
             <AlertCircle className="w-12 h-12 text-red-500 flex-shrink-0 ml-3" />
           </div>
@@ -96,6 +96,23 @@ export function WhyEdiblesDontWork() {
 
 
           <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-gray-900">Why they hit too hard (same root causes)</h2>
+            <div className="space-y-2">
+              {[
+                "Not decarbed correctly: under- or over-heated flower leads to unpredictable activation.",
+                "Uneven mixing: hot spots create servings that are much stronger than the batch average.",
+                "Wrong dosage math: using total batch mg as serving mg makes portions far too strong.",
+                "Timing mistakes: re-dosing before the first edible peaks stacks effects unexpectedly.",
+              ].map((issue) => (
+                <div key={issue} className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                  <XCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">{issue}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-4">
             <h2 className="text-2xl font-bold text-gray-900">The Edible Test Protocol</h2>
             <p>If you've never felt edibles work before, follow this exact protocol before concluding they "don't work for you":</p>
             <div className="space-y-2">
@@ -117,9 +134,9 @@ export function WhyEdiblesDontWork() {
 
           <div className="bg-gradient-to-r from-green-600 to-green-800 rounded-2xl p-6 text-white">
             <p className="text-lg font-bold mb-2">🧮 Know Your Exact Dose</p>
-            <p className="text-green-100 mb-4 text-sm">Use Infusion Sensei to calculate the exact mg THC in every serving of your homemade edibles — no more guessing.</p>
+            <p className="text-green-100 mb-4 text-sm">Fix it with the edibles calculator: get exact mg THC per serving before you cook.</p>
             <Link to="/infusions" className="inline-flex items-center gap-2 bg-white text-green-700 font-semibold px-4 py-2 rounded-lg hover:bg-green-50 transition-colors text-sm">
-              Calculate My Dose <ArrowRight className="w-4 h-4" />
+              Fix it with calculator <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           {/* Internal CTA */}

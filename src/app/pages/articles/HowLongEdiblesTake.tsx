@@ -15,10 +15,10 @@ export function HowLongEdiblesTake() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
       <Helmet>
-        <title>How Long Edibles REALLY Take to Kick In | Infusion Sensei</title>
-        <meta name="description" content="Fasted vs full stomach, drinks vs solids, fast vs slow metabolism. The complete breakdown of edible onset times and what controls them." />
-        <meta property="og:title" content="How Long Edibles REALLY Take to Kick In | Infusion Sensei" />
-        <meta property="og:description" content="Fasted vs full stomach, drinks vs solids, fast vs slow metabolism. The complete breakdown of edible onset times and what controls them." />
+        <title>How Long Do Edibles Take to Kick In? (Timing Chart) | Infusion Sensei</title>
+        <meta name="description" content="Learn when edibles start, peak, and wear off based on dose, metabolism, and food. Includes a simple timing chart and safety tips." />
+        <meta property="og:title" content="How Long Do Edibles Take to Kick In? (Timing Chart) | Infusion Sensei" />
+        <meta property="og:description" content="Learn when edibles start, peak, and wear off based on dose, metabolism, and food. Includes a simple timing chart and safety tips." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/how-long-edibles-take" />
       </Helmet>
       <div className="text-sm text-gray-600">

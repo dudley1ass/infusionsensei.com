@@ -15,10 +15,10 @@ export function BeginnerCookingGuide() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
       <Helmet>
-        <title>How to Cook with THC: The Complete Beginner Guide | Infusion Sensei</title>
-        <meta name="description" content="Master cannabis cooking with a repeatable system. Decarboxylation, infusion, dosing, and recipes — everything a beginner needs." />
-        <meta property="og:title" content="How to Cook with THC: The Complete Beginner Guide | Infusion Sensei" />
-        <meta property="og:description" content="Master cannabis cooking with a repeatable system. Decarboxylation, infusion, dosing, and recipes — everything a beginner needs." />
+        <title>Beginner Edibles Guide: Dose, Timing, and Safety | Infusion Sensei</title>
+        <meta name="description" content="New to edibles? Start with safe dose ranges, onset timing, and common mistakes to avoid for a better first experience." />
+        <meta property="og:title" content="Beginner Edibles Guide: Dose, Timing, and Safety | Infusion Sensei" />
+        <meta property="og:description" content="New to edibles? Start with safe dose ranges, onset timing, and common mistakes to avoid for a better first experience." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/beginner-guide" />
       </Helmet>
       {/* Breadcrumb */}

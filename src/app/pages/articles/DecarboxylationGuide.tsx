@@ -14,8 +14,8 @@ export function DecarboxylationGuide() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <Helmet>
-        <title>How to Decarb Cannabis for Edibles (Temperature, Time & Method) | Infusion Sensei</title>
-        <meta name="description" content="Learn how to decarb cannabis correctly for edibles. The exact temperature, time, and step-by-step method to activate THC before making cannabutter, oils, or any edible recipe." />
+        <title>Decarboxylation Guide: Temps, Times, and Mistakes | Infusion Sensei</title>
+        <meta name="description" content="Use the right decarb temperature and time for better potency. Step-by-step chart, troubleshooting, and beginner-safe guidance." />
         <meta property="og:title" content="How to Decarb Cannabis for Edibles | Infusion Sensei" />
         <meta property="og:description" content="The exact temperature, time, and method to decarb cannabis before making edibles. Skipping this step is the #1 reason homemade edibles are weak." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/decarboxylation-guide" />

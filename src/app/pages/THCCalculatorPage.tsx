@@ -86,10 +86,10 @@ export function THCCalculatorPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-12">
       <Helmet>
-        <title>Edibles Calculator — THC Dosage Calculator (mg per Serving) | Infusion Sensei</title>
+        <title>Edibles Calculator: Exact THC Dosage Per Serving | Infusion Sensei</title>
         <meta
           name="description"
-          content="Free edibles calculator: exact THC mg per serving for cannabutter, cannabis oil, and whole batches. How to calculate THC in edibles, common mistakes, and a beginner-friendly dosage chart — no guesswork."
+          content="Calculate exact mg THC per serving for any recipe in seconds. Stop guessing potency with our free edibles dosage calculator."
         />
         <meta name="keywords" content="edibles calculator, THC dosage calculator, THC per serving, homemade edibles, cannabutter calculator, edible potency" />
         <link rel="canonical" href="https://infusionsensei.com/edibles-calculator" />
