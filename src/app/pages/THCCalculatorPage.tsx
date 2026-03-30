@@ -33,22 +33,32 @@ const INFUSION_PRESETS = [
   { id: "alcohol", label: "Alcohol tincture (85%)", efficiency: 85 },
 ];
 
+const BASE_UNITS = [
+  { id: "tbsp", label: "tbsp", toTbsp: 1 },
+  { id: "cups", label: "cups", toTbsp: 16 },
+  { id: "ml", label: "ml", toTbsp: 1 / 14.7868 },
+];
+
 export function THCCalculatorPage() {
   const [productId, setProductId] = useState<ProductPreset["id"]>("cookies");
   const [thcPct, setThcPct] = useState(20);
   const [grams, setGrams] = useState(7);
   const [efficiency, setEfficiency] = useState(70);
-  const [totalInfusionAmount, setTotalInfusionAmount] = useState(16);
+  const [baseUnit, setBaseUnit] = useState("tbsp");
+  const [baseAmount, setBaseAmount] = useState(16);
+  const [usedInfusionTbsp, setUsedInfusionTbsp] = useState(12);
   const [servingsOverride, setServingsOverride] = useState(24);
 
   const selectedProduct = PRODUCT_PRESETS.find((p) => p.id === productId) ?? PRODUCT_PRESETS[0];
   const selectedPreset = INFUSION_PRESETS.find((p) => p.efficiency === efficiency);
 
   const totalInfusionMg = grams * (thcPct / 100) * 1000 * (efficiency / 100);
-  const mgPerTbsp = totalInfusionAmount > 0 ? totalInfusionMg / totalInfusionAmount : 0;
-  const recipeMg = mgPerTbsp * selectedProduct.baseInfusionTbsp;
+  const selectedBaseUnit = BASE_UNITS.find((u) => u.id === baseUnit) ?? BASE_UNITS[0];
+  const totalInfusionTbsp = baseAmount * selectedBaseUnit.toTbsp;
+  const mgPerTbsp = totalInfusionTbsp > 0 ? totalInfusionMg / totalInfusionTbsp : 0;
+  const recipeMg = mgPerTbsp * usedInfusionTbsp;
   const mgPerServing = servingsOverride > 0 ? recipeMg / servingsOverride : 0;
-  const infusionTbspPerServing = servingsOverride > 0 ? selectedProduct.baseInfusionTbsp / servingsOverride : 0;
+  const infusionTbspPerServing = servingsOverride > 0 ? usedInfusionTbsp / servingsOverride : 0;
 
   const doseCopy = useMemo(() => {
     if (mgPerServing <= 5) {
@@ -70,7 +80,7 @@ export function THCCalculatorPage() {
     { label: "Very Strong", color: "text-red-600", bg: "bg-red-50 border-red-200" };
 
   const doseScalePct = Math.min(100, (mgPerServing / 50) * 100);
-  const builderLink = `/ingredients?category=${encodeURIComponent(selectedProduct.category)}&recipe=${encodeURIComponent(selectedProduct.recipeHint)}&servings=${encodeURIComponent(servingsOverride)}&targetMgPerServing=${encodeURIComponent(mgPerServing.toFixed(4))}&calcInfusedTbsp=${encodeURIComponent(selectedProduct.baseInfusionTbsp)}&calcMgPerTbsp=${encodeURIComponent(mgPerTbsp.toFixed(4))}&calcSource=edibles-calculator`;
+  const builderLink = `/ingredients?category=${encodeURIComponent(selectedProduct.category)}&recipe=${encodeURIComponent(selectedProduct.recipeHint)}&servings=${encodeURIComponent(servingsOverride)}&targetMgPerServing=${encodeURIComponent(mgPerServing.toFixed(4))}&calcInfusedTbsp=${encodeURIComponent(usedInfusionTbsp.toFixed(4))}&calcMgPerTbsp=${encodeURIComponent(mgPerTbsp.toFixed(4))}&calcSource=edibles-calculator`;
 
   return (
     <div className="max-w-4xl mx-auto space-y-12">
@@ -90,7 +100,7 @@ export function THCCalculatorPage() {
 
       <section id="calculator" className="bg-white rounded-3xl border-2 border-green-200 p-8 shadow-xl">
         <h1 className="text-3xl font-black text-gray-900 mb-2">Edibles Calculator</h1>
-        <p className="text-gray-500 text-sm mb-5">Choose your infusion setup first, then pick a product to see THC per serving from the base recipe amount.</p>
+        <p className="text-gray-500 text-sm mb-5">Enter your cannabis + base infusion batch, then choose how much of that infused base is used in a recipe.</p>
 
         <div className="grid lg:grid-cols-5 gap-6">
           <div className="lg:col-span-3 space-y-5">
@@ -110,8 +120,15 @@ export function THCCalculatorPage() {
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">2) Infusion Quantity (tbsp)</label>
-                <Input type="number" min={1} step={0.5} value={totalInfusionAmount} onChange={(e) => setTotalInfusionAmount(Math.max(1, Number(e.target.value) || 1))} />
-                <p className="text-xs text-gray-500 mt-1">Total infused butter/oil made in this batch.</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input type="number" min={0.1} step={0.1} value={baseAmount} onChange={(e) => setBaseAmount(Math.max(0.1, Number(e.target.value) || 0.1))} />
+                  <select className="rounded-lg border border-gray-300 px-2 py-2 text-sm" value={baseUnit} onChange={(e) => setBaseUnit(e.target.value)}>
+                    {BASE_UNITS.map((u) => (
+                      <option key={u.id} value={u.id}>{u.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Total base after decarb + infusion (entire batch).</p>
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">3) Product</label>
@@ -121,7 +138,10 @@ export function THCCalculatorPage() {
                   onChange={(e) => {
                     const next = PRODUCT_PRESETS.find((p) => p.id === e.target.value);
                     setProductId(e.target.value as ProductPreset["id"]);
-                    if (next) setServingsOverride(next.baseServings);
+                    if (next) {
+                      setServingsOverride(next.baseServings);
+                      setUsedInfusionTbsp(next.baseInfusionTbsp);
+                    }
                   }}
                 >
                   {PRODUCT_PRESETS.map((p) => (
@@ -162,6 +182,11 @@ export function THCCalculatorPage() {
                 <Input type="number" min={1} step={1} value={servingsOverride} onChange={(e) => setServingsOverride(Math.max(1, Number(e.target.value) || 1))} />
                 <p className="text-xs text-gray-500 mt-1">Default for {selectedProduct.label.toLowerCase()}: {selectedProduct.baseServings} servings.</p>
               </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Infused Base Used in Recipe (tbsp)</label>
+                <Input type="number" min={0} step={0.1} value={usedInfusionTbsp} onChange={(e) => setUsedInfusionTbsp(Math.max(0, Number(e.target.value) || 0))} />
+                <p className="text-xs text-gray-500 mt-1">Default for {selectedProduct.label.toLowerCase()}: {selectedProduct.baseInfusionTbsp} tbsp.</p>
+              </div>
             </div>
 
             <div>
@@ -184,7 +209,7 @@ export function THCCalculatorPage() {
               <p className="text-gray-700 text-sm mt-1 font-semibold">{doseCopy.headline}</p>
               <p className="text-gray-500 text-sm">{doseCopy.sub}</p>
               <p className="text-gray-600 text-xs mt-3">
-                {totalInfusionMg.toFixed(0)}mg total in infusion • {mgPerTbsp.toFixed(1)}mg per tbsp • {recipeMg.toFixed(0)}mg in this {selectedProduct.label.toLowerCase()} batch
+                Total batch: {totalInfusionMg.toFixed(0)}mg THC • Potency: {mgPerTbsp.toFixed(1)}mg/tbsp • Used in recipe: {recipeMg.toFixed(0)}mg THC
               </p>
               <p className="text-gray-500 text-xs mt-1">
                 Base recipe infusion per serving: {infusionTbspPerServing.toFixed(3)} tbsp
