@@ -67,6 +67,7 @@ export function THCCalculatorPage() {
     { label: "Very Strong", color: "text-red-600", bg: "bg-red-50 border-red-200" };
 
   const doseScalePct = Math.min(100, (mgPerServing / 50) * 100);
+  const builderLink = `/ingredients?category=${encodeURIComponent(selectedProduct.category)}&recipe=${encodeURIComponent(selectedProduct.recipeHint)}&servings=${encodeURIComponent(servingsOverride)}&targetMgPerServing=${encodeURIComponent(mgPerServing.toFixed(4))}&calcInfusedTbsp=${encodeURIComponent(selectedProduct.baseInfusionTbsp)}&calcMgPerTbsp=${encodeURIComponent(mgPerTbsp.toFixed(4))}&calcSource=edibles-calculator`;
 
   return (
     <div className="max-w-4xl mx-auto space-y-12">
@@ -161,7 +162,7 @@ export function THCCalculatorPage() {
             </div>
 
             <div>
-              <Link to={`/ingredients?category=${encodeURIComponent(selectedProduct.category)}&recipe=${encodeURIComponent(selectedProduct.recipeHint)}&servings=${encodeURIComponent(servingsOverride)}`}>
+              <Link to={builderLink}>
                 <Button className="bg-green-600 hover:bg-green-700 text-white font-bold">
                   <FlaskConical className="w-4 h-4 mr-2" /> Open {selectedProduct.label} Recipe
                 </Button>

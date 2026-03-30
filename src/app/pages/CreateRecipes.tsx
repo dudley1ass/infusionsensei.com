@@ -1346,6 +1346,53 @@ function mergePreservedInfusionRows(prev: Ingredient[], built: Ingredient[]): In
   });
 }
 
+function tbspToUnitAmount(tbsp: number, unit: string): number {
+  switch (unit) {
+    case "cups": return tbsp / 16;
+    case "tsp": return tbsp * 3;
+    case "ml": return tbsp * 14.7868;
+    case "g": return tbsp * 14.2;
+    case "fl oz": return (tbsp * 14.7868) / 29.5735;
+    case "oz": return (tbsp * 14.2) / 28.3495;
+    default: return tbsp;
+  }
+}
+
+function mgPerTbspToUnit(mgPerTbsp: number, unit: string): number {
+  switch (unit) {
+    case "cups": return mgPerTbsp * 16;
+    case "tsp": return mgPerTbsp / 3;
+    case "ml": return mgPerTbsp / 14.7868;
+    case "g": return mgPerTbsp / 14.2;
+    case "fl oz": return (mgPerTbsp / 14.7868) * 29.5735;
+    case "oz": return (mgPerTbsp / 14.2) * 28.3495;
+    default: return mgPerTbsp;
+  }
+}
+
+function applyCalculatorInfusionOverride(
+  builtIngredients: Ingredient[],
+  infusedTbsp: number,
+  mgPerTbsp: number
+): Ingredient[] {
+  if (!Number.isFinite(infusedTbsp) || infusedTbsp <= 0 || !Number.isFinite(mgPerTbsp) || mgPerTbsp <= 0) {
+    return builtIngredients;
+  }
+  let applied = false;
+  return builtIngredients.map((ing) => {
+    if (applied || !ing.isInfused) return ing;
+    applied = true;
+    const nextAmount = tbspToUnitAmount(infusedTbsp, ing.unit);
+    const nextThcPerUnit = mgPerTbspToUnit(mgPerTbsp, ing.unit);
+    return {
+      ...ing,
+      amount: nextAmount,
+      thcPerUnit: nextThcPerUnit,
+      infusionBaseId: undefined,
+    };
+  });
+}
+
 // Available units for measurement
 const UNIT_OPTIONS = [
   // Metric
@@ -1409,6 +1456,9 @@ export function CreateRecipes() {
   const partyItemId = searchParams.get("partyItemId");
   const partyProgressKey = partyPackId ? `party-pack-progress:${partyPackId}` : null;
   const targetMgPerServingRaw = searchParams.get("targetMgPerServing");
+  const calcInfusedTbspRaw = searchParams.get("calcInfusedTbsp");
+  const calcMgPerTbspRaw = searchParams.get("calcMgPerTbsp");
+  const calcSource = searchParams.get("calcSource");
 
   const resolveRecipeIdForCategory = (category: string, recipeId: string) => {
     const directMatch = standardRecipes[category]?.some((r) => r.id === recipeId);
@@ -1660,6 +1710,16 @@ export function CreateRecipes() {
           }
         }
 
+        if (calcSource === "edibles-calculator") {
+          const calcInfusedTbsp = calcInfusedTbspRaw ? Number(calcInfusedTbspRaw) : NaN;
+          const calcMgPerTbsp = calcMgPerTbspRaw ? Number(calcMgPerTbspRaw) : NaN;
+          builtIngredients = applyCalculatorInfusionOverride(
+            builtIngredients,
+            calcInfusedTbsp,
+            calcMgPerTbsp
+          );
+        }
+
         setIngredients((prev) => mergePreservedInfusionRows(prev, builtIngredients));
         // Reset measurement system to metric since all library items use metric units by default
         setMeasurementSystem("metric");
@@ -1672,6 +1732,9 @@ export function CreateRecipes() {
     servingsOverrideParam,
     wingsQtyParamRaw,
     targetMgPerServingRaw,
+    calcInfusedTbspRaw,
+    calcMgPerTbspRaw,
+    calcSource,
   ]);
 
   // Calculate total THC
