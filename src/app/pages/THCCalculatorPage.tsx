@@ -1,27 +1,28 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, Calculator, ChefHat, BookOpen, FlaskConical } from "lucide-react";
+import { ArrowRight, Calculator, FlaskConical } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { trackEvent } from "../utils/analytics";
 
-type Scenario = {
-  id: "brownies" | "popcorn" | "wings" | "coffee";
+type ProductPreset = {
+  id: "cookies" | "brownies" | "popcorn" | "wings" | "coffee";
   label: string;
   emoji: string;
+  baseInfusionTbsp: number;
+  baseServings: number;
   servingUnit: string;
-  defaultServings: number;
-  defaultGrams: number;
   category: string;
   recipeHint: string;
 };
 
-const SCENARIOS: Scenario[] = [
-  { id: "brownies", label: "Brownies", emoji: "🍪", servingUnit: "1 brownie", defaultServings: 16, defaultGrams: 7, category: "baked-goods", recipeHint: "brownies" },
-  { id: "popcorn", label: "Popcorn", emoji: "🍿", servingUnit: "1 cup popcorn", defaultServings: 12, defaultGrams: 5, category: "snacks", recipeHint: "garlic-butter-popcorn" },
-  { id: "wings", label: "Wings", emoji: "🍗", servingUnit: "1 wing", defaultServings: 32, defaultGrams: 7, category: "wings", recipeHint: "classic-buffalo-wings" },
-  { id: "coffee", label: "Coffee", emoji: "☕", servingUnit: "1 cup coffee", defaultServings: 4, defaultGrams: 3.5, category: "drinks", recipeHint: "bulletproof-coffee" },
+const PRODUCT_PRESETS: ProductPreset[] = [
+  { id: "cookies", label: "Cookies", emoji: "🍪", baseInfusionTbsp: 12, baseServings: 24, servingUnit: "1 cookie", category: "baked-goods", recipeHint: "chocolate-chip-cookies" },
+  { id: "brownies", label: "Brownies", emoji: "🍫", baseInfusionTbsp: 8, baseServings: 16, servingUnit: "1 brownie", category: "baked-goods", recipeHint: "brownies" },
+  { id: "popcorn", label: "Popcorn", emoji: "🍿", baseInfusionTbsp: 4, baseServings: 12, servingUnit: "1 cup popcorn", category: "snacks", recipeHint: "garlic-butter-popcorn" },
+  { id: "wings", label: "Wings", emoji: "🍗", baseInfusionTbsp: 4, baseServings: 32, servingUnit: "1 wing", category: "wings", recipeHint: "classic-buffalo-wings" },
+  { id: "coffee", label: "Coffee", emoji: "☕", baseInfusionTbsp: 2, baseServings: 4, servingUnit: "1 cup coffee", category: "drinks", recipeHint: "bulletproof-coffee" },
 ];
 
 const INFUSION_PRESETS = [
@@ -31,49 +32,33 @@ const INFUSION_PRESETS = [
   { id: "store", label: "Store edible (100%)", efficiency: 100 },
 ];
 
-const INFUSION_UNITS = [
-  { id: "tbsp", label: "tbsp" },
-  { id: "cups", label: "cups" },
-  { id: "ml", label: "ml" },
-  { id: "g", label: "g" },
-];
-
 export function THCCalculatorPage() {
-  const [scenarioId, setScenarioId] = useState<Scenario["id"]>("brownies");
+  const [productId, setProductId] = useState<ProductPreset["id"]>("cookies");
   const [thcPct, setThcPct] = useState(20);
   const [grams, setGrams] = useState(7);
   const [efficiency, setEfficiency] = useState(70);
-  const [servings, setServings] = useState(16);
-  const [mode, setMode] = useState<"input" | "target">("input");
-  const [targetMg, setTargetMg] = useState(10);
-  const [infusionUnit, setInfusionUnit] = useState("tbsp");
   const [totalInfusionAmount, setTotalInfusionAmount] = useState(16);
-  const [usedInfusionAmount, setUsedInfusionAmount] = useState(8);
+  const [servingsOverride, setServingsOverride] = useState(24);
 
-  const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS[0];
+  const selectedProduct = PRODUCT_PRESETS.find((p) => p.id === productId) ?? PRODUCT_PRESETS[0];
+  const selectedPreset = INFUSION_PRESETS.find((p) => p.efficiency === efficiency);
 
   const totalInfusionMg = grams * (thcPct / 100) * 1000 * (efficiency / 100);
-  const infusionUseRatio = totalInfusionAmount > 0 ? Math.min(1, Math.max(0, usedInfusionAmount / totalInfusionAmount)) : 0;
-  const recipeMg = totalInfusionMg * infusionUseRatio;
-  const mgPerServing = servings > 0 ? recipeMg / servings : 0;
-
-  const recommendedServings = Math.max(1, Math.ceil(recipeMg / Math.max(targetMg, 1)));
-  const recommendedGrams =
-    (thcPct / 100) * 1000 * (efficiency / 100) * Math.max(infusionUseRatio, 0.0001) > 0
-      ? (targetMg * servings) / ((thcPct / 100) * 1000 * (efficiency / 100) * Math.max(infusionUseRatio, 0.0001))
-      : grams;
+  const mgPerTbsp = totalInfusionAmount > 0 ? totalInfusionMg / totalInfusionAmount : 0;
+  const recipeMg = mgPerTbsp * selectedProduct.baseInfusionTbsp;
+  const mgPerServing = servingsOverride > 0 ? recipeMg / servingsOverride : 0;
 
   const doseCopy = useMemo(() => {
     if (mgPerServing <= 5) {
-      return { headline: "Light / beginner friendly", sub: "Most people can start here comfortably.", firstDoseFraction: 1 };
+      return { headline: "Light / beginner friendly", sub: "Most people can start here comfortably." };
     }
     if (mgPerServing <= 10) {
-      return { headline: "Good for a relaxing evening", sub: "Moderate and manageable for many users.", firstDoseFraction: 1 };
+      return { headline: "Good for a relaxing evening", sub: "Moderate and manageable for many users." };
     }
     if (mgPerServing <= 25) {
-      return { headline: "Strong — most people will feel this", sub: "Start with a partial serving and wait.", firstDoseFraction: 2 };
+      return { headline: "Strong — most people will feel this", sub: "Start with a partial serving and wait." };
     }
-    return { headline: "Heavy — experienced users only", sub: "Very strong; most people should take a fraction only.", firstDoseFraction: 6 };
+    return { headline: "Heavy — experienced users only", sub: "Very strong; most people should take a fraction only." };
   }, [mgPerServing]);
 
   const tier =
@@ -83,20 +68,6 @@ export function THCCalculatorPage() {
     { label: "Very Strong", color: "text-red-600", bg: "bg-red-50 border-red-200" };
 
   const doseScalePct = Math.min(100, (mgPerServing / 50) * 100);
-
-  const applyScenario = (nextId: Scenario["id"]) => {
-    const next = SCENARIOS.find((s) => s.id === nextId);
-    if (!next) return;
-    setScenarioId(next.id);
-    setServings(next.defaultServings);
-    setGrams(next.defaultGrams);
-  };
-
-  const setDoseTarget = (mg: number) => {
-    const nextServings = Math.max(1, Math.ceil(recipeMg / mg));
-    setServings(nextServings);
-    setTargetMg(mg);
-  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-12">
@@ -114,49 +85,15 @@ export function THCCalculatorPage() {
         <meta property="og:type" content="website" />
       </Helmet>
 
-      {/* HERO */}
-      <section className="bg-gradient-to-br from-green-700 to-green-900 rounded-3xl p-8 md:p-12 text-white text-center shadow-2xl">
-        <div className="text-5xl mb-4">🧮</div>
-        <h1 className="text-4xl md:text-5xl font-black mb-3 leading-tight">Edibles Calculator</h1>
-        <p className="text-xl md:text-2xl font-bold text-green-50 max-w-2xl mx-auto mb-3">
-          Get exact THC mg per serving in seconds — stop guessing your homemade edibles.
-        </p>
-        <p className="text-green-100 text-lg max-w-2xl mx-auto mb-6">
-          Works for cannabutter, cannabis oil, distillate-style infusions, and full batches. Free, no account.
-        </p>
-        <a href="#calculator">
-          <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-lg px-10 py-6 rounded-xl shadow-lg">
-            Start Calculating <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
-        </a>
-        <p className="text-green-400 text-sm mt-4">✓ Free &nbsp;·&nbsp; ✓ No account &nbsp;·&nbsp; ✓ Instant results</p>
-      </section>
-
-      {/* TOOL SECTION */}
       <section id="calculator" className="bg-white rounded-3xl border-2 border-green-200 p-8 shadow-xl">
-        <h2 className="text-2xl font-black text-gray-900 mb-2">THC dosage calculator</h2>
-        <p className="text-gray-500 text-sm mb-5">Set your infusion, how much you used in the recipe, and servings. Results update live.</p>
+        <h1 className="text-3xl font-black text-gray-900 mb-2">Edibles Calculator</h1>
+        <p className="text-gray-500 text-sm mb-5">Choose your infusion setup first, then pick a product to see THC per serving from the base recipe amount.</p>
 
         <div className="grid lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-3">
-            <div className="mb-5">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Common scenarios</p>
-              <div className="flex flex-wrap gap-2">
-                {SCENARIOS.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => applyScenario(s.id)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-semibold border ${scenarioId === s.id ? "bg-green-600 text-white border-green-600" : "bg-gray-50 text-gray-700 border-gray-200 hover:border-green-300"}`}
-                  >
-                    {s.emoji} {s.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-6 grid md:grid-cols-2 gap-4">
+          <div className="lg:col-span-3 space-y-5">
+            <div className="grid md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Infusion Type Preset</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">1) Infusion Type</label>
                 <select
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                   value={efficiency}
@@ -166,35 +103,51 @@ export function THCCalculatorPage() {
                     <option key={p.id} value={p.efficiency}>{p.label}</option>
                   ))}
                 </select>
+                <p className="text-xs text-gray-500 mt-1">{selectedPreset ? `Using ${selectedPreset.label}` : ""}</p>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Mode</label>
-                <div className="flex gap-2">
-                  <button onClick={() => setMode("input")} className={`px-3 py-2 rounded-lg text-sm font-semibold border ${mode === "input" ? "bg-green-600 text-white border-green-600" : "bg-gray-50 border-gray-300 text-gray-700"}`}>I know my inputs</button>
-                  <button onClick={() => setMode("target")} className={`px-3 py-2 rounded-lg text-sm font-semibold border ${mode === "target" ? "bg-green-600 text-white border-green-600" : "bg-gray-50 border-gray-300 text-gray-700"}`}>I want X mg</button>
-                </div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">2) Infusion Quantity (tbsp)</label>
+                <Input type="number" min={1} step={0.5} value={totalInfusionAmount} onChange={(e) => setTotalInfusionAmount(Math.max(1, Number(e.target.value) || 1))} />
+                <p className="text-xs text-gray-500 mt-1">Total infused butter/oil made in this batch.</p>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">3) Product</label>
+                <select
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                  value={productId}
+                  onChange={(e) => {
+                    const next = PRODUCT_PRESETS.find((p) => p.id === e.target.value);
+                    setProductId(e.target.value as ProductPreset["id"]);
+                    if (next) setServingsOverride(next.baseServings);
+                  }}
+                >
+                  {PRODUCT_PRESETS.map((p) => (
+                    <option key={p.id} value={p.id}>{p.emoji} {p.label}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Base recipe uses {selectedProduct.baseInfusionTbsp} tbsp.</p>
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Flower / Concentrate THC %</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">4) THC Strength %</label>
                 <p className="text-xs text-gray-400 mb-2">Check your packaging — usually 15–30% for flower</p>
                 <div className="flex items-center gap-3">
-                  <input type="range" min="1" max="99" value={thcPct} onChange={e => { setThcPct(Number(e.target.value)); trackEvent('calculator_used', {thc_pct: Number(e.target.value)}); }} className="flex-1 accent-green-600" />
+                  <input type="range" min="1" max="99" value={thcPct} onChange={e => { setThcPct(Number(e.target.value)); trackEvent("calculator_used", { thc_pct: Number(e.target.value) }); }} className="flex-1 accent-green-600" />
                   <span className="font-black text-green-700 text-lg w-16 text-right">{thcPct}%</span>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Amount of Cannabis Used (grams)</label>
-                <p className="text-xs text-gray-400 mb-2">How many grams are you infusing?</p>
+                <label className="block text-sm font-bold text-gray-700 mb-1">5) Cannabis Used (grams)</label>
+                <p className="text-xs text-gray-400 mb-2">How many grams are in your infusion batch?</p>
                 <div className="flex items-center gap-3">
                   <input type="range" min="0.5" max="28" step="0.5" value={grams} onChange={e => setGrams(Number(e.target.value))} className="flex-1 accent-green-600" />
                   <span className="font-black text-green-700 text-lg w-16 text-right">{grams}g</span>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Infusion Efficiency (%)</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">6) Infusion Efficiency (%)</label>
                 <p className="text-xs text-gray-400 mb-2">Typical: 60–80% for butter/oil, 90%+ for distillate</p>
                 <div className="flex items-center gap-3">
                   <input type="range" min="10" max="100" value={efficiency} onChange={e => setEfficiency(Number(e.target.value))} className="flex-1 accent-green-600" />
@@ -202,82 +155,30 @@ export function THCCalculatorPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Number of Servings</label>
-                <p className="text-xs text-gray-400 mb-2">How many pieces / drinks / portions?</p>
-                <div className="flex items-center gap-3">
-                  <input type="range" min="1" max="100" value={servings} onChange={e => { setServings(Number(e.target.value)); trackEvent('calculator_used', {servings: Number(e.target.value)}); }} className="flex-1 accent-green-600" />
-                  <span className="font-black text-green-700 text-lg w-16 text-right">{servings}</span>
-                </div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Servings in This Product Batch</label>
+                <Input type="number" min={1} step={1} value={servingsOverride} onChange={(e) => setServingsOverride(Math.max(1, Number(e.target.value) || 1))} />
+                <p className="text-xs text-gray-500 mt-1">Default for {selectedProduct.label.toLowerCase()}: {selectedProduct.baseServings} servings.</p>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 p-4 mb-6 bg-gray-50">
-              <p className="font-black text-gray-900 mb-3">How much infused base did you use in this recipe?</p>
-              <div className="grid md:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 mb-1">Unit</label>
-                  <select className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white" value={infusionUnit} onChange={(e) => setInfusionUnit(e.target.value)}>
-                    {INFUSION_UNITS.map((u) => (
-                      <option key={u.id} value={u.id}>{u.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 mb-1">Total infused made</label>
-                  <Input type="number" min={0.1} step={0.1} value={totalInfusionAmount} onChange={(e) => setTotalInfusionAmount(Math.max(0.1, Number(e.target.value) || 0.1))} />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 mb-1">Infused used in recipe</label>
-                  <Input type="number" min={0} step={0.1} value={usedInfusionAmount} onChange={(e) => setUsedInfusionAmount(Math.max(0, Number(e.target.value) || 0))} />
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">Example: made 1 cup infused butter (16 tbsp), used 8 tbsp in brownies.</p>
-            </div>
-
-            <div className="rounded-2xl border border-gray-200 p-4">
-              <p className="font-black text-gray-900 mb-3">What should I do next?</p>
-              <div className="flex flex-wrap gap-2">
-                <Button onClick={() => setDoseTarget(10)} variant="outline">Make it beginner-friendly (10mg)</Button>
-                <Button onClick={() => setDoseTarget(25)} variant="outline">Make it stronger (25mg)</Button>
-                <Button onClick={() => setDoseTarget(targetMg)} variant="outline">Perfect this dose</Button>
-              </div>
-              <p className="text-sm text-gray-600 mt-3">
-                Suggested first dose: <span className="font-bold">eat 1/{doseCopy.firstDoseFraction} serving</span>, then wait 2 hours.
-              </p>
-              {mode === "target" && (
-                <div className="mt-3 grid md:grid-cols-3 gap-3 text-sm">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 mb-1">Target mg/serving</label>
-                    <Input type="number" min={1} max={100} value={targetMg} onChange={(e) => setTargetMg(Number(e.target.value) || 10)} />
-                  </div>
-                  <div className="rounded-lg bg-green-50 border border-green-200 px-3 py-2">
-                    <p className="text-xs text-gray-500">Recommended servings</p>
-                    <p className="font-black text-green-700">{recommendedServings}</p>
-                  </div>
-                  <div className="rounded-lg bg-blue-50 border border-blue-200 px-3 py-2">
-                    <p className="text-xs text-gray-500">Grams for target (approx)</p>
-                    <p className="font-black text-blue-700">{recommendedGrams.toFixed(1)}g</p>
-                  </div>
-                </div>
-              )}
-              <div className="mt-4">
-                <Link to={`/ingredients?category=${encodeURIComponent(scenario.category)}&recipe=${encodeURIComponent(scenario.recipeHint)}&servings=${encodeURIComponent(servings)}`}>
-                  <Button className="bg-green-600 hover:bg-green-700 text-white font-bold">
-                    <FlaskConical className="w-4 h-4 mr-2" /> Turn This Into a Recipe
-                  </Button>
-                </Link>
-              </div>
+            <div>
+              <Link to={`/ingredients?category=${encodeURIComponent(selectedProduct.category)}&recipe=${encodeURIComponent(selectedProduct.recipeHint)}&servings=${encodeURIComponent(servingsOverride)}`}>
+                <Button className="bg-green-600 hover:bg-green-700 text-white font-bold">
+                  <FlaskConical className="w-4 h-4 mr-2" /> Open {selectedProduct.label} Recipe
+                </Button>
+              </Link>
             </div>
           </div>
+
           <div className="lg:col-span-2">
             <div className={`rounded-2xl border-2 p-6 ${tier.bg} text-center lg:sticky lg:top-24`}>
-              <p className="text-sm font-bold text-gray-600 mb-1">THC Per Serving ({scenario.servingUnit})</p>
+              <p className="text-sm font-bold text-gray-600 mb-1">THC Per Serving ({selectedProduct.servingUnit})</p>
               <p className={`text-6xl font-black ${tier.color}`}>{mgPerServing.toFixed(1)}<span className="text-2xl ml-1">mg</span></p>
               <p className={`font-black text-lg mt-2 ${tier.color}`}>{tier.label}</p>
               <p className="text-gray-700 text-sm mt-1 font-semibold">{doseCopy.headline}</p>
               <p className="text-gray-500 text-sm">{doseCopy.sub}</p>
               <p className="text-gray-600 text-xs mt-3">
-                {totalInfusionMg.toFixed(0)}mg in full infusion • {recipeMg.toFixed(0)}mg used in recipe • {servings} servings
+                {totalInfusionMg.toFixed(0)}mg total in infusion • {mgPerTbsp.toFixed(1)}mg per tbsp • {recipeMg.toFixed(0)}mg in this {selectedProduct.label.toLowerCase()} batch
               </p>
 
               <div className="mt-4 text-left">
@@ -294,7 +195,6 @@ export function THCCalculatorPage() {
         </div>
       </section>
 
-      {/* COMMON MISTAKES — supports “edibles calculator” / dosing intent */}
       <section id="common-mistakes" className="bg-white rounded-3xl border border-amber-200 p-8 shadow-sm">
         <h2 className="text-2xl font-black text-gray-900 mb-2">Common mistakes when dosing edibles</h2>
         <p className="text-gray-600 text-sm mb-5">
@@ -303,123 +203,29 @@ export function THCCalculatorPage() {
         <ul className="space-y-3 text-sm text-gray-800">
           <li className="flex gap-2">
             <span className="font-black text-amber-600">1.</span>
-            <span><strong className="text-gray-900">Skipping decarb or ignoring efficiency.</strong> If THC never fully activated or your butter only captures part of it, “7g in 16 brownies” math will lie.</span>
+            <span><strong className="text-gray-900">Skipping decarb or ignoring efficiency.</strong> If THC never fully activated or your butter only captures part of it, the math will lie.</span>
           </li>
           <li className="flex gap-2">
             <span className="font-black text-amber-600">2.</span>
-            <span><strong className="text-gray-900">Confusing total mg with mg per serving.</strong> Always divide total infused THC by <em>portions</em>, not pan size by eye.</span>
+            <span><strong className="text-gray-900">Confusing total mg with mg per serving.</strong> Always divide total infused THC by portions.</span>
           </li>
           <li className="flex gap-2">
             <span className="font-black text-amber-600">3.</span>
-            <span><strong className="text-gray-900">Uneven mixing.</strong> Hotspots in batter mean one brownie can be 3× stronger than the next — stir thoroughly.</span>
+            <span><strong className="text-gray-900">Uneven mixing.</strong> Hotspots in batter mean one piece can be much stronger than the next.</span>
           </li>
           <li className="flex gap-2">
             <span className="font-black text-amber-600">4.</span>
-            <span><strong className="text-gray-900">Re-dosing too soon.</strong> Wait at least 2 hours before eating more; onset is slow.</span>
+            <span><strong className="text-gray-900">Re-dosing too soon.</strong> Wait at least 2 hours before eating more.</span>
           </li>
         </ul>
       </section>
 
-      {/* TRUST SECTION */}
-      <section className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
-        <h2 className="text-2xl font-black text-gray-900 mb-2">Why this edibles calculator works</h2>
-        <p className="text-gray-500 text-sm mb-6">Built on real cannabis science — not guesswork.</p>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { emoji: "🔬", title: "Standard extraction efficiency", desc: "Accounts for real-world THC loss during decarboxylation and infusion (typically 60–80%)." },
-            { emoji: "🧈", title: "All infusion methods", desc: "Works for cannabutter, cannabis oil, tinctures, distillates, and any fat-based infusion." },
-            { emoji: "👩‍🍳", title: "Beginner to advanced", desc: "Simple enough for first-timers, accurate enough for experienced cannabis cooks." },
-          ].map(({ emoji, title, desc }) => (
-            <div key={title} className="bg-green-50 rounded-2xl p-5 border border-green-100">
-              <div className="text-3xl mb-2">{emoji}</div>
-              <h3 className="font-black text-gray-900 mb-1">{title}</h3>
-              <p className="text-gray-600 text-sm">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* EDUCATION SECTION */}
-      <section id="how-to-calculate-thc" className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
-        <h2 className="text-2xl font-black text-gray-900 mb-2">How to calculate THC per serving</h2>
-        <p className="text-gray-600 mb-6">The math is simple once you break it down. Here's the formula and a real example.</p>
-
-        <div className="bg-gray-50 rounded-2xl p-6 mb-6 font-mono text-center border border-gray-200">
-          <p className="text-gray-500 text-xs mb-2 uppercase font-bold tracking-widest">The Formula</p>
-          <p className="text-lg font-black text-gray-900">THC% × grams × 1000 × efficiency%</p>
-          <p className="text-gray-500 mt-1">÷ number of servings</p>
-          <p className="text-green-700 font-black mt-1">= mg THC per serving</p>
-        </div>
-
-        <h3 className="font-black text-gray-900 mb-3">Real Example</h3>
-        <div className="space-y-2 text-sm">
-          {[
-            { step: "1", text: "7g of flower at 20% THC = 7 × 0.20 × 1000 = 1,400mg total THC" },
-            { step: "2", text: "At 70% infusion efficiency = 1,400 × 0.70 = 980mg absorbed into butter" },
-            { step: "3", text: "Divided by 16 brownies = 61.25mg per brownie" },
-            { step: "4", text: "That's a HIGH dose — most people want 5–15mg per serving" },
-          ].map(({ step, text }) => (
-            <div key={step} className="flex gap-3 items-start bg-gray-50 rounded-xl p-3">
-              <span className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-black flex-shrink-0">{step}</span>
-              <span className="text-gray-700">{text}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
-          <strong>💡 Key insight:</strong> Most people severely underestimate how strong their edibles are. 7g in 16 brownies = 61mg per brownie — 10× stronger than a commercial 5mg edible.
-        </div>
-      </section>
-
-      {/* SAFETY SECTION */}
-      <section id="dosage-chart" className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
-        <h2 className="text-2xl font-black text-gray-900 mb-2">THC dosage chart (edibles)</h2>
-        <p className="text-gray-500 text-sm mb-6">Use this as your target when calculating — edibles affect everyone differently. Always start low.</p>
-        <div className="space-y-3">
-          {[
-            { range: "1–2.5 mg", level: "Microdose", who: "First-timers, daytime use, anxiety relief", color: "bg-blue-50 border-blue-200 text-blue-800" },
-            { range: "2.5–5 mg", level: "Beginner", who: "New to edibles, mild relaxation, sleep aid", color: "bg-green-50 border-green-200 text-green-800" },
-            { range: "5–15 mg", level: "Intermediate", who: "Regular users, recreational, pain relief", color: "bg-yellow-50 border-yellow-200 text-yellow-800" },
-            { range: "15–30 mg", level: "Advanced", who: "High tolerance only — can be intense for most", color: "bg-orange-50 border-orange-200 text-orange-800" },
-            { range: "30+ mg", level: "Very High", who: "Medical patients, very high tolerance required", color: "bg-red-50 border-red-200 text-red-800" },
-          ].map(({ range, level, who, color }) => (
-            <div key={level} className={`flex items-center gap-4 rounded-2xl border-2 px-5 py-4 ${color}`}>
-              <div className="font-black text-base w-20 flex-shrink-0">{range}</div>
-              <div className="font-black w-28">{level}</div>
-              <div className="text-sm opacity-80">{who}</div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
-          ⚠️ <strong>Start low, go slow.</strong> Edibles take 30–120 minutes to kick in. Wait at least 2 hours before consuming more.
-        </div>
-      </section>
-
-      {/* INTERNAL LINKS */}
-      <section>
-        <h2 className="text-xl font-black text-gray-900 mb-4">Related Tools & Guides</h2>
-        <div className="grid md:grid-cols-3 gap-4">
-          {[
-            { title: "Recipe builder & mg per serving", desc: "Scale batches and align infusion to your target dose", to: "/ingredients", emoji: "🧪" },
-            { title: "Cannabis edible recipes", desc: "Browse ideas — then plug servings into this calculator", to: "/edible-recipes", emoji: "🍪" },
-            { title: "Learn dosing & infusion", desc: "Guides that pair with the calculator", to: "/learn", emoji: "📚" },
-          ].map(({ title, desc, to, emoji }) => (
-            <Link key={title} to={to} className="bg-white rounded-2xl border-2 border-gray-200 hover:border-green-400 p-5 transition-all hover:shadow-md group">
-              <div className="text-3xl mb-2">{emoji}</div>
-              <h3 className="font-black text-gray-900 group-hover:text-green-700">{title}</h3>
-              <p className="text-gray-500 text-sm mt-1">{desc}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <div className="bg-gradient-to-br from-green-600 to-green-800 rounded-3xl p-8 text-center text-white shadow-2xl">
+      <section className="bg-gradient-to-br from-green-600 to-green-800 rounded-3xl p-8 text-center text-white shadow-2xl">
         <Calculator className="w-10 h-10 mx-auto mb-3 text-green-300" />
         <h2 className="text-2xl font-black mb-2">Ready to Calculate Your Exact Dose?</h2>
-        <p className="text-green-200 mb-5">Free. No account. Works for any recipe.</p>
-        <a href="#calculator"><Button className="bg-white text-green-800 hover:bg-green-50 font-black px-8 py-3">Calculate Now <ArrowRight className="w-4 h-4 ml-2" /></Button></a>
-      </div>
-
+        <p className="text-green-200 mb-5">Use your infusion details once, then test different products quickly.</p>
+        <a href="#calculator"><Button className="bg-white text-green-800 hover:bg-green-50 font-black px-8 py-3">Back to calculator <ArrowRight className="w-4 h-4 ml-2" /></Button></a>
+      </section>
     </div>
   );
 }
