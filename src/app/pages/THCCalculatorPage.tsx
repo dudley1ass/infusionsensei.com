@@ -29,7 +29,6 @@ const INFUSION_PRESETS = [
   { id: "butter", label: "Butter (70%)", efficiency: 70 },
   { id: "oil", label: "Oil (75%)", efficiency: 75 },
   { id: "distillate", label: "Distillate (95%)", efficiency: 95 },
-  { id: "store", label: "Store edible (100%)", efficiency: 100 },
 ];
 
 export function THCCalculatorPage() {
