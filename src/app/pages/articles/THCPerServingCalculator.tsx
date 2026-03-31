@@ -90,7 +90,7 @@ export function THCPerServingCalculator() {
 
           {/* Mid-article CTA */}
           <div className="bg-green-50 border-2 border-green-400 rounded-2xl p-5 no-print">
-            <p className="font-black text-green-900 text-lg">Build base -> use recipe -> verify dose</p>
+            <p className="font-black text-green-900 text-lg">Build base -&gt; use recipe -&gt; verify dose</p>
             <p className="text-green-700 text-sm mt-0.5 mb-3">Use this exact flow to avoid potency surprises and get repeatable servings.</p>
             <div className="flex flex-col sm:flex-row gap-2">
               <Link to="/ingredients" className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm">
