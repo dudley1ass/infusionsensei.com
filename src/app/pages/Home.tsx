@@ -28,12 +28,12 @@ export function Home() {
               <Zap className="w-3.5 h-3.5 mr-1.5" /> Free edible maker + dose tools
             </Badge>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-3 leading-tight">
-              I want to make something edible — with real THC math
+              Calculate Exact THC in Your Edibles
             </h1>
             <p className="text-green-300 text-base font-semibold mb-6">
-              Start from a cannabutter, oil, or tincture base, then build dips, brownies, drinks, and party snacks with mg per serving you can trust.
+              Enter your flower and butter or oil to get precise mg per serving - no guessing.
             </p>
-            <p className="text-green-400 text-sm mb-6">No login. No guesswork. Just answers → then the builder.</p>
+            <p className="text-green-400 text-sm mb-6">Start by building your infused base, then use it in recipes.</p>
           </div>
 
           {/* Image-based snack cards */}
@@ -88,11 +88,11 @@ export function Home() {
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link
-              to="/spreads-dips"
-              onClick={() => trackEvent("homepage_primary_cta_click", { location: "hero", target: "spreads-dips" })}
+              to="/ingredients"
+              onClick={() => trackEvent("homepage_primary_cta_click", { location: "hero", target: "ingredients" })}
             >
               <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-base px-8 py-5 shadow-xl rounded-xl transition-transform hover:scale-105">
-                Make a dip or spread <ArrowRight className="w-4 h-4 ml-2" />
+                Build Your Infused Base <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
             <Link
@@ -107,6 +107,34 @@ export function Home() {
           <p className="text-green-400 text-sm mt-4 font-medium text-center">
             ✓ No account &nbsp;·&nbsp; ✓ No setup &nbsp;·&nbsp; ✓ Instant results
           </p>
+        </div>
+      </section>
+
+      <section>
+        <div className="bg-white border-2 border-green-300 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-1">Start Here</p>
+            <h2 className="text-2xl font-black text-gray-900">Build your infused base first</h2>
+            <p className="text-sm text-gray-600 mt-1">This is the fastest path: base -> recipe -> calculator.</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Link
+              to="/ingredients"
+              onClick={() => trackEvent("homepage_start_here_cta_click", { location: "start_here_module", target: "ingredients" })}
+            >
+              <Button className="bg-green-600 hover:bg-green-700 font-bold">
+                Start Here: Build Your Base <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+            <Link
+              to="/learn/articles/how-to-calculate-thc-in-edibles"
+              onClick={() => trackEvent("homepage_article_cta_click", { location: "start_here_module", target: "how-to-calculate-thc-in-edibles" })}
+            >
+              <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50 font-semibold">
+                Read: How to Calculate THC
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

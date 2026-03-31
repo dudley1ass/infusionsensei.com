@@ -506,6 +506,7 @@ export function Learn() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
             { title: "THC Edible Calculator", desc: "Calculate exact mg per serving for any recipe", to: "/edibles-calculator", emoji: "🧮" },
+            { title: "How to Calculate THC in Edibles", desc: "Simple formula + live walkthrough for exact mg per serving", to: "/learn/articles/how-to-calculate-thc-in-edibles", emoji: "📊" },
             { title: "Edible Potency Guide", desc: "How to calculate THC in homemade edibles", to: "/edible-potency-guide", emoji: "📐" },
             { title: "Cannabis Edible Recipes", desc: "Beginner recipes with accurate dosing", to: "/edible-recipes", emoji: "🍪" },
             { title: "Infused Drinks Guide", desc: "Smoothies, coffee, tea, and more", to: "/infused-drinks", emoji: "🥤" },

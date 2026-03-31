@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import { flushSync } from "react-dom";
 import { useSearchParams, useNavigate, useLocation } from "react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
@@ -1421,6 +1421,7 @@ const UNIT_OPTIONS = [
 ];
 
 export function CreateRecipes() {
+  const hasTrackedBaseCompletion = useRef(false);
   const [infusionBases, setInfusionBases] = useState<InfusionBase[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [recipeType, setRecipeType] = useState<"standard" | "custom" | "">("");
@@ -1499,10 +1500,31 @@ export function CreateRecipes() {
   }, [searchParams, setSearchParams]);
 
   useEffect(() => {
+    trackEvent("start_base", {
+      page: "ingredients",
+      source: searchParams.get("calcSource") || "direct",
+    });
+  // Track this once per page load to measure funnel entry.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     const onAfterPrint = () => setPrintTarget("full");
     window.addEventListener("afterprint", onAfterPrint);
     return () => window.removeEventListener("afterprint", onAfterPrint);
   }, []);
+
+  useEffect(() => {
+    if (hasTrackedBaseCompletion.current) return;
+    if (!recipeType || ingredients.length === 0) return;
+    hasTrackedBaseCompletion.current = true;
+    trackEvent("base_completed", {
+      category: selectedCategory || "unknown",
+      recipe_type: recipeType,
+      ingredients_count: ingredients.length,
+      servings,
+    });
+  }, [ingredients.length, recipeType, selectedCategory, servings]);
 
   const runPrint = (target: "full" | "buffet") => {
     // Commit state, then wait for paint — print dialog can open before layout updates otherwise.
@@ -2679,6 +2701,19 @@ export function CreateRecipes() {
           </Button>
         </div>
 
+        <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">Recommended flow</p>
+          <p className="text-sm text-gray-700 mb-3">Build your infused base here, then choose a recipe to apply it.</p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button onClick={() => navigate("/recipes")} className="bg-green-600 hover:bg-green-700 font-bold">
+              Next: Use This Base In a Recipe <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+            <Button onClick={() => navigate("/edibles-calculator")} variant="outline" className="border-green-300 text-green-700 hover:bg-green-100 font-semibold">
+              Or jump to mg/serving calculator
+            </Button>
+          </div>
+        </div>
+
         {showWhatCanIMake && (
           <Card className="bg-white border-2 border-purple-300 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100">
@@ -3719,6 +3754,20 @@ export function CreateRecipes() {
             <p className="text-sm text-amber-800">
               <strong>Start Low, Go Slow</strong> — Edibles take 30–120 min to take effect. Wait before taking more. Store safely away from children and pets.
             </p>
+          </div>
+
+          <div className="bg-white border-2 border-green-200 rounded-2xl p-5 no-print">
+            <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">Next step</p>
+            <h3 className="text-lg font-black text-gray-900 mb-1">Ready to verify your final dose?</h3>
+            <p className="text-sm text-gray-600 mb-3">Use the calculator for a second pass on total batch and per-serving targets.</p>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button onClick={() => navigate("/edibles-calculator")} className="bg-green-600 hover:bg-green-700 font-bold">
+                Calculate mg Per Serving <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+              <Button onClick={() => navigate("/recipes")} variant="outline" className="border-green-300 text-green-700 hover:bg-green-50 font-semibold">
+                Browse more recipes
+              </Button>
+            </div>
           </div>
 
             </div>{/* end left column */}

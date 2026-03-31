@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router";
 import { getRecipeById, Recipe } from "../data/recipes";
 import { Button } from "../components/ui/button";
@@ -7,11 +7,13 @@ import { Separator } from "../components/ui/separator";
 import { ArrowLeft, Clock, ChefHat, Leaf, AlertCircle, CheckCircle2, Lightbulb, Printer, Flame, Users } from "lucide-react";
 import { loadRecipeByIdFromDb } from "../services/contentService";
 import { Helmet } from "react-helmet-async";
+import { trackEvent } from "../utils/analytics";
 
 export function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
   const fallbackRecipe = id ? getRecipeById(id) : undefined;
   const [recipe, setRecipe] = useState<Recipe | undefined>(fallbackRecipe);
+  const trackedRecipeIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -24,6 +26,17 @@ export function RecipeDetail() {
       cancelled = true;
     };
   }, [id]);
+
+  useEffect(() => {
+    if (!recipe?.id) return;
+    if (trackedRecipeIdRef.current === recipe.id) return;
+    trackedRecipeIdRef.current = recipe.id;
+    trackEvent("recipe_opened", {
+      recipe_id: recipe.id,
+      category: recipe.category,
+      source: "recipe_detail",
+    });
+  }, [recipe]);
 
   const handlePrint = () => window.print();
 
@@ -369,6 +382,24 @@ export function RecipeDetail() {
           </div>
         )}
 
+        <div className="bg-white border-2 border-green-200 rounded-2xl p-5 no-print">
+          <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">Next step</p>
+          <h3 className="text-lg font-black text-gray-900 mb-1">Use this recipe in your dosing flow</h3>
+          <p className="text-sm text-gray-600 mb-3">Open it in the builder with your infused base, then verify mg per serving in the calculator.</p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Link to={getBuilderLinkForRecipe(recipe)}>
+              <Button className="bg-green-600 hover:bg-green-700 font-bold">
+                Open in Builder <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+            <Link to="/edibles-calculator">
+              <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50 font-semibold">
+                Calculate mg Per Serving
+              </Button>
+            </Link>
+          </div>
+        </div>
+
         {/* ── PRINT BUTTON (bottom) ───────────────────────── */}
         <div className="flex gap-4 justify-center no-print">
           <Button onClick={handlePrint} className="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-6 text-base gap-2 rounded-xl shadow-md hover:shadow-lg transition-all">
@@ -376,7 +407,7 @@ export function RecipeDetail() {
           </Button>
           <Link to={getBuilderLinkForRecipe(recipe)}>
             <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50 font-bold px-8 py-6 text-base rounded-xl">
-              Build Recipe →
+              Open in Builder →
             </Button>
           </Link>
         </div>

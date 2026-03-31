@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, Calculator, FlaskConical } from "lucide-react";
@@ -83,6 +83,12 @@ export function THCCalculatorPage() {
 
   const doseScalePct = Math.min(100, (mgPerServing / 50) * 100);
   const builderLink = `/ingredients?category=${encodeURIComponent(selectedProduct.category)}&recipe=${encodeURIComponent(selectedProduct.recipeHint)}&servings=${encodeURIComponent(recipeServings)}&targetMgPerServing=${encodeURIComponent(mgPerServing.toFixed(4))}&calcInfusedTbsp=${encodeURIComponent(usedInfusionTbsp.toFixed(4))}&calcMgPerTbsp=${encodeURIComponent(mgPerTbsp.toFixed(4))}&calcSource=edibles-calculator`;
+
+  useEffect(() => {
+    trackEvent("calculator_started", {
+      page: "edibles-calculator",
+    });
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto space-y-12">
@@ -220,7 +226,17 @@ export function THCCalculatorPage() {
           </p>
           <p className="text-xs text-gray-500 mt-1">Infused base per serving: {infusionTbspPerServing.toFixed(3)} tbsp</p>
           <div className="mt-4">
-            <Link to={builderLink}>
+            <Link
+              to={builderLink}
+              onClick={() =>
+                trackEvent("calculator_completed", {
+                  product: selectedProduct.id,
+                  recipe_servings: recipeServings,
+                  infused_tbsp: Number(usedInfusionTbsp.toFixed(2)),
+                  mg_per_serving: Number(mgPerServing.toFixed(2)),
+                })
+              }
+            >
               <Button className="bg-green-600 hover:bg-green-700 text-white font-bold">
                 <FlaskConical className="w-4 h-4 mr-2" /> Move to {selectedProduct.label} Recipe
               </Button>

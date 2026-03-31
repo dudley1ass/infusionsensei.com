@@ -24,7 +24,7 @@ export function Layout() {
     { path: "/", label: "Home", icon: Home },
     { path: "/recipes", label: "Recipes", icon: BookOpen },
     { path: "/infusions", label: "My Infusions", icon: FlaskConical },
-    { path: "/ingredients", label: "Create Recipe", icon: Package },
+    { path: "/ingredients", label: "Start Here", icon: Package },
     { path: "/learn", label: "Learn", icon: Leaf },
     { path: "/edibles-calculator", label: "Calculator", icon: Calculator },
   ];
@@ -104,6 +104,32 @@ export function Layout() {
           </div>
         </div>
       </header>
+
+      <div className="app-print-hide border-b border-green-100 bg-green-50/70">
+        <div className="container mx-auto px-4 py-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wide text-green-700 mr-1">Quick links:</span>
+            {[
+              { to: "/", label: "Homepage" },
+              { to: "/recipes", label: "Recipes" },
+              { to: "/learn", label: "Articles" },
+              { to: "/edibles-calculator", label: "Calculator" },
+            ].map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-full border transition-colors ${
+                  isActive(link.to)
+                    ? "bg-green-600 text-white border-green-600"
+                    : "bg-white text-green-700 border-green-200 hover:bg-green-100"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 print:py-0 print:px-0 print:max-w-none">
