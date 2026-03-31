@@ -74,14 +74,30 @@ export function RecipeDetail() {
   };
   const diff = difficultyConfig[recipe.difficulty] ?? difficultyConfig.beginner;
   const canonicalUrl = `https://infusionsensei.com/recipes/${recipe.id}`;
-  const pageTitle =
-    recipe.id === "canna-gummies"
-      ? "Cannabis Gummies Recipe (With THC Per Serving Guide) | Infusion Sensei"
-      : `${recipe.name} | Infusion Sensei`;
-  const pageDescription =
-    recipe.id === "canna-gummies"
-      ? "Make consistent canna gummies with clear potency steps. Includes dosage tips and links to calculate exact THC per gummy."
-      : recipe.description;
+  const recipeSeo: Record<string, { title: string; description: string }> = {
+    "classic-brownies": {
+      title: "THC Brownies Recipe (Perfect Dosage Per Serving)",
+      description: "Make THC brownies with predictable potency using exact mg-per-serving math and dosing-friendly portion steps.",
+    },
+    "cannabis-cookies": {
+      title: "THC Chocolate Chip Cookies (Soft, Chewy, Precise Dosing)",
+      description: "Bake THC chocolate chip cookies with clear potency math so each cookie lands near your target dose.",
+    },
+    "canna-gummies": {
+      title: "THC Gummies Recipe (Accurate mg Per Piece Guide)",
+      description: "Make consistent THC gummies with clear potency steps, safer serving guidance, and exact mg-per-piece control.",
+    },
+    "popcorn-balls": {
+      title: "THC Popcorn Recipe (Easy, Light, Controlled Dosing)",
+      description: "Make infused popcorn with easy batch dosing and consistent per-serving THC estimates for snackable control.",
+    },
+    "caramel-popcorn": {
+      title: "THC Caramel Popcorn (Controlled Dosing Per Serving)",
+      description: "Bake infused caramel popcorn with predictable dosing and simple mg-per-serving planning for party snacks.",
+    },
+  };
+  const pageTitle = recipeSeo[recipe.id]?.title ?? `${recipe.name} | Infusion Sensei`;
+  const pageDescription = recipeSeo[recipe.id]?.description ?? recipe.description;
 
   return (
     <>

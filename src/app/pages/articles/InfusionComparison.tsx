@@ -8,8 +8,8 @@ export function InfusionComparison() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <Helmet>
-        <title>Oil vs Butter vs Tincture: Which Cannabis Infusion Should You Use? | Infusion Sensei</title>
-        <meta name="description" content="Compare cannabutter, cannabis oil, and tinctures — potency, flavor, best uses, and which to choose for every recipe type. Full comparison with recipe recommendations." />
+        <title>Best Base for Cannabis Infusion (Butter vs Oil vs Honey)</title>
+        <meta name="description" content="Compare butter vs oil vs honey for cannabis infusion: potency, flavor, best uses, and which base works best for each recipe." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/infusion-comparison" />
       </Helmet>
       <div className="text-sm text-gray-600">

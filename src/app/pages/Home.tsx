@@ -13,8 +13,8 @@ export function Home() {
   return (
     <div className="space-y-14">
       <Helmet>
-        <title>Infusion Sensei: Edibles Calculator, Dosing, and Recipes</title>
-        <meta name="description" content="Calculate THC dosage, learn safe edible dosing, and cook better cannabis recipes with clear step-by-step guides." />
+        <title>THC Edibles Calculator + Infused Recipes (Precise Dosing)</title>
+        <meta name="description" content="Use our THC edibles calculator to get exact mg per serving, then cook infused recipes with clear dosing steps and safer outcomes." />
         <link rel="canonical" href="https://infusionsensei.com/" />
       </Helmet>
 

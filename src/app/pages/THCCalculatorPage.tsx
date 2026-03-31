@@ -87,10 +87,10 @@ export function THCCalculatorPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-12">
       <Helmet>
-        <title>Edibles Calculator: Exact THC Dosage Per Serving | Infusion Sensei</title>
+        <title>Edibles Calculator: Exact THC Per Serving (No Guessing)</title>
         <meta
           name="description"
-          content="Calculate exact mg THC per serving for any recipe in seconds. Stop guessing potency with our free edibles dosage calculator."
+          content="Calculate exact THC in butter, oil, honey, sugar, or recipes. Stop guessing edible strength and get mg per serving instantly."
         />
         <meta name="keywords" content="edibles calculator, THC dosage calculator, THC per serving, homemade edibles, cannabutter calculator, edible potency" />
         <link rel="canonical" href="https://infusionsensei.com/edibles-calculator" />
@@ -102,7 +102,7 @@ export function THCCalculatorPage() {
 
       <section id="calculator" className="bg-white rounded-3xl border-2 border-green-200 p-8 shadow-xl space-y-6">
         <h1 className="text-3xl font-black text-gray-900 mb-2">Edibles Calculator</h1>
-        <p className="text-gray-500 text-sm">Step 1: set your infusion batch. Step 2: optionally apply it to a recipe.</p>
+        <p className="text-gray-500 text-sm">Enter your flower and base to calculate exact THC per serving, then apply it to a recipe.</p>
 
         <div className="grid md:grid-cols-3 gap-4">
               <div>

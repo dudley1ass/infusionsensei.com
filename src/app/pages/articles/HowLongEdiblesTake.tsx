@@ -15,10 +15,10 @@ export function HowLongEdiblesTake() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
       <Helmet>
-        <title>How Long Do Edibles Take to Kick In? (Timing Chart) | Infusion Sensei</title>
-        <meta name="description" content="Learn when edibles start, peak, and wear off based on dose, metabolism, and food. Includes a simple timing chart and safety tips." />
-        <meta property="og:title" content="How Long Do Edibles Take to Kick In? (Timing Chart) | Infusion Sensei" />
-        <meta property="og:description" content="Learn when edibles start, peak, and wear off based on dose, metabolism, and food. Includes a simple timing chart and safety tips." />
+        <title>How Long Do Edibles Take to Kick In? (And Why)</title>
+        <meta name="description" content="Most edibles take 30-120 minutes to kick in. Learn what changes onset time and how to avoid taking too much too soon." />
+        <meta property="og:title" content="How Long Do Edibles Take to Kick In? (And Why) | Infusion Sensei" />
+        <meta property="og:description" content="Most edibles take 30-120 minutes to kick in. Learn what changes onset time and how to avoid taking too much too soon." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/how-long-edibles-take" />
       </Helmet>
       <div className="text-sm text-gray-600">

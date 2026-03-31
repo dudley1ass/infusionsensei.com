@@ -8,8 +8,8 @@ export function EdiblesTasteBad() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <Helmet>
-        <title>Why Edibles Taste Bad (And 9 Easy Fixes That Work) | Infusion Sensei</title>
-        <meta name="description" content="Fix bitter, weedy edibles with practical flavor and infusion tweaks. Make cleaner-tasting gummies, brownies, and oils." />
+        <title>Why Edibles Taste Bad (And How to Fix It Fast)</title>
+        <meta name="description" content="Fix bitter, weedy edibles with practical infusion and flavor tweaks so gummies, brownies, and oils taste cleaner." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/edibles-taste-bad" />
       </Helmet>
       <div className="text-sm text-gray-600">

@@ -8,8 +8,8 @@ export function CannabisButterGuide() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <Helmet>
-        <title>The Perfect Cannabutter Guide – Step-by-Step, No Guesswork | Infusion Sensei</title>
-        <meta name="description" content="The complete cannabutter guide — exact ratios, step-by-step process, common mistakes, storage, and how to calculate exact THC per serving. Make cannabutter that actually works." />
+        <title>How to Make Cannabutter (With Exact THC Math)</title>
+        <meta name="description" content="Make cannabutter step-by-step with exact THC math, serving guidance, common mistakes, and storage tips for consistent potency." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/cannabutter-guide" />
       </Helmet>
       <div className="text-sm text-gray-600">

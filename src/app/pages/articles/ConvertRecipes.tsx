@@ -14,10 +14,10 @@ export function ConvertRecipes() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <Helmet>
-        <title>Convert Any Recipe to Cannabis Edibles (Step by Step) | Infusion Sensei</title>
-        <meta name="description" content="Turn regular recipes into infused versions without ruining texture or dose. Includes butter/oil swaps and potency guidance." />
-        <meta property="og:title" content="Convert Any Recipe to Cannabis Edibles (Step by Step) | Infusion Sensei" />
-        <meta property="og:description" content="Turn regular recipes into infused versions without ruining texture or dose. Includes butter/oil swaps and potency guidance." />
+        <title>Convert Recipes to Edibles (Without Ruining Dose)</title>
+        <meta name="description" content="Convert regular recipes into THC edibles with smart carrier swaps, better texture control, and reliable mg-per-serving planning." />
+        <meta property="og:title" content="Convert Recipes to Edibles (Without Ruining Dose)" />
+        <meta property="og:description" content="Convert regular recipes into THC edibles with smart carrier swaps, better texture control, and reliable mg-per-serving planning." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/convert-recipes" />
       </Helmet>
       <div className="text-sm text-gray-600">

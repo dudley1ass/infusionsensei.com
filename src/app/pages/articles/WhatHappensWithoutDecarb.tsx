@@ -15,10 +15,10 @@ export function WhatHappensWithoutDecarb() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
       <Helmet>
-        <title>What Happens If You Skip Decarb? THC Explained | Infusion Sensei</title>
-        <meta name="description" content="Skipping decarboxylation can drastically reduce potency. Learn what decarb does, common mistakes, and how to fix weak batches." />
-        <meta property="og:title" content="What Happens If You Skip Decarb? THC Explained | Infusion Sensei" />
-        <meta property="og:description" content="Skipping decarboxylation can drastically reduce potency. Learn what decarb does, common mistakes, and how to fix weak batches." />
+        <title>What Happens Without Decarb? Why Edibles Feel Weak</title>
+        <meta name="description" content="Skipping decarb is a top reason edibles feel weak. Learn what decarb does, what goes wrong, and how to fix potency issues." />
+        <meta property="og:title" content="What Happens Without Decarb? Why Edibles Feel Weak" />
+        <meta property="og:description" content="Skipping decarb is a top reason edibles feel weak. Learn what decarb does, what goes wrong, and how to fix potency issues." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/what-happens-without-decarb" />
       </Helmet>
       <div className="text-sm text-gray-600">

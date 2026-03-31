@@ -27,10 +27,10 @@ export function THCPerServingCalculator() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
       <Helmet>
-        <title>THC Per Serving Calculator: How to Estimate Dose | Infusion Sensei</title>
-        <meta name="description" content="Learn the THC-per-serving formula and avoid overpowered edibles. Then use our full edibles calculator for exact numbers." />
-        <meta property="og:title" content="THC Per Serving Calculator: How to Estimate Dose | Infusion Sensei" />
-        <meta property="og:description" content="Learn the THC-per-serving formula and avoid overpowered edibles. Then use our full edibles calculator for exact numbers." />
+        <title>THC Per Serving Calculator: Estimate Edible Dose Fast</title>
+        <meta name="description" content="Use the THC per serving formula to estimate dose quickly, then switch to our full edibles calculator for exact mg per serving." />
+        <meta property="og:title" content="THC Per Serving Calculator: Estimate Edible Dose Fast" />
+        <meta property="og:description" content="Use the THC per serving formula to estimate dose quickly, then switch to our full edibles calculator for exact mg per serving." />
         <link rel="canonical" href="https://infusionsensei.com/learn/articles/thc-per-serving-calculator" />
       </Helmet>
       <div className="text-sm text-gray-600">

@@ -9,8 +9,8 @@ export function DosingGuide() {
   const location = useLocation();
   const isSafeDoseSlug = location.pathname.endsWith("/how-to-dose-edibles-safely");
   const pageTitle = isSafeDoseSlug
-    ? "How to Dose Edibles Safely (Beginner Guide) | Infusion Sensei"
-    : "How to Dose THC Edibles Correctly — Stop Guessing | Infusion Sensei";
+    ? "How to Dose Edibles Safely (Beginner Guide)"
+    : "Edible Dosage Chart (Beginner to Experienced)";
   const canonicalPath = isSafeDoseSlug ? "/learn/articles/how-to-dose-edibles-safely" : "/learn/articles/dosing-guide";
 
   const relatedArticles = [
@@ -23,9 +23,9 @@ export function DosingGuide() {
     <div className="max-w-4xl mx-auto space-y-8">
       <Helmet>
         <title>{pageTitle}</title>
-        <meta name="description" content="The standard THC dose guide from 1mg to 100mg, how to calculate exact mg per serving, and the 7 most common dosing mistakes." />
+        <meta name="description" content="Edible dosage chart from beginner to experienced users, plus exact THC-per-serving math to avoid weak or too-strong batches." />
         <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content="The standard THC dose guide from 1mg to 100mg, how to calculate exact mg per serving, and the 7 most common dosing mistakes." />
+        <meta property="og:description" content="Edible dosage chart from beginner to experienced users, plus exact THC-per-serving math to avoid weak or too-strong batches." />
         <link rel="canonical" href={`https://infusionsensei.com${canonicalPath}`} />
       </Helmet>
       <div className="text-sm text-gray-600">
