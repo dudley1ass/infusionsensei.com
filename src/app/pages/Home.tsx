@@ -115,7 +115,7 @@ export function Home() {
           <div>
             <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-1">Start Here</p>
             <h2 className="text-2xl font-black text-gray-900">Build your infused base first</h2>
-            <p className="text-sm text-gray-600 mt-1">This is the fastest path: base -> recipe -> calculator.</p>
+            <p className="text-sm text-gray-600 mt-1">This is the fastest path: base -&gt; recipe -&gt; calculator.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
             <Link
