@@ -332,6 +332,83 @@ const DIRECT_CATEGORY_DEFAULTS: Record<string, string> = {
   snacks: "garlic-butter-popcorn",
 };
 
+type InfusionFunnelStep = 1 | 2 | 3;
+
+const INFUSION_FUNNEL_STEPS: { step: InfusionFunnelStep; label: string }[] = [
+  { step: 1, label: "Choose what you're making" },
+  { step: 2, label: "Choose your base" },
+  { step: 3, label: "Adjust servings & THC" },
+];
+
+function InfusionFunnelProgressBar({
+  activeStep,
+  categoryDoneLabel,
+  baseDoneLabel,
+}: {
+  activeStep: InfusionFunnelStep;
+  categoryDoneLabel?: string;
+  baseDoneLabel?: string;
+}) {
+  return (
+    <div className="space-y-2 no-print mb-4">
+      <div
+        className="flex flex-col gap-4 rounded-2xl border border-green-200 bg-gradient-to-br from-green-50 via-white to-green-50/50 px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-3"
+        role="navigation"
+        aria-label="Guided infusion steps"
+      >
+        {INFUSION_FUNNEL_STEPS.map(({ step, label }, idx) => {
+          const complete = activeStep > step;
+          const active = activeStep === step;
+          return (
+            <Fragment key={step}>
+              {idx > 0 && <span className="hidden shrink-0 text-green-300 sm:inline" aria-hidden>→</span>}
+              <div
+                className={`flex min-w-0 flex-1 items-center gap-2.5 sm:max-w-[min(100%,220px)] sm:flex-1 ${complete || active ? "" : "opacity-50"}`}
+              >
+                <div
+                  className={
+                    complete
+                      ? "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-600 text-xs font-black text-white"
+                      : active
+                        ? "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-600 text-xs font-black text-white ring-2 ring-green-400 ring-offset-2"
+                        : "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-500"
+                  }
+                >
+                  {complete ? "✓" : step}
+                </div>
+                <div className="min-w-0">
+                  <p
+                    className={`text-[10px] font-bold uppercase tracking-wide sm:text-[11px] ${active ? "text-green-700" : complete ? "text-green-600" : "text-gray-400"}`}
+                  >
+                    Step {step}
+                  </p>
+                  <p
+                    className={`text-xs leading-snug sm:text-sm ${active ? "font-black text-green-900" : complete ? "font-semibold text-green-800" : "font-semibold text-gray-500"}`}
+                  >
+                    {label}
+                  </p>
+                </div>
+              </div>
+            </Fragment>
+          );
+        })}
+      </div>
+      {activeStep >= 2 && categoryDoneLabel && (
+        <p className="flex items-start gap-2 rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm font-semibold text-green-900">
+          <CheckCheck className="mt-0.5 h-4 w-4 shrink-0 text-green-600" aria-hidden />
+          <span>Step 1 complete: {categoryDoneLabel}</span>
+        </p>
+      )}
+      {activeStep >= 3 && baseDoneLabel && (
+        <p className="flex items-start gap-2 rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm font-semibold text-green-900">
+          <CheckCheck className="mt-0.5 h-4 w-4 shrink-0 text-green-600" aria-hidden />
+          <span>Step 2 complete: {baseDoneLabel}</span>
+        </p>
+      )}
+    </div>
+  );
+}
+
 // Standard Recipe Templates (exported for Party Snacks grocery list & tooling)
 export const standardRecipes: Record<string, any[]> = {
   "baked-goods": [
@@ -2704,6 +2781,8 @@ export function CreateRecipes() {
   if (!selectedCategory) {
     return (
       <div className="max-w-6xl mx-auto space-y-6">
+        <InfusionFunnelProgressBar activeStep={1} />
+
         <div className="bg-white border-2 border-green-200 rounded-2xl px-6 py-4 shadow-sm">
           <div>
             <h1 className="text-2xl font-black text-gray-900">Start Your Infusion</h1>
@@ -2974,6 +3053,10 @@ export function CreateRecipes() {
 
     return (
       <div className="max-w-4xl mx-auto space-y-5">
+        <InfusionFunnelProgressBar
+          activeStep={2}
+          categoryDoneLabel={`${category?.name ?? "Category"} selected`}
+        />
 
         {/* Compact breadcrumb header */}
         <div className="flex items-center gap-3">
@@ -2984,24 +3067,6 @@ export function CreateRecipes() {
           <span className="text-gray-700 font-semibold flex items-center gap-1.5">
             <span>{category?.emoji}</span> {category?.name}
           </span>
-        </div>
-
-        {/* Step indicator */}
-        <div className="flex items-center gap-2 text-sm">
-          <div className="flex items-center gap-1.5 text-green-700 font-semibold">
-            <div className="w-5 h-5 rounded-full bg-green-600 text-white flex items-center justify-center text-xs font-bold">✓</div>
-            Category
-          </div>
-          <div className="flex-1 h-0.5 bg-green-200 rounded" />
-          <div className="flex items-center gap-1.5 text-green-700 font-bold">
-            <div className="w-5 h-5 rounded-full bg-green-600 text-white flex items-center justify-center text-xs font-bold">2</div>
-            Pick a Recipe
-          </div>
-          <div className="flex-1 h-0.5 bg-gray-200 rounded" />
-          <div className="flex items-center gap-1.5 text-gray-400">
-            <div className="w-5 h-5 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold">3</div>
-            Customize & Dose
-          </div>
         </div>
 
         {/* Main question */}
@@ -3096,6 +3161,15 @@ export function CreateRecipes() {
     };
 
     const infusedIngredients = ingredients.filter(i => i.isInfused && i.thcPerUnit);
+
+    const funnelCategoryDone = `${category?.name ?? "Category"} selected`;
+    const funnelBaseDone = startingRecipeName
+      ? `${startingRecipeName} selected`
+      : recipeType === "custom"
+        ? "Custom recipe started"
+        : recipeName.trim()
+          ? `${recipeName.trim()} loaded`
+          : "Recipe loaded";
 
     return (
       <>
@@ -3469,6 +3543,11 @@ export function CreateRecipes() {
 
         {/* ── SCREEN VERSION ─────────────────────────────── */}
         <div className="screen-only max-w-7xl mx-auto">
+          <InfusionFunnelProgressBar
+            activeStep={3}
+            categoryDoneLabel={funnelCategoryDone}
+            baseDoneLabel={funnelBaseDone}
+          />
 
           {/* ── TOP BAR ──────────────────────────────────────── */}
           <div className="flex items-center justify-between bg-white px-4 py-3 rounded-2xl shadow-sm border border-gray-200 no-print mb-6">
