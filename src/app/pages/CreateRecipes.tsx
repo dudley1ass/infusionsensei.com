@@ -335,57 +335,60 @@ const DIRECT_CATEGORY_DEFAULTS: Record<string, string> = {
 type InfusionFunnelStep = 1 | 2 | 3;
 
 const INFUSION_FUNNEL_STEPS: { step: InfusionFunnelStep; label: string }[] = [
-  { step: 1, label: "Make your base" },
-  { step: 2, label: "Choose what you want to make" },
-  { step: 3, label: "Adjust servings & strength, print labels or recipe" },
+  { step: 1, label: "Create or choose your base" },
+  { step: 2, label: "Choose your recipe" },
+  { step: 3, label: "Adjust strength & print" },
 ];
-
-const INFUSION_BASE_INTRO_KEY = "infusionSensei_ingredients_base_intro_ok";
 
 function InfusionFunnelProgressBar({
   activeStep,
   step1CompleteNote,
   step2CompleteNote,
+  compact = false,
 }: {
   activeStep: InfusionFunnelStep;
   step1CompleteNote?: string;
   step2CompleteNote?: string;
+  compact?: boolean;
 }) {
   return (
-    <div className="space-y-2 no-print mb-4">
+    <div className={`no-print ${compact ? "space-y-1.5 mb-2" : "space-y-2 mb-4"}`}>
       <div
-        className="flex flex-col gap-4 rounded-2xl border border-green-200 bg-gradient-to-br from-green-50 via-white to-green-50/50 px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-3"
+        className={`flex flex-col rounded-xl border border-green-200 bg-gradient-to-br from-green-50 via-white to-green-50/50 shadow-sm sm:flex-row sm:items-stretch sm:justify-between sm:gap-1 ${
+          compact ? "gap-2 px-2 py-2" : "gap-4 px-4 py-3"
+        }`}
         role="navigation"
         aria-label="Guided infusion steps"
       >
         {INFUSION_FUNNEL_STEPS.map(({ step, label }, idx) => {
           const complete = activeStep > step;
           const active = activeStep === step;
+          const dotSm = compact ? "h-6 w-6 text-[10px]" : "h-8 w-8 text-xs";
           return (
             <Fragment key={step}>
-              {idx > 0 && <span className="hidden shrink-0 text-green-300 sm:inline" aria-hidden>→</span>}
+              {idx > 0 && <span className="hidden shrink-0 self-center text-green-300 sm:inline" aria-hidden>→</span>}
               <div
-                className={`flex min-w-0 flex-1 items-center gap-2.5 sm:max-w-[min(100%,220px)] sm:flex-1 ${complete || active ? "" : "opacity-50"}`}
+                className={`flex min-w-0 flex-1 items-center gap-2 sm:max-w-[min(100%,240px)] sm:flex-1 ${complete || active ? "" : "opacity-45"} ${compact ? "gap-1.5" : "gap-2.5"}`}
               >
                 <div
                   className={
                     complete
-                      ? "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-600 text-xs font-black text-white"
+                      ? `flex shrink-0 items-center justify-center rounded-full bg-green-600 font-black text-white ${dotSm}`
                       : active
-                        ? "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-600 text-xs font-black text-white ring-2 ring-green-400 ring-offset-2"
-                        : "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-500"
+                        ? `flex shrink-0 items-center justify-center rounded-full bg-green-600 font-black text-white ring-2 ring-green-400 ring-offset-1 ${dotSm}`
+                        : `flex shrink-0 items-center justify-center rounded-full bg-gray-200 font-bold text-gray-500 ${dotSm}`
                   }
                 >
                   {complete ? "✓" : step}
                 </div>
                 <div className="min-w-0">
                   <p
-                    className={`text-[10px] font-bold uppercase tracking-wide sm:text-[11px] ${active ? "text-green-700" : complete ? "text-green-600" : "text-gray-400"}`}
+                    className={`font-bold uppercase tracking-wide text-green-700 ${compact ? "text-[9px] leading-none" : "text-[10px] sm:text-[11px]"}`}
                   >
                     Step {step}
                   </p>
                   <p
-                    className={`text-xs leading-snug sm:text-sm ${active ? "font-black text-green-900" : complete ? "font-semibold text-green-800" : "font-semibold text-gray-500"}`}
+                    className={`leading-tight ${compact ? "text-[11px] sm:text-xs" : "text-xs sm:text-sm"} ${active ? "font-black text-green-900" : complete ? "font-semibold text-green-800" : "font-semibold text-gray-500"}`}
                   >
                     {label}
                   </p>
@@ -1524,18 +1527,6 @@ export function CreateRecipes() {
   /** Controls which print layout is shown when the print dialog opens. */
   const [printTarget, setPrintTarget] = useState<"full" | "buffet">("full");
 
-  const [baseIntroAcknowledged, setBaseIntroAcknowledged] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.sessionStorage.getItem(INFUSION_BASE_INTRO_KEY) === "1";
-  });
-
-  const acknowledgeBaseIntro = () => {
-    if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(INFUSION_BASE_INTRO_KEY, "1");
-    }
-    setBaseIntroAcknowledged(true);
-  };
-
   // What Can I Make - Ingredient Selection
   const [selectedPantryItems, setSelectedPantryItems] = useState<string[]>([]);
   const [selectedInfusionType, setSelectedInfusionType] = useState<string>("none");
@@ -1593,10 +1584,6 @@ export function CreateRecipes() {
       setSelectedCategory(cat);
       setRecipeType("standard");
       setSelectedStandardRecipe(rec);
-      if (typeof window !== "undefined") {
-        window.sessionStorage.setItem(INFUSION_BASE_INTRO_KEY, "1");
-      }
-      setBaseIntroAcknowledged(true);
     }
   }, [searchParams, setSearchParams]);
 
@@ -2784,7 +2771,6 @@ export function CreateRecipes() {
   };
 
   const handleCategoryStart = (categoryId: string) => {
-    acknowledgeBaseIntro();
     const defaultRecipeId = DIRECT_CATEGORY_DEFAULTS[categoryId];
     if (defaultRecipeId) {
       setSelectedCategory(categoryId);
@@ -2796,125 +2782,46 @@ export function CreateRecipes() {
     setSelectedCategory(categoryId);
   };
 
-  // STEP 1: Make your base (intro — before category grid)
-  if (!selectedCategory && !baseIntroAcknowledged) {
+  // Hub: Step 1 + Step 2 categories (single above-the-fold layout)
+  if (!selectedCategory) {
     return (
-      <div className="max-w-6xl mx-auto space-y-6">
-        <InfusionFunnelProgressBar activeStep={1} />
+      <div className="max-w-6xl mx-auto space-y-2 sm:space-y-3">
+        <InfusionFunnelProgressBar activeStep={2} compact />
 
-        <div className="bg-white border-2 border-green-200 rounded-2xl px-6 py-5 shadow-sm space-y-4">
-          <div>
-            <h1 className="text-2xl font-black text-gray-900">Step 1: Make your base</h1>
-            <p className="text-gray-600 text-sm mt-2 leading-relaxed">
-              Use cannabutter, infused oil, a tincture, distillate, or a premade THC product already dosed — like a
-              squeeze bottle or stir-in packet. Save everything in{" "}
-              <span className="font-semibold text-green-800">My Infusions</span> so your recipes stay consistent.
+        <div className="rounded-xl border border-green-200 bg-white px-3 py-2 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-3">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-green-700">Step 1</p>
+            <p className="text-xs font-semibold text-gray-900 sm:text-sm">
+              Create your base — or in the recipe builder choose a premade option (squeeze, stir-in packet, tincture,
+              oil, butter).
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button asChild className="bg-green-600 hover:bg-green-700 font-bold">
+          <div className="mt-2 flex shrink-0 flex-wrap gap-1.5 sm:mt-0">
+            <Button asChild size="sm" className="h-8 bg-green-600 px-2.5 text-xs font-bold sm:h-9 sm:px-3 sm:text-sm">
               <Link
                 to="/infusions"
-                onClick={() => trackEvent("ingredients_hub_click", { target: "infusions", step: "make_base" })}
+                onClick={() => trackEvent("ingredients_hub_click", { target: "infusions", step: "hub_step1" })}
               >
-                Open My Infusions <ArrowRight className="w-4 h-4 ml-2" />
+                My Infusions
               </Link>
             </Button>
             <Button
+              size="sm"
               variant="outline"
-              className="border-green-300 text-green-800 font-semibold hover:bg-green-50"
+              className="h-8 border-green-300 px-2.5 text-xs font-semibold text-green-800 sm:h-9 sm:px-3 sm:text-sm"
               onClick={() => {
-                trackEvent("ingredients_hub_click", { target: "calculator", step: "make_base" });
+                trackEvent("ingredients_hub_click", { target: "calculator", step: "hub_step1" });
                 navigate("/edibles-calculator");
               }}
             >
-              <Calculator className="w-4 h-4 mr-2" />
-              THC calculator
+              Calculator
             </Button>
           </div>
-          <Button
-            className="w-full sm:w-auto bg-green-800 hover:bg-green-900 font-bold"
-            onClick={() => {
-              acknowledgeBaseIntro();
-              trackEvent("ingredients_base_intro_continue", { target: "choose_what_to_make" });
-            }}
-          >
-            Continue — choose what you want to make <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-          <p className="text-xs text-gray-500">
-            No infusion yet? Use the calculator or My Infusions first — or continue and pick a recipe; you can attach a
-            base in the builder.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // STEP 2: Category Selection
-  if (!selectedCategory) {
-    return (
-      <div className="max-w-6xl mx-auto space-y-6">
-        <InfusionFunnelProgressBar
-          activeStep={2}
-          step1CompleteNote="Base step covered — use My Infusions for oils, tinctures, premade squeezes, or the calculator"
-        />
-
-        <div className="bg-white border-2 border-green-200 rounded-2xl px-6 py-4 shadow-sm">
-          <div>
-            <h1 className="text-2xl font-black text-gray-900">Start Your Infusion</h1>
-            <p className="text-gray-700 text-sm mt-0.5 font-semibold">Step 2: Choose what you want to make</p>
-            <p className="text-gray-500 text-sm mt-0.5">Pick a category, then a recipe — we'll keep your dose math in sync.</p>
-          </div>
         </div>
 
-        <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">Need your base first?</p>
-          <p className="text-sm text-gray-700 mb-3">
-            Open{" "}
-            <Link
-              to="/infusions"
-              className="font-semibold text-green-800 underline hover:text-green-900"
-              onClick={() => trackEvent("ingredients_hub_click", { target: "infusions", location: "recommended_flow" })}
-            >
-              My Infusions
-            </Link>{" "}
-            for saved butter, oil, tincture, or premade THC products — or use the calculator to plan potency.
-          </p>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <Button
-              onClick={() => {
-                trackEvent("ingredients_hub_click", { target: "calculator" });
-                navigate("/edibles-calculator");
-              }}
-              className="bg-green-600 hover:bg-green-700 font-bold"
-            >
-              Use Calculator <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-            <p className="text-sm text-green-800">
-              <button
-                type="button"
-                onClick={() => {
-                  trackEvent("ingredients_hub_click", { target: "recipes" });
-                  navigate("/recipes");
-                }}
-                className="underline font-semibold hover:text-green-900"
-              >
-                Browse recipes
-              </button>
-              {" "}·{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  trackEvent("ingredients_hub_click", { target: "infusions" });
-                  navigate("/infusions");
-                }}
-                className="underline font-semibold hover:text-green-900"
-              >
-                My Infusions
-              </button>
-            </p>
-          </div>
-        </div>
+        <p className="text-sm font-black text-gray-900">
+          Step 2 — Choose your recipe <span className="font-semibold text-gray-500">· choose a category below</span>
+        </p>
 
         {showWhatCanIMake && (
           <Card className="bg-white border-2 border-purple-300 shadow-lg">
@@ -3101,26 +3008,34 @@ export function CreateRecipes() {
           </Card>
         )}
 
-        <p className="text-sm font-semibold text-gray-700">Choose a category to get started:</p>
-        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-2">
           {recipeCategories.map((category) => (
             <Card
               key={category.id}
-              className="group bg-white border-2 border-gray-200 hover:border-green-500 shadow-sm hover:shadow-lg transition-all cursor-pointer hover:scale-105"
-              onClick={() => handleCategoryStart(category.id)}
+              className="flex flex-col bg-white border border-gray-200 shadow-sm"
             >
-              <CardHeader className="text-center pb-3">
-                <div className="text-5xl mb-2">{category.emoji}</div>
-                <CardTitle className="text-base text-gray-900">{category.name}</CardTitle>
-                <CardDescription className="text-xs text-gray-600">{category.description}</CardDescription>
+              <CardHeader className="px-2 py-2 pb-1 text-center sm:px-3 sm:py-2">
+                <div className="text-2xl sm:text-3xl mb-0.5">{category.emoji}</div>
+                <CardTitle className="text-xs font-black text-gray-900 leading-tight sm:text-sm">{category.name}</CardTitle>
+                <CardDescription className="text-[10px] text-gray-600 leading-snug line-clamp-2 mt-0.5">
+                  {category.description}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="pt-0 text-center">
-                <Badge className="bg-green-100 text-green-800 text-xs">
+              <CardContent className="mt-auto flex flex-col gap-1.5 px-2 pb-2 pt-0 sm:px-3 sm:pb-2">
+                <Badge className="mx-auto bg-green-100 text-green-800 text-[10px] px-1.5 py-0">
                   {standardRecipes[category.id]?.length || 0} recipes
                 </Badge>
-                <div className="text-xs font-bold text-green-700 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Start →
-                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-8 w-full bg-green-700 px-1 text-[10px] font-black leading-tight text-white hover:bg-green-800 sm:h-9 sm:text-xs"
+                  onClick={() => {
+                    trackEvent("ingredients_on_to_step_3", { category: category.id });
+                    handleCategoryStart(category.id);
+                  }}
+                >
+                  On to Step 3
+                </Button>
               </CardContent>
             </Card>
           ))}
@@ -3154,8 +3069,8 @@ export function CreateRecipes() {
 
         {/* Main question */}
         <div>
-          <h1 className="text-2xl font-black text-gray-900">Choose what you want to make</h1>
-          <p className="text-gray-500 text-sm mt-1">Pick a recipe to load — Step 3 is where you adjust servings, strength, and print.</p>
+          <h1 className="text-2xl font-black text-gray-900">Choose your recipe</h1>
+          <p className="text-gray-500 text-sm mt-1">Pick one to load — Step 3 is servings, strength, and print.</p>
         </div>
 
         {/* Recipe cards — horizontal list */}
