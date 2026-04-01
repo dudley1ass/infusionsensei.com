@@ -326,6 +326,12 @@ const recipeCategories = [
   { id: "breads-breakfast",name: "🍞 Breads & Breakfast", emoji: "🍞", description: "Muffins, pancakes, breakfast" },
 ];
 
+const DIRECT_CATEGORY_DEFAULTS: Record<string, string> = {
+  wings: "classic-buffalo-wings",
+  drinks: "bulletproof-coffee",
+  snacks: "garlic-butter-popcorn",
+};
+
 // Standard Recipe Templates (exported for Party Snacks grocery list & tooling)
 export const standardRecipes: Record<string, any[]> = {
   "baked-goods": [
@@ -2682,29 +2688,34 @@ export function CreateRecipes() {
     setInstructions(["Add your recipe instructions here"]);
   };
 
+  const handleCategoryStart = (categoryId: string) => {
+    const defaultRecipeId = DIRECT_CATEGORY_DEFAULTS[categoryId];
+    if (defaultRecipeId) {
+      setSelectedCategory(categoryId);
+      setRecipeType("standard");
+      setSelectedStandardRecipe(defaultRecipeId);
+      trackEvent("category_direct_start", { category: categoryId, recipe: defaultRecipeId });
+      return;
+    }
+    setSelectedCategory(categoryId);
+  };
+
   // STEP 1: Category Selection
   if (!selectedCategory) {
     return (
       <div className="max-w-6xl mx-auto space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border-2 border-green-200 rounded-2xl px-6 py-4 shadow-sm">
+        <div className="bg-white border-2 border-green-200 rounded-2xl px-6 py-4 shadow-sm">
           <div>
-            <h1 className="text-2xl font-black text-gray-900">What do you want to make?</h1>
-            <p className="text-gray-500 text-sm mt-0.5">We'll calculate the exact THC per serving automatically.</p>
+            <h1 className="text-2xl font-black text-gray-900">Start Your Infusion</h1>
+            <p className="text-gray-700 text-sm mt-0.5 font-semibold">Step 1: Choose what you're making</p>
+            <p className="text-gray-500 text-sm mt-0.5">We'll calculate THC automatically as you go.</p>
           </div>
-          <Button
-            onClick={() => setShowWhatCanIMake(!showWhatCanIMake)}
-            className="bg-purple-600 hover:bg-purple-700 flex-shrink-0"
-            size="sm"
-          >
-            <Lightbulb className="w-4 h-4 mr-2" />
-            What Can I Make?
-          </Button>
         </div>
 
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
           <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">Recommended flow</p>
           <p className="text-sm text-gray-700 mb-3">Build your infused base here, then choose a recipe to apply it.</p>
-          <div className="grid sm:grid-cols-3 gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <Button
               onClick={() => {
                 trackEvent("ingredients_hub_click", { target: "calculator" });
@@ -2714,26 +2725,29 @@ export function CreateRecipes() {
             >
               Use Calculator <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Button
-              onClick={() => {
-                trackEvent("ingredients_hub_click", { target: "recipes" });
-                navigate("/recipes");
-              }}
-              variant="outline"
-              className="border-green-300 text-green-700 hover:bg-green-100 font-semibold"
-            >
-              Best Recipes for This Base
-            </Button>
-            <Button
-              onClick={() => {
-                trackEvent("ingredients_hub_click", { target: "infusions" });
-                navigate("/infusions");
-              }}
-              variant="outline"
-              className="border-green-300 text-green-700 hover:bg-green-100 font-semibold"
-            >
-              Start / Manage Infusions
-            </Button>
+            <p className="text-sm text-green-800">
+              <button
+                type="button"
+                onClick={() => {
+                  trackEvent("ingredients_hub_click", { target: "recipes" });
+                  navigate("/recipes");
+                }}
+                className="underline font-semibold hover:text-green-900"
+              >
+                Browse recipes
+              </button>
+              {" "}·{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  trackEvent("ingredients_hub_click", { target: "infusions" });
+                  navigate("/infusions");
+                }}
+                className="underline font-semibold hover:text-green-900"
+              >
+                Manage infusions
+              </button>
+            </p>
           </div>
         </div>
 
@@ -2922,12 +2936,13 @@ export function CreateRecipes() {
           </Card>
         )}
 
+        <p className="text-sm font-semibold text-gray-700">Choose a category to get started:</p>
         <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
           {recipeCategories.map((category) => (
             <Card
               key={category.id}
-              className="bg-white border-2 border-gray-200 hover:border-green-500 shadow-sm hover:shadow-lg transition-all cursor-pointer hover:scale-105"
-              onClick={() => setSelectedCategory(category.id)}
+              className="group bg-white border-2 border-gray-200 hover:border-green-500 shadow-sm hover:shadow-lg transition-all cursor-pointer hover:scale-105"
+              onClick={() => handleCategoryStart(category.id)}
             >
               <CardHeader className="text-center pb-3">
                 <div className="text-5xl mb-2">{category.emoji}</div>
@@ -2938,6 +2953,9 @@ export function CreateRecipes() {
                 <Badge className="bg-green-100 text-green-800 text-xs">
                   {standardRecipes[category.id]?.length || 0} recipes
                 </Badge>
+                <div className="text-xs font-bold text-green-700 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  Start ->
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -3047,6 +3065,10 @@ export function CreateRecipes() {
   // STEP 3: Recipe Builder
   if (recipeType && ingredients.length > 0) {
     const category = recipeCategories.find(c => c.id === selectedCategory);
+    const startingRecipeName =
+      recipeType === "standard" && selectedCategory && selectedStandardRecipe
+        ? (standardRecipes[selectedCategory] || []).find((r) => r.id === selectedStandardRecipe)?.name
+        : "";
 
     // Dosing tier
     const dosingTier = thcPerServing < 2.5 ? { label: "Microdose", color: "text-blue-700", bg: "bg-blue-50 border-blue-200" }
@@ -3527,6 +3549,26 @@ export function CreateRecipes() {
               </Button>
             </div>
           </div>
+
+          {recipeType === "standard" && !!startingRecipeName && (
+            <div className="bg-green-50 border border-green-200 rounded-2xl px-4 py-3 mb-4 no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <p className="text-sm text-green-900">
+                Starting with: <span className="font-black">{startingRecipeName}</span>
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-green-300 text-green-800 hover:bg-green-100 font-semibold"
+                onClick={() => {
+                  setRecipeType("");
+                  setSelectedStandardRecipe("");
+                  setIngredients([]);
+                }}
+              >
+                Change Recipe
+              </Button>
+            </div>
+          )}
 
           {/* ── TWO COLUMN LAYOUT ────────────────────────────── */}
           <div className="flex gap-6 items-start">
