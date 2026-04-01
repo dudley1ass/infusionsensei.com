@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { ChefHat, Clock, ArrowRight, Calculator, TrendingUp, Zap } from "lucide-react";
@@ -8,7 +9,37 @@ import { recipes } from "../data/recipes";
 import { trackEvent } from "../utils/analytics";
 
 export function Home() {
+  const [heroVariant, setHeroVariant] = useState<"A" | "B">("A");
   const featuredRecipes = recipes.filter(r => r.isNew).slice(0, 3);
+  const heroCtas = useMemo(() => {
+    const variantA = [
+      { key: "calculator", to: "/edibles-calculator", label: "THC Calculator", style: "primary" as const },
+      { key: "ingredients", to: "/ingredients", label: "Start with Ingredients", style: "outline" as const },
+      { key: "recipes", to: "/recipes", label: "Browse Recipes", style: "outline" as const },
+    ];
+    const variantB = [
+      { key: "ingredients", to: "/ingredients", label: "Start with Ingredients", style: "primary" as const },
+      { key: "calculator", to: "/edibles-calculator", label: "THC Calculator", style: "outline" as const },
+      { key: "recipes", to: "/recipes", label: "Browse Recipes", style: "outline" as const },
+    ];
+    return heroVariant === "A" ? variantA : variantB;
+  }, [heroVariant]);
+
+  useEffect(() => {
+    const key = "is_home_hero_variant";
+    const existing = localStorage.getItem(key);
+    if (existing === "A" || existing === "B") {
+      setHeroVariant(existing);
+      return;
+    }
+    const assigned = Math.random() < 0.5 ? "A" : "B";
+    localStorage.setItem(key, assigned);
+    setHeroVariant(assigned);
+  }, []);
+
+  useEffect(() => {
+    trackEvent("homepage_variant_seen", { variant: heroVariant });
+  }, [heroVariant]);
 
   return (
     <div className="space-y-14">
@@ -86,23 +117,33 @@ export function Home() {
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Link
-              to="/ingredients"
-              onClick={() => trackEvent("homepage_primary_cta_click", { location: "hero", target: "ingredients" })}
-            >
-              <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-base px-8 py-5 shadow-xl rounded-xl transition-transform hover:scale-105">
-                Build Your Infused Base <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-            <Link
-              to="/infusions"
-              onClick={() => trackEvent("homepage_secondary_cta_click", { location: "hero", target: "infusions" })}
-            >
-              <Button size="lg" variant="outline" className="border-2 border-white/40 text-white hover:bg-white/10 font-bold text-base px-8 py-5 rounded-xl">
-                <Calculator className="w-4 h-4 mr-2" /> Calculate THC & bases
-              </Button>
-            </Link>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-4xl mx-auto">
+            {heroCtas.map((cta) => (
+              <Link
+                key={cta.key}
+                to={cta.to}
+                onClick={() => {
+                  trackEvent("homepage_cta_click", { location: "hero", target: cta.key, variant: heroVariant });
+                  trackEvent(cta.style === "primary" ? "homepage_primary_cta_click" : "homepage_secondary_cta_click", {
+                    location: "hero",
+                    target: cta.key,
+                    variant: heroVariant,
+                  });
+                }}
+              >
+                <Button
+                  size="lg"
+                  variant={cta.style === "primary" ? "default" : "outline"}
+                  className={cta.style === "primary"
+                    ? "w-full bg-white text-green-800 hover:bg-green-50 font-black text-base px-6 py-5 shadow-xl rounded-xl transition-transform hover:scale-105"
+                    : "w-full border-2 border-white/40 text-white hover:bg-white/10 font-bold text-base px-6 py-5 rounded-xl"
+                  }
+                >
+                  {cta.key === "calculator" && <Calculator className="w-4 h-4 mr-2" />}
+                  {cta.label}
+                </Button>
+              </Link>
+            ))}
           </div>
           <p className="text-green-400 text-sm mt-4 font-medium text-center">
             ✓ No account &nbsp;·&nbsp; ✓ No setup &nbsp;·&nbsp; ✓ Instant results

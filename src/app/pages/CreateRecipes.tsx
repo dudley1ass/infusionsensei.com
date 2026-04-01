@@ -2704,12 +2704,35 @@ export function CreateRecipes() {
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
           <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">Recommended flow</p>
           <p className="text-sm text-gray-700 mb-3">Build your infused base here, then choose a recipe to apply it.</p>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button onClick={() => navigate("/recipes")} className="bg-green-600 hover:bg-green-700 font-bold">
-              Next: Use This Base In a Recipe <ArrowRight className="w-4 h-4 ml-2" />
+          <div className="grid sm:grid-cols-3 gap-2">
+            <Button
+              onClick={() => {
+                trackEvent("ingredients_hub_click", { target: "calculator" });
+                navigate("/edibles-calculator");
+              }}
+              className="bg-green-600 hover:bg-green-700 font-bold"
+            >
+              Use Calculator <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Button onClick={() => navigate("/edibles-calculator")} variant="outline" className="border-green-300 text-green-700 hover:bg-green-100 font-semibold">
-              Or jump to mg/serving calculator
+            <Button
+              onClick={() => {
+                trackEvent("ingredients_hub_click", { target: "recipes" });
+                navigate("/recipes");
+              }}
+              variant="outline"
+              className="border-green-300 text-green-700 hover:bg-green-100 font-semibold"
+            >
+              Best Recipes for This Base
+            </Button>
+            <Button
+              onClick={() => {
+                trackEvent("ingredients_hub_click", { target: "infusions" });
+                navigate("/infusions");
+              }}
+              variant="outline"
+              className="border-green-300 text-green-700 hover:bg-green-100 font-semibold"
+            >
+              Start / Manage Infusions
             </Button>
           </div>
         </div>
