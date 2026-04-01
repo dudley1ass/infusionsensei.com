@@ -19,24 +19,24 @@ export function Home() {
       </Helmet>
 
       {/* HERO */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-800 via-green-700 to-green-900 px-4 py-4 sm:px-6 sm:py-5 md:py-6 shadow-2xl">
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-800 via-green-700 to-green-900 px-4 pt-3 pb-3 sm:px-6 sm:pt-4 sm:pb-4 md:pt-5 md:pb-5 shadow-2xl">
         <div className="absolute top-0 right-0 w-72 h-72 bg-green-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-green-900/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
         <div className="relative z-10 max-w-4xl mx-auto">
-          <div className="text-center mb-1">
-            <Badge className="bg-green-900/70 text-green-200 border border-green-600/50 mb-2 text-xs sm:text-sm px-3 py-1 inline-flex">
+          <div className="text-center mb-0.5">
+            <Badge className="bg-green-900/70 text-green-200 border border-green-600/50 mb-1 text-xs sm:text-sm px-3 py-1 inline-flex">
               <Zap className="w-3.5 h-3.5 mr-1.5" /> Free edible maker + dose tools
             </Badge>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-2 leading-[1.05]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-1 leading-[1.03]">
               Calculate Exact THC in Your Edibles
             </h1>
-            <p className="text-green-300 text-sm sm:text-base font-semibold mb-2">
+            <p className="text-green-300 text-sm sm:text-base font-semibold mb-1.5">
               Enter your flower and butter or oil to get precise mg per serving - no guessing.
             </p>
-            <p className="hidden sm:block text-green-400 text-xs sm:text-sm mb-2">Start by building your infused base, then use it in recipes.</p>
+            <p className="hidden sm:block text-green-400 text-xs sm:text-sm mb-1.5">Start by building your infused base, then use it in recipes.</p>
           </div>
 
-          <div className="flex justify-center mb-2">
+          <div className="flex justify-center mb-1.5">
             <Link
               to="/ingredients"
               onClick={() => {
@@ -49,14 +49,14 @@ export function Home() {
               </Button>
             </Link>
           </div>
-          <p className="text-center text-green-200 text-xs sm:text-sm mb-2">
+          <p className="text-center text-green-200 text-xs sm:text-sm mb-1.5">
             <Link to="/edibles-calculator" onClick={() => trackEvent("homepage_cta_click", { location: "hero_secondary", target: "calculator" })} className="hover:text-white font-semibold">Use calculator instead</Link>
             {" "}·{" "}
             <Link to="/recipes" onClick={() => trackEvent("homepage_cta_click", { location: "hero_secondary", target: "recipes" })} className="hover:text-white font-semibold">Browse recipes</Link>
           </p>
 
           {/* What are you making today? */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-2 sm:mb-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-1.5 sm:mb-2">
             {[
               { emoji: "🍗", label: "Wings", sub: "Start here", to: "/wings", img: "/IMAGES/chickenwings.jpg", highlight: false, mobilePriority: true },
               { emoji: "🍿", label: "Popcorn", sub: "Start here", to: "/popcorn", img: "/IMAGES/popcorn.webp", highlight: false, mobilePriority: true },
@@ -106,7 +106,7 @@ export function Home() {
               </Link>
             ))}
           </div>
-          <p className="text-green-400 text-sm mt-4 font-medium text-center">
+          <p className="text-green-400 text-sm mt-2 font-medium text-center">
             ✓ No account &nbsp;·&nbsp; ✓ No setup &nbsp;·&nbsp; ✓ Instant results
           </p>
         </div>
