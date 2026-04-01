@@ -2714,7 +2714,10 @@ export function CreateRecipes() {
 
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
           <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">Recommended flow</p>
-          <p className="text-sm text-gray-700 mb-3">Build your infused base here, then choose a recipe to apply it.</p>
+          <p className="text-sm text-gray-700 mb-3">
+            Build your infused base here, then choose a recipe to apply it—or choose one of our premade bases, a
+            tincture, or a premade THC-infused base like a squeeze bottle.
+          </p>
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <Button
               onClick={() => {
