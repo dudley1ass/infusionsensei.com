@@ -1631,6 +1631,75 @@ function hasStructuralBakingFlour(ingredients: Ingredient[]): boolean {
   return ingredients.some((i) => isStructuralBakingFlourKey(ingredientLibraryKey(i)));
 }
 
+const CAKE_BATTER_STANDARD_IDS = new Set<string>([
+  "mini-cupcakes-infused-frosting",
+  "vanilla-layer-cake",
+  "chocolate-layer-cake",
+  "red-velvet-cake",
+  "carrot-cake",
+  "lemon-cake",
+  "pound-cake",
+  "coffee-cake",
+  "marble-cake",
+  "funfetti-cake",
+  "chocolate-cupcakes",
+]);
+
+const COOKIE_STANDARD_IDS = new Set<string>([
+  "chocolate-chip-cookies",
+  "sugar-cookies",
+  "cookie-sandwiches-infused-filling",
+  "peanut-butter-cookies",
+  "oatmeal-raisin-cookies",
+  "snickerdoodles",
+  "double-chocolate-cookies",
+  "white-chocolate-macadamia-cookies",
+  "shortbread-cookies",
+  "molasses-cookies",
+  "gingerbread-cookies",
+]);
+
+const BAR_TRAY_STANDARD_IDS = new Set<string>([
+  "brownies",
+  "mini-brownie-bites",
+  "blondie-squares",
+  "peanut-butter-bars",
+  "lemon-bars",
+  "cheesecake-bars",
+  "magic-cookie-bars",
+  "chocolate-chip-cookie-bars",
+  "brownie-cheesecake-swirl-bars",
+  "smores-bars",
+]);
+
+/** Moisture : flour can exceed cookie limits for batters, tray bakes, and gooey bars. */
+function isCakeBatterStyleRecipe(recipeName: string, recipeId: string): boolean {
+  if (CAKE_BATTER_STANDARD_IDS.has(recipeId)) return true;
+  const n = recipeName.toLowerCase();
+  return (
+    /\b(cupcakes?|layer cake|birthday cake|sponge|chiffon|muffins?)\b/i.test(recipeName) ||
+    /\b(pound cake|coffee cake|bundt|funfetti|red velvet)\b/i.test(n) ||
+    /\b(carrot cake|lemon cake|vanilla cake|chocolate cake|marble cake)\b/i.test(n) ||
+    (/\bcake\b/.test(n) && !/\bcrab\b/i.test(n))
+  );
+}
+
+function isBarTrayBakeRecipe(recipeName: string, recipeId: string): boolean {
+  if (BAR_TRAY_STANDARD_IDS.has(recipeId)) return true;
+  const n = recipeName.toLowerCase();
+  return /\b(brownie|blondie)\b/.test(n) || /\b(bar|bars)\b/.test(n);
+}
+
+function isCookieTemplateRecipe(recipeName: string, recipeId: string): boolean {
+  if (COOKIE_STANDARD_IDS.has(recipeId)) return true;
+  const n = recipeName.toLowerCase();
+  return (
+    /\b(chocolate chip cookie|sugar cookie)\b/i.test(recipeName) ||
+    /\b(cookies?|snickerdoodles?)\b/.test(n) ||
+    /\b(shortbread|gingerbread)\b/.test(n)
+  );
+}
+
 /** When switching templates (e.g. tea → latte), keep saved infusion rows so THC dosing carries over. */
 function mergePreservedInfusionRows(prev: Ingredient[], built: Ingredient[]): Ingredient[] {
   if (!prev.length) return built;
@@ -2433,14 +2502,9 @@ export function CreateRecipes() {
        lowerNames.some(n => n.includes("chocolate")));
     const isBlondieStyle =
       /blondie/i.test(recipeName.toLowerCase()) || selectedStandardRecipe === "blondie-squares";
-    const isCookieStyle =
-      selectedStandardRecipe === "chocolate-chip-cookies" ||
-      selectedStandardRecipe === "sugar-cookies" ||
-      selectedStandardRecipe === "cookie-sandwiches-infused-filling" ||
-      /\b(chocolate chip cookie|sugar cookie)\b/i.test(recipeName);
-    const isCakeStyle =
-      /\b(cupcake|cupcakes|layer cake|birthday cake|sponge|chiffon|muffin)\b/i.test(recipeName) ||
-      selectedStandardRecipe === "mini-cupcakes-infused-frosting";
+    const isCookieStyle = isCookieTemplateRecipe(recipeName, selectedStandardRecipe);
+    const isCakeStyle = isCakeBatterStyleRecipe(recipeName, selectedStandardRecipe);
+    const isBarStyle = isBarTrayBakeRecipe(recipeName, selectedStandardRecipe);
     const isPancakeStyle =
       recipeName.toLowerCase().includes("pancake") ||
       recipeName.toLowerCase().includes("waffle") ||
@@ -2469,8 +2533,8 @@ export function CreateRecipes() {
 
     if (cat === 'fat') {
       const fatToFlour = fat / Math.max(flour, 1);
-      const fatProblemThreshold = isBrownieStyle ? 1.8 : 0.85;
-      const fatWarningThreshold = isBrownieStyle ? 1.4 : 0.65;
+      const fatProblemThreshold = isBrownieStyle || isBarStyle ? 1.8 : 0.85;
+      const fatWarningThreshold = isBrownieStyle || isBarStyle ? 1.4 : 0.65;
       if (fatToFlour > fatProblemThreshold) {
         warning = 'Too much fat — baked goods will be greasy and spread flat. Reduce butter or add more flour.';
         color = 'red';
@@ -2520,8 +2584,8 @@ export function CreateRecipes() {
         return sum;
       }, 0);
       const eggToFlour = egg / Math.max(realFlour || flour, 1);
-      const eggProblemThreshold = isBrownieStyle ? 3.0 : 1.8;
-      const eggWarningThreshold = isBrownieStyle ? 2.6 : 1.4;
+      const eggProblemThreshold = isBrownieStyle ? 3.0 : isCakeStyle ? 2.2 : 1.8;
+      const eggWarningThreshold = isBrownieStyle ? 2.6 : isCakeStyle ? 1.85 : 1.4;
       if (eggToFlour > eggProblemThreshold) {
         warning = 'Too many eggs for this flour — result will be very puffy and cakey. Reduce eggs or add more flour.';
         color = 'red';
@@ -2537,8 +2601,8 @@ export function CreateRecipes() {
       // Cake/cupcake batters are legitimately wetter than cookie dough (~1.0–1.3 moisture vs flour).
       if (!isHighLiquidRecipe) {
         const liquidToFlour = totalMoisture / Math.max(flour, 1);
-        const problemL = isCakeStyle ? 1.45 : 1.1;
-        const warnL = isCakeStyle ? 1.28 : 0.7;
+        const problemL = isBarStyle ? 3.6 : isCakeStyle ? 1.45 : 1.1;
+        const warnL = isBarStyle ? 3.0 : isCakeStyle ? 1.28 : 0.7;
         if (liquidToFlour > problemL) {
           warning = 'Way too much liquid — batter will not hold shape and won\'t bake properly.';
           color = 'red';
@@ -2602,14 +2666,9 @@ export function CreateRecipes() {
        lowerNames.some(n => n.includes("chocolate")));
     const isBlondieStyle =
       /blondie/i.test(recipeName.toLowerCase()) || selectedStandardRecipe === "blondie-squares";
-    const isCookieStyle =
-      selectedStandardRecipe === "chocolate-chip-cookies" ||
-      selectedStandardRecipe === "sugar-cookies" ||
-      selectedStandardRecipe === "cookie-sandwiches-infused-filling" ||
-      /\b(chocolate chip cookie|sugar cookie)\b/i.test(recipeName);
-    const isCakeStyle =
-      /\b(cupcake|cupcakes|layer cake|birthday cake|sponge|chiffon|muffin)\b/i.test(recipeName) ||
-      selectedStandardRecipe === "mini-cupcakes-infused-frosting";
+    const isCookieStyle = isCookieTemplateRecipe(recipeName, selectedStandardRecipe);
+    const isCakeStyle = isCakeBatterStyleRecipe(recipeName, selectedStandardRecipe);
+    const isBarStyle = isBarTrayBakeRecipe(recipeName, selectedStandardRecipe);
     const isPancakeStyle =
       recipeName.toLowerCase().includes("pancake") ||
       recipeName.toLowerCase().includes("waffle") ||
@@ -2677,7 +2736,7 @@ export function CreateRecipes() {
     const issues: string[] = [];
     let severity: 'good' | 'warning' | 'problem' = 'good';
 
-    const moistureProblemThreshold = isCakeStyle ? 1.45 : 1.1;
+    const moistureProblemThreshold = isBarStyle ? 3.6 : isCakeStyle ? 1.45 : 1.1;
     // Way too much liquid — bail early (but only if not an intentional batter or cake batter)
     if (moistureRatio > moistureProblemThreshold && !isHighLiquidRecipe && !isBrownieStyle) {
       return {
@@ -2695,18 +2754,18 @@ export function CreateRecipes() {
     if (sugarRatio > sugarProblemThreshold)       { issues.push('sugar is very high — expect thin, sweet, fast-browning results'); tags.push({ label: 'Too much sugar', color: 'red' }); severity = 'problem'; }
     else if (sugarRatio > sugarWarningThreshold)  { issues.push('sugar is elevated — baked goods will spread more and brown faster'); tags.push({ label: 'High sugar', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    const fatProblemThreshold = isBrownieStyle ? 1.8 : 0.85;
-    const fatWarningThreshold = isBrownieStyle ? 1.4 : 0.65;
+    const fatProblemThreshold = isBrownieStyle || isBarStyle ? 1.8 : 0.85;
+    const fatWarningThreshold = isBrownieStyle || isBarStyle ? 1.4 : 0.65;
     if (fatRatio > fatProblemThreshold)        { issues.push('fat is very high — baked goods will be greasy and spread flat'); tags.push({ label: 'Too much fat', color: 'red' }); severity = 'problem'; }
     else if (fatRatio > fatWarningThreshold)   { issues.push('fat is elevated — expect significant spread, chill dough before baking'); tags.push({ label: 'High fat', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
     else if (fatRatio < 0.25 && flour > 100) { issues.push('low fat for this flour — dough may be dry and stiff'); tags.push({ label: 'Low fat', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    const eggProblemThreshold = isBrownieStyle ? 3.0 : 1.8;
-    const eggWarningThreshold = isBrownieStyle ? 2.6 : 1.4;
+    const eggProblemThreshold = isBrownieStyle ? 3.0 : isCakeStyle ? 2.2 : 1.8;
+    const eggWarningThreshold = isBrownieStyle ? 2.6 : isCakeStyle ? 1.85 : 1.4;
     if (eggRatio > eggProblemThreshold)          { issues.push('too many eggs for this flour — result will be very puffy and cakey'); tags.push({ label: 'Too many eggs', color: 'red' }); severity = 'problem'; }
     else if (eggRatio > eggWarningThreshold)     { issues.push('high egg ratio — will lean soft and cakey. Great for fudgy bakes'); tags.push({ label: 'High eggs', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    if (moistureRatio > 0.9 && !isHighLiquidRecipe && !isBrownieStyle && !isCakeStyle) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
+    if (moistureRatio > 0.9 && !isHighLiquidRecipe && !isBrownieStyle && !isCakeStyle && !isBarStyle) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
     if (leavenerRatio > 0.12)   { issues.push('leavener is very high — may taste bitter or soapy'); tags.push({ label: 'Too much leavener', color: 'red' }); severity = 'problem'; }
     else if (leavenerRatio > 0.08) { issues.push('leavener is elevated — fine for pancakes/quick breads, watch for cakes'); tags.push({ label: 'High leavener', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
