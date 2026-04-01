@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, Fragment } from "react";
 import { flushSync } from "react-dom";
-import { useSearchParams, useNavigate, useLocation } from "react-router";
+import { useSearchParams, useNavigate, useLocation, Link } from "react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -335,19 +335,21 @@ const DIRECT_CATEGORY_DEFAULTS: Record<string, string> = {
 type InfusionFunnelStep = 1 | 2 | 3;
 
 const INFUSION_FUNNEL_STEPS: { step: InfusionFunnelStep; label: string }[] = [
-  { step: 1, label: "Choose what you're making" },
-  { step: 2, label: "Choose your base" },
-  { step: 3, label: "Adjust servings & THC" },
+  { step: 1, label: "Make your base" },
+  { step: 2, label: "Choose what you want to make" },
+  { step: 3, label: "Adjust servings & strength, print labels or recipe" },
 ];
+
+const INFUSION_BASE_INTRO_KEY = "infusionSensei_ingredients_base_intro_ok";
 
 function InfusionFunnelProgressBar({
   activeStep,
-  categoryDoneLabel,
-  baseDoneLabel,
+  step1CompleteNote,
+  step2CompleteNote,
 }: {
   activeStep: InfusionFunnelStep;
-  categoryDoneLabel?: string;
-  baseDoneLabel?: string;
+  step1CompleteNote?: string;
+  step2CompleteNote?: string;
 }) {
   return (
     <div className="space-y-2 no-print mb-4">
@@ -393,16 +395,16 @@ function InfusionFunnelProgressBar({
           );
         })}
       </div>
-      {activeStep >= 2 && categoryDoneLabel && (
+      {activeStep >= 2 && step1CompleteNote && (
         <p className="flex items-start gap-2 rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm font-semibold text-green-900">
           <CheckCheck className="mt-0.5 h-4 w-4 shrink-0 text-green-600" aria-hidden />
-          <span>Step 1 complete: {categoryDoneLabel}</span>
+          <span>Step 1 complete: {step1CompleteNote}</span>
         </p>
       )}
-      {activeStep >= 3 && baseDoneLabel && (
+      {activeStep >= 3 && step2CompleteNote && (
         <p className="flex items-start gap-2 rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm font-semibold text-green-900">
           <CheckCheck className="mt-0.5 h-4 w-4 shrink-0 text-green-600" aria-hidden />
-          <span>Step 2 complete: {baseDoneLabel}</span>
+          <span>Step 2 complete: {step2CompleteNote}</span>
         </p>
       )}
     </div>
@@ -1522,6 +1524,18 @@ export function CreateRecipes() {
   /** Controls which print layout is shown when the print dialog opens. */
   const [printTarget, setPrintTarget] = useState<"full" | "buffet">("full");
 
+  const [baseIntroAcknowledged, setBaseIntroAcknowledged] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.sessionStorage.getItem(INFUSION_BASE_INTRO_KEY) === "1";
+  });
+
+  const acknowledgeBaseIntro = () => {
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem(INFUSION_BASE_INTRO_KEY, "1");
+    }
+    setBaseIntroAcknowledged(true);
+  };
+
   // What Can I Make - Ingredient Selection
   const [selectedPantryItems, setSelectedPantryItems] = useState<string[]>([]);
   const [selectedInfusionType, setSelectedInfusionType] = useState<string>("none");
@@ -1579,6 +1593,10 @@ export function CreateRecipes() {
       setSelectedCategory(cat);
       setRecipeType("standard");
       setSelectedStandardRecipe(rec);
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(INFUSION_BASE_INTRO_KEY, "1");
+      }
+      setBaseIntroAcknowledged(true);
     }
   }, [searchParams, setSearchParams]);
 
@@ -2766,6 +2784,7 @@ export function CreateRecipes() {
   };
 
   const handleCategoryStart = (categoryId: string) => {
+    acknowledgeBaseIntro();
     const defaultRecipeId = DIRECT_CATEGORY_DEFAULTS[categoryId];
     if (defaultRecipeId) {
       setSelectedCategory(categoryId);
@@ -2777,25 +2796,89 @@ export function CreateRecipes() {
     setSelectedCategory(categoryId);
   };
 
-  // STEP 1: Category Selection
-  if (!selectedCategory) {
+  // STEP 1: Make your base (intro — before category grid)
+  if (!selectedCategory && !baseIntroAcknowledged) {
     return (
       <div className="max-w-6xl mx-auto space-y-6">
         <InfusionFunnelProgressBar activeStep={1} />
 
+        <div className="bg-white border-2 border-green-200 rounded-2xl px-6 py-5 shadow-sm space-y-4">
+          <div>
+            <h1 className="text-2xl font-black text-gray-900">Step 1: Make your base</h1>
+            <p className="text-gray-600 text-sm mt-2 leading-relaxed">
+              Use cannabutter, infused oil, a tincture, distillate, or a premade THC product already dosed — like a
+              squeeze bottle or stir-in packet. Save everything in{" "}
+              <span className="font-semibold text-green-800">My Infusions</span> so your recipes stay consistent.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button asChild className="bg-green-600 hover:bg-green-700 font-bold">
+              <Link
+                to="/infusions"
+                onClick={() => trackEvent("ingredients_hub_click", { target: "infusions", step: "make_base" })}
+              >
+                Open My Infusions <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              className="border-green-300 text-green-800 font-semibold hover:bg-green-50"
+              onClick={() => {
+                trackEvent("ingredients_hub_click", { target: "calculator", step: "make_base" });
+                navigate("/edibles-calculator");
+              }}
+            >
+              <Calculator className="w-4 h-4 mr-2" />
+              THC calculator
+            </Button>
+          </div>
+          <Button
+            className="w-full sm:w-auto bg-green-800 hover:bg-green-900 font-bold"
+            onClick={() => {
+              acknowledgeBaseIntro();
+              trackEvent("ingredients_base_intro_continue", { target: "choose_what_to_make" });
+            }}
+          >
+            Continue — choose what you want to make <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+          <p className="text-xs text-gray-500">
+            No infusion yet? Use the calculator or My Infusions first — or continue and pick a recipe; you can attach a
+            base in the builder.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // STEP 2: Category Selection
+  if (!selectedCategory) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-6">
+        <InfusionFunnelProgressBar
+          activeStep={2}
+          step1CompleteNote="Base step covered — use My Infusions for oils, tinctures, premade squeezes, or the calculator"
+        />
+
         <div className="bg-white border-2 border-green-200 rounded-2xl px-6 py-4 shadow-sm">
           <div>
             <h1 className="text-2xl font-black text-gray-900">Start Your Infusion</h1>
-            <p className="text-gray-700 text-sm mt-0.5 font-semibold">Step 1: Choose what you're making</p>
-            <p className="text-gray-500 text-sm mt-0.5">We'll calculate THC automatically as you go.</p>
+            <p className="text-gray-700 text-sm mt-0.5 font-semibold">Step 2: Choose what you want to make</p>
+            <p className="text-gray-500 text-sm mt-0.5">Pick a category, then a recipe — we'll keep your dose math in sync.</p>
           </div>
         </div>
 
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">Recommended flow</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">Need your base first?</p>
           <p className="text-sm text-gray-700 mb-3">
-            Build your infused base here, then choose a recipe to apply it—or choose one of our premade bases, a
-            tincture, or a premade THC-infused base like a squeeze bottle.
+            Open{" "}
+            <Link
+              to="/infusions"
+              className="font-semibold text-green-800 underline hover:text-green-900"
+              onClick={() => trackEvent("ingredients_hub_click", { target: "infusions", location: "recommended_flow" })}
+            >
+              My Infusions
+            </Link>{" "}
+            for saved butter, oil, tincture, or premade THC products — or use the calculator to plan potency.
           </p>
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <Button
@@ -2827,7 +2910,7 @@ export function CreateRecipes() {
                 }}
                 className="underline font-semibold hover:text-green-900"
               >
-                Manage infusions
+                My Infusions
               </button>
             </p>
           </div>
@@ -3055,7 +3138,7 @@ export function CreateRecipes() {
       <div className="max-w-4xl mx-auto space-y-5">
         <InfusionFunnelProgressBar
           activeStep={2}
-          categoryDoneLabel={`${category?.name ?? "Category"} selected`}
+          step1CompleteNote="Base step covered — pick a recipe to load your ingredients"
         />
 
         {/* Compact breadcrumb header */}
@@ -3071,8 +3154,8 @@ export function CreateRecipes() {
 
         {/* Main question */}
         <div>
-          <h1 className="text-2xl font-black text-gray-900">Choose a starting recipe</h1>
-          <p className="text-gray-500 text-sm mt-1">Pick one to load — you can customize every ingredient and serving size after.</p>
+          <h1 className="text-2xl font-black text-gray-900">Choose what you want to make</h1>
+          <p className="text-gray-500 text-sm mt-1">Pick a recipe to load — Step 3 is where you adjust servings, strength, and print.</p>
         </div>
 
         {/* Recipe cards — horizontal list */}
@@ -3162,14 +3245,13 @@ export function CreateRecipes() {
 
     const infusedIngredients = ingredients.filter(i => i.isInfused && i.thcPerUnit);
 
-    const funnelCategoryDone = `${category?.name ?? "Category"} selected`;
-    const funnelBaseDone = startingRecipeName
-      ? `${startingRecipeName} selected`
+    const funnelStep1Done =
+      "Base ready — swap in cannabutter, oil, tincture, or a premade squeeze in the ingredient list";
+    const funnelStep2Done = startingRecipeName
+      ? `${category?.name ?? "Category"} · ${startingRecipeName}`
       : recipeType === "custom"
-        ? "Custom recipe started"
-        : recipeName.trim()
-          ? `${recipeName.trim()} loaded`
-          : "Recipe loaded";
+        ? `${recipeName.trim() || "Custom recipe"} ready to customize`
+        : `${recipeName.trim() || "Recipe"} loaded — adjust servings & strength below`;
 
     return (
       <>
@@ -3545,8 +3627,8 @@ export function CreateRecipes() {
         <div className="screen-only max-w-7xl mx-auto">
           <InfusionFunnelProgressBar
             activeStep={3}
-            categoryDoneLabel={funnelCategoryDone}
-            baseDoneLabel={funnelBaseDone}
+            step1CompleteNote={funnelStep1Done}
+            step2CompleteNote={funnelStep2Done}
           />
 
           {/* ── TOP BAR ──────────────────────────────────────── */}
