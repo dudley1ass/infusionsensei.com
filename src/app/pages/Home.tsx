@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { ChefHat, Clock, ArrowRight, Calculator, TrendingUp, Zap } from "lucide-react";
+import { ChefHat, Clock, ArrowRight, TrendingUp, Zap } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -9,37 +8,7 @@ import { recipes } from "../data/recipes";
 import { trackEvent } from "../utils/analytics";
 
 export function Home() {
-  const [heroVariant, setHeroVariant] = useState<"A" | "B">("A");
   const featuredRecipes = recipes.filter(r => r.isNew).slice(0, 3);
-  const heroCtas = useMemo(() => {
-    const variantA = [
-      { key: "calculator", to: "/edibles-calculator", label: "THC Calculator", style: "primary" as const },
-      { key: "ingredients", to: "/ingredients", label: "Start with Ingredients", style: "outline" as const },
-      { key: "recipes", to: "/recipes", label: "Browse Recipes", style: "outline" as const },
-    ];
-    const variantB = [
-      { key: "ingredients", to: "/ingredients", label: "Start with Ingredients", style: "primary" as const },
-      { key: "calculator", to: "/edibles-calculator", label: "THC Calculator", style: "outline" as const },
-      { key: "recipes", to: "/recipes", label: "Browse Recipes", style: "outline" as const },
-    ];
-    return heroVariant === "A" ? variantA : variantB;
-  }, [heroVariant]);
-
-  useEffect(() => {
-    const key = "is_home_hero_variant";
-    const existing = localStorage.getItem(key);
-    if (existing === "A" || existing === "B") {
-      setHeroVariant(existing);
-      return;
-    }
-    const assigned = Math.random() < 0.5 ? "A" : "B";
-    localStorage.setItem(key, assigned);
-    setHeroVariant(assigned);
-  }, []);
-
-  useEffect(() => {
-    trackEvent("homepage_variant_seen", { variant: heroVariant });
-  }, [heroVariant]);
 
   return (
     <div className="space-y-14">
@@ -50,38 +19,59 @@ export function Home() {
       </Helmet>
 
       {/* HERO */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-800 via-green-700 to-green-900 px-6 py-12 md:py-16 shadow-2xl">
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-800 via-green-700 to-green-900 px-4 py-6 sm:px-6 sm:py-8 md:py-10 shadow-2xl">
         <div className="absolute top-0 right-0 w-72 h-72 bg-green-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-green-900/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
         <div className="relative z-10 max-w-5xl mx-auto">
-          <div className="text-center mb-3">
+          <div className="text-center mb-1">
             <Badge className="bg-green-900/70 text-green-200 border border-green-600/50 mb-4 text-sm px-4 py-1.5 inline-flex">
               <Zap className="w-3.5 h-3.5 mr-1.5" /> Free edible maker + dose tools
             </Badge>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-3 leading-tight">
               Calculate Exact THC in Your Edibles
             </h1>
-            <p className="text-green-300 text-base font-semibold mb-6">
+            <p className="text-green-300 text-sm sm:text-base font-semibold mb-3">
               Enter your flower and butter or oil to get precise mg per serving - no guessing.
             </p>
-            <p className="text-green-400 text-sm mb-6">Start by building your infused base, then use it in recipes.</p>
+            <p className="text-green-400 text-xs sm:text-sm mb-3">Start by building your infused base, then use it in recipes.</p>
           </div>
 
-          {/* Image-based snack cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
+          <div className="flex justify-center mb-3">
+            <Link
+              to="/ingredients"
+              onClick={() => {
+                trackEvent("homepage_cta_click", { location: "hero", target: "ingredients" });
+                trackEvent("homepage_primary_cta_click", { location: "hero", target: "ingredients" });
+              }}
+            >
+              <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-sm sm:text-base px-6 sm:px-8 py-4 sm:py-5 shadow-xl rounded-xl transition-transform hover:scale-105">
+                Start My Infusion (Free) <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+          <p className="text-center text-green-200 text-xs sm:text-sm mb-3">
+            <Link to="/edibles-calculator" onClick={() => trackEvent("homepage_cta_click", { location: "hero_secondary", target: "calculator" })} className="hover:text-white font-semibold">Use calculator instead</Link>
+            {" "}·{" "}
+            <Link to="/recipes" onClick={() => trackEvent("homepage_cta_click", { location: "hero_secondary", target: "recipes" })} className="hover:text-white font-semibold">Browse recipes</Link>
+          </p>
+
+          {/* What are you making today? */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-4">
             {[
-              { emoji: "🍗", label: "Wings", sub: "Start here", to: "/wings", img: "/IMAGES/chickenwings.jpg", highlight: false },
-              { emoji: "🍿", label: "Popcorn", sub: "Start here", to: "/popcorn", img: "/IMAGES/popcorn.webp", highlight: false },
-              { emoji: "☕", label: "Coffee", sub: "Start here", to: "/coffee", img: "/IMAGES/coffee.jpg", highlight: false },
-              { emoji: "🥣", label: "Spreads & Dips", sub: "Dips + party sauces", to: "/spreads-dips", img: ["/IMAGES/spreadsdips.jpg", "/images/spreadsdips.jpg", "/IMAGES/fries.jpg"], highlight: false },
-              { emoji: "🍬", label: "Jello", sub: "Dose-controlled cubes", to: "/jello", img: "/IMAGES/jello-shots.png", highlight: true },
+              { emoji: "🍗", label: "Wings", sub: "Start here", to: "/wings", img: "/IMAGES/chickenwings.jpg", highlight: false, mobilePriority: true },
+              { emoji: "🍿", label: "Popcorn", sub: "Start here", to: "/popcorn", img: "/IMAGES/popcorn.webp", highlight: false, mobilePriority: true },
+              { emoji: "☕", label: "Coffee", sub: "Start here", to: "/coffee", img: "/IMAGES/coffee.jpg", highlight: false, mobilePriority: true },
+              { emoji: "🍬", label: "Jello", sub: "Dose-controlled cubes", to: "/jello", img: "/IMAGES/jello-shots.png", highlight: true, mobilePriority: true },
               { emoji: "🧸", label: "Gummies", sub: "Single-piece dosing", to: "/gummies", img: "/IMAGES/gummies.jpg", highlight: true },
               { emoji: "🎉", label: "Party Snacks", sub: "Handheld + controllable", to: "/party-snacks", img: "/IMAGES/popcorn.webp", highlight: true },
-              { emoji: "🍽️", label: "Dinner of the Week", sub: "New this week", to: "/dinner-of-the-week", img: ["/IMAGES/steakalfredo.jpg", "/IMAGES/steakalfredo.jpeg", "/IMAGES/steakalfredo.png", "/IMAGES/steakalfredo.webp"], highlight: true },
-              { emoji: "🎉", label: "Party Mode", sub: "Hosting? Start here", to: "/party-mode", img: ["/IMAGES/partynight.jpg", "/IMAGES/partynight.jpeg", "/IMAGES/partynight.png", "/IMAGES/partynight.webp"], highlight: true },
-            ].map(({ emoji, label, sub, to, img, highlight }) => (
-              <Link key={label} to={to}>
-                <div className={`relative overflow-hidden rounded-2xl h-32 md:h-40 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-white/50 group`}>
+            ].map(({ emoji, label, sub, to, img, highlight, mobilePriority }) => (
+              <Link
+                key={label}
+                to={to}
+                onClick={() => trackEvent("homepage_tile_click", { tile_id: label.toLowerCase().replace(/\s+/g, "-"), target: to })}
+                className={mobilePriority ? "" : "hidden sm:block"}
+              >
+                <div className={`relative overflow-hidden rounded-2xl h-24 sm:h-32 md:h-40 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-white/50 group`}>
                   {img ? (
                     <img
                       src={Array.isArray(img) ? img[0] : img}
@@ -103,45 +93,16 @@ export function Home() {
                     <div className="absolute inset-0 bg-gradient-to-br from-green-700 to-green-900" />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                  {highlight && <div className="absolute top-2 left-2"><span className="bg-green-500 text-white text-xs font-black px-2 py-0.5 rounded-full">NEW</span></div>}
+                  {highlight && <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2"><span className="bg-green-500 text-white text-[10px] sm:text-xs font-black px-1.5 sm:px-2 py-0.5 rounded-full">NEW</span></div>}
                   <div className="absolute inset-0 flex flex-col justify-end p-3">
-                    <div className="text-2xl mb-1">{emoji}</div>
-                    <div className="text-white font-black text-sm leading-tight">{label}</div>
-                    <div className="text-green-300 text-xs mt-0.5">{sub}</div>
+                    <div className="text-lg sm:text-2xl mb-0.5 sm:mb-1">{emoji}</div>
+                    <div className="text-white font-black text-xs sm:text-sm leading-tight">{label}</div>
+                    <div className="text-green-300 text-[10px] sm:text-xs mt-0.5">{sub}</div>
                   </div>
                   <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="bg-white/20 rounded-full p-1"><ArrowRight className="w-3 h-3 text-white" /></div>
                   </div>
                 </div>
-              </Link>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-4xl mx-auto">
-            {heroCtas.map((cta) => (
-              <Link
-                key={cta.key}
-                to={cta.to}
-                onClick={() => {
-                  trackEvent("homepage_cta_click", { location: "hero", target: cta.key, variant: heroVariant });
-                  trackEvent(cta.style === "primary" ? "homepage_primary_cta_click" : "homepage_secondary_cta_click", {
-                    location: "hero",
-                    target: cta.key,
-                    variant: heroVariant,
-                  });
-                }}
-              >
-                <Button
-                  size="lg"
-                  variant={cta.style === "primary" ? "default" : "outline"}
-                  className={cta.style === "primary"
-                    ? "w-full bg-white text-green-800 hover:bg-green-50 font-black text-base px-6 py-5 shadow-xl rounded-xl transition-transform hover:scale-105"
-                    : "w-full border-2 border-white/40 text-white hover:bg-white/10 font-bold text-base px-6 py-5 rounded-xl"
-                  }
-                >
-                  {cta.key === "calculator" && <Calculator className="w-4 h-4 mr-2" />}
-                  {cta.label}
-                </Button>
               </Link>
             ))}
           </div>
