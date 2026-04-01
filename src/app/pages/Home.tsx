@@ -38,14 +38,14 @@ export function Home() {
 
           <div className="flex justify-center mb-1.5">
             <Link
-              to="/edibles-calculator"
+              to="/ingredients"
               onClick={() => {
-                trackEvent("homepage_cta_click", { location: "hero", target: "calculator" });
-                trackEvent("homepage_primary_cta_click", { location: "hero", target: "calculator" });
+                trackEvent("homepage_cta_click", { location: "hero", target: "ingredients" });
+                trackEvent("homepage_primary_cta_click", { location: "hero", target: "ingredients" });
               }}
             >
               <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-sm sm:text-base px-6 sm:px-8 py-4 sm:py-5 shadow-xl rounded-xl transition-transform hover:scale-105">
-                Start My Infusion (Free) <ArrowRight className="w-4 h-4 ml-2" />
+                Start Here (Free) <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
           </div>

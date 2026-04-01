@@ -311,6 +311,64 @@ export function PartySnacks() {
 
   const showPrintSheet = uniqueInfusedIds.length > 0 && !hasDuplicatePicks;
 
+  const printSnackLabels = () => {
+    if (!showPrintSheet) return;
+    const labelRows = uniqueInfusedIds
+      .map((id) => {
+        const name = (snackNameById.get(id) ?? id)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+        const totalThc = mgEachTarget * guestCount;
+        return `
+          <div class="label-card">
+            <h2>${name}</h2>
+            <p><strong>mg per serving:</strong> ${mgEachTarget.toFixed(1)}mg</p>
+            <p><strong>Total servings:</strong> ${guestCount}</p>
+            <p><strong>Total THC:</strong> ${totalThc.toFixed(1)}mg</p>
+            <p class="foot">Infusion Sensei</p>
+          </div>
+        `;
+      })
+      .join("");
+
+    const popup = window.open("", "_blank", "width=980,height=760");
+    if (!popup) return;
+    popup.document.write(`
+      <!doctype html>
+      <html>
+        <head>
+          <title>Party Snack Labels</title>
+          <style>
+            @page { margin: 0.5in; size: letter; }
+            body { font-family: Arial, sans-serif; margin: 0; color: #111; }
+            .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+            .label-card {
+              border: 2px solid #111;
+              border-radius: 10px;
+              padding: 12px;
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
+            h2 { margin: 0 0 8px; font-size: 20px; line-height: 1.2; }
+            p { margin: 4px 0; font-size: 15px; }
+            .foot { margin-top: 10px; font-size: 12px; color: #555; }
+          </style>
+        </head>
+        <body>
+          <div class="grid">${labelRows}</div>
+          <script>
+            window.onload = function () {
+              window.print();
+              window.onafterprint = function () { window.close(); };
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    popup.document.close();
+  };
+
   return (
     <>
       <div className="app-print-hide max-w-6xl mx-auto space-y-8">
@@ -511,6 +569,14 @@ export function PartySnacks() {
                 <Button type="button" variant="outline" className="font-bold gap-2" onClick={() => window.print()}>
                   <Printer className="w-4 h-4" /> Print / Save PDF
                 </Button>
+                <Button type="button" variant="outline" className="font-bold gap-2 border-purple-300 text-purple-700 hover:bg-purple-50" onClick={printSnackLabels}>
+                  <Printer className="w-4 h-4" /> Print Labels
+                </Button>
+                <Link to="/party-mode">
+                  <Button type="button" variant="outline" className="font-bold gap-2 border-indigo-300 text-indigo-700 hover:bg-indigo-50">
+                    Party Planner <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
               </>
             )}
           </div>
