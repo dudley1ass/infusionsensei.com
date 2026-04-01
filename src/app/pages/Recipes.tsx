@@ -116,7 +116,7 @@ export function Recipes() {
               <span className="text-green-800 font-bold">{newCount} New Recipes Added!</span>
             </div>
           )}
-          <Link to="/ingredients">
+          <Link to="/ingredients" state={{ resetStartHere: true }}>
             <Button className="bg-green-600 hover:bg-green-700 gap-2 font-bold">
               <Calculator className="w-4 h-4" /> Build Custom Recipe
             </Button>
@@ -213,6 +213,7 @@ export function Recipes() {
                   {/* Funnel CTA */}
                   <Link
                     to={recipe.category === "spreads-dips" ? recipe.route : "/ingredients"}
+                    state={recipe.category === "spreads-dips" ? undefined : { resetStartHere: true }}
                     onClick={(e) => e.stopPropagation()}
                     className="flex items-center justify-center gap-2 w-full bg-green-50 hover:bg-green-100 border border-green-300 hover:border-green-500 text-green-700 font-bold text-sm py-2 rounded-lg transition-all group/cta"
                   >

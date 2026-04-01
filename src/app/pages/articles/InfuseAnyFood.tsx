@@ -142,7 +142,7 @@ export function InfuseAnyFood() {
             <h3 className="text-xl font-black text-gray-900 mb-2">Use the Recipe Builder</h3>
             <p className="text-gray-600 mb-4 text-sm">Load any recipe into the builder, swap in your infused fat, and get exact THC per serving before you cook.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to="/ingredients"><button className="bg-purple-600 hover:bg-purple-700 text-white font-black px-6 py-3 rounded-xl transition-colors flex items-center gap-2">Open Recipe Builder <ArrowRight className="w-4 h-4" /></button></Link>
+              <Link to="/ingredients" state={{ resetStartHere: true }}><button className="bg-purple-600 hover:bg-purple-700 text-white font-black px-6 py-3 rounded-xl transition-colors flex items-center gap-2">Open Recipe Builder <ArrowRight className="w-4 h-4" /></button></Link>
               <Link to="/edibles-calculator"><button className="border-2 border-purple-600 text-purple-700 hover:bg-purple-50 font-black px-6 py-3 rounded-xl transition-colors">THC Calculator</button></Link>
             </div>
           </div>

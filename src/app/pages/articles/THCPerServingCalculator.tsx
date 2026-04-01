@@ -93,7 +93,7 @@ export function THCPerServingCalculator() {
             <p className="font-black text-green-900 text-lg">Build base -&gt; use recipe -&gt; verify dose</p>
             <p className="text-green-700 text-sm mt-0.5 mb-3">Use this exact flow to avoid potency surprises and get repeatable servings.</p>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Link to="/ingredients" className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm">
+              <Link to="/ingredients" state={{ resetStartHere: true }} className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm">
                 Build Your Infused Base <ArrowRight className="w-4 h-4" />
               </Link>
               <Link to="/recipes" className="inline-flex items-center justify-center gap-2 border border-green-300 text-green-800 hover:bg-green-100 font-bold px-5 py-2.5 rounded-xl transition-colors text-sm">
@@ -139,7 +139,7 @@ export function THCPerServingCalculator() {
           <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-6 text-white text-center">
             <p className="text-lg font-bold mb-1">Ready to calculate your exact dose?</p>
             <p className="text-green-100 text-sm mb-4">Start with your infused base, then apply it to recipes and confirm final mg per serving.</p>
-            <Link to="/ingredients" className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
+            <Link to="/ingredients" state={{ resetStartHere: true }} className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-5 py-2.5 rounded-lg hover:bg-green-50 transition-colors text-sm">
               Start Here: Build Your Base <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

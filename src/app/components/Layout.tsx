@@ -36,12 +36,15 @@ export function Layout() {
     return location.pathname.startsWith(path);
   };
 
+  const startHereState = { resetStartHere: true as const };
+
   const NavLinks = ({ mobile = false, compact = false }: { mobile?: boolean; compact?: boolean }) => (
     <>
       {navItems.map((item) => (
         <Link
           key={item.path}
           to={item.path}
+          state={item.path === "/ingredients" ? startHereState : undefined}
           className={`flex items-center rounded-lg transition-colors font-medium ${
             compact && !mobile
               ? "gap-1.5 px-2.5 py-1.5 text-sm"

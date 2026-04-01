@@ -39,6 +39,7 @@ export function Home() {
           <div className="flex justify-center mb-1.5">
             <Link
               to="/ingredients"
+              state={{ resetStartHere: true }}
               onClick={() => {
                 trackEvent("homepage_cta_click", { location: "hero", target: "ingredients" });
                 trackEvent("homepage_primary_cta_click", { location: "hero", target: "ingredients" });

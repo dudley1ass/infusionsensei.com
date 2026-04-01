@@ -51,7 +51,7 @@ export function BestEdibleBasesBeginners() {
             </p>
             <p className="text-sm text-gray-600">
               Next step: save your batch on <Link to="/infusions" className="text-green-700 font-semibold underline">My Infusions</Link>, then select it in the{" "}
-              <Link to="/ingredients" className="text-green-700 font-semibold underline">recipe builder</Link> so servings math stays honest.
+              <Link to="/ingredients" state={{ resetStartHere: true }} className="text-green-700 font-semibold underline">recipe builder</Link> so servings math stays honest.
             </p>
           </section>
 
