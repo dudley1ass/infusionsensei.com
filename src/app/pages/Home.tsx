@@ -121,8 +121,8 @@ export function Home() {
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
             <Link
-              to="/ingredients"
-              onClick={() => trackEvent("homepage_start_here_cta_click", { location: "start_here_module", target: "ingredients" })}
+              to="/infusions"
+              onClick={() => trackEvent("homepage_start_here_cta_click", { location: "start_here_module", target: "infusions" })}
             >
               <Button className="bg-green-600 hover:bg-green-700 font-bold">
                 Start Here: Build Your Base <ArrowRight className="w-4 h-4 ml-2" />
