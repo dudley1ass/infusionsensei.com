@@ -489,6 +489,71 @@ export function PartyPackPlanner() {
     localStorage.setItem(wingsReturnCtxKey, JSON.stringify({ peopleCount }));
   };
 
+  const printSnackLabels = () => {
+    const labelRows = items
+      .map((item) => {
+        const totalThc = item.qty * item.mgEach;
+        const safeName = item.name
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+        const safeUnit = item.unitLabel
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+        return `
+          <div class="label-card">
+            <h2>${safeName}</h2>
+            <p><strong>mg per serving:</strong> ${item.mgEach.toFixed(1)}mg</p>
+            <p><strong>Total servings:</strong> ${item.qty} ${safeUnit}</p>
+            <p><strong>Total THC:</strong> ${totalThc.toFixed(1)}mg</p>
+            <p class="foot">Infusion Sensei</p>
+          </div>
+        `;
+      })
+      .join("");
+
+    const popup = window.open("", "_blank", "width=1000,height=800");
+    if (!popup) return;
+    popup.document.write(`
+      <!doctype html>
+      <html>
+        <head>
+          <title>Snack Labels - ${pack.title}</title>
+          <style>
+            @page { margin: 0.5in; size: letter; }
+            body { font-family: Arial, sans-serif; margin: 0; color: #111; }
+            .grid {
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 12px;
+            }
+            .label-card {
+              border: 2px solid #111;
+              border-radius: 10px;
+              padding: 12px;
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
+            h2 { margin: 0 0 8px; font-size: 20px; line-height: 1.2; }
+            p { margin: 4px 0; font-size: 15px; }
+            .foot { margin-top: 10px; font-size: 12px; color: #555; }
+          </style>
+        </head>
+        <body>
+          <div class="grid">${labelRows}</div>
+          <script>
+            window.onload = function () {
+              window.print();
+              window.onafterprint = function () { window.close(); };
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    popup.document.close();
+  };
+
   const savoryGuidance = useMemo(() => {
     if (!isSavoryPack) return "";
     if (savoryInfusedItemId === "savory-main") return "Infusing the protein/main: prepare starch and vegetable sides however you like.";
@@ -901,6 +966,10 @@ export function PartyPackPlanner() {
         <Button onClick={() => window.print()} variant="outline" className="font-bold">
           <Printer className="w-4 h-4 mr-1.5" />
           Print Party Package
+        </Button>
+        <Button onClick={printSnackLabels} variant="outline" className="font-bold border-purple-300 text-purple-700 hover:bg-purple-50">
+          <Printer className="w-4 h-4 mr-1.5" />
+          Print Snack Labels
         </Button>
         <Link to={`/party-mode/plan/${encodeURIComponent(pack.id)}/grocery`} onClick={saveGroceryDraft}>
           <Button variant="outline" className="font-bold border-blue-300 text-blue-700 hover:bg-blue-50">

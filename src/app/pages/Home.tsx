@@ -38,10 +38,10 @@ export function Home() {
 
           <div className="flex justify-center mb-1.5">
             <Link
-              to="/ingredients"
+              to="/edibles-calculator"
               onClick={() => {
-                trackEvent("homepage_cta_click", { location: "hero", target: "ingredients" });
-                trackEvent("homepage_primary_cta_click", { location: "hero", target: "ingredients" });
+                trackEvent("homepage_cta_click", { location: "hero", target: "calculator" });
+                trackEvent("homepage_primary_cta_click", { location: "hero", target: "calculator" });
               }}
             >
               <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-sm sm:text-base px-6 sm:px-8 py-4 sm:py-5 shadow-xl rounded-xl transition-transform hover:scale-105">
