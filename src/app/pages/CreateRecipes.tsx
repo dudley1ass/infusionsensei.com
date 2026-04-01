@@ -326,10 +326,8 @@ const recipeCategories = [
   { id: "breads-breakfast",name: "🍞 Breads & Breakfast", emoji: "🍞", description: "Muffins, pancakes, breakfast" },
 ];
 
-/** Categories that jump straight into the builder with a default recipe. Others open recipe selection first. */
-const DIRECT_CATEGORY_DEFAULTS: Record<string, string> = {
-  wings: "classic-buffalo-wings",
-};
+/** Optional category → default recipe id for skipping the picker. Empty: every category opens recipe selection first. */
+const DIRECT_CATEGORY_DEFAULTS: Record<string, string> = {};
 
 type InfusionFunnelStep = 1 | 2 | 3;
 
