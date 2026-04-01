@@ -2954,7 +2954,7 @@ export function CreateRecipes() {
                   {standardRecipes[category.id]?.length || 0} recipes
                 </Badge>
                 <div className="text-xs font-bold text-green-700 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  Start ->
+                    Start →
                 </div>
               </CardContent>
             </Card>
