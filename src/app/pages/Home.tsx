@@ -55,6 +55,17 @@ export function Home() {
             {" "}·{" "}
             <Link to="/recipes" onClick={() => trackEvent("homepage_cta_click", { location: "hero_secondary", target: "recipes" })} className="hover:text-white font-semibold">Browse recipes</Link>
           </p>
+          <div className="rounded-2xl border border-white/20 bg-black/20 p-3 mb-2">
+            <p className="text-white font-black text-sm sm:text-base text-center">Start Your Infusion Plan</p>
+            <div className="mt-2 flex flex-col sm:flex-row gap-2 justify-center">
+              <Link to="/edibles-calculator" onClick={() => trackEvent("homepage_funnel_click", { target: "calculator" })}>
+                <Button className="bg-white text-green-800 hover:bg-green-50 font-bold w-full sm:w-auto">Use Calculator</Button>
+              </Link>
+              <Link to="/party-mode" onClick={() => trackEvent("homepage_funnel_click", { target: "party_mode" })}>
+                <Button variant="outline" className="border-white/40 text-white hover:bg-white/10 font-bold w-full sm:w-auto">Plan Party Mode</Button>
+              </Link>
+            </div>
+          </div>
 
           {/* What are you making today? */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-1.5 sm:mb-2">

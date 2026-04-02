@@ -38,9 +38,15 @@ export function captureUtmFromUrl(search: string): void {
 
   const hasUTM = !!(source || medium || campaign || content || term);
   if (hasUTM) {
+    const normalizedSource = (source || "unknown").toLowerCase();
+    const inferredMedium =
+      medium ||
+      (["tiktok", "reddit", "instagram", "facebook", "x", "twitter", "youtube", "pinterest"].includes(normalizedSource)
+        ? "social"
+        : undefined);
     const data: UTMAttribution = {
-      source: (source || "unknown").toLowerCase(),
-      medium: (medium || "unknown").toLowerCase(),
+      source: normalizedSource,
+      medium: (inferredMedium || "unknown").toLowerCase(),
       campaign: campaign || undefined,
       content: content || undefined,
       term: term || undefined,

@@ -21,6 +21,13 @@ export function CannabisEdibleRecipesPage() {
           <Link to="/edibles-calculator"><Button className="bg-white text-orange-700 hover:bg-orange-50 font-black px-6 py-3">Calculate My Dose <ArrowRight className="w-4 h-4 ml-2" /></Button></Link>
           <Link to="/recipes"><Button variant="outline" className="border-white/40 text-white hover:bg-white/10 font-bold px-6 py-3">Browse All Recipes</Button></Link>
         </div>
+        <div className="mt-4 rounded-2xl border border-white/25 bg-black/20 p-3">
+          <p className="text-orange-100 text-sm font-bold mb-2">Start Your Infusion Plan</p>
+          <div className="flex flex-wrap gap-2">
+            <Link to="/edibles-calculator"><Button className="bg-white text-orange-700 hover:bg-orange-50 font-bold">Calculator</Button></Link>
+            <Link to="/party-mode"><Button variant="outline" className="border-white/40 text-white hover:bg-white/10 font-bold">Party Mode</Button></Link>
+          </div>
+        </div>
       </div>
 
       {/* Section 1: Base Infusions */}

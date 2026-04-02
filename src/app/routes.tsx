@@ -33,6 +33,10 @@ import { InfuseAnyFood } from "./pages/articles/InfuseAnyFood";
 import { InfusedPeanutButterArticle } from "./pages/articles/InfusedPeanutButterArticle";
 import InfusedCreamCheeseArticle from "./pages/articles/InfusedCreamCheese";
 import { BestEdibleBasesBeginners } from "./pages/articles/BestEdibleBasesBeginners";
+import { HowToMakeCannabutter } from "./pages/articles/HowToMakeCannabutter";
+import { ThcDosageCalculatorExplained } from "./pages/articles/ThcDosageCalculatorExplained";
+import { HowStrongAreHomemadeEdibles } from "./pages/articles/HowStrongAreHomemadeEdibles";
+import { WeedButterRatioGuide } from "./pages/articles/WeedButterRatioGuide";
 import { DinnerOfTheWeek } from "./pages/DinnerOfTheWeek";
 import { PartyMode } from "./pages/PartyMode";
 import { WingSauces } from "./pages/WingSauces";
@@ -117,6 +121,10 @@ export const router = createBrowserRouter([
       { path: "learn/articles/infused-peanut-butter", Component: InfusedPeanutButterArticle },
       { path: "learn/articles/infused-cream-cheese", Component: InfusedCreamCheeseArticle },
       { path: "learn/articles/best-edible-bases-beginners", Component: BestEdibleBasesBeginners },
+      { path: "learn/articles/how-to-make-cannabutter", Component: HowToMakeCannabutter },
+      { path: "learn/articles/thc-dosage-calculator-explained", Component: ThcDosageCalculatorExplained },
+      { path: "learn/articles/how-strong-are-homemade-edibles", Component: HowStrongAreHomemadeEdibles },
+      { path: "learn/articles/weed-butter-ratio-guide", Component: WeedButterRatioGuide },
       { path: "learn/articles/how-to-dose-edibles-safely", Component: DosingGuide },
       { path: "learn/articles/why-edibles-hit-harder", Component: WhyEdiblesHitTooHard },
       { path: "learn/articles/how-to-calculate-thc-in-edibles", Component: THCPerServingCalculator },
