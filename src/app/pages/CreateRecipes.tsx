@@ -319,7 +319,7 @@ const recipeCategories = [
   { id: "baked-goods",     name: "🍪 Baked Goods",       emoji: "🍪", description: "Cookies, brownies, cakes" },
   { id: "wings",           name: "🍗 Wings",              emoji: "🍗", description: "Buffalo, garlic parm, Nashville hot" },
   { id: "spreads-dips",    name: "🥣 Spreads & Dips",     emoji: "🥣", description: "Dips, spreads & party sauces" },
-  { id: "snacks",          name: "🍿 Snacks & Candy",     emoji: "🍿", description: "Popcorn, gummies, protein bars" },
+  { id: "snacks",          name: "🍿 Snacks & Candy",     emoji: "🍿", description: "Popcorn, fudge, gummies, protein bars" },
   { id: "drinks",          name: "🥤 Drinks & Coffee",    emoji: "🥤", description: "Coffee, smoothies, cocktails" },
   { id: "savory-meals",    name: "🍝 Savory & Meals",     emoji: "🍝", description: "Pasta, pizza, steak" },
   { id: "ice-cream",       name: "🍨 Ice Cream & Frozen", emoji: "🍨", description: "Ice cream, popsicles" },
@@ -1074,6 +1074,21 @@ export const standardRecipes: Record<string, any[]> = {
         "Remove from heat, fold in rice cereal until coated.",
         "Press into a parchment-lined pan and cool fully.",
         "Cut into equal squares for your serving count — one square ≈ one portion when planning by guests.",
+      ],
+    },
+    {
+      id: "infused-chocolate-fudge",
+      name: "Infused Chocolate Fudge (No-Bake)",
+      servings: 25,
+      ingredients: ["Sweetened Condensed Milk","Semi-Sweet Chips","Cannabutter","Unsalted Butter","Vanilla Extract","Salt"],
+      amounts: [414,510,42,14,5,1],
+      units: ["ml","g","g","g","ml","g"],
+      instructions: [
+        "Line an 8x8 pan with parchment (edges overhang for easy lift-out).",
+        "Combine sweetened condensed milk and semi-sweet chips in a heavy saucepan over low heat; stir constantly until smooth. Do not boil.",
+        "Off heat, stir in cannabutter, unsalted butter, vanilla extract, and salt until fully combined and glossy.",
+        "Spread evenly in the pan. Chill 2–3 hours until firm.",
+        "Cut into equal squares to match your serving count; label each portion with mg THC (total mg in cannabutter ÷ number of squares).",
       ],
     },
     {
@@ -3923,6 +3938,8 @@ export function CreateRecipes() {
                   navigate("/jello");
                 } else if (cat === "snacks" && isGummyRecipe) {
                   navigate("/gummies");
+                } else if (cat === "snacks" && rec === "infused-chocolate-fudge") {
+                  navigate("/learn/articles/infused-fudge-recipe");
                 } else if (cat === "popcorn" || cat === "snacks") {
                   navigate("/popcorn");
                 } else if (cat === "spreads-dips") {
@@ -3949,6 +3966,7 @@ export function CreateRecipes() {
                  searchParams.get("recipe") === "fruit-gummies" ||
                  searchParams.get("recipe") === "sour-gummies"
                )) ? "← Back to Gummies" :
+               (searchParams.get("category") === "snacks" && searchParams.get("recipe") === "infused-chocolate-fudge") ? "← Fudge guide" :
                searchParams.get("category") === "popcorn" ? "← Back to Popcorn" :
                searchParams.get("category") === "drinks" ? "← Back to Coffee" :
                searchParams.get("category") === "spreads-dips" ? "← Back to Spreads & Dips" :
