@@ -11,7 +11,7 @@ import { DEFAULT_RECIPE_STOCK_IMAGE, POPCORN_STOCK_BY_ID } from "./recipeStockIm
  * Hero image URL for a builder template. Popcorn flavors map to canonical bases; wing sauce
  * aliases map to `*-wings` ids; coffee builds map to shared drink templates.
  */
-export function resolveTemplateHeroImage(_builderKey: string, id: string): string {
+export function resolveTemplateHeroImage(builderKey: string, id: string): string {
   const popcornDirect = POPCORN_STOCK_BY_ID[id];
   if (popcornDirect) return popcornDirect;
 
@@ -21,7 +21,11 @@ export function resolveTemplateHeroImage(_builderKey: string, id: string): strin
     if (p) return p;
   }
 
-  if (builderKey === "wings" || WING_SAUCE_TO_BUILDER_RECIPE[id] || id.endsWith("-wings")) {
+  if (
+    builderKey === "wings" ||
+    WING_SAUCE_TO_BUILDER_RECIPE[id] ||
+    id.endsWith("-wings")
+  ) {
     const canonical = WING_SAUCE_TO_BUILDER_RECIPE[id] ?? id;
     return recipeLocalImage(canonical);
   }
