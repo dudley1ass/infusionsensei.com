@@ -1,9 +1,10 @@
 import type { Recipe } from "./recipeTypes";
-import { recipesDerivedFromStandardTemplates } from "./recipesFromTemplates";
+import { getAllStandardTemplateIds, recipesDerivedFromStandardTemplates } from "./recipesFromTemplates";
 
 export type { Recipe } from "./recipeTypes";
 
-const RECIPES_MANUAL: Recipe[] = [
+/** Editorial / legacy-only recipes — any id that exists in `standardRecipes` is stripped (template is canonical) */
+const RECIPES_MANUAL_RAW: Recipe[] = [
   {
     id: "classic-cannabutter",
     name: "Classic Cannabutter",
@@ -1341,7 +1342,10 @@ const RECIPES_MANUAL: Recipe[] = [
   },
 ];
 
-/** Manual catalog first; builder templates add any id not already defined (single source for amounts: `standardRecipes.ts`) */
+const TEMPLATE_RECIPE_IDS = getAllStandardTemplateIds();
+const RECIPES_MANUAL = RECIPES_MANUAL_RAW.filter((r) => !TEMPLATE_RECIPE_IDS.has(r.id));
+
+/** Manual-only first; full builder set from `standardRecipes.ts` (no duplicate ids) */
 const MANUAL_RECIPE_IDS = new Set(RECIPES_MANUAL.map((r) => r.id));
 export const recipes: Recipe[] = [
   ...RECIPES_MANUAL,

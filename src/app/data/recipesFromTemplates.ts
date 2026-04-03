@@ -133,3 +133,18 @@ export function recipesDerivedFromStandardTemplates(): Recipe[] {
 
   return out;
 }
+
+let _standardTemplateIds: Set<string> | null = null;
+
+/** All `standardRecipes` template ids — manual catalog rows with the same id are omitted so amounts stay single-sourced */
+export function getAllStandardTemplateIds(): Set<string> {
+  if (_standardTemplateIds) return _standardTemplateIds;
+  const ids = new Set<string>();
+  for (const list of Object.values(standardRecipes)) {
+    for (const raw of list as { id: string }[]) {
+      if (raw?.id) ids.add(raw.id);
+    }
+  }
+  _standardTemplateIds = ids;
+  return ids;
+}
