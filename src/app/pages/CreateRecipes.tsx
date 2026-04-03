@@ -99,6 +99,7 @@ const INGREDIENT_LIBRARY = [
 
   // ── FATS & OILS ─────────────────────────────────────────────────
   { name: "Unsalted Butter",        category: "fat",        defaultAmount: 115, defaultUnit: "g",     calories: 717, carbs: 0.1,  protein: 0.9,  fat: 81.1, type: "fat" },
+  { name: "Unsalted Butter (for streusel)", category: "fat", defaultAmount: 30,  defaultUnit: "g",     calories: 717, carbs: 0.1,  protein: 0.9,  fat: 81.1, type: "fat" },
   { name: "Salted Butter",          category: "fat",        defaultAmount: 115, defaultUnit: "g",     calories: 714, carbs: 0.1,  protein: 0.9,  fat: 80.5, type: "fat" },
   { name: "Brown Butter",           category: "fat",        defaultAmount: 115, defaultUnit: "g",     calories: 740, carbs: 0.2,  protein: 1.0,  fat: 83.0, type: "fat" },
   { name: "Vegan Butter",           category: "fat",        defaultAmount: 115, defaultUnit: "g",     calories: 700, carbs: 1.0,  protein: 0.0,  fat: 78.0, type: "fat" },
@@ -306,6 +307,15 @@ const INGREDIENT_LIBRARY = [
   { name: "Ketchup",                category: "savory",     defaultAmount: 60,  defaultUnit: "ml",    calories: 112, carbs: 26.0, protein: 1.0,  fat: 0.0,  type: "liquid" },
   { name: "Mustard (yellow)",       category: "savory",     defaultAmount: 30,  defaultUnit: "ml",    calories: 66,  carbs: 5.0,  protein: 4.0,  fat: 4.0,  type: "liquid" },
   { name: "Worcestershire Sauce",   category: "savory",     defaultAmount: 15,  defaultUnit: "ml",    calories: 13,  carbs: 3.3,  protein: 0.0,  fat: 0.0,  type: "liquid" },
+  { name: "Soy Sauce",              category: "savory",     defaultAmount: 45,  defaultUnit: "ml",    calories: 53,  carbs: 5.2,  protein: 5.6,  fat: 0.0,  type: "liquid" },
+  { name: "Sriracha",               category: "savory",     defaultAmount: 30,  defaultUnit: "ml",    calories: 18,  carbs: 3.5,  protein: 0.4,  fat: 0.5,  type: "liquid" },
+  { name: "Gochujang",              category: "savory",     defaultAmount: 30,  defaultUnit: "g",     calories: 175, carbs: 38.0, protein: 5.0,  fat: 1.5,  type: "semi-solid" },
+  { name: "Chili Crisp",            category: "savory",     defaultAmount: 30,  defaultUnit: "ml",    calories: 120, carbs: 3.0,  protein: 1.0,  fat: 12.0, type: "liquid" },
+  { name: "Bacon",                  category: "savory",     defaultAmount: 60,  defaultUnit: "g",     calories: 541, carbs: 1.4,  protein: 37.0, fat: 42.0, type: "solid" },
+  { name: "Habanero Pepper",        category: "savory",     defaultAmount: 5,   defaultUnit: "g",     calories: 40,  carbs: 8.8,  protein: 1.8,  fat: 0.4,  type: "solid" },
+  { name: "Parsley",                category: "savory",     defaultAmount: 15,  defaultUnit: "g",     calories: 36,  carbs: 6.3,  protein: 3.0,  fat: 0.8,  type: "solid" },
+  { name: "Ginger (fresh)",         category: "savory",     defaultAmount: 15,  defaultUnit: "g",     calories: 80,  carbs: 17.8, protein: 1.8,  fat: 0.8,  type: "solid" },
+  { name: "Red Wine Vinegar",       category: "liquid",     defaultAmount: 30,  defaultUnit: "ml",    calories: 6,   carbs: 0.1,  protein: 0.0,  fat: 0.0,  type: "liquid" },
   { name: "Spinach (frozen)",       category: "savory",     defaultAmount: 150, defaultUnit: "g",     calories: 23,  carbs: 3.6,  protein: 3.0,  fat: 0.3,  type: "solid" },
   { name: "Artichoke Hearts",       category: "savory",     defaultAmount: 200, defaultUnit: "g",     calories: 45,  carbs: 9.0,  protein: 3.0,  fat: 0.0,  type: "solid" },
   { name: "Hot Dogs",               category: "savory",     defaultAmount: 12,  defaultUnit: "pieces",calories: 290, carbs: 3.0,  protein: 11.0, fat: 26.0, type: "count" },
@@ -509,7 +519,8 @@ function driftBandsForLibraryKey(key: string): { soft: number; hard: number } {
   if (cat === "flour") return { soft: 0.12, hard: 0.2 };
   if (cat === "chocolate") return { soft: 0.18, hard: 0.3 };
   if (key === "Salt") return { soft: 0.72, hard: 0.88 };
-  if (cat === "spice" || cat === "fruit" || cat === "flavoring") return { soft: 0.5, hard: 0.72 };
+  if (cat === "spice" || cat === "savory" || cat === "fruit" || cat === "flavoring")
+    return { soft: 0.5, hard: 0.72 };
   return { soft: 0.2, hard: 0.32 };
 }
 
@@ -684,15 +695,22 @@ const BAR_TRAY_STANDARD_IDS = new Set<string>([
   "smores-bars",
 ]);
 
-/** Strips "infused" phrasing for product-forward UI labels only (IDs and ingredient matching unchanged). */
+/** Strips redundant site-context words for UI/search labels only (template IDs and ingredient keys unchanged). */
 function cleanRecipeDisplayTitle(name: string): string {
-  return name
+  let s = name
+    .replace(/\bcannabis\b/gi, "")
     .replace(/\binfused\b/gi, "")
     .replace(/\(\s*\)/g, "")
     .replace(/\s{2,}/g, " ")
     .replace(/\(\s+/g, "(")
     .replace(/\s+\)/g, ")")
     .trim();
+  s = s
+    .replace(/^\s*[–—\-]\s*/g, "")
+    .replace(/\s*[–—\-]\s*$/g, "")
+    .trim();
+  s = s.replace(/\(\s*\)/g, "").replace(/\s{2,}/g, " ").trim();
+  return s;
 }
 
 const CHOCOLATE_FUDGE_BUILDER_ID = "infused-chocolate-fudge";
@@ -867,6 +885,7 @@ const INGREDIENT_GRAMS_PER_CUP: Record<string, number> = {
   "Coconut Sugar": 180,
   "Monk Fruit Sweetener": 200,
   "Unsalted Butter": 227,
+  "Unsalted Butter (for streusel)": 227,
   "Salted Butter": 227,
   "Brown Butter": 227,
   "Vegan Butter": 227,
@@ -888,6 +907,7 @@ const INGREDIENT_GRAMS_PER_CUP: Record<string, number> = {
   "Protein Powder": 120,
   Salt: 273,
   "Black Pepper": 100,
+  "Garlic Powder": 125,
   Cinnamon: 125,
   Nutmeg: 100,
   "Peanut Butter": 258,
@@ -1482,17 +1502,21 @@ export function CreateRecipes() {
       const updated = [...prev];
       const key = ingredientLibraryKey(ing);
       const thc = Number(ing.thcPerUnit);
-      if (ing.isInfused && Number.isFinite(thc) && thc > 0 && !skipUnits.has(ing.unit) && !skipUnits.has(newUnit)) {
-        const totalMg = ing.amount * thc;
+      if (!skipUnits.has(ing.unit) && !skipUnits.has(newUnit)) {
         const bridge = toGrams(ing.amount, ing.unit, key);
         const newAmount = convertGramsToRecipeUnit(bridge, newUnit, key);
         if (Number.isFinite(newAmount) && newAmount > 0) {
-          updated[index] = {
-            ...ing,
-            unit: newUnit,
-            amount: newAmount,
-            thcPerUnit: parseFloat((totalMg / newAmount).toFixed(6)),
-          };
+          if (ing.isInfused && Number.isFinite(thc) && thc > 0) {
+            const totalMg = ing.amount * thc;
+            updated[index] = {
+              ...ing,
+              unit: newUnit,
+              amount: newAmount,
+              thcPerUnit: parseFloat((totalMg / newAmount).toFixed(6)),
+            };
+            return updated;
+          }
+          updated[index] = { ...ing, unit: newUnit, amount: newAmount };
           return updated;
         }
       }
@@ -1508,9 +1532,19 @@ export function CreateRecipes() {
     if (rounded >= 0.25) {
       return { amount: rounded, unit: "cups" };
     }
-    // Less than 0.25 cups — convert to tbsp
+    // Less than 0.25 cups — convert to tbsp, or tsp when tbsp would inflate tiny masses (e.g. spices)
     const tbsp = cups * 16;
     const roundedTbsp = Math.round(tbsp * 2) / 2;
+    if (roundedTbsp < 0.5) {
+      const tsp = cups * 48;
+      const roundedTsp = Math.round(Math.max(tsp, 0.125) * 2) / 2;
+      if (roundedTsp >= 3) {
+        const tbspOut = roundedTsp / 3;
+        const roundedTbspOut = Math.round(tbspOut * 2) / 2;
+        return { amount: roundedTbspOut, unit: "tbsp" };
+      }
+      return { amount: roundedTsp, unit: "tsp" };
+    }
     return { amount: Math.max(roundedTbsp, 0.5), unit: "tbsp" };
   };
 
@@ -2899,8 +2933,8 @@ export function CreateRecipes() {
     const funnelStep2Done = startingRecipeName
       ? `${category?.name ?? "Category"} · ${startingRecipeName}`
       : recipeType === "custom"
-        ? `${recipeName.trim() || "Custom recipe"} ready to customize`
-        : `${recipeName.trim() || "Recipe"} loaded — adjust servings & strength below`;
+        ? `${cleanRecipeDisplayTitle(recipeName.trim()) || "Custom recipe"} ready to customize`
+        : `${cleanRecipeDisplayTitle(recipeName.trim()) || "Recipe"} loaded — adjust servings & strength below`;
 
     return (
       <>
@@ -3147,7 +3181,10 @@ export function CreateRecipes() {
           <div className="print-page">
 
             {/* Title */}
-            <div className="print-title">{recipeName || "My Cannabis Recipe"}</div>
+            <div className="print-title">{cleanRecipeDisplayTitle(recipeName) || "My Recipe"}</div>
+            <div style={{ fontSize: "10pt", fontWeight: 700, color: "#1a3d0f", marginBottom: "8pt", lineHeight: 1.35 }}>
+              Cannabis-infused recipe — contains THC. For adults 21+ only; dose responsibly.
+            </div>
             <div style={{fontSize:"10pt", color:"#555", marginBottom:"14pt"}}>
               {servings} servings &nbsp;·&nbsp; {category?.name || "Recipe"} &nbsp;·&nbsp; Generated by Infusion Sensei
             </div>
@@ -3246,7 +3283,7 @@ export function CreateRecipes() {
               {Array.from({ length: 6 }).map((_, idx) => (
                 <div key={idx} className="buffet-tent">
                   <div className="buffet-tent-panel">
-                    <div className="buffet-title">{recipeName || "Infused dish"}</div>
+                    <div className="buffet-title">{cleanRecipeDisplayTitle(recipeName) || "Recipe"}</div>
                     <div className="buffet-dose">{thcPerServing.toFixed(1)} mg</div>
                     <div className="buffet-dose-sub">THC per serving</div>
                     <div className="buffet-batch">
@@ -3257,7 +3294,7 @@ export function CreateRecipes() {
                   </div>
                   <div className="buffet-fold">Fold here — same text on both sides</div>
                   <div className="buffet-tent-panel">
-                    <div className="buffet-title">{recipeName || "Infused dish"}</div>
+                    <div className="buffet-title">{cleanRecipeDisplayTitle(recipeName) || "Recipe"}</div>
                     <div className="buffet-dose">{thcPerServing.toFixed(1)} mg</div>
                     <div className="buffet-dose-sub">THC per serving</div>
                     <div className="buffet-batch">
@@ -3440,7 +3477,7 @@ export function CreateRecipes() {
               <div>
                 <Label className="text-gray-700 font-semibold text-sm">Recipe Name</Label>
                 <Input value={recipeName} onChange={(e) => setRecipeName(e.target.value)}
-                  className="text-gray-900 border-gray-300 mt-1" placeholder="My Cannabis Recipe" />
+                  className="text-gray-900 border-gray-300 mt-1" placeholder="Recipe name" />
               </div>
               <div>
                 <Label className="text-gray-700 font-semibold text-sm">Servings</Label>
@@ -3721,10 +3758,10 @@ export function CreateRecipes() {
                     </div>
                     <button
                       onClick={() => {
-                        const summary = `${recipeName || "My Recipe"}\n${thcPerServing.toFixed(1)}mg THC per serving\n${totalTHC.toFixed(0)}mg total batch\n${servings} servings\n\nCalculated with Infusion Sensei — infusionsensei.com`;
+                        const summary = `${cleanRecipeDisplayTitle(recipeName) || "My Recipe"}\n${thcPerServing.toFixed(1)}mg THC per serving\n${totalTHC.toFixed(0)}mg total batch\n${servings} servings\n\nCalculated with Infusion Sensei — infusionsensei.com`;
                         navigator.clipboard.writeText(summary);
                         trackEvent("recipe_copied", {
-                          recipe_name: recipeName || "My Recipe",
+                          recipe_name: cleanRecipeDisplayTitle(recipeName) || "My Recipe",
                           servings,
                           thc_per_serving: Number(thcPerServing.toFixed(1)),
                         });
@@ -3797,10 +3834,10 @@ export function CreateRecipes() {
                   {/* Action strip */}
                   <div className="bg-black/20 px-4 py-3 border-t border-white/10 grid grid-cols-2 gap-2">
                     {[
-                      { key: "copy", icon: <Copy className="w-4 h-4" />, label: copied ? "Copied!" : "Copy", action: () => { const s = `${recipeName || "My Recipe"}\n${thcPerServing.toFixed(1)}mg THC per serving\n${totalTHC.toFixed(0)}mg total\n${servings} servings\n\ninfusionsensei.com`; navigator.clipboard.writeText(s); trackEvent("recipe_copied", { recipe_name: recipeName || "My Recipe", servings, thc_per_serving: Number(thcPerServing.toFixed(1)) }); setCopied(true); setTimeout(() => setCopied(false), 2000); } },
+                      { key: "copy", icon: <Copy className="w-4 h-4" />, label: copied ? "Copied!" : "Copy", action: () => { const s = `${cleanRecipeDisplayTitle(recipeName) || "My Recipe"}\n${thcPerServing.toFixed(1)}mg THC per serving\n${totalTHC.toFixed(0)}mg total\n${servings} servings\n\ninfusionsensei.com`; navigator.clipboard.writeText(s); trackEvent("recipe_copied", { recipe_name: cleanRecipeDisplayTitle(recipeName) || "My Recipe", servings, thc_per_serving: Number(thcPerServing.toFixed(1)) }); setCopied(true); setTimeout(() => setCopied(false), 2000); } },
                       { key: "print", icon: <Printer className="w-4 h-4" />, label: "Print", action: () => runPrint("full") },
                       { key: "labels", icon: <LayoutGrid className="w-4 h-4" />, label: "Labels", action: () => runPrint("buffet") },
-                      { key: "share", icon: <Share2 className="w-4 h-4" />, label: "Share", action: () => { if (navigator.share) navigator.share({ title: "Infusion Sensei", text: `${recipeName}: ${thcPerServing.toFixed(1)}mg THC per serving`, url: "https://infusionsensei.com" }); } },
+                      { key: "share", icon: <Share2 className="w-4 h-4" />, label: "Share", action: () => { if (navigator.share) navigator.share({ title: "Infusion Sensei", text: `${cleanRecipeDisplayTitle(recipeName) || "Recipe"}: ${thcPerServing.toFixed(1)}mg THC per serving`, url: "https://infusionsensei.com" }); } },
                     ].map(({ key, icon, label, action }) => (
                       <button key={key} type="button" onClick={action}
                         className="flex flex-col items-center gap-1 bg-white/10 hover:bg-white/20 rounded-xl py-2 text-white transition-all border border-white/10">

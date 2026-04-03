@@ -27,14 +27,6 @@ export function canonicalBuilderRecipeId(raw: string): string {
   return COFFEE_TO_BUILDER_RECIPE[raw] ?? raw;
 }
 
-/** Builder recipe ids that match recipes.ts but with different slugs */
-const BUILDER_TO_SITE_RECIPE_ID: Record<string, string> = {
-  brownies: "classic-brownies",
-  "sugar-cookies": "infused-sugar-cookies",
-  "chocolate-chip-cookies": "cannabis-cookies",
-  gummies: "classic-gummies",
-};
-
 function parseRoute(route: string): { category: string | null; recipe: string | null } {
   if (!route.startsWith("/ingredients")) return { category: null, recipe: null };
   const q = route.split("?")[1] ?? "";
@@ -74,11 +66,6 @@ export function findSiteRecipe(route: string): Recipe | null {
   const { recipe } = parseRoute(route);
   if (!recipe) return null;
   const canonical = canonicalBuilderRecipeId(recipe);
-  const siteId = BUILDER_TO_SITE_RECIPE_ID[recipe] ?? BUILDER_TO_SITE_RECIPE_ID[canonical];
-  if (siteId) {
-    const byMap = siteRecipes.find((r) => r.id === siteId);
-    if (byMap) return byMap;
-  }
   return siteRecipes.find((r) => r.id === canonical || r.id === recipe) ?? null;
 }
 

@@ -15,4 +15,6 @@ export interface Recipe {
   tips?: string[];
   strainRecommendation?: string;
   isNew?: boolean;
+  /** How the recipe is finished (e.g. oven bake) — optional for catalog UX */
+  cookMethod?: string;
 }

@@ -55,15 +55,20 @@ function formatIngredientLine(name: string, amount: number, unit: string): strin
   return `${amtStr} ${u} ${name}`.trim();
 }
 
-/** One Recipe card per builder template — manual `recipes.ts` entries win on duplicate ids */
+/** One Recipe card per builder template — `standardRecipes` is canonical; manual rows omit duplicate ids */
 export function recipesDerivedFromStandardTemplates(): Recipe[] {
   const out: Recipe[] = [];
 
   for (const [builderKey, list] of Object.entries(standardRecipes)) {
     const category = BUILDER_KEY_TO_CATEGORY[builderKey] ?? "edibles";
-    const { prep, cook } = defaultPrepCook(builderKey);
+    const baseTimes = defaultPrepCook(builderKey);
 
     for (const raw of list as BuilderTemplate[]) {
+      let prep = baseTimes.prep;
+      let cook = baseTimes.cook;
+      if (raw.id === "caramel-popcorn") {
+        cook = 70;
+      }
       const ingredients = raw.ingredients.map((name, idx) => {
         const amt = raw.amounts[idx];
         const unit = raw.units?.[idx] ?? "g";
@@ -94,6 +99,7 @@ export function recipesDerivedFromStandardTemplates(): Recipe[] {
         tips: [
           "Open this recipe in Start Here (/ingredients) to match template amounts, scale servings, and tie in your saved infusion THC.",
         ],
+        ...(raw.id === "caramel-popcorn" ? { cookMethod: "bake" } : {}),
       });
     }
   }

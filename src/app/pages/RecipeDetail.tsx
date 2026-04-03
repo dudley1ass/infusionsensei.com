@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router";
-import { getRecipeById, Recipe } from "../data/recipes";
+import { getRecipeById, ingredientsBuilderPathForRecipeId, Recipe } from "../data/recipes";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Separator } from "../components/ui/separator";
@@ -42,10 +42,6 @@ export function RecipeDetail() {
 
   const getBuilderLinkForRecipe = (r: Recipe) => {
     const explicitMap: Record<string, { category: string; recipe: string }> = {
-      "classic-brownies": { category: "baked-goods", recipe: "brownies" },
-      "cannabis-cookies": { category: "baked-goods", recipe: "chocolate-chip-cookies" },
-      "infused-sugar-cookies": { category: "baked-goods", recipe: "sugar-cookies" },
-      "canna-gummies": { category: "snacks", recipe: "gummies" },
       "cannabis-tea": { category: "drinks", recipe: "cannabis-tea" },
       "cannabis-smoothie": { category: "drinks", recipe: "cannabis-smoothie" },
       "infused-protein-smoothie": { category: "drinks", recipe: "cannabis-smoothie" },
@@ -61,6 +57,9 @@ export function RecipeDetail() {
     if (mapped) {
       return `/ingredients?category=${encodeURIComponent(mapped.category)}&recipe=${encodeURIComponent(mapped.recipe)}`;
     }
+
+    const fromTemplate = ingredientsBuilderPathForRecipeId(r.id);
+    if (fromTemplate) return fromTemplate;
 
     return `/ingredients?category=baked-goods&recipe=brownies`;
   };
@@ -88,15 +87,19 @@ export function RecipeDetail() {
   const diff = difficultyConfig[recipe.difficulty] ?? difficultyConfig.beginner;
   const canonicalUrl = `https://infusionsensei.com/recipes/${recipe.id}`;
   const recipeSeo: Record<string, { title: string; description: string }> = {
-    "classic-brownies": {
+    brownies: {
       title: "THC Brownies Recipe (Perfect Dosage Per Serving)",
       description: "Make THC brownies with predictable potency using exact mg-per-serving math and dosing-friendly portion steps.",
     },
-    "cannabis-cookies": {
+    "chocolate-chip-cookies": {
       title: "THC Chocolate Chip Cookies (Soft, Chewy, Precise Dosing)",
       description: "Bake THC chocolate chip cookies with clear potency math so each cookie lands near your target dose.",
     },
-    "canna-gummies": {
+    "sugar-cookies": {
+      title: "THC Sugar Cookies (Cut-Outs & Precise Dosing)",
+      description: "Bake THC sugar cookies with predictable mg per cookie, chill-and-roll tips, and clean decorating steps.",
+    },
+    gummies: {
       title: "THC Gummies Recipe (Accurate mg Per Piece Guide)",
       description: "Make consistent THC gummies with clear potency steps, safer serving guidance, and exact mg-per-piece control.",
     },
