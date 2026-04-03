@@ -10,6 +10,7 @@ import { Button } from "../components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Clock, ChefHat, Search, Sparkles, Calculator, ArrowRight } from "lucide-react";
 import { Input } from "../components/ui/input";
+import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
 
 export function Recipes() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,9 +73,12 @@ export function Recipes() {
   });
 
   const filteredRecipes = sortedRecipes.filter((recipe) => {
+    const q = searchQuery.toLowerCase();
+    const display = cleanRecipeDisplayTitle(recipe.name).toLowerCase();
     const matchesSearch =
-      recipe.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      recipe.description.toLowerCase().includes(searchQuery.toLowerCase());
+      recipe.name.toLowerCase().includes(q) ||
+      display.includes(q) ||
+      recipe.description.toLowerCase().includes(q);
     const matchesCategory =
       selectedCategory === "all" || recipe.category === selectedCategory;
     return matchesSearch && matchesCategory;
@@ -164,7 +168,7 @@ export function Recipes() {
                 <div className="relative h-48 overflow-hidden">
                   <img
                     src={recipe.image}
-                    alt={recipe.name}
+                    alt={cleanRecipeDisplayTitle(recipe.name)}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   {/* NEW badge — top left */}
@@ -189,7 +193,7 @@ export function Recipes() {
                   </div>
                 </div>
                 <CardHeader>
-                  <CardTitle className="text-gray-900">{recipe.name}</CardTitle>
+                  <CardTitle className="text-gray-900">{cleanRecipeDisplayTitle(recipe.name)}</CardTitle>
                   <CardDescription className="text-gray-500 line-clamp-2">
                     {recipe.description}
                   </CardDescription>

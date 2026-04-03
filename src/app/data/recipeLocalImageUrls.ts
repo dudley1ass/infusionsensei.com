@@ -11,7 +11,7 @@ const RECIPE_LOCAL_IMAGE_ALIASES: Record<string, string> = {
   "infused-mint-ice-cream": "mint-ice-cream",
   "infused-protein-smoothie": "cannabis-smoothie",
   "canna-gummies": "classic-gummies",
-  gummies: "classic-gummies",
+  /** Template id `gummies` uses `gummies.jpg` (classic-gummies is a different snack variant in photo tooling). */
   "classic-brownies": "brownies",
 };
 

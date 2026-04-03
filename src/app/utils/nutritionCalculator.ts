@@ -30,6 +30,9 @@ export const nutritionData: Record<string, { calories: number; protein: number; 
   "gelatin powder": { calories: 335, protein: 85, carbs: 0, fat: 0.1, sodium: 196 },
 };
 
+/** Matches wing templates: 900g batch ≈ 32 pieces (see CreateRecipes `CHICKEN_WING_GRAMS_PER_PIECE`). */
+const CHICKEN_WING_GRAMS_PER_PIECE = 900 / 32;
+
 export const unitToGrams: Record<string, number> = {
   "cup": 240, "cups": 240, "tbsp": 15, "tsp": 5,
   "g": 1, "ml": 1, "oz": 28.35, "lb": 453.6,
@@ -68,7 +71,9 @@ export function calculateNutrition(
   }
   if (!nutrition) return { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0, saturatedFat: 0, cholesterol: 0 };
 
-  const gramsPerUnit = unitToGrams[unit.toLowerCase()] || 1;
+  const u = unit.toLowerCase();
+  let gramsPerUnit = unitToGrams[u] || 1;
+  if (u === "pieces" && normalizedName === "chicken wings") gramsPerUnit = CHICKEN_WING_GRAMS_PER_PIECE;
   const totalGrams = amount * gramsPerUnit;
   const m = totalGrams / 100;
 

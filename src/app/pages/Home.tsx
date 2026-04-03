@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { recipes } from "../data/recipes";
+import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
 import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { trackEvent } from "../utils/analytics";
 
@@ -239,7 +240,7 @@ export function Home() {
               <Link key={recipe.id} to={`/recipes/${recipe.id}`}>
                 <Card className="bg-white border-2 border-green-100 hover:border-green-400 transition-all hover:-translate-y-1 overflow-hidden group shadow-md hover:shadow-xl h-full">
                   <div className="relative h-48 overflow-hidden">
-                    <img src={recipe.image} alt={recipe.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={recipe.image} alt={cleanRecipeDisplayTitle(recipe.name)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                     <div className="absolute top-3 left-3">
                       <span className="bg-green-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-lg">✨ NEW</span>
@@ -249,7 +250,7 @@ export function Home() {
                     </div>
                   </div>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-gray-900 text-lg">{recipe.name}</CardTitle>
+                    <CardTitle className="text-gray-900 text-lg">{cleanRecipeDisplayTitle(recipe.name)}</CardTitle>
                     <p className="text-gray-500 text-sm line-clamp-2">{recipe.description}</p>
                   </CardHeader>
                   <CardContent>

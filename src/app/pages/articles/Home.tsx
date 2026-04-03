@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { recipes } from "../data/recipes";
+import { cleanRecipeDisplayTitle } from "../../utils/recipeDisplayTitle";
 
 export function Home() {
   const featuredRecipes = recipes.filter(r => r.isNew).slice(0, 3);
@@ -208,7 +209,7 @@ export function Home() {
               <Link key={recipe.id} to={`/recipes/${recipe.id}`}>
                 <Card className="bg-white border-green-200 hover:border-green-400 transition-all hover:scale-105 overflow-hidden group shadow-md hover:shadow-xl h-full">
                   <div className="relative h-48 overflow-hidden">
-                    <img src={recipe.image} alt={recipe.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                    <img src={recipe.image} alt={cleanRecipeDisplayTitle(recipe.name)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                     <div className="absolute top-3 left-3">
                       <span className="bg-green-500 text-white text-xs font-black px-2 py-1 rounded-full">✨ NEW</span>
                     </div>
@@ -217,7 +218,7 @@ export function Home() {
                     </div>
                   </div>
                   <CardHeader>
-                    <CardTitle className="text-gray-900">{recipe.name}</CardTitle>
+                    <CardTitle className="text-gray-900">{cleanRecipeDisplayTitle(recipe.name)}</CardTitle>
                     <p className="text-gray-500 text-sm line-clamp-2">{recipe.description}</p>
                   </CardHeader>
                   <CardContent>

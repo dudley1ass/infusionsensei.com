@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { ArrowRight } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { recipes } from "../data/recipes";
+import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
 
 export function CannabisEdibleRecipesPage() {
   const featured = recipes.slice(0, 6);
@@ -58,10 +59,10 @@ export function CannabisEdibleRecipesPage() {
           {featured.map(recipe => (
             <Link key={recipe.id} to={`/recipes/${recipe.id}`} className="bg-white rounded-2xl border-2 border-gray-200 hover:border-green-400 overflow-hidden group shadow-sm hover:shadow-md transition-all">
               <div className="h-40 overflow-hidden">
-                <img src={recipe.image} alt={recipe.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <img src={recipe.image} alt={cleanRecipeDisplayTitle(recipe.name)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               </div>
               <div className="p-4">
-                <h3 className="font-black text-gray-900 mb-1">{recipe.name}</h3>
+                <h3 className="font-black text-gray-900 mb-1">{cleanRecipeDisplayTitle(recipe.name)}</h3>
                 <p className="text-gray-500 text-xs mb-3 line-clamp-2">{recipe.description}</p>
                 <div className="bg-green-50 border border-green-200 rounded-xl px-3 py-1.5 text-xs text-center">
                   <span className="text-gray-600">Est. THC: </span>

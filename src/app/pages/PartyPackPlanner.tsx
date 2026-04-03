@@ -21,6 +21,7 @@ import {
   formatScaledTemplateLine,
   scaleSiteRecipeIngredientLine,
 } from "../utils/partyPlannerPrint";
+import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
 
 type PlannerItem = {
   id: string;
@@ -726,7 +727,7 @@ export function PartyPackPlanner() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-lg font-black text-gray-900">{item.name}</p>
+                  <p className="text-lg font-black text-gray-900">{cleanRecipeDisplayTitle(item.name)}</p>
                   <p className="text-sm text-gray-700">
                     {item.qty} {item.unitLabel} · {item.mgEach}mg each
                   </p>
@@ -844,7 +845,7 @@ export function PartyPackPlanner() {
                 .filter((r) => r.category === "edibles" || r.category === "drinks")
                 .map((r) => (
                   <SelectItem key={r.id} value={r.id}>
-                    {r.name} ({r.category})
+                    {cleanRecipeDisplayTitle(r.name)} ({r.category})
                   </SelectItem>
                 ))}
             </SelectContent>
@@ -936,7 +937,7 @@ export function PartyPackPlanner() {
                 const unitsNeeded = mgNeeded / Math.max(selectedInfusion.thcPerUnit, 0.0001);
                 return (
                   <p key={`calc-${item.id}`}>
-                    - {item.name}: {mgNeeded.toFixed(1)}mg total (~{unitsNeeded.toFixed(1)} infusion units)
+                    - {cleanRecipeDisplayTitle(item.name)}: {mgNeeded.toFixed(1)}mg total (~{unitsNeeded.toFixed(1)} infusion units)
                   </p>
                 );
               })}
@@ -956,7 +957,7 @@ export function PartyPackPlanner() {
             to={buildItemUrl(nextBuildItem)}
             className="inline-flex items-center gap-2 text-green-700 font-bold hover:underline"
           >
-            {nextBuildItem.id === "wings" ? "Start building your wings (main item)" : `Build ${nextBuildItem.name}`}
+            {nextBuildItem.id === "wings" ? "Start building your wings (main item)" : `Build ${cleanRecipeDisplayTitle(nextBuildItem.name)}`}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

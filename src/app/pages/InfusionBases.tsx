@@ -37,6 +37,7 @@ import {
 import { defaultStrains, Strain } from "../data/cannabisData";
 import { CustomStrainDialog } from "../components/CustomStrainDialog";
 import { safeJsonParse } from "../utils/storage";
+import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
 
 type InfusionRecipeBaseType = "butter" | "oil" | "syrup" | "liquid" | "chocolate" | "spread";
 
@@ -1589,7 +1590,7 @@ export function InfusionBases() {
                     }`}
                   >
                     <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <h3 className="text-gray-900 font-semibold">{recipe.name}</h3>
+                      <h3 className="text-gray-900 font-semibold">{cleanRecipeDisplayTitle(recipe.name)}</h3>
                       {recipe.baseRole === "both" ? (
                         <>
                           <Badge className="bg-slate-700 text-white text-xs">🍯 Ready-to-eat</Badge>
@@ -1746,7 +1747,7 @@ export function InfusionBases() {
           {selectedRecipe && (
             <div className="bg-white border border-green-200 rounded-xl p-6 space-y-6">
               <div>
-                <h3 className="text-gray-900 text-xl font-semibold mb-4">📖 Recipe Details: {selectedRecipe.name}</h3>
+                <h3 className="text-gray-900 text-xl font-semibold mb-4">📖 Recipe Details: {cleanRecipeDisplayTitle(selectedRecipe.name)}</h3>
 
                 {selectedRecipe.preparationMode === "mix-in" ? (
                   <p className="text-sm text-gray-700 mb-4 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2">

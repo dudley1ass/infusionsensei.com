@@ -33,6 +33,7 @@ import {
 import { InfusionBase } from "../types/infusion";
 import { NutritionFactsLabel } from "../components/NutritionFactsLabel";
 import { safeJsonParse } from "../utils/storage";
+import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
 import { trackEvent } from "../utils/analytics";
 import {
   COFFEE_TO_BUILDER_RECIPE,
@@ -327,6 +328,9 @@ const INGREDIENT_LIBRARY = [
   { name: "Apple Cider Vinegar",    category: "liquid",     defaultAmount: 30,  defaultUnit: "ml",    calories: 3,   carbs: 0.1,  protein: 0.0,  fat: 0.0,  type: "liquid" },
   { name: "Cheese Crackers",        category: "savory",     defaultAmount: 40,  defaultUnit: "pieces",calories: 480, carbs: 64.0, protein: 8.0,  fat: 22.0, type: "solid" },
 ];
+
+/** Wing templates: 900g chicken per batch ≈ 32 pieces (`standardRecipes.wings` uses 900g for 4 servings). Used for pieces↔g so drift coaching matches the gram-based template. */
+const CHICKEN_WING_GRAMS_PER_PIECE = 900 / 32;
 
 // Recipe Categories
 const recipeCategories = [
@@ -694,24 +698,6 @@ const BAR_TRAY_STANDARD_IDS = new Set<string>([
   "brownie-cheesecake-swirl-bars",
   "smores-bars",
 ]);
-
-/** Strips redundant site-context words for UI/search labels only (template IDs and ingredient keys unchanged). */
-function cleanRecipeDisplayTitle(name: string): string {
-  let s = name
-    .replace(/\bcannabis\b/gi, "")
-    .replace(/\binfused\b/gi, "")
-    .replace(/\(\s*\)/g, "")
-    .replace(/\s{2,}/g, " ")
-    .replace(/\(\s+/g, "(")
-    .replace(/\s+\)/g, ")")
-    .trim();
-  s = s
-    .replace(/^\s*[–—\-]\s*/g, "")
-    .replace(/\s*[–—\-]\s*$/g, "")
-    .trim();
-  s = s.replace(/\(\s*\)/g, "").replace(/\s{2,}/g, " ").trim();
-  return s;
-}
 
 const CHOCOLATE_FUDGE_BUILDER_ID = "infused-chocolate-fudge";
 /** Fudge template expects modest butter vs chocolate + condensed milk — sum these for a fat budget check */
@@ -1219,7 +1205,7 @@ export function CreateRecipes() {
           const usePiecesForWings = selectedCategory === "wings" && isChickenWings;
           const scaledAmount = recipe.amounts[idx] * scaleFactor;
           // Keep wing quantity in pieces for user clarity (vs grams/oz).
-          const wingPiecesFromGrams = scaledAmount / 28.125; // 900g ~= 32 wings baseline
+          const wingPiecesFromGrams = scaledAmount / CHICKEN_WING_GRAMS_PER_PIECE;
           const finalAmount = usePiecesForWings
             ? wingsQtyParam && wingsQtyParam > 0
               ? wingsQtyParam
@@ -1326,7 +1312,9 @@ export function CreateRecipes() {
       case "medium":  return amount * 44;
       case "small":   return amount * 38;
       case "whole":   return amount * 100;
-      case "pieces":  return amount * 100;
+      case "pieces":
+        if (ingName === "Chicken Wings") return amount * CHICKEN_WING_GRAMS_PER_PIECE;
+        return amount * 100;
       case "cloves":  return amount * 3;
       case "pinch":   return amount * 0.36;
       // Special cannabis units — small amounts, negligible nutrition

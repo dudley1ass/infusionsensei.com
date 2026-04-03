@@ -8,6 +8,7 @@ import { ArrowLeft, ArrowRight, Clock, ChefHat, Leaf, AlertCircle, CheckCircle2,
 import { loadRecipeByIdFromDb } from "../services/contentService";
 import { Helmet } from "react-helmet-async";
 import { trackEvent } from "../utils/analytics";
+import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
 
 export function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
@@ -112,7 +113,8 @@ export function RecipeDetail() {
       description: "Bake infused caramel popcorn with predictable dosing and simple mg-per-serving planning for party snacks.",
     },
   };
-  const pageTitle = recipeSeo[recipe.id]?.title ?? `${recipe.name} | Infusion Sensei`;
+  const displayName = cleanRecipeDisplayTitle(recipe.name);
+  const pageTitle = recipeSeo[recipe.id]?.title ?? `${displayName} | Infusion Sensei`;
   const pageDescription = recipeSeo[recipe.id]?.description ?? recipe.description;
 
   return (
@@ -146,7 +148,8 @@ export function RecipeDetail() {
             max-width: 100% !important;
             padding: 0.5in 0.75in !important;
           }
-          .print-title { font-size: 26pt !important; font-weight: 900 !important; border-bottom: 3px solid black !important; padding-bottom: 6pt !important; margin-bottom: 10pt !important; }
+          .print-title { font-size: 26pt !important; font-weight: 900 !important; border-bottom: 3px solid black !important; padding-bottom: 6pt !important; margin-bottom: 6pt !important; }
+          .print-cannabis-notice { font-size: 9.5pt !important; font-weight: 600 !important; color: #111 !important; margin-bottom: 10pt !important; line-height: 1.35 !important; }
           .print-meta { font-size: 9.5pt !important; color: #555 !important; margin-bottom: 14pt !important; }
           .print-thc-box { border: 2px solid black !important; padding: 10pt 14pt !important; margin-bottom: 14pt !important; background: #f8f8f8 !important; display: flex !important; gap: 24pt !important; flex-wrap: wrap !important; page-break-inside: avoid !important; break-inside: avoid !important; }
           .print-big-num { font-size: 26pt !important; font-weight: 900 !important; line-height: 1 !important; }
@@ -168,6 +171,9 @@ export function RecipeDetail() {
       <div className="print-only">
         <div className="print-page">
           <div className="print-title">{recipe.name}</div>
+          <p className="print-cannabis-notice">
+            Cannabis-infused recipe — contains THC. For adults 21+ only; dose responsibly.
+          </p>
           <div className="print-meta">
             {recipe.servings} servings &nbsp;·&nbsp; {recipe.prepTime + recipe.cookTime} min total &nbsp;·&nbsp; {recipe.difficulty} &nbsp;·&nbsp; {recipe.category}
           </div>
@@ -263,7 +269,7 @@ export function RecipeDetail() {
 
         {/* ── HERO ────────────────────────────────────────── */}
         <div className="relative rounded-3xl overflow-hidden shadow-xl h-72 md:h-96">
-          <img src={recipe.image} alt={recipe.name} className="w-full h-full object-cover" />
+          <img src={recipe.image} alt={displayName} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
             <div className="flex items-center gap-2 mb-3">
@@ -278,7 +284,7 @@ export function RecipeDetail() {
                 <span className="bg-green-500 text-white text-xs font-black px-3 py-1 rounded-full">✨ NEW</span>
               )}
             </div>
-            <h1 className="text-3xl md:text-5xl font-black text-white leading-tight">{recipe.name}</h1>
+            <h1 className="text-3xl md:text-5xl font-black text-white leading-tight">{displayName}</h1>
           </div>
         </div>
 
