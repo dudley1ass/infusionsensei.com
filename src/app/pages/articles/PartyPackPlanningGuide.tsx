@@ -47,7 +47,7 @@ export function PartyPackPlanningGuide() {
               },
               {
                 t: "Decision 3 — Marketing hygiene",
-                d: "If you post clips or flyers, build links with UTMs so you learn which platform actually drives signups. Our builder saves the guesswork.",
+                d: "If you post clips or flyers, add UTM parameters to links so you learn which platform actually drives signups.",
               },
             ].map(({ t, d }) => (
               <div key={t} className="bg-violet-50 border border-violet-100 rounded-2xl p-4">
@@ -55,16 +55,6 @@ export function PartyPackPlanningGuide() {
                 <p className="text-gray-700 text-sm mt-1">{d}</p>
               </div>
             ))}
-          </div>
-
-          <div className="bg-gray-950 rounded-2xl p-6">
-            <p className="text-violet-300 text-xs uppercase tracking-widest mb-2">Operator note</p>
-            <p className="text-white text-sm">
-              <Link to="/utm" className="text-green-400 font-semibold hover:underline">
-                Growth &amp; UTM tools
-              </Link>{" "}
-              show a weekly cadence template — useful when you are promoting the same party flows across Reddit, TikTok, and Pinterest.
-            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">

@@ -47,7 +47,6 @@ import { Jello } from "./pages/Jello";
 import { Gummies } from "./pages/Gummies";
 import { PartySnacks } from "./pages/PartySnacks";
 import { PartyWingsSplit } from "./pages/PartyWingsSplit";
-import { UTMBuilder } from "./pages/UTMBuilder";
 import { THCCalculatorPage } from "./pages/THCCalculatorPage";
 import { EdiblePotencyGuide } from "./pages/EdiblePotencyGuide";
 import { CannabisEdibleRecipesPage } from "./pages/CannabisEdibleRecipesPage";
@@ -73,6 +72,10 @@ function RedirectThcToEdiblesCalculator() {
   return <Navigate to={`/edibles-calculator${search}`} replace />;
 }
 
+function RedirectUtmToHome() {
+  return <Navigate to="/" replace />;
+}
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -92,7 +95,7 @@ export const router = createBrowserRouter([
       { path: "jello", Component: Jello },
       { path: "gummies", Component: Gummies },
       { path: "party-snacks", Component: PartySnacks },
-      { path: "utm", Component: UTMBuilder },
+      { path: "utm", Component: RedirectUtmToHome },
       { path: "edibles-calculator", Component: THCCalculatorPage },
       { path: "thc-calculator", Component: RedirectThcToEdiblesCalculator },
       { path: "edible-potency-guide", Component: EdiblePotencyGuide },

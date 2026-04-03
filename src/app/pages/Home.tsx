@@ -86,8 +86,6 @@ export function Home() {
             </Link>
             {" "}&middot;{" "}
             <Link to="/recipes" onClick={() => trackEvent("homepage_cta_click", { location: "hero_secondary", target: "recipes" })} className="hover:text-white font-semibold">Browse recipes</Link>
-            {" "}&middot;{" "}
-            <Link to="/utm" onClick={() => trackEvent("homepage_cta_click", { location: "hero_secondary", target: "utm" })} className="hover:text-white font-semibold">Growth &amp; UTM tools</Link>
           </p>
 
           {/* What are you making today? */}
