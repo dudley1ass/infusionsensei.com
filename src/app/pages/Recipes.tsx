@@ -12,6 +12,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Clock, ChefHat, Search, Sparkles, Calculator, ArrowRight } from "lucide-react";
 import { Input } from "../components/ui/input";
 import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
+import {
+  getRecipeLibraryCategory,
+  RECIPE_LIBRARY_TABS,
+  recipeLibraryBadgeLabel,
+} from "../data/recipeLibraryCategory";
+
+function buildCustomizeLink(recipe: {
+  id: string;
+  category: string;
+  route: string;
+}): { to: string; state?: { resetStartHere: boolean } } {
+  if (recipe.category === "spreads-dips") {
+    return { to: recipe.route };
+  }
+  const lib = getRecipeLibraryCategory(recipe.id);
+  const baseRecipeId = recipe.id.startsWith("spreads-dips-") ? recipe.id.slice("spreads-dips-".length) : recipe.id;
+  if (lib === "basics" || lib === "infusions") {
+    return { to: "/ingredients", state: { resetStartHere: true } };
+  }
+  return {
+    to: `/ingredients?category=${encodeURIComponent(lib)}&recipe=${encodeURIComponent(baseRecipeId)}`,
+    state: { resetStartHere: true },
+  };
+}
 
 export function Recipes() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -80,21 +104,20 @@ export function Recipes() {
       recipe.name.toLowerCase().includes(q) ||
       display.includes(q) ||
       recipe.description.toLowerCase().includes(q);
-    const matchesCategory =
-      selectedCategory === "all" || recipe.category === selectedCategory;
+    const lib = getRecipeLibraryCategory(recipe.id);
+    const matchesCategory = selectedCategory === "all" || lib === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   const newCount = recipeSource.filter((r) => r.isNew).length;
 
-  const categories = [
-    { value: "all", label: "All Recipes", count: allDisplayRecipes.length },
-    { value: "basics", label: "Basics", count: recipeSource.filter((r) => r.category === "basics").length },
-    { value: "edibles", label: "Edibles", count: recipeSource.filter((r) => r.category === "edibles").length },
-    { value: "drinks", label: "Drinks", count: recipeSource.filter((r) => r.category === "drinks").length },
-    { value: "infusions", label: "Infusions", count: recipeSource.filter((r) => r.category === "infusions").length },
-    { value: "spreads-dips", label: "Spreads & Dips", count: spreadsDipsDisplayRecipes.length },
-  ];
+  const libraryTabCounts = RECIPE_LIBRARY_TABS.map((tab) => ({
+    ...tab,
+    count:
+      tab.id === "all"
+        ? allDisplayRecipes.length
+        : allDisplayRecipes.filter((r) => getRecipeLibraryCategory(r.id) === tab.id).length,
+  }));
 
   const getDifficultyColor = (difficulty: Recipe["difficulty"]) => {
     switch (difficulty) {
@@ -144,16 +167,16 @@ export function Recipes() {
 
       {/* Category Tabs */}
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-        <TabsList className="bg-white border-2 border-green-200 shadow-sm flex-wrap h-auto gap-1 p-1">
-          {categories.map((cat) => (
+        <TabsList className="bg-white border-2 border-green-200 shadow-sm flex-wrap h-auto gap-1 p-1 max-w-full justify-start">
+          {libraryTabCounts.map((tab) => (
             <TabsTrigger
-              key={cat.value}
-              value={cat.value}
-              className="data-[state=active]:bg-green-600 data-[state=active]:text-white"
+              key={tab.id}
+              value={tab.id}
+              className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-xs sm:text-sm"
             >
-              {cat.label}
-              <Badge variant="secondary" className="ml-2 bg-green-100 text-green-700">
-                {cat.count}
+              <span className="whitespace-nowrap">{tab.label}</span>
+              <Badge variant="secondary" className="ml-1.5 sm:ml-2 bg-green-100 text-green-700 shrink-0">
+                {tab.count}
               </Badge>
             </TabsTrigger>
           ))}
@@ -163,7 +186,9 @@ export function Recipes() {
       {/* Recipe Grid */}
       {filteredRecipes.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredRecipes.map((recipe) => (
+          {filteredRecipes.map((recipe) => {
+            const customize = buildCustomizeLink(recipe);
+            return (
             <Link key={recipe.id} to={recipe.route}>
               <Card className={`bg-white hover:border-green-400 transition-all hover:scale-105 overflow-hidden group h-full shadow-md hover:shadow-xl ${recipe.isNew ? "border-2 border-green-400" : "border-green-200"}`}>
                 <div className="relative h-48 overflow-hidden">
@@ -180,10 +205,10 @@ export function Recipes() {
                       </span>
                     </div>
                   )}
-                  {/* Category badge — bottom left */}
-                  <div className="absolute bottom-3 left-3">
-                    <Badge className="bg-green-600 text-white border-0 capitalize shadow-lg">
-                      {recipe.category}
+                  {/* Library category — bottom left (same buckets as Start Here) */}
+                  <div className="absolute bottom-3 left-3 max-w-[70%]">
+                    <Badge className="bg-green-600 text-white border-0 shadow-lg text-[10px] sm:text-xs font-bold truncate">
+                      {recipeLibraryBadgeLabel(getRecipeLibraryCategory(recipe.id))}
                     </Badge>
                   </div>
                   {/* Difficulty badge — top right */}
@@ -218,8 +243,8 @@ export function Recipes() {
                   </div>
                   {/* Funnel CTA */}
                   <Link
-                    to={recipe.category === "spreads-dips" ? recipe.route : "/ingredients"}
-                    state={recipe.category === "spreads-dips" ? undefined : { resetStartHere: true }}
+                    to={customize.to}
+                    state={customize.state}
                     onClick={(e) => e.stopPropagation()}
                     className="flex items-center justify-center gap-2 w-full bg-green-50 hover:bg-green-100 border border-green-300 hover:border-green-500 text-green-700 font-bold text-sm py-2 rounded-lg transition-all group/cta"
                   >
@@ -230,7 +255,8 @@ export function Recipes() {
                 </CardContent>
               </Card>
             </Link>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="text-center py-12">
