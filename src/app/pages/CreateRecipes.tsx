@@ -3258,6 +3258,42 @@ export function CreateRecipes() {
       "Salt": 273, "Black Pepper": 100, "Cinnamon": 125, "Nutmeg": 100,
     };
 
+    /** Prefer cups when ¼-cup rounding is within ~6% of true grams; else tbsp or tsp so mass round-trips (avoids phantom template drift). */
+    const imperialFromGramsPowder = (grams: number, gPerCup: number): { amount: number; unit: string } => {
+      const cupsExact = grams / gPerCup;
+      if (cupsExact >= 0.25) {
+        const formattedCups = formatCups(cupsExact);
+        const estG =
+          formattedCups.unit === "cups"
+            ? formattedCups.amount * gPerCup
+            : formattedCups.amount * (gPerCup / 16);
+        if (Math.abs(estG - grams) / Math.max(grams, 0.001) <= 0.06) {
+          return { amount: formattedCups.amount, unit: formattedCups.unit };
+        }
+      }
+      const tbspExact = cupsExact * 16;
+      if (tbspExact < 1) {
+        const tspExact = cupsExact * 48;
+        return roundToCommonMeasurement(Math.max(tspExact, 0.125), "tsp");
+      }
+      return roundToCommonMeasurement(tbspExact, "tbsp");
+    };
+
+    const imperialFromGramsFat = (grams: number, gPerCup: number): { amount: number; unit: string } => {
+      const cupsExact = grams / gPerCup;
+      if (cupsExact >= 0.25) {
+        const formattedCups = formatCups(cupsExact);
+        const estG =
+          formattedCups.unit === "cups"
+            ? formattedCups.amount * gPerCup
+            : formattedCups.amount * (gPerCup / 16);
+        if (Math.abs(estG - grams) / Math.max(grams, 0.001) <= 0.06) {
+          return { amount: formattedCups.amount, unit: formattedCups.unit };
+        }
+      }
+      return roundToCommonMeasurement(cupsExact * 16, "tbsp");
+    };
+
     // Convert all ingredient amounts and units based on ingredient type
     const convertedIngredients = ingredients.map(ing => {
       const lookupKey = ingredientLibraryKey(ing);
@@ -3308,26 +3344,12 @@ export function CreateRecipes() {
         if (ing.unit === "g") {
           if (ingredientType === "powder") {
             const gPerCup = gramsPerCup[lookupKey] || 120;
-            const cups = ing.amount / gPerCup;
-            if (cups >= 0.25) {
-              const formattedCups = formatCups(cups);
-              return { ...ing, amount: formattedCups.amount, unit: formattedCups.unit };
-            } else {
-              const tbsp = cups * 16;
-              const rounded = roundToCommonMeasurement(Math.max(tbsp, 0.5), "tbsp");
-              return { ...ing, amount: rounded.amount, unit: rounded.unit };
-            }
+            const { amount, unit } = imperialFromGramsPowder(ing.amount, gPerCup);
+            return { ...ing, amount, unit };
           } else if (ingredientType === "fat") {
             const gPerCup = gramsPerCup[lookupKey] || 227;
-            const cups = ing.amount / gPerCup;
-            if (cups >= 0.25) {
-              const formattedCups = formatCups(cups);
-              return { ...ing, amount: formattedCups.amount, unit: formattedCups.unit };
-            } else {
-              const tbsp = cups * 16;
-              const rounded = roundToCommonMeasurement(Math.max(tbsp, 0.5), "tbsp");
-              return { ...ing, amount: rounded.amount, unit: rounded.unit };
-            }
+            const { amount, unit } = imperialFromGramsFat(ing.amount, gPerCup);
+            return { ...ing, amount, unit };
           } else {
             // solid, semi-solid, count → oz
             const oz = ing.amount * 0.035274;
