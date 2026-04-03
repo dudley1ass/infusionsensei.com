@@ -43,6 +43,7 @@ import {
   WING_SAUCE_TO_BUILDER_RECIPE,
 } from "../data/builderRecipeMaps";
 import { standardRecipes } from "../data/standardRecipes";
+import { resolveTemplateHeroImage } from "../data/recipeTemplateHeroImages";
 
 export { standardRecipes };
 
@@ -2834,8 +2835,14 @@ export function CreateRecipes() {
                     onClick={() => { setRecipeType("standard"); setSelectedStandardRecipe(recipe.id); trackEvent('recipe_selected', {recipe_name: recipe.name}); }}
                     className="w-full bg-white border-2 border-gray-200 hover:border-green-500 hover:shadow-md rounded-2xl p-4 text-left transition-all group flex items-center gap-4"
                   >
-                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 group-hover:bg-green-200 transition-colors">
-                      {category?.emoji}
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex-shrink-0 overflow-hidden bg-gray-100 border border-gray-200 shadow-inner group-hover:border-green-400 group-hover:ring-2 group-hover:ring-green-200/90 transition-all">
+                      <img
+                        src={resolveTemplateHeroImage(selectedCategory, recipe.id)}
+                        alt={cleanRecipeDisplayTitle(recipe.name)}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-black text-gray-900 text-base">{cleanRecipeDisplayTitle(recipe.name)}</div>
