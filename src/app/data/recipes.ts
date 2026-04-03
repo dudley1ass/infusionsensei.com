@@ -1,22 +1,9 @@
-export interface Recipe {
-  id: string;
-  name: string;
-  category: "edibles" | "drinks" | "infusions" | "basics";
-  difficulty: "beginner" | "intermediate" | "advanced";
-  prepTime: number; // minutes
-  cookTime: number; // minutes
-  servings: number;
-  thcPerServing: string;
-  image: string;
-  description: string;
-  ingredients: string[];
-  instructions: string[];
-  tips?: string[];
-  strainRecommendation?: string;
-  isNew?: boolean;
-}
+import type { Recipe } from "./recipeTypes";
+import { recipesDerivedFromStandardTemplates } from "./recipesFromTemplates";
 
-export const recipes: Recipe[] = [
+export type { Recipe } from "./recipeTypes";
+
+const RECIPES_MANUAL: Recipe[] = [
   {
     id: "classic-cannabutter",
     name: "Classic Cannabutter",
@@ -1352,6 +1339,13 @@ export const recipes: Recipe[] = [
     ],
     tips: ["Break apart while cooling for individual portions."],
   },
+];
+
+/** Manual catalog first; builder templates add any id not already defined (single source for amounts: `standardRecipes.ts`) */
+const MANUAL_RECIPE_IDS = new Set(RECIPES_MANUAL.map((r) => r.id));
+export const recipes: Recipe[] = [
+  ...RECIPES_MANUAL,
+  ...recipesDerivedFromStandardTemplates().filter((r) => !MANUAL_RECIPE_IDS.has(r.id)),
 ];
 
 export const getRecipeById = (id: string): Recipe | undefined => {

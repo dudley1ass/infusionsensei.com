@@ -1,4 +1,4 @@
-import { Recipe } from "../data/recipes";
+import type { Recipe } from "../data/recipeTypes";
 
 type DbRecipeRow = {
   id: string;
