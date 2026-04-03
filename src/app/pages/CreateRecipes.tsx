@@ -121,7 +121,7 @@ const INGREDIENT_LIBRARY = [
   { name: "Cream of Tartar",        category: "leavening",  defaultAmount: 3,   defaultUnit: "g",     calories: 218, carbs: 54.3, protein: 0.0,  fat: 0.0,  type: "powder" },
   { name: "Instant Yeast",          category: "leavening",  defaultAmount: 7,   defaultUnit: "g",     calories: 325, carbs: 40.7, protein: 40.4, fat: 7.6,  type: "powder" },
   { name: "Gelatin (unflavored)",   category: "leavening",  defaultAmount: 7,   defaultUnit: "g",     calories: 335, carbs: 0.0,  protein: 85.0, fat: 0.0,  type: "powder" },
-  { name: "Red Food Coloring",      category: "leavening",  defaultAmount: 10,  defaultUnit: "ml",    calories: 0,   carbs: 0.0,  protein: 0.0,  fat: 0.0,  type: "liquid" },
+  { name: "Red Food Coloring",      category: "flavoring",  defaultAmount: 10,  defaultUnit: "ml",    calories: 0,   carbs: 0.0,  protein: 0.0,  fat: 0.0,  type: "liquid" },
 
   // ── DAIRY ───────────────────────────────────────────────────────
   { name: "Whole Milk",             category: "dairy",      defaultAmount: 120, defaultUnit: "ml",    calories: 61,  carbs: 4.8,  protein: 3.2,  fat: 3.3,  type: "liquid" },
@@ -1973,16 +1973,19 @@ export function CreateRecipes() {
       }
     }
 
-    if (cat === 'leavener') {
+    // Only BP / soda / cream of tartar / yeast belong in flour-ratio math; gelatin & food coloring are "leavening" in the library but must not show this warning on those rows.
+    if (cat === 'leavener' && countsTowardLeavenerFlourRatio(ingredientLibraryKey(ing))) {
       const leavenerToFlour = leavener / Math.max(flour, 1);
-      // Standard: 1 tsp (5g) per 125g flour = 0.04
-      // Pancakes/quick breads use 1.5-2x more leavening — only warn at >3x normal
-      const leavenerWarn = isCakeStyle ? 0.1 : 0.08;
-      if (leavenerToFlour > 0.12) {
-        warning = 'Too much leavener — baked goods will taste bitter and soapy. Typical is 1 tsp per cup of flour.';
+      // ~1 tsp (≈4g) per 125g flour ≈ 0.032. Enriched cakes often use 2–3× that — looser caps than cookies.
+      const leavenerWarn = isCakeStyle ? 0.14 : 0.08;
+      const leavenerProblem = isCakeStyle ? 0.18 : 0.12;
+      if (leavenerToFlour > leavenerProblem) {
+        warning = 'Too much leavener — baked goods will taste bitter or soapy. Typical is about 1–2 tsp baking powder per cup of flour (cakes may use a bit more).';
         color = 'red';
       } else if (leavenerToFlour > leavenerWarn) {
-        warning = 'Leavener is on the high side — may cause excessive puffing. Fine for pancakes, but watch it for cakes.';
+        warning = isCakeStyle
+          ? 'Leavener is elevated vs flour — still plausible for an enriched or high-rise cake; cut back if the batter rises unevenly or tastes metallic.'
+          : 'Leavener is on the high side — may cause excessive puffing. Fine for pancakes; watch it for dense cookies or lean breads.';
         color = 'yellow';
       }
     }
@@ -2161,9 +2164,21 @@ export function CreateRecipes() {
 
     if (moistureRatio > 0.9 && !isHighLiquidRecipe && !isBrownieStyle && !isCakeStyle && !isBarStyle) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    const leavenerWarnRatio = isCakeStyle ? 0.1 : 0.08;
-    if (leavenerRatio > 0.12)   { issues.push('leavener is very high — may taste bitter or soapy'); tags.push({ label: 'Too much leavener', color: 'red' }); severity = 'problem'; }
-    else if (leavenerRatio > leavenerWarnRatio) { issues.push('leavener is elevated — fine for pancakes/quick breads, watch for cakes'); tags.push({ label: 'High leavener', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
+    const leavenerWarnRatio = isCakeStyle ? 0.14 : 0.08;
+    const leavenerProblemRatio = isCakeStyle ? 0.18 : 0.12;
+    if (leavenerRatio > leavenerProblemRatio) {
+      issues.push('leavener is very high — may taste bitter or soapy');
+      tags.push({ label: 'Too much leavener', color: 'red' });
+      severity = 'problem';
+    } else if (leavenerRatio > leavenerWarnRatio) {
+      issues.push(
+        isCakeStyle
+          ? 'leavener is elevated — common for tall butter cakes; reduce only if you see metallic flavor or a very coarse crumb'
+          : 'leavener is elevated — fine for pancakes/quick breads, watch for cookies and lean breads'
+      );
+      tags.push({ label: 'High leavener', color: 'yellow' });
+      if (severity === 'good') severity = 'warning';
+    }
 
     // Positive descriptions when balanced
     if (severity === 'good') {
