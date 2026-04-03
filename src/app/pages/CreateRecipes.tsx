@@ -112,8 +112,8 @@ const INGREDIENT_LIBRARY = [
   { name: "Flax Egg",               category: "egg",        defaultAmount: 45,  defaultUnit: "g",     calories: 37,  carbs: 2.8,  protein: 2.0,  fat: 2.5,  type: "semi-solid" },
 
   // ── LEAVENING ───────────────────────────────────────────────────
-  { name: "Baking Powder",          category: "leavening",  defaultAmount: 1,   defaultUnit: "tsp",   calories: 53,  carbs: 27.7, protein: 0.0,  fat: 0.0,  type: "powder" },
-  { name: "Baking Soda",            category: "leavening",  defaultAmount: 0.5, defaultUnit: "tsp",   calories: 0,   carbs: 0.0,  protein: 0.0,  fat: 0.0,  type: "powder" },
+  { name: "Baking Powder",          category: "leavening",  defaultAmount: 1,   defaultUnit: "tsp",   calories: 53,  carbs: 27.7, protein: 0.0,  fat: 0.0,  type: "powder", driftSoftPct: 0.05, driftHardPct: 0.1 },
+  { name: "Baking Soda",            category: "leavening",  defaultAmount: 0.5, defaultUnit: "tsp",   calories: 0,   carbs: 0.0,  protein: 0.0,  fat: 0.0,  type: "powder", driftSoftPct: 0.05, driftHardPct: 0.1 },
   { name: "Cream of Tartar",        category: "leavening",  defaultAmount: 3,   defaultUnit: "g",     calories: 218, carbs: 54.3, protein: 0.0,  fat: 0.0,  type: "powder" },
   { name: "Instant Yeast",          category: "leavening",  defaultAmount: 7,   defaultUnit: "g",     calories: 325, carbs: 40.7, protein: 40.4, fat: 7.6,  type: "powder" },
   { name: "Gelatin (unflavored)",   category: "leavening",  defaultAmount: 7,   defaultUnit: "g",     calories: 335, carbs: 0.0,  protein: 85.0, fat: 0.0,  type: "powder" },
@@ -1644,6 +1644,112 @@ function hasStructuralBakingFlour(ingredients: Ingredient[]): boolean {
   return ingredients.some((i) => isStructuralBakingFlourKey(ingredientLibraryKey(i)));
 }
 
+/** Soft / hard fractional drift vs servings-scaled template (e.g. 0.10 → OK within ±10%). Optional per-library overrides: driftSoftPct, driftHardPct */
+function driftBandsForLibraryKey(key: string): { soft: number; hard: number } {
+  const lib = INGREDIENT_LIBRARY.find((i) => i.name === key) as
+    | { category?: string; driftSoftPct?: number; driftHardPct?: number }
+    | undefined;
+  if (
+    lib &&
+    typeof lib.driftSoftPct === "number" &&
+    typeof lib.driftHardPct === "number" &&
+    lib.driftHardPct > lib.driftSoftPct
+  ) {
+    return { soft: lib.driftSoftPct, hard: lib.driftHardPct };
+  }
+  const cat = lib?.category ?? "other";
+  if (isStructuralBakingFlourKey(key)) return { soft: 0.1, hard: 0.16 };
+  if (cat === "leavening") return { soft: 0.06, hard: 0.12 };
+  if (cat === "liquid" || cat === "dairy") return { soft: 0.16, hard: 0.28 };
+  if (cat === "sugar") return { soft: 0.22, hard: 0.36 };
+  if (cat === "fat" || cat === "infused") return { soft: 0.15, hard: 0.26 };
+  if (cat === "egg") return { soft: 0.14, hard: 0.24 };
+  if (cat === "flour") return { soft: 0.12, hard: 0.2 };
+  if (cat === "chocolate") return { soft: 0.18, hard: 0.3 };
+  return { soft: 0.2, hard: 0.32 };
+}
+
+function coachingDriftCopy(
+  displayName: string,
+  libraryKey: string,
+  high: boolean,
+  severityHard: boolean,
+  servings: number
+): string {
+  const lib = INGREDIENT_LIBRARY.find((i) => i.name === libraryKey);
+  const cat = lib?.category ?? "other";
+  const s = servings;
+  const structFlour = isStructuralBakingFlourKey(libraryKey);
+
+  if (structFlour) {
+    return high
+      ? severityHard
+        ? `${displayName} is well above this recipe for ${s} servings — bakes often turn dense, dry, or bricky. Ease back on flour or add a little liquid/fat if the mix feels stiff.`
+        : `${displayName} is a bit high for ${s} servings — texture may trend tighter or drier. Trim flour slightly or add a small splash of liquid if needed.`
+      : severityHard
+        ? `${displayName} is well below the scaled recipe for ${s} servings — batters can spread too much, collapse, or feel greasy. Add flour or reduce liquid/fat until it matches the template.`
+        : `${displayName} is a bit low for ${s} servings — you may see extra spread or softness. Add a small amount of flour if the mix is loose.`;
+  }
+
+  if (cat === "leavening") {
+    return high
+      ? severityHard
+        ? `Leavening (${displayName}) is much higher than this recipe at ${s} servings — you risk bitter/soapy flavor and unreliable rise. Scale back toward the template amount.`
+        : `Leavening is a little high for ${s} servings — rise may be aggressive or texture airy. Trim slightly for closer-to-template results.`
+      : severityHard
+        ? `Leavening is much lower than the scaled recipe — the batch may bake dense or squat. Bring it closer to the template for this serving count.`
+        : `Leavening is a little low — you may get less lift than intended. Nudge up if the batter looks heavy.`;
+  }
+
+  if (cat === "liquid" || cat === "dairy") {
+    return high
+      ? severityHard
+        ? `${displayName} is much higher than the template for ${s} servings — expect a looser batter, weaker structure, or longer bake. Cut liquid or add flour (if it fits the recipe) to tighten.`
+        : `${displayName} is a bit high for ${s} servings — the mix may be wetter than intended. Reduce slightly or balance with flour if structure feels weak.`
+      : severityHard
+        ? `${displayName} is much lower than the scaled recipe — results tend toward dry, stiff, or crumbly. Add liquid or fat until it matches the template consistency.`
+        : `${displayName} is a bit low — watch for dryness or toughness. Add a small amount if the dough feels stiff.`;
+  }
+
+  if (cat === "sugar") {
+    return high
+      ? severityHard
+        ? `${displayName} is much higher than the template for ${s} servings — cookies and bars often spread and brown fast; flavor can be cloying. Dial sugar down or add structure (flour) if needed.`
+        : `${displayName} is a bit high for ${s} servings — expect more browning and spread. Trim slightly if you want closer-to-template behavior.`
+      : severityHard
+        ? `${displayName} is much lower than the scaled recipe — results may be pale, bland, or dry. Sweeten back toward the template if taste feels flat.`
+        : `${displayName} is a bit low — color and spread may be muted. Add a little more if the batch seems undersweet.`;
+  }
+
+  if (cat === "fat" || cat === "infused") {
+    return high
+      ? severityHard
+        ? `${displayName} is much higher than the template for ${s} servings — expect greasier texture and extra spread; if this is your infusion, THC per piece concentrates too. Dial fat down or dilute with plain butter/oil.`
+        : `${displayName} is a bit high for ${s} servings — texture may spread or soften more than the recipe assumes. Trim a little if the mix feels oily.`
+      : severityHard
+        ? `${displayName} is much lower than the scaled recipe — bakes may be dry or tough and infusion may taste weak in fat. Add fat or pair with more liquid as the recipe allows.`
+        : `${displayName} is a bit low — watch for a tougher or drier crumb. Add a small amount if the dough feels lean.`;
+  }
+
+  if (cat === "egg") {
+    return high
+      ? severityHard
+        ? `Eggs (${displayName}) are well above the scaled recipe for ${s} servings — the batch may turn custardy, rubbery, or overly cakey. Reduce eggs or add a bit of flour/structure.`
+        : `Eggs are a touch high for ${s} servings — you may get a softer, more tender crumb.`
+      : severityHard
+        ? `Eggs are well below the template for ${s} servings — structure may be crumbly or fragile. Add an egg or a little extra moisture/binder.`
+        : `Eggs are a touch low — structure may be slightly weaker than the template.`;
+  }
+
+  return high
+    ? severityHard
+      ? `${displayName} is well above the scaled template for ${s} servings — flavor or texture may drift. Bring it closer to the recipe or rebalance companion ingredients.`
+      : `${displayName} is a little high for ${s} servings compared with the loaded recipe — tweak down if you want closer-to-template results.`
+    : severityHard
+      ? `${displayName} is well below the scaled template for ${s} servings — flavor or texture may be off. Add back toward the template or adjust paired ingredients.`
+      : `${displayName} is a little low for ${s} servings — nudge up if the mix seems thin on that component.`;
+}
+
 /** All standard cake/cupcake templates — ratio engine uses this + name heuristics for isCakeStyle (sugar, fat, moisture, eggs, leavening). */
 const CAKE_BATTER_STANDARD_IDS = new Set<string>([
   "mini-cupcakes-infused-frosting",
@@ -1685,6 +1791,27 @@ const BAR_TRAY_STANDARD_IDS = new Set<string>([
   "chocolate-chip-cookie-bars",
   "brownie-cheesecake-swirl-bars",
   "smores-bars",
+]);
+
+/** Strips "infused" phrasing for product-forward UI labels only (IDs and ingredient matching unchanged). */
+function cleanRecipeDisplayTitle(name: string): string {
+  return name
+    .replace(/\binfused\b/gi, "")
+    .replace(/\(\s*\)/g, "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\(\s+/g, "(")
+    .replace(/\s+\)/g, ")")
+    .trim();
+}
+
+const CHOCOLATE_FUDGE_BUILDER_ID = "infused-chocolate-fudge";
+/** Fudge template expects modest butter vs chocolate + condensed milk — sum these for a fat budget check */
+const FUDGE_TEMPLATE_FAT_NAMES = new Set([
+  "Cannabutter",
+  "Unsalted Butter",
+  "Salted Butter",
+  "Brown Butter",
+  "Vegan Butter",
 ]);
 
 /** Moisture : flour can exceed cookie limits for batters, tray bakes, and gooey bars. */
@@ -2083,7 +2210,7 @@ export function CreateRecipes() {
             }
           : undefined);
       if (recipe) {
-        setRecipeName(recipe.name);
+        setRecipeName(cleanRecipeDisplayTitle(recipe.name));
         const overrideServings =
           servingsOverrideParam && servingsOverrideParam > 0
             ? Math.max(1, Math.round(servingsOverrideParam))
@@ -2504,8 +2631,70 @@ export function CreateRecipes() {
     return Math.max(0, totalSugarGrams - powdered);
   };
 
+  /** Compares this row to the servings-scaled standard template (no ML) — coaching copy, not binary errors. */
+  const computeTemplateDriftCoaching = (
+    ing: Ingredient,
+    idx: number
+  ): { text: string; color: string; level: "hard" | "soft" } | null => {
+    if (recipeType !== "standard" || !selectedStandardRecipe || !selectedCategory) return null;
+    if (idx < 0 || idx >= ingredients.length) return null;
+    const resolvedId = resolveRecipeIdForCategory(selectedCategory, selectedStandardRecipe);
+    const template = standardRecipes[selectedCategory]?.find((r) => r.id === resolvedId);
+    if (!template || idx >= template.ingredients.length) return null;
+
+    const slotName = template.ingredients[idx];
+    const rowKey = ingredientLibraryKey(ing);
+    if (rowKey !== slotName && ing.name !== slotName) return null;
+
+    if (
+      selectedCategory === "snacks" &&
+      selectedStandardRecipe === CHOCOLATE_FUDGE_BUILDER_ID &&
+      FUDGE_TEMPLATE_FAT_NAMES.has(rowKey)
+    ) {
+      return null;
+    }
+
+    const scale = servings / Math.max(1, template.servings);
+    const libraryRow = INGREDIENT_LIBRARY.find((i) => i.name === slotName);
+    const templateUnit = template.units?.[idx] ?? libraryRow?.defaultUnit ?? "g";
+    const expectedAmount = template.amounts[idx] * scale;
+    const displayName = ing.name?.trim() || slotName;
+
+    if (
+      templateUnit === "large" &&
+      ing.unit === "large" &&
+      (slotName.toLowerCase().includes("egg") || libraryRow?.category === "egg")
+    ) {
+      const delta = ing.amount - expectedAmount;
+      if (Math.abs(delta) < 0.35) return null;
+      const hard = Math.abs(delta) >= 0.9;
+      const high = delta > 0;
+      return {
+        text: coachingDriftCopy(displayName, slotName, high, hard, servings),
+        color: hard ? "red" : "yellow",
+        level: hard ? "hard" : "soft",
+      };
+    }
+
+    const expectedGrams = toGrams(expectedAmount, templateUnit, slotName);
+    const actualGrams = toGramsIng(ing);
+    if (!Number.isFinite(expectedGrams) || expectedGrams <= 0 || !Number.isFinite(actualGrams)) return null;
+
+    const ratio = actualGrams / expectedGrams;
+    const { soft, hard } = driftBandsForLibraryKey(slotName);
+    if (ratio >= 1 - soft && ratio <= 1 + soft) return null;
+
+    const high = ratio > 1;
+    const severityHard = ratio <= 1 - hard || ratio >= 1 + hard;
+    return {
+      text: coachingDriftCopy(displayName, slotName, high, severityHard, servings),
+      color: severityHard ? "red" : "orange",
+      level: severityHard ? "hard" : "soft",
+    };
+  };
+
   // ── Per-ingredient warnings (cookie-science ratio engine) ──
-  const getIngredientWarning = (ing: Ingredient, _servings: number) => {
+  const getIngredientWarning = (ing: Ingredient, _servings: number, idx: number) => {
     const lib = INGREDIENT_LIBRARY.find(i => i.name === ingredientLibraryKey(ing));
     const rawCat = lib?.category || 'other';
     const cat =
@@ -2547,15 +2736,68 @@ export function CreateRecipes() {
       recipeName.toLowerCase().includes("waffle") ||
       recipeName.toLowerCase().includes("crepe") ||
       selectedStandardRecipe === "pancakes";
+    const isFriedDoughStyle =
+      selectedStandardRecipe === "churro-bites" ||
+      selectedStandardRecipe === "funnel-cake-bites" ||
+      recipeName.toLowerCase().includes("churro") ||
+      recipeName.toLowerCase().includes("funnel cake");
 
     let warning = '';
     let color = '';
 
-    // Only run baking-science warnings for structural flour (not cornstarch-thickened sauces)
-    if (!hasStructuralBakingFlour(ingredients)) return { warning, color };
+    const templateDrift = computeTemplateDriftCoaching(ing, idx);
+    if (templateDrift?.level === "hard") {
+      return { warning: templateDrift.text, color: templateDrift.color };
+    }
 
-    // High liquid ratio is expected for batters (pancakes/waffles/crepes), not brownies
-    const isHighLiquidRecipe = isPancakeStyle && totalMoisture > flour * 0.8;
+    // No-bake fudge has no structural flour — fat-ratio engine below is skipped. Warn when butter/cannabutter far exceeds the template budget.
+    if (
+      recipeType === "standard" &&
+      selectedCategory === "snacks" &&
+      selectedStandardRecipe === CHOCOLATE_FUDGE_BUILDER_ID &&
+      cat === "fat"
+    ) {
+      const fudgeTemplate = standardRecipes.snacks?.find((r) => r.id === CHOCOLATE_FUDGE_BUILDER_ID);
+      if (fudgeTemplate) {
+        const scale = servings / Math.max(1, fudgeTemplate.servings);
+        let expectedFatG = 0;
+        fudgeTemplate.ingredients.forEach((nm: string, idx: number) => {
+          if (FUDGE_TEMPLATE_FAT_NAMES.has(nm)) expectedFatG += fudgeTemplate.amounts[idx] * scale;
+        });
+        let actualFatG = 0;
+        for (const row of ingredients) {
+          const k = ingredientLibraryKey(row);
+          if (FUDGE_TEMPLATE_FAT_NAMES.has(k)) actualFatG += toGramsIng(row);
+        }
+        if (expectedFatG > 0 && actualFatG > expectedFatG * 1.6) {
+          const ratio = actualFatG / expectedFatG;
+          const thisFatG = toGramsIng(ing);
+          const isLargestBudgetFat = !ingredients.some((other) => {
+            if (other === ing) return false;
+            return FUDGE_TEMPLATE_FAT_NAMES.has(ingredientLibraryKey(other)) && toGramsIng(other) > thisFatG;
+          });
+          if (isLargestBudgetFat) {
+            warning =
+              ratio >= 2.35
+                ? `Very high fat for this fudge formula (~${actualFatG.toFixed(0)}g vs ~${expectedFatG.toFixed(0)}g typical at this serving count). That much butter often prevents fudge from setting, causes oil to pool, or makes the batch greasy — and THC becomes concentrated in the same number of pieces if you keep the same cut grid. Prefer diluting with plain butter or using less cannabutter if you want traditional fudge texture.`
+                : `Fat is high for this fudge formula (~${actualFatG.toFixed(0)}g vs ~${expectedFatG.toFixed(0)}g typical at this serving count). Excess butter can keep fudge soft or greasy; reduce it if the mixture looks oily or never firms up.`;
+            color = ratio >= 2.35 ? "red" : "orange";
+            return { warning, color };
+          }
+        }
+      }
+    }
+
+    // Only run baking-science warnings for structural flour (not cornstarch-thickened sauces)
+    if (!hasStructuralBakingFlour(ingredients)) {
+      if (templateDrift?.level === "soft") {
+        return { warning: templateDrift.text, color: templateDrift.color };
+      }
+      return { warning, color };
+    }
+
+    // High liquid ratio is expected for batters and fried dough styles.
+    const isHighLiquidRecipe = (isPancakeStyle && totalMoisture > flour * 0.8) || isFriedDoughStyle;
 
     if (cat === 'flour') {
       // Cookie and dessert-bar crusts are intentionally low in "moisture" vs flour — these ratios misfire.
@@ -2686,7 +2928,11 @@ export function CreateRecipes() {
       }
     }
 
-    return { warning, color };
+    if (warning) return { warning, color };
+    if (templateDrift?.level === "soft") {
+      return { warning: templateDrift.text, color: templateDrift.color };
+    }
+    return { warning: "", color: "" };
   };
 
   // Recipe Summary Analysis
@@ -2734,13 +2980,18 @@ export function CreateRecipes() {
       recipeName.toLowerCase().includes("waffle") ||
       recipeName.toLowerCase().includes("crepe") ||
       selectedStandardRecipe === "pancakes";
+    const isFriedDoughStyle =
+      selectedStandardRecipe === "churro-bites" ||
+      selectedStandardRecipe === "funnel-cake-bites" ||
+      recipeName.toLowerCase().includes("churro") ||
+      recipeName.toLowerCase().includes("funnel cake");
     const isSavoryStyle = selectedCategory === "wings" || selectedCategory === "spreads-dips" || selectedCategory === "savory-meals";
     const isDrinkStyle = selectedCategory === "drinks";
 
     const structuralFlour = hasStructuralBakingFlour(ingredients);
 
-    // High liquid intentional recipes (pancakes, waffles, crepes, batters)
-    const isHighLiquidRecipe = structuralFlour && isPancakeStyle && totalMoisture > flour * 0.8;
+    // High liquid intentional recipes (pancakes, waffles, crepes, churros, funnel cake)
+    const isHighLiquidRecipe = (structuralFlour && isPancakeStyle && totalMoisture > flour * 0.8) || isFriedDoughStyle;
 
     const tags: { label: string; color: string }[] = [];
     if (hasInfused) tags.push({ label: '🧪 Cannabis Infused', color: 'purple' });
@@ -2768,11 +3019,13 @@ export function CreateRecipes() {
     // Batter recipe — high liquid is intentional
     if (isHighLiquidRecipe) {
       return {
-        headline: '🥞 Batter Recipe',
-        description: 'High liquid ratio detected — this is expected for pancakes, waffles, or crepe-style batters. Ratios look correct.',
+        headline: isFriedDoughStyle ? '🍩 Fried Dough Recipe' : '🥞 Batter Recipe',
+        description: isFriedDoughStyle
+          ? 'Higher moisture is expected for churro and funnel-cake style doughs. Ratios look correct for a piped/fried preparation.'
+          : 'High liquid ratio detected — this is expected for pancakes, waffles, or crepe-style batters. Ratios look correct.',
         tags: [...tags, { label: 'Batter', color: 'blue' }, { label: 'Balanced', color: 'green' }],
         severity: 'good',
-        styleLabel: 'Batter',
+        styleLabel: isFriedDoughStyle ? 'Fried Dough' : 'Batter',
       };
     }
 
@@ -3332,7 +3585,7 @@ export function CreateRecipes() {
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-2xl">{recipe.categoryEmoji}</span>
-                              <h4 className="font-bold text-gray-900">{recipe.name}</h4>
+                              <h4 className="font-bold text-gray-900">{cleanRecipeDisplayTitle(recipe.name)}</h4>
                             </div>
                             <p className="text-xs text-gray-600">{recipe.categoryName}</p>
                           </div>
@@ -3414,6 +3667,28 @@ export function CreateRecipes() {
   if (selectedCategory && !recipeType) {
     const category = recipeCategories.find(c => c.id === selectedCategory);
     const categoryRecipes = standardRecipes[selectedCategory] || [];
+    const sortedCategoryRecipes = [...categoryRecipes].sort((a, b) =>
+      cleanRecipeDisplayTitle(a.name).localeCompare(cleanRecipeDisplayTitle(b.name))
+    );
+    const snackGroupLabel = (recipe: { id: string; name: string }) => {
+      const key = `${recipe.id} ${recipe.name}`.toLowerCase();
+      if (/(popcorn|kettle-corn)/.test(key)) return "Popcorn";
+      if (/pretzel/.test(key)) return "Pretzels";
+      if (/(gumm|jello|gel cube|shot)/.test(key)) return "Gummies & Jello";
+      if (/(brownie|blondie|fudge|marshmallow|cupcake|cookie|churro|funnel-cake|rice-krispie|cereal treat)/.test(key)) return "Sweet Bites";
+      if (/(mix|nuts|cracker|chex)/.test(key)) return "Snack Mixes & Savory";
+      return "Other Snacks";
+    };
+    const snackGroupOrder = ["Popcorn", "Pretzels", "Gummies & Jello", "Sweet Bites", "Snack Mixes & Savory", "Other Snacks"];
+    const groupedSnackRecipes =
+      selectedCategory === "snacks"
+        ? snackGroupOrder
+            .map((label) => ({
+              label,
+              recipes: sortedCategoryRecipes.filter((recipe) => snackGroupLabel(recipe) === label),
+            }))
+            .filter((group) => group.recipes.length > 0)
+        : [];
 
     return (
       <div className="max-w-4xl mx-auto space-y-5">
@@ -3442,28 +3717,37 @@ export function CreateRecipes() {
         {/* Recipe cards — horizontal list */}
         {categoryRecipes.length > 0 && (
           <div className="space-y-3">
-            {categoryRecipes.map((recipe) => (
-              <button
-                key={recipe.id}
-                onClick={() => { setRecipeType("standard"); setSelectedStandardRecipe(recipe.id); trackEvent('recipe_selected', {recipe_name: recipe.name}); }}
-                className="w-full bg-white border-2 border-gray-200 hover:border-green-500 hover:shadow-md rounded-2xl p-4 text-left transition-all group flex items-center gap-4"
-              >
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 group-hover:bg-green-200 transition-colors">
-                  {category?.emoji}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-black text-gray-900 text-base">{recipe.name}</div>
-                  <div className="text-gray-500 text-sm mt-0.5">
-                    {recipe.servings} servings · {recipe.ingredients.length} ingredients
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-xs bg-green-100 text-green-700 font-semibold px-2.5 py-1 rounded-full">
-                    Load Recipe
-                  </span>
-                  <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-green-600 group-hover:translate-x-0.5 transition-all" />
-                </div>
-              </button>
+            {(selectedCategory === "snacks" ? groupedSnackRecipes : [{ label: "", recipes: sortedCategoryRecipes }]).map((group) => (
+              <div key={group.label || "all"} className="space-y-3">
+                {group.label ? (
+                  <h2 className="text-sm font-black uppercase tracking-wide text-gray-500 pt-2">
+                    {group.label}
+                  </h2>
+                ) : null}
+                {group.recipes.map((recipe) => (
+                  <button
+                    key={recipe.id}
+                    onClick={() => { setRecipeType("standard"); setSelectedStandardRecipe(recipe.id); trackEvent('recipe_selected', {recipe_name: recipe.name}); }}
+                    className="w-full bg-white border-2 border-gray-200 hover:border-green-500 hover:shadow-md rounded-2xl p-4 text-left transition-all group flex items-center gap-4"
+                  >
+                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 group-hover:bg-green-200 transition-colors">
+                      {category?.emoji}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-black text-gray-900 text-base">{cleanRecipeDisplayTitle(recipe.name)}</div>
+                      <div className="text-gray-500 text-sm mt-0.5">
+                        {recipe.servings} servings · {recipe.ingredients.length} ingredients
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-xs bg-green-100 text-green-700 font-semibold px-2.5 py-1 rounded-full">
+                        Load Recipe
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-green-600 group-hover:translate-x-0.5 transition-all" />
+                    </div>
+                  </button>
+                ))}
+              </div>
             ))}
           </div>
         )}
@@ -3499,7 +3783,9 @@ export function CreateRecipes() {
     const category = recipeCategories.find(c => c.id === selectedCategory);
     const startingRecipeName =
       recipeType === "standard" && selectedCategory && selectedStandardRecipe
-        ? (standardRecipes[selectedCategory] || []).find((r) => r.id === selectedStandardRecipe)?.name
+        ? cleanRecipeDisplayTitle(
+            (standardRecipes[selectedCategory] || []).find((r) => r.id === selectedStandardRecipe)?.name ?? ""
+          )
         : "";
 
     // Dosing tier
@@ -4081,7 +4367,7 @@ export function CreateRecipes() {
 
             <div className="divide-y divide-gray-100 px-2 py-2">
               {ingredients.map((ing, idx) => {
-                const warning = getIngredientWarning(ing, servings);
+                const warning = getIngredientWarning(ing, servings, idx);
                 const lib = INGREDIENT_LIBRARY.find(i => i.name === ingredientLibraryKey(ing));
                 const cat = lib?.category || "other";
                 const ingredientSelectValue = ing.infusionBaseId
