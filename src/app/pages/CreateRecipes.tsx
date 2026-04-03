@@ -4305,6 +4305,47 @@ export function CreateRecipes() {
 
         {/* ── SCREEN VERSION ─────────────────────────────── */}
         <div className="screen-only max-w-7xl mx-auto">
+          {/* Mobile / tablet: compact THC always visible under site header while scrolling */}
+          <div className="no-print lg:hidden">
+            <div
+              aria-live="polite"
+              aria-label={`THC ${thcPerServing.toFixed(1)} milligrams per serving, ${totalTHC.toFixed(0)} milligrams total batch, ${servings} servings, ${dosingTier.label} strength`}
+              className="fixed left-0 right-0 z-40 border-b border-black/20 bg-gradient-to-r from-green-800 via-green-900 to-green-950 px-2 py-1.5 shadow-md"
+              style={{ top: "max(4rem, calc(env(safe-area-inset-top, 0px) + 3.25rem))" }}
+            >
+              <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 text-center leading-tight">
+                <span className="inline-flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wide text-green-200/90 sm:text-[10px]">
+                  <Calculator className="h-3 w-3 shrink-0 text-green-300" aria-hidden />
+                  Live
+                </span>
+                <span className="text-[10px] font-black tabular-nums text-white sm:text-[11px]">
+                  {thcPerServing.toFixed(1)} mg/srv
+                </span>
+                <span className="text-[9px] text-green-300/70">·</span>
+                <span className="text-[9px] tabular-nums text-green-100 sm:text-[10px]">{totalTHC.toFixed(0)} mg tot</span>
+                <span className="text-[9px] text-green-300/70">·</span>
+                <span className="text-[9px] tabular-nums text-green-100 sm:text-[10px]">{servings} srv</span>
+                <span className="text-[9px] text-green-300/70">·</span>
+                <span
+                  className={`text-[9px] font-bold sm:text-[10px] ${
+                    dosingTier.label === "Microdose"
+                      ? "text-sky-200"
+                      : dosingTier.label === "Low"
+                        ? "text-lime-200"
+                        : dosingTier.label === "Moderate"
+                          ? "text-yellow-200"
+                          : dosingTier.label === "High"
+                            ? "text-orange-200"
+                            : "text-red-200"
+                  }`}
+                >
+                  {dosingTier.label}
+                </span>
+              </div>
+            </div>
+            <div className="h-11 w-full shrink-0 sm:h-12" aria-hidden />
+          </div>
+
           <InfusionFunnelProgressBar
             activeStep={3}
             step1CompleteNote={funnelStep1Done}
