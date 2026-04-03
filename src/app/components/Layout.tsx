@@ -3,7 +3,7 @@ import { Leaf, BookOpen, FlaskConical, Home, Menu, Package, Calculator } from "l
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { useEffect } from "react";
-import { captureUtmFromUrl, markSessionOnce, trackPageView } from "../utils/analytics";
+import { captureSessionLanding, captureUtmFromUrl, markSessionOnce, trackPageView } from "../utils/analytics";
 
 export function Layout() {
   const location = useLocation();
@@ -16,6 +16,7 @@ export function Layout() {
   // Capture UTM/referrer attribution and emit SPA page views.
   useEffect(() => {
     captureUtmFromUrl(location.search);
+    captureSessionLanding(location.pathname, location.search);
     markSessionOnce();
     trackPageView(`${location.pathname}${location.search}`);
   }, [location.pathname, location.search]);

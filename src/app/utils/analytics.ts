@@ -2,6 +2,35 @@ type EventParams = Record<string, string | number | boolean | null | undefined>;
 
 const UTM_STORAGE_KEY = "is_utm_attribution";
 const SESSION_MARK_KEY = "is_session_marked";
+const SESSION_LANDING_KEY = "is_session_landing";
+
+export type SessionLandingSnapshot = {
+  landing_path: string;
+  landing_page: string;
+};
+
+/** First URL in this tab (for GA4 custom dims / debugging). Call once per navigation batch from Layout. */
+export function captureSessionLanding(pathname: string, search: string): void {
+  if (typeof window === "undefined") return;
+  if (sessionStorage.getItem(SESSION_LANDING_KEY)) return;
+  const landing_path = `${pathname}${search || ""}`;
+  const payload: SessionLandingSnapshot = {
+    landing_path,
+    landing_page: pathname,
+  };
+  sessionStorage.setItem(SESSION_LANDING_KEY, JSON.stringify(payload));
+}
+
+export function getSessionLandingSnapshot(): SessionLandingSnapshot | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(SESSION_LANDING_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as SessionLandingSnapshot;
+  } catch {
+    return null;
+  }
+}
 
 type UTMAttribution = {
   source: string;
@@ -90,8 +119,10 @@ export function trackEvent(name: string, params?: EventParams): void {
 export function trackPageView(path: string): void {
   if (typeof window.gtag !== "function") return;
   const attr = getStoredAttribution();
+  const land = getSessionLandingSnapshot();
   window.gtag("event", "page_view", {
     page_path: path,
+    session_landing_page: land?.landing_path,
     source: attr.source,
     medium: attr.medium,
     campaign: attr.campaign,
@@ -103,6 +134,11 @@ export function trackPageView(path: string): void {
 export function markSessionOnce(): void {
   if (sessionStorage.getItem(SESSION_MARK_KEY)) return;
   sessionStorage.setItem(SESSION_MARK_KEY, "1");
-  trackEvent("session_started");
+  const landing = getSessionLandingSnapshot();
+  const landing_page =
+    landing?.landing_path ||
+    (typeof window !== "undefined" ? `${window.location.pathname}${window.location.search}` : "/");
+  trackEvent("session_started", { landing_page });
 }
+
 

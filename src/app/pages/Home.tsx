@@ -36,36 +36,58 @@ export function Home() {
             <p className="hidden sm:block text-green-400 text-xs sm:text-sm mb-1.5">Start by building your infused base, then use it in recipes.</p>
           </div>
 
-          <div className="flex justify-center mb-1.5">
+          <p className="text-center text-green-200 text-xs font-bold uppercase tracking-wide mb-2">Pick your path</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mb-2 max-w-3xl mx-auto">
+            <Link
+              to="/party-mode"
+              onClick={() => {
+                trackEvent("homepage_forced_path", { path: "party_mode" });
+                trackEvent("homepage_primary_cta_click", { location: "hero_three", target: "party_mode" });
+              }}
+            >
+              <Button size="lg" className="w-full bg-amber-400 text-gray-900 hover:bg-amber-300 font-black text-sm py-5 shadow-lg rounded-xl border-2 border-amber-200/80 flex items-center justify-center gap-1.5">
+                Build Party Pack <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link
+              to="/edibles-calculator"
+              onClick={() => {
+                trackEvent("homepage_forced_path", { path: "calculator" });
+                trackEvent("homepage_primary_cta_click", { location: "hero_three", target: "edibles-calculator" });
+              }}
+            >
+              <Button size="lg" className="w-full bg-white text-green-800 hover:bg-green-50 font-black text-sm py-5 shadow-xl rounded-xl flex items-center justify-center gap-1.5">
+                THC Calculator <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link
+              to="/wings"
+              onClick={() => {
+                trackEvent("homepage_forced_path", { path: "wings" });
+                trackEvent("homepage_primary_cta_click", { location: "hero_three", target: "wings" });
+              }}
+            >
+              <Button size="lg" className="w-full bg-green-900/80 text-white hover:bg-green-900 font-black text-sm py-5 shadow-lg rounded-xl border-2 border-white/25 flex items-center justify-center gap-1.5">
+                Start with Wings <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+          <p className="text-center text-green-200 text-xs sm:text-sm mb-2">
             <Link
               to="/ingredients"
               state={{ resetStartHere: true }}
               onClick={() => {
-                trackEvent("homepage_cta_click", { location: "hero", target: "ingredients" });
-                trackEvent("homepage_primary_cta_click", { location: "hero", target: "ingredients" });
+                trackEvent("homepage_cta_click", { location: "hero_secondary", target: "ingredients" });
               }}
+              className="hover:text-white font-semibold"
             >
-              <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-sm sm:text-base px-6 sm:px-8 py-4 sm:py-5 shadow-xl rounded-xl transition-transform hover:scale-105">
-                Start Here (Free) <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
+              Recipe builder (all categories)
             </Link>
-          </div>
-          <p className="text-center text-green-200 text-xs sm:text-sm mb-1.5">
-            <Link to="/edibles-calculator" onClick={() => trackEvent("homepage_cta_click", { location: "hero_secondary", target: "calculator" })} className="hover:text-white font-semibold">Use calculator instead</Link>
-            {" "}·{" "}
+            {" "}&middot;{" "}
             <Link to="/recipes" onClick={() => trackEvent("homepage_cta_click", { location: "hero_secondary", target: "recipes" })} className="hover:text-white font-semibold">Browse recipes</Link>
+            {" "}&middot;{" "}
+            <Link to="/utm" onClick={() => trackEvent("homepage_cta_click", { location: "hero_secondary", target: "utm" })} className="hover:text-white font-semibold">Growth &amp; UTM tools</Link>
           </p>
-          <div className="rounded-2xl border border-white/20 bg-black/20 p-3 mb-2">
-            <p className="text-white font-black text-sm sm:text-base text-center">Start Your Infusion Plan</p>
-            <div className="mt-2 flex flex-col sm:flex-row gap-2 justify-center">
-              <Link to="/edibles-calculator" onClick={() => trackEvent("homepage_funnel_click", { target: "calculator" })}>
-                <Button className="bg-white text-green-800 hover:bg-green-50 font-bold w-full sm:w-auto">Use Calculator</Button>
-              </Link>
-              <Link to="/party-mode" onClick={() => trackEvent("homepage_funnel_click", { target: "party_mode" })}>
-                <Button variant="outline" className="border-white/40 text-white hover:bg-white/10 font-bold w-full sm:w-auto">Plan Party Mode</Button>
-              </Link>
-            </div>
-          </div>
 
           {/* What are you making today? */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-1.5 sm:mb-2">

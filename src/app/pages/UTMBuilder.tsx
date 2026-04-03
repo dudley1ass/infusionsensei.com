@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Copy, CheckCheck } from "lucide-react";
+import { getSessionLandingSnapshot, getStoredAttribution } from "../utils/analytics";
 
 const PAGES = [
   { label: "🏠 Homepage", path: "/" },
+  { label: "🎉 Party Mode", path: "/party-mode" },
+  { label: "🧮 THC Calculator", path: "/edibles-calculator" },
   { label: "🍗 Wing Sauces", path: "/wings" },
   { label: "🍿 Popcorn", path: "/popcorn" },
   { label: "☕ Coffee", path: "/coffee" },
@@ -12,6 +15,24 @@ const PAGES = [
   { label: "🧪 My Infusions", path: "/infusions" },
   { label: "🔧 Create Recipe", path: "/ingredients" },
   { label: "📚 Learn", path: "/learn" },
+];
+
+const WEEKLY_CADENCE = [
+  {
+    channel: "Reddit",
+    cadence: "1 post / day in a relevant sub (rotate r/treedibles, r/infused, local cannabis cooking)",
+    template: "https://infusionsensei.com/wings?utm_source=reddit&utm_medium=social&utm_campaign=daily-post&utm_content=day-{n}",
+  },
+  {
+    channel: "TikTok",
+    cadence: "1 short / day — hook with dosing safety, link in bio to calculator or party mode",
+    template: "https://infusionsensei.com/edibles-calculator?utm_source=tiktok&utm_medium=social&utm_campaign=daily-video&utm_content=video-{n}",
+  },
+  {
+    channel: "Pinterest",
+    cadence: "1–2 pins / day — recipe card + “mg per serving” text overlay",
+    template: "https://infusionsensei.com/edible-recipes?utm_source=pinterest&utm_medium=social&utm_campaign=daily-pin&utm_content=pin-{n}",
+  },
 ];
 
 const SOURCES = [
@@ -40,6 +61,17 @@ export function UTMBuilder() {
   const [campaign, setCampaign] = useState("");
   const [content, setContent] = useState("");
   const [copied, setCopied] = useState(false);
+  const [sessionDebug, setSessionDebug] = useState<{
+    attribution: ReturnType<typeof getStoredAttribution> | null;
+    landing: ReturnType<typeof getSessionLandingSnapshot> | null;
+  } | null>(null);
+
+  useEffect(() => {
+    setSessionDebug({
+      attribution: getStoredAttribution(),
+      landing: getSessionLandingSnapshot(),
+    });
+  }, []);
 
   const selectedSource = SOURCES.find(s => s.value === source && s.medium === medium) || SOURCES[0];
 
@@ -66,9 +98,34 @@ export function UTMBuilder() {
       <Helmet><title>UTM Link Builder | Infusion Sensei</title></Helmet>
 
       <div className="bg-gradient-to-br from-green-700 to-green-900 rounded-3xl p-8 text-white">
-        <h1 className="text-3xl font-black mb-2">🔗 UTM Link Builder</h1>
-        <p className="text-green-200">Build tracked links for every post so GA shows TikTok, Reddit, Instagram — not "not set".</p>
+        <h1 className="text-3xl font-black mb-2">🔗 Growth &amp; UTM Tools</h1>
+        <p className="text-green-200">
+          Build tracked links for every post so GA4 shows TikTok, Reddit, and Pinterest — not &quot;Unassigned&quot; or plain direct.
+        </p>
       </div>
+
+      {sessionDebug && (
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+          <h2 className="font-black text-gray-900 mb-3">This browser session (debug)</h2>
+          <p className="text-xs text-gray-500 mb-4">
+            Used to verify first-touch UTM storage and landing path. In GA4, map custom parameters or use DebugView while testing.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-3 text-sm">
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <p className="text-xs font-bold text-gray-500 uppercase">Stored attribution</p>
+              <pre className="mt-1 text-xs text-gray-800 whitespace-pre-wrap break-all font-mono">
+                {JSON.stringify(sessionDebug.attribution, null, 2)}
+              </pre>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <p className="text-xs font-bold text-gray-500 uppercase">Session landing</p>
+              <pre className="mt-1 text-xs text-gray-800 whitespace-pre-wrap break-all font-mono">
+                {JSON.stringify(sessionDebug.landing, null, 2)}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-6">
 
@@ -156,6 +213,32 @@ export function UTMBuilder() {
           <p className="text-sm font-bold text-blue-800 mb-2">📍 Where to find this in GA4</p>
           <p className="text-xs text-blue-700">Reports → Acquisition → Traffic Acquisition → Session source/medium</p>
           <p className="text-xs text-blue-700 mt-1">Or: Reports → Acquisition → Traffic Acquisition → Session campaign</p>
+        </div>
+      </div>
+
+      {/* Distribution cadence */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <h2 className="font-black text-gray-900 mb-2">📅 Weekly distribution cadence</h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Repeatable beats viral. Replace <span className="font-mono text-green-700">{"{n}"}</span> with the day or post number. Always use the same campaign name per week so GA4 buckets cleanly.
+        </p>
+        <div className="space-y-4">
+          {WEEKLY_CADENCE.map((row) => (
+            <div key={row.channel} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+              <p className="font-black text-gray-900">{row.channel}</p>
+              <p className="text-sm text-gray-600 mt-1">{row.cadence}</p>
+              <div className="mt-2 flex items-start gap-2">
+                <p className="text-green-700 font-mono text-xs flex-1 break-all">{row.template}</p>
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(row.template.replace("{n}", "1"))}
+                  className="flex-shrink-0 text-xs bg-gray-200 hover:bg-green-100 text-gray-700 px-2 py-1 rounded-lg"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

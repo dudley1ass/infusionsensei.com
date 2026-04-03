@@ -56,6 +56,12 @@ import { SavoryCannabisPage } from "./pages/SavoryCannabisPage";
 import { PartyPackPlanner } from "./pages/PartyPackPlanner";
 import { PartyGroceryList } from "./pages/PartyGroceryList";
 import { ContactUs } from "./pages/ContactUs";
+import { CannabisWingsDosingGuide } from "./pages/articles/CannabisWingsDosingGuide";
+import { EdiblesCalculatorWalkthrough } from "./pages/articles/EdiblesCalculatorWalkthrough";
+import { MgThcPerServingPartyEdibles } from "./pages/articles/MgThcPerServingPartyEdibles";
+import { WingSauceThcDosing } from "./pages/articles/WingSauceThcDosing";
+import { PartyPackPlanningGuide } from "./pages/articles/PartyPackPlanningGuide";
+import { InfusedFudgeRecipe } from "./pages/articles/InfusedFudgeRecipe";
 
 function RedirectFriesToSpreadsDips() {
   return <Navigate to="/spreads-dips" replace />;
@@ -125,6 +131,12 @@ export const router = createBrowserRouter([
       { path: "learn/articles/thc-dosage-calculator-explained", Component: ThcDosageCalculatorExplained },
       { path: "learn/articles/how-strong-are-homemade-edibles", Component: HowStrongAreHomemadeEdibles },
       { path: "learn/articles/weed-butter-ratio-guide", Component: WeedButterRatioGuide },
+      { path: "learn/articles/cannabis-wings-dosing", Component: CannabisWingsDosingGuide },
+      { path: "learn/articles/edibles-calculator-walkthrough", Component: EdiblesCalculatorWalkthrough },
+      { path: "learn/articles/mg-thc-per-serving-party-edibles", Component: MgThcPerServingPartyEdibles },
+      { path: "learn/articles/wing-sauce-thc-dosing", Component: WingSauceThcDosing },
+      { path: "learn/articles/cannabis-party-pack-planning", Component: PartyPackPlanningGuide },
+      { path: "learn/articles/infused-fudge-recipe", Component: InfusedFudgeRecipe },
       { path: "learn/articles/how-to-dose-edibles-safely", Component: DosingGuide },
       { path: "learn/articles/why-edibles-hit-harder", Component: WhyEdiblesHitTooHard },
       { path: "learn/articles/how-to-calculate-thc-in-edibles", Component: THCPerServingCalculator },

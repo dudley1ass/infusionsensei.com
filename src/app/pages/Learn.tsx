@@ -512,6 +512,7 @@ export function Learn() {
             { title: "Infused Drinks Guide", desc: "Smoothies, coffee, tea, and more", to: "/infused-drinks", emoji: "🥤" },
             { title: "Savory Cannabis Recipes", desc: "Wings, fries, pizza sauce, pasta", to: "/savory-cannabis", emoji: "🍗" },
             { title: "My Infusions", desc: "Build cannabutter and cannabis oils", to: "/infusions", emoji: "🧈" },
+            { title: "Growth & UTM Tools", desc: "Tracked links, weekly cadence, session attribution check", to: "/utm", emoji: "🔗" },
           ].map(({ title, desc, to, emoji }) => (
             <a key={title} href={to} className="flex items-start gap-3 bg-gray-50 hover:bg-green-50 border border-gray-200 hover:border-green-300 rounded-2xl p-4 transition-all group">
               <span className="text-2xl">{emoji}</span>
