@@ -4,7 +4,7 @@ import {
   POPCORN_TO_BUILDER_RECIPE,
   WING_SAUCE_TO_BUILDER_RECIPE,
 } from "./builderRecipeMaps";
-import { recipeLocalImage } from "./recipeLocalImageUrls";
+import { drinkShowcaseHeroImage, recipeLocalImage } from "./recipeLocalImageUrls";
 import { DEFAULT_RECIPE_STOCK_IMAGE, POPCORN_STOCK_BY_ID } from "./recipeStockImageUrls";
 
 /**
@@ -45,10 +45,14 @@ export function resolveTemplateHeroImage(builderKey: string, id: string): string
   }
 
   if (builderKey === "drinks") {
+    const showcase = drinkShowcaseHeroImage(id);
+    if (showcase) return showcase;
     const stem = DRINK_HERO_STEM_OVERRIDE[id] ?? COFFEE_TO_BUILDER_RECIPE[id] ?? id;
     return recipeLocalImage(stem);
   }
 
+  const coffeeShowcase = drinkShowcaseHeroImage(id);
+  if (coffeeShowcase) return coffeeShowcase;
   const coffeeBase = COFFEE_TO_BUILDER_RECIPE[id];
   if (coffeeBase) return recipeLocalImage(coffeeBase);
 

@@ -6,6 +6,46 @@
  * root folder.
  */
 
+/** Single file under `public/images/` (any extension). */
+export function rootMarketingImage(filename: string): string {
+  return `/images/${encodeURIComponent(filename)}`;
+}
+
+/**
+ * `Coffee.tsx` slugs and canonical drink template ids → root PNG for builder / showcase heroes.
+ * Checked in `resolveTemplateHeroImage` before stem mapping.
+ */
+export const COFFEE_SHOWCASE_ROOT_PNG: Record<string, string> = {
+  bulletproof: "bulletproof.png",
+  "bulletproof-coffee": "bulletproof.png",
+  "infused-latte": "latte.png",
+  "cold-brew": "cold_brew.png",
+  "infused-mocha": "mocha.png",
+  "infused-caramel-latte": "caramel_latte.png",
+  "infused-americano": "americano.png",
+  "infused-iced-coffee": "iced_coffee.png",
+  "infused-frappuccino": "frappuccino.png",
+  "golden-latte": "golden_latte.png",
+  "infused-matcha": "matcha.png",
+  "infused-chai": "chai.png",
+  "infused-hot-chocolate": "hot_chocolate.png",
+  "infused-irish-coffee": "irish_coffee.png",
+  "espresso-tonic": "espresso_tonic.png",
+  "coconut-coffee": "coconut_coffee.png",
+  "pumpkin-spice-latte": "cinnamon_dolce.png",
+  "mint-mocha": "mint_mocha.png",
+  "cinnamon-dolce": "cinnamon_dolce.png",
+  cortado: "cortado.png",
+  "vanilla-latte": "vanilla_latte.png",
+  "cannabis-tea": "tea.png",
+  "cannabis-smoothie": "protein_smoothie.png",
+};
+
+export function drinkShowcaseHeroImage(slugOrTemplateId: string): string | undefined {
+  const f = COFFEE_SHOWCASE_ROOT_PNG[slugOrTemplateId];
+  return f ? rootMarketingImage(f) : undefined;
+}
+
 /** Popcorn snack templates (PNG heroes). */
 const POPCORN_HERO_AT_ROOT: Record<string, string> = {
   "garlic-butter-popcorn": "garlic_butter_popcorn.png",
@@ -22,7 +62,7 @@ const SPREADS_SNACKS_PNG_AT_ROOT: Record<string, string> = {
   "infused-peanut-butter-spread": "peanut_butter.png",
   "infused-cream-cheese-whipped": "cream_cheese.png",
   "sweet-honey-cream-cheese-spread-infused": "honey_cream_cheese.png",
-  "herb-garlic-cream-cheese-spread-infused": "cream_cheese.png",
+  "herb-garlic-cream-cheese-spread-infused": "herb_garlic_cream_cheese.png",
   "queso-dip-infused": "queso_dip.png",
   "spinach-artichoke-dip-infused": "spinach_artichoke_dip.png",
   "ranch-dip-infused": "ranch_dip.png",
@@ -31,6 +71,7 @@ const SPREADS_SNACKS_PNG_AT_ROOT: Record<string, string> = {
   "sweet-chili-sauce-infused": "sweet_chili_sauce.png",
   "cheese-sauce-infused": "cheese_sauce.png",
   "buffalo-dip-infused": "cheese_dip.png",
+  "garlic-aioli-infused": "garlicaioli.png",
   "chex-mix-infused": "chex_mix.png",
   "infused-nuts": "mixed_nuts.png",
   "snack-mix-party": "party_mix.png",
@@ -59,6 +100,30 @@ const WING_HERO_JPEG: Record<string, string> = {
   "orange-glaze-wings": "orangeglazed.jpg",
   "garlic-soy-umami-wings": "soygarlicwings.jpg",
   "chimichurri-wings": "chimichurrichicken.jpg",
+};
+
+/** New root PNGs — spread late so they override earlier JPG lines in `HERO_JPEG_AT_IMAGES_ROOT`. */
+const ROOT_PNG_MARKETING_AT_ROOT: Record<string, string> = {
+  "brownies": "brownies.png",
+  "blondie-squares": "blondies.png",
+  "chocolate-chip-cookies": "chocolate_chip_cookies.png",
+  "sugar-cookies": "sugar_cookies.png",
+  "double-chocolate-cookies": "chocolate_chip_cookies.png",
+  "classic-cannabutter": "cannabutter.png",
+  "cannabis-oil": "cannabis_oil.png",
+  "canna-honey": "cannabis_honey.png",
+  "cannabis-smoothie": "protein_smoothie.png",
+  "cannabis-tea": "tea.png",
+  "bulletproof-coffee": "bulletproof.png",
+  "alfredo": "alfredo_sauce.png",
+  "infused-pizza-sauce": "pizza_sauce.png",
+  "fruit-juice-jello-cubes": "jello-shots.png",
+  "sour-jello-bites": "jello-shots.png",
+  "classic-jello-shots": "jello-shots.png",
+  "layered-jello-shots": "jello-shots.png",
+  "infused-chocolate-fudge": "chocolate_drizzle.png",
+  "chocolate-bark-infused": "chocolate_drizzle.png",
+  "mini-brownie-bites": "brownies.png",
 };
 
 const HERO_JPEG_AT_IMAGES_ROOT: Record<string, string> = {
@@ -121,7 +186,7 @@ const HERO_JPEG_AT_IMAGES_ROOT: Record<string, string> = {
 
   "popcorn-balls": "popcorn_balls.png",
   "rice-krispie-treat-squares": "ricecrispytreats.jpg",
-  "chocolate-dipped-pretzels": "chocolatedippedpretz.jpg",
+  "chocolate-dipped-pretzels": "chocolate_pretzels.png",
   "mini-slider-sauce": "minisliders.jpg",
   "mini-cupcakes-infused-frosting": "minicupcakes.jpg",
   "cookie-sandwiches-infused-filling": "cookiesandwich.jpg",
@@ -147,6 +212,7 @@ const HERO_JPEG_AT_IMAGES_ROOT: Record<string, string> = {
   "sweet-honey-cream-cheese-spread-infused": "cream cheese.jpg",
   "herb-garlic-cream-cheese-spread-infused": "cream cheese.jpg",
 
+  ...ROOT_PNG_MARKETING_AT_ROOT,
   ...SPREADS_SNACKS_PNG_AT_ROOT,
 };
 

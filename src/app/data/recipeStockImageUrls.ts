@@ -1,4 +1,4 @@
-import { pageLocalImage, recipeLocalImage } from "./recipeLocalImageUrls";
+import { pageLocalImage, recipeLocalImage, rootMarketingImage } from "./recipeLocalImageUrls";
 
 /**
  * @deprecated Use `recipeLocalImage` + assets in `public/images/recipes`. Kept for optional tooling.
@@ -23,14 +23,14 @@ export const DEFAULT_RECIPE_STOCK_IMAGE = recipeLocalImage("default");
 export const PAGE_STOCK = {
   wings: pageLocalImage("wings"),
   popcorn: POPCORN_STOCK_BY_ID["garlic-butter-popcorn"]!,
-  coffee: pageLocalImage("coffee"),
-  jello: pageLocalImage("jello"),
+  coffee: rootMarketingImage("latte.png"),
+  jello: rootMarketingImage("jello-shots.png"),
   gummies: pageLocalImage("gummies"),
-  partySnacks: pageLocalImage("partySnacks"),
-  spreads: pageLocalImage("spreads"),
-  fries: pageLocalImage("fries"),
-  pizza: pageLocalImage("pizza"),
+  partySnacks: rootMarketingImage("nachos.png"),
+  spreads: rootMarketingImage("guacamole.png"),
+  fries: rootMarketingImage("onion_rings.png"),
+  pizza: rootMarketingImage("pizza_sauce.png"),
   macAndCheese: pageLocalImage("macAndCheese"),
   dinner: pageLocalImage("dinner"),
-  brownies: pageLocalImage("brownies"),
+  brownies: rootMarketingImage("brownies.png"),
 } as const;
