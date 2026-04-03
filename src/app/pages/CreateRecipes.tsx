@@ -2631,6 +2631,38 @@ export function CreateRecipes() {
     return Math.max(0, totalSugarGrams - powdered);
   };
 
+  /**
+   * If every template slot still matches and all rows scale by the same factor vs the written
+   * template amounts, return that factor (actual÷template in grams). Otherwise null.
+   * Stops false drift when the servings field is tweaked for THC / slice count but amounts
+   * still describe one coherent batch (e.g. full 16-serv recipe with servings set to 8).
+   */
+  const inferUniformTemplateBatchScale = (template: {
+    servings: number;
+    ingredients: string[];
+    amounts: number[];
+    units?: string[];
+  }): number | null => {
+    if (ingredients.length !== template.ingredients.length) return null;
+    const ratios: number[] = [];
+    for (let i = 0; i < ingredients.length; i++) {
+      const slot = template.ingredients[i];
+      const row = ingredients[i];
+      if (ingredientLibraryKey(row) !== slot && row.name !== slot) return null;
+      const libRow = INGREDIENT_LIBRARY.find((x) => x.name === slot);
+      const templateUnit = template.units?.[i] ?? libRow?.defaultUnit ?? "g";
+      const baseG = toGrams(template.amounts[i], templateUnit, slot);
+      const actualG = toGramsIng(row);
+      if (!Number.isFinite(baseG) || baseG <= 0 || !Number.isFinite(actualG)) continue;
+      ratios.push(actualG / baseG);
+    }
+    if (ratios.length === 0) return null;
+    const r0 = ratios[0];
+    const tol = 0.045;
+    if (!ratios.every((r) => Math.abs(r - r0) <= tol * Math.max(r0, 0.08))) return null;
+    return r0;
+  };
+
   /** Compares this row to the servings-scaled standard template (no ML) — coaching copy, not binary errors. */
   const computeTemplateDriftCoaching = (
     ing: Ingredient,
@@ -2654,7 +2686,9 @@ export function CreateRecipes() {
       return null;
     }
 
-    const scale = servings / Math.max(1, template.servings);
+    const uniform = inferUniformTemplateBatchScale(template);
+    const scale =
+      uniform !== null ? uniform : servings / Math.max(1, template.servings);
     const libraryRow = INGREDIENT_LIBRARY.find((i) => i.name === slotName);
     const templateUnit = template.units?.[idx] ?? libraryRow?.defaultUnit ?? "g";
     const expectedAmount = template.amounts[idx] * scale;
