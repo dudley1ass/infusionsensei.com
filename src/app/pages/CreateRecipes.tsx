@@ -3298,8 +3298,9 @@ export function CreateRecipes() {
         return ing;
       }
 
-      // Skip items that don't use g or ml (count, squeeze, packet, dropper, etc.)
-      const skipUnits = ["large", "medium", "small", "whole", "pieces", "cloves", "squeeze", "packet", "dropper", "0.1ml", "tsp", "tbsp", "cups"];
+      // Skip only count / special pack units — NOT tsp, tbsp, cups: those are produced when
+      // switching g/ml → imperial and must convert back on "Switch to g" or rows stay stuck.
+      const skipUnits = ["large", "medium", "small", "whole", "pieces", "cloves", "squeeze", "packet", "dropper", "0.1ml"];
       if (skipUnits.includes(ing.unit)) return ing;
 
       if (newSystem === "imperial") {
