@@ -28,6 +28,7 @@ import {
   Share2,
   CheckCheck,
   LayoutGrid,
+  Search,
 } from "lucide-react";
 import { InfusionBase } from "../types/infusion";
 import { NutritionFactsLabel } from "../components/NutritionFactsLabel";
@@ -1961,6 +1962,8 @@ export function CreateRecipes() {
   const [copied, setCopied] = useState(false);
   /** Controls which print layout is shown when the print dialog opens. */
   const [printTarget, setPrintTarget] = useState<"full" | "buffet">("full");
+  /** Step 2 recipe list filter (display name, id, ingredients) */
+  const [recipePickerSearch, setRecipePickerSearch] = useState("");
 
   // What Can I Make - Ingredient Selection
   const [selectedPantryItems, setSelectedPantryItems] = useState<string[]>([]);
@@ -2058,6 +2061,10 @@ export function CreateRecipes() {
     window.addEventListener("afterprint", onAfterPrint);
     return () => window.removeEventListener("afterprint", onAfterPrint);
   }, []);
+
+  useEffect(() => {
+    setRecipePickerSearch("");
+  }, [selectedCategory]);
 
   useEffect(() => {
     if (hasTrackedBaseCompletion.current) return;
@@ -3729,6 +3736,24 @@ export function CreateRecipes() {
     const sortedCategoryRecipes = [...categoryRecipes].sort((a, b) =>
       cleanRecipeDisplayTitle(a.name).localeCompare(cleanRecipeDisplayTitle(b.name))
     );
+    const searchQ = recipePickerSearch.trim().toLowerCase();
+    const recipeMatchesPicker = (recipe: {
+      id: string;
+      name: string;
+      ingredients?: string[];
+    }) => {
+      if (!searchQ) return true;
+      const words = searchQ.split(/\s+/).filter(Boolean);
+      const hay = [
+        recipe.id,
+        recipe.name,
+        cleanRecipeDisplayTitle(recipe.name),
+        ...(recipe.ingredients ?? []),
+      ]
+        .join(" ")
+        .toLowerCase();
+      return words.every((w) => hay.includes(w));
+    };
     const snackGroupLabel = (recipe: { id: string; name: string }) => {
       const key = `${recipe.id} ${recipe.name}`.toLowerCase();
       if (/(popcorn|kettle-corn)/.test(key)) return "Popcorn";
@@ -3748,6 +3773,16 @@ export function CreateRecipes() {
             }))
             .filter((group) => group.recipes.length > 0)
         : [];
+    const pickerGroups =
+      selectedCategory === "snacks"
+        ? groupedSnackRecipes
+            .map((group) => ({
+              ...group,
+              recipes: group.recipes.filter(recipeMatchesPicker),
+            }))
+            .filter((group) => group.recipes.length > 0)
+        : [{ label: "", recipes: sortedCategoryRecipes.filter(recipeMatchesPicker) }];
+    const pickerRecipeCount = pickerGroups.reduce((n, g) => n + g.recipes.length, 0);
 
     return (
       <div className="max-w-4xl mx-auto space-y-5">
@@ -3773,10 +3808,29 @@ export function CreateRecipes() {
           <p className="text-gray-500 text-sm mt-1">Pick one to load — Step 3 is servings, strength, and print.</p>
         </div>
 
+        {/* Search recipes in this category */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden />
+          <Input
+            type="search"
+            value={recipePickerSearch}
+            onChange={(e) => setRecipePickerSearch(e.target.value)}
+            placeholder="Search recipes (e.g. blondie, wings, chocolate)…"
+            className="pl-10 text-gray-900 border-gray-300 bg-white h-11 rounded-xl shadow-sm"
+            aria-label="Search recipes in this category"
+          />
+        </div>
+
         {/* Recipe cards — horizontal list */}
+        {categoryRecipes.length > 0 && pickerRecipeCount === 0 && searchQ ? (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-6 text-center text-sm text-amber-900">
+            No recipes match <span className="font-bold">&ldquo;{recipePickerSearch.trim()}&rdquo;</span> in {category?.name}.
+            Try another word or clear the search.
+          </div>
+        ) : null}
         {categoryRecipes.length > 0 && (
           <div className="space-y-3">
-            {(selectedCategory === "snacks" ? groupedSnackRecipes : [{ label: "", recipes: sortedCategoryRecipes }]).map((group) => (
+            {pickerGroups.map((group) => (
               <div key={group.label || "all"} className="space-y-3">
                 {group.label ? (
                   <h2 className="text-sm font-black uppercase tracking-wide text-gray-500 pt-2">
@@ -4364,7 +4418,8 @@ export function CreateRecipes() {
           )}
 
           {/* ── TWO COLUMN LAYOUT ────────────────────────────── */}
-          <div className="flex gap-6 items-start">
+          <div className="flex gap-6 items-stretch">
+            {/* items-stretch so the right column is as tall as the editor; sticky THC panel can track full page scroll */}
 
             {/* ── LEFT COLUMN: Recipe editor ───────────────── */}
             <div className="flex-1 min-w-0 space-y-6">
@@ -4631,8 +4686,8 @@ export function CreateRecipes() {
             </div>{/* end left column */}
 
             {/* ── RIGHT COLUMN: Sticky THC Dashboard ───────── */}
-            <div className="w-80 flex-shrink-0 hidden lg:block no-print">
-              <div className="sticky top-24 space-y-4">
+            <div className="w-80 flex-shrink-0 hidden lg:flex lg:flex-col no-print">
+              <div className="sticky top-20 z-20 w-full space-y-4 max-h-[calc(100vh-5rem)] overflow-y-auto overflow-x-hidden overscroll-y-contain pb-2">
 
                 {/* THC Results Panel */}
                 <div className="bg-gradient-to-br from-green-700 to-green-900 rounded-2xl overflow-hidden shadow-xl">
