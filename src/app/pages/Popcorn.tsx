@@ -7,6 +7,7 @@ import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
 import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { recipeLocalImage } from "../data/recipeLocalImageUrls";
+import { recipeHeroImgClass } from "../utils/recipeHeroImageClass";
 import { loadShowcaseItemsFromDb } from "../services/contentService";
 
 type PopcornFlavor = {
@@ -311,7 +312,7 @@ export function Popcorn() {
                   <img
                     src={recipeLocalImage(flavor.id)}
                     alt={flavor.name}
-                    className="absolute inset-0 h-full w-full object-cover object-center"
+                    className={`absolute inset-0 ${recipeHeroImgClass(flavor.id, "snacks")}`}
                   />
                 </div>
                 <div className="p-4">
