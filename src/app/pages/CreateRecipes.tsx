@@ -2813,7 +2813,9 @@ export function CreateRecipes() {
       }
     }
 
-    if (cat === 'fat') {
+    // Churro / funnel-cake templates list fry oil and finish oil as ingredients — they are not
+    // "dough fat" like cookies. Dough sugar is also often low; sweetness is from coating/dust.
+    if (cat === 'fat' && !isFriedDoughStyle) {
       const fatToFlour = fat / Math.max(flour, 1);
       const fatProblemThreshold =
         isBrownieStyle || isBarStyle ? 1.8 : isCakeStyle ? 1.15 : isCookieStyle ? 1.0 : 0.85;
@@ -2833,7 +2835,7 @@ export function CreateRecipes() {
       }
     }
 
-    if (cat === 'sugar') {
+    if (cat === 'sugar' && !isFriedDoughStyle) {
       // Only warn on the biggest sugar contributor to avoid duplicate warnings
       const thisSugarGrams = toGramsIng(ing);
       const isLargestSugar = !ingredients.some(other => {
