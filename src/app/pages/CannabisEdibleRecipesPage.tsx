@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { recipes } from "../data/recipes";
 import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
+import { recipeHeroImgClass } from "../utils/recipeHeroImageClass";
 
 export function CannabisEdibleRecipesPage() {
   const featured = recipes.slice(0, 6);
@@ -59,7 +60,7 @@ export function CannabisEdibleRecipesPage() {
           {featured.map(recipe => (
             <Link key={recipe.id} to={`/recipes/${recipe.id}`} className="bg-white rounded-2xl border-2 border-gray-200 hover:border-green-400 overflow-hidden group shadow-sm hover:shadow-md transition-all">
               <div className="h-40 overflow-hidden">
-                <img src={recipe.image} alt={cleanRecipeDisplayTitle(recipe.name)} className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500" />
+                <img src={recipe.image} alt={cleanRecipeDisplayTitle(recipe.name)} className={`${recipeHeroImgClass(recipe.id, recipe.category)} group-hover:scale-105 transition-transform duration-500`} />
               </div>
               <div className="p-4">
                 <h3 className="font-black text-gray-900 mb-1">{cleanRecipeDisplayTitle(recipe.name)}</h3>

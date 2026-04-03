@@ -6,7 +6,14 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
 import { PAGE_STOCK } from "../data/recipeStockImageUrls";
+import { COFFEE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
+import { drinkShowcaseHeroImage, recipeLocalImage } from "../data/recipeLocalImageUrls";
+import { recipeHeroImgClass } from "../utils/recipeHeroImageClass";
 import { loadShowcaseItemsFromDb } from "../services/contentService";
+
+function drinkHeroSrc(drinkId: string): string {
+  return drinkShowcaseHeroImage(drinkId) ?? recipeLocalImage(COFFEE_TO_BUILDER_RECIPE[drinkId] ?? "bulletproof-coffee");
+}
 
 type Drink = { id:string; name:string; type:"Butter"|"Oil"|"Tincture"|"Syrup"|"Cream"; profile:string; build:string; tags:string[]; emoji:string; strength:0|1|2|3; sweetness:0|1|2|3; servings:string; ingredients:string[]; steps:string[]; note:string; };
 
@@ -91,7 +98,11 @@ export function Coffee() {
       </Helmet>
 
       <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{minHeight:"280px"}}>
-        <img src={PAGE_STOCK.coffee} alt="Infused coffee" className="absolute inset-0 w-full h-full object-cover" />
+        <img
+          src={PAGE_STOCK.coffee}
+          alt="Infused coffee"
+          className="absolute inset-0 w-full h-full object-contain object-center bg-neutral-900/25"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         <div className="relative z-10 px-6 py-14 text-center">
           <div className="text-6xl mb-3">☕</div>
@@ -117,7 +128,15 @@ export function Coffee() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {section.drinks.map(drink => (
               <button key={drink.id} onClick={() => setSelected(selected?.id === drink.id ? null : drink)}
-                className={`bg-white rounded-2xl border-2 p-4 text-left transition-all hover:shadow-md ${selected?.id === drink.id ? "border-amber-400 shadow-lg" : "border-gray-200 hover:border-amber-300"}`}>
+                className={`bg-white rounded-2xl border-2 overflow-hidden text-left transition-all hover:shadow-md ${selected?.id === drink.id ? "border-amber-400 shadow-lg" : "border-gray-200 hover:border-amber-300"}`}>
+                <div className="relative h-36 w-full overflow-hidden bg-neutral-100">
+                  <img
+                    src={drinkHeroSrc(drink.id)}
+                    alt={drink.name}
+                    className={`absolute inset-0 ${recipeHeroImgClass(drink.id, "drinks")}`}
+                  />
+                </div>
+                <div className="p-4">
                 <div className="flex items-start justify-between mb-2">
                   <span className="text-3xl">{drink.emoji}</span>
                   <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${TYPE_COLORS[drink.type]}`}>{drink.type}</span>
@@ -145,6 +164,7 @@ export function Coffee() {
                     </Link>
                   </div>
                 )}
+                </div>
               </button>
             ))}
           </div>

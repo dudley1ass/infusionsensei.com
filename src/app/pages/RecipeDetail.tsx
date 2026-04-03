@@ -9,6 +9,7 @@ import { loadRecipeByIdFromDb } from "../services/contentService";
 import { Helmet } from "react-helmet-async";
 import { trackEvent } from "../utils/analytics";
 import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
+import { recipeHeroImgClass } from "../utils/recipeHeroImageClass";
 
 export function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
@@ -269,7 +270,7 @@ export function RecipeDetail() {
 
         {/* ── HERO ────────────────────────────────────────── */}
         <div className="relative rounded-3xl overflow-hidden shadow-xl h-72 md:h-96">
-          <img src={recipe.image} alt={displayName} className="h-full w-full object-cover object-center" />
+          <img src={recipe.image} alt={displayName} className={recipeHeroImgClass(recipe.id, recipe.category)} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
             <div className="flex items-center gap-2 mb-3">

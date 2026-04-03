@@ -6,6 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { recipeLocalImage } from "../data/recipeLocalImageUrls";
+import { recipeHeroImgClass } from "../utils/recipeHeroImageClass";
 import { trackEvent } from "../utils/analytics";
 import { loadShowcaseItemsFromDb } from "../services/contentService";
 
@@ -416,7 +417,7 @@ export function SpreadsDips() {
               <img
                 src={recipeLocalImage(recipe.id)}
                 alt={recipe.name}
-                className="absolute inset-0 h-full w-full object-cover object-center"
+                className={`absolute inset-0 ${recipeHeroImgClass(recipe.id)}`}
               />
             </div>
             <div className="p-4">

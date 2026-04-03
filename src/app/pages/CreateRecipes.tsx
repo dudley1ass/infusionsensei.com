@@ -44,6 +44,7 @@ import {
 } from "../data/builderRecipeMaps";
 import { standardRecipes } from "../data/standardRecipes";
 import { resolveTemplateHeroImage } from "../data/recipeTemplateHeroImages";
+import { recipeHeroImgClassForPicker } from "../utils/recipeHeroImageClass";
 
 export { standardRecipes };
 
@@ -2839,7 +2840,7 @@ export function CreateRecipes() {
                       <img
                         src={resolveTemplateHeroImage(selectedCategory, recipe.id)}
                         alt={cleanRecipeDisplayTitle(recipe.name)}
-                        className="h-full w-full object-cover object-center"
+                        className={recipeHeroImgClassForPicker(recipe.id, selectedCategory)}
                         loading="lazy"
                         decoding="async"
                       />

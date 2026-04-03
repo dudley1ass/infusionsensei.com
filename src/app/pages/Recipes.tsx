@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { recipes, Recipe } from "../data/recipes";
 import { recipeLocalImage } from "../data/recipeLocalImageUrls";
+import { recipeHeroImgClass } from "../utils/recipeHeroImageClass";
 import { RECIPES as spreadsDipsStyles } from "./SpreadsDips";
 import { isContentDbStrictMode, loadPublishedRecipesFromDb } from "../services/contentService";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
@@ -169,7 +170,7 @@ export function Recipes() {
                   <img
                     src={recipe.image}
                     alt={cleanRecipeDisplayTitle(recipe.name)}
-                    className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-300"
+                    className={`${recipeHeroImgClass(recipe.id, recipe.category)} group-hover:scale-110 transition-transform duration-300`}
                   />
                   {/* NEW badge — top left */}
                   {recipe.isNew && (
