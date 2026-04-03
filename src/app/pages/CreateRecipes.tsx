@@ -508,6 +508,8 @@ function driftBandsForLibraryKey(key: string): { soft: number; hard: number } {
   if (cat === "egg") return { soft: 0.14, hard: 0.24 };
   if (cat === "flour") return { soft: 0.12, hard: 0.2 };
   if (cat === "chocolate") return { soft: 0.18, hard: 0.3 };
+  if (key === "Salt") return { soft: 0.72, hard: 0.88 };
+  if (cat === "spice" || cat === "fruit" || cat === "flavoring") return { soft: 0.5, hard: 0.72 };
   return { soft: 0.2, hard: 0.32 };
 }
 
@@ -516,7 +518,8 @@ function coachingDriftCopy(
   libraryKey: string,
   high: boolean,
   severityHard: boolean,
-  servings: number
+  servings: number,
+  sauceOrDipMode: boolean
 ): string {
   const lib = INGREDIENT_LIBRARY.find((i) => i.name === libraryKey);
   const cat = lib?.category ?? "other";
@@ -544,6 +547,15 @@ function coachingDriftCopy(
   }
 
   if (cat === "liquid" || cat === "dairy") {
+    if (sauceOrDipMode) {
+      return high
+        ? severityHard
+          ? `${displayName} is much higher than the template for ${s} servings — the sauce or dip may be thinner or looser than intended. Reduce slightly or thicken if needed.`
+          : `${displayName} is a bit high for ${s} servings — you may want to balance other ingredients for the texture you like.`
+        : severityHard
+          ? `${displayName} is much lower than the scaled recipe — the sauce may taste less rich or coat less evenly. Add toward the template and whisk again.`
+          : `${displayName} is a bit low — add a splash if the mixture seems thicker than you want.`;
+    }
     return high
       ? severityHard
         ? `${displayName} is much higher than the template for ${s} servings — expect a looser batter, weaker structure, or longer bake. Cut liquid or add flour (if it fits the recipe) to tighten.`
@@ -554,6 +566,15 @@ function coachingDriftCopy(
   }
 
   if (cat === "sugar") {
+    if (sauceOrDipMode) {
+      return high
+        ? severityHard
+          ? `${displayName} is much higher than the template for ${s} servings — the sauce may taste very sweet or sticky; cut back if needed.`
+          : `${displayName} is a bit high — sweetness may be punchier than the template; adjust to taste.`
+        : severityHard
+          ? `${displayName} is much lower than the scaled recipe — the sauce may taste flat or not sweet enough. Add toward the template and taste again.`
+          : `${displayName} is a bit low — add a little if you want more sweetness or body.`;
+    }
     return high
       ? severityHard
         ? `${displayName} is much higher than the template for ${s} servings — cookies and bars often spread and brown fast; flavor can be cloying. Dial sugar down or add structure (flour) if needed.`
@@ -564,6 +585,15 @@ function coachingDriftCopy(
   }
 
   if (cat === "fat" || cat === "infused") {
+    if (sauceOrDipMode) {
+      return high
+        ? severityHard
+          ? `${displayName} is much higher than the template for ${s} servings — the mixture may taste richer or oilier; if this is your infusion, total THC in the batch goes up unless you dilute.`
+          : `${displayName} is a bit high — richness may exceed the template; trim slightly if it feels heavy.`
+        : severityHard
+          ? `${displayName} is much lower than the scaled recipe — the sauce or dip may be leaner than intended and the infusion can taste milder in the batch. Add fat or oil toward the template if you want a closer match.`
+          : `${displayName} is a bit low — texture or mouthfeel may be lighter than the template; add a little if it seems thin.`;
+    }
     return high
       ? severityHard
         ? `${displayName} is much higher than the template for ${s} servings — expect greasier texture and extra spread; if this is your infusion, THC per piece concentrates too. Dial fat down or dilute with plain butter/oil.`
@@ -574,6 +604,15 @@ function coachingDriftCopy(
   }
 
   if (cat === "egg") {
+    if (sauceOrDipMode) {
+      return high
+        ? severityHard
+          ? `Eggs (${displayName}) are well above the template for ${s} servings — texture or flavor may shift; reduce if the recipe allows.`
+          : `Eggs are a touch high for ${s} servings — you may notice a richer or softer result.`
+        : severityHard
+          ? `Eggs are well below the template for ${s} servings — you may want a bit more for binding or richness if the mix seems thin.`
+          : `Eggs are a touch low — nudge up if the mixture feels like it needs more body.`;
+    }
     return high
       ? severityHard
         ? `Eggs (${displayName}) are well above the scaled recipe for ${s} servings — the batch may turn custardy, rubbery, or overly cakey. Reduce eggs or add a bit of flour/structure.`
@@ -581,6 +620,16 @@ function coachingDriftCopy(
       : severityHard
         ? `Eggs are well below the template for ${s} servings — structure may be crumbly or fragile. Add an egg or a little extra moisture/binder.`
         : `Eggs are a touch low — structure may be slightly weaker than the template.`;
+  }
+
+  if ((cat === "spice" || cat === "savory") && sauceOrDipMode) {
+    return high
+      ? severityHard
+        ? `${displayName} is well above the template for ${s} servings — taste before adding more; the flavor may be strong.`
+        : `${displayName} is a little high — taste and adjust seasoning.`
+      : severityHard
+        ? `${displayName} is well below the template for ${s} servings — flavor may be mild; season to taste with small pinches.`
+        : `${displayName} is a little low — you can always add more after tasting.`;
   }
 
   return high
@@ -784,6 +833,80 @@ const UNIT_OPTIONS = [
   { value: "whole", label: "whole" },
   { value: "pinch", label: "pinch" },
 ];
+
+/**
+ * Grams per US cup — must match imperial toggle rounding so mass round-trips across g ↔ tbsp/cups.
+ * Used by `toGrams` for ratio warnings, nutrition, and template drift (not only the measurement switcher).
+ */
+const INGREDIENT_GRAMS_PER_CUP: Record<string, number> = {
+  "All-Purpose Flour": 125,
+  "Cake Flour": 114,
+  "Bread Flour": 127,
+  "Whole Wheat Flour": 120,
+  "Almond Flour": 96,
+  "Oat Flour": 92,
+  "Rice Flour": 158,
+  "Coconut Flour": 112,
+  "Buckwheat Flour": 120,
+  Cornstarch: 128,
+  "Tapioca Starch": 152,
+  "Cocoa Powder": 100,
+  "Cocoa Powder (Natural)": 100,
+  "Dutch Cocoa Powder": 100,
+  "Espresso Powder": 85,
+  "Matcha Powder": 85,
+  "Graham Cracker Crumbs": 90,
+  Cornmeal: 157,
+  "Granulated Sugar": 200,
+  Sugar: 200,
+  "Brown Sugar (Light)": 220,
+  "Brown Sugar (Dark)": 220,
+  "Brown Sugar": 220,
+  "Powdered Sugar": 120,
+  "Raw Turbinado Sugar": 200,
+  "Coconut Sugar": 180,
+  "Monk Fruit Sweetener": 200,
+  "Unsalted Butter": 227,
+  "Salted Butter": 227,
+  "Brown Butter": 227,
+  "Vegan Butter": 227,
+  "Butter (Regular)": 227,
+  Cannabutter: 227,
+  Shortening: 190,
+  "Baking Powder": 192,
+  "Baking Soda": 220,
+  "Cream of Tartar": 150,
+  "Instant Yeast": 150,
+  "Gelatin (unflavored)": 150,
+  Gelatin: 150,
+  "Flavored Jello Mix": 85,
+  "Xanthan Gum": 190,
+  "Poppy Seeds": 145,
+  Sprinkles: 190,
+  "Rolled Oats": 90,
+  Quinoa: 170,
+  "Protein Powder": 120,
+  Salt: 273,
+  "Black Pepper": 100,
+  Cinnamon: 125,
+  Nutmeg: 100,
+  "Peanut Butter": 258,
+  "Almond Butter": 250,
+};
+
+function gramsPerCupForIngredient(ingName: string): number {
+  return INGREDIENT_GRAMS_PER_CUP[ingName] ?? 240;
+}
+
+/** Only chemical / yeast leaveners belong in baking-powder–to–flour ratio checks */
+function countsTowardLeavenerFlourRatio(libraryKey: string): boolean {
+  return (
+    libraryKey === "Baking Powder" ||
+    libraryKey === "Baking Soda" ||
+    libraryKey === "Cream of Tartar" ||
+    libraryKey === "Instant Yeast"
+  );
+}
 
 export function CreateRecipes() {
   const hasTrackedBaseCompletion = useRef(false);
@@ -1164,20 +1287,7 @@ export function CreateRecipes() {
 
   // Convert any ingredient amount to grams for nutrition math
   const toGrams = (amount: number, unit: string, ingName: string): number => {
-    // Ingredient-specific grams per cup (powder/solid densities vary widely)
-    const gramsPerCup: Record<string, number> = {
-      "All-Purpose Flour": 125, "Cake Flour": 114, "Bread Flour": 127,
-      "Whole Wheat Flour": 120, "Almond Flour": 96, "Oat Flour": 92,
-      "Rice Flour": 158, "Coconut Flour": 112, "Buckwheat Flour": 120,
-      "Cornstarch": 128, "Tapioca Starch": 152,
-      "Cocoa Powder": 100,
-      "Cocoa Powder (Natural)": 100, "Dutch Cocoa Powder": 100,
-      "Granulated Sugar": 200, "Brown Sugar (Light)": 220, "Brown Sugar (Dark)": 220,
-      "Powdered Sugar": 120, "Coconut Sugar": 180, "Raw Turbinado Sugar": 200,
-      "Rolled Oats": 90, "Protein Powder": 120,
-      "Unsalted Butter": 227, "Salted Butter": 227, "Cannabutter": 227,
-      "Shortening": 190, "Peanut Butter": 258, "Almond Butter": 250,
-    };
+    const gPerCup = gramsPerCupForIngredient(ingName);
     switch (unit) {
       case "g":       return amount;
       case "kg":      return amount * 1000;
@@ -1185,9 +1295,9 @@ export function CreateRecipes() {
       case "L":       return amount * 1000;
       case "oz":      return amount * 28.3495;
       case "lb":      return amount * 453.592;
-      case "cups":    return amount * (gramsPerCup[ingName] ?? 240);
-      case "tbsp":    return amount * (gramsPerCup[ingName] ? gramsPerCup[ingName] / 16 : 14.787);
-      case "tsp":     return amount * (gramsPerCup[ingName] ? gramsPerCup[ingName] / 48 : 4.929);
+      case "cups":    return amount * gPerCup;
+      case "tbsp":    return amount * (gPerCup / 16);
+      case "tsp":     return amount * (gPerCup / 48);
       case "fl oz":   return amount * 29.574;
       case "pint":    return amount * 473.176;
       case "quart":   return amount * 946.353;
@@ -1210,6 +1320,34 @@ export function CreateRecipes() {
 
   const toGramsIng = (ing: Ingredient) => toGrams(ing.amount, ing.unit, ingredientLibraryKey(ing));
 
+  /**
+   * Always show mg/g and mg/tbsp equivalents so switching the row unit (g vs tbsp) does not look like THC changed.
+   * Uses the same `toGrams(1, …)` model as amount math (for ml-based rows, mg/g matches the app’s ~1:1 ml↔g nutrition convention).
+   */
+  const infusedThcEquivalenceHint = (ing: Ingredient): string | null => {
+    const t = Number(ing.thcPerUnit);
+    if (!ing.isInfused || !Number.isFinite(t) || t <= 0) return null;
+    const key = ingredientLibraryKey(ing);
+    const u = ing.unit;
+    const skip = new Set([
+      "large", "medium", "small", "whole", "pieces", "cloves", "pinch", "squeeze", "packet", "dropper", "0.1ml",
+    ]);
+    if (skip.has(u)) return null;
+    const gPerCurrent = toGrams(1, u, key);
+    if (!(gPerCurrent > 0)) return null;
+    const mgPerG = t / gPerCurrent;
+    const mgPerTbsp = mgPerG * toGrams(1, "tbsp", key);
+    return `≈ ${mgPerG.toFixed(3)} mg/g · ≈ ${mgPerTbsp.toFixed(2)} mg/tbsp (same potency)`;
+  };
+
+  /** BP / soda / cream of tartar / yeast only — excludes gelatin, jello, etc. from flour ratio math */
+  const leavenerGramsForFlourRatio = () =>
+    ingredients.reduce((sum, ing) => {
+      const k = ingredientLibraryKey(ing);
+      if (!countsTowardLeavenerFlourRatio(k)) return sum;
+      return sum + toGramsIng(ing);
+    }, 0);
+
   const normalizeInfusionRecipeUnit = (raw: string): string => {
     const u = (raw || "g").toLowerCase().trim();
     if (u === "gram" || u === "grams") return "g";
@@ -1224,6 +1362,8 @@ export function CreateRecipes() {
     const u = normalizeInfusionRecipeUnit(unit);
     if (u === "g") return parseFloat(grams.toFixed(2));
     if (u === "ml") return parseFloat(grams.toFixed(2));
+    if (u === "kg") return parseFloat((grams / 1000).toFixed(4));
+    if (u === "l") return parseFloat((grams / 1000).toFixed(4));
     if (u === "tbsp") {
       const per = toGrams(1, "tbsp", anchorName);
       return parseFloat((grams / Math.max(per, 0.001)).toFixed(3));
@@ -1236,6 +1376,9 @@ export function CreateRecipes() {
       const per = toGrams(1, "cups", anchorName);
       return parseFloat((grams / Math.max(per, 0.001)).toFixed(3));
     }
+    if (u === "fl oz") return parseFloat((grams / 29.574).toFixed(3));
+    if (u === "pint") return parseFloat((grams / 473.176).toFixed(3));
+    if (u === "quart") return parseFloat((grams / 946.353).toFixed(3));
     if (u === "oz") return parseFloat((grams / 28.3495).toFixed(3));
     if (u === "lb") return parseFloat((grams / 453.592).toFixed(4));
     return parseFloat(grams.toFixed(2));
@@ -1326,6 +1469,36 @@ export function CreateRecipes() {
     const updated = [...ingredients];
     (updated[index] as any)[field] = value;
     setIngredients(updated);
+  };
+
+  /** Preserve total mg when the user changes unit on an infused row (mg/{label} must match amount × potency). */
+  const handleIngredientUnitChange = (index: number, newUnit: string) => {
+    setIngredients((prev) => {
+      const ing = prev[index];
+      if (!ing || ing.unit === newUnit) return prev;
+      const skipUnits = new Set([
+        "large", "medium", "small", "whole", "pieces", "cloves", "squeeze", "packet", "dropper", "0.1ml", "pinch",
+      ]);
+      const updated = [...prev];
+      const key = ingredientLibraryKey(ing);
+      const thc = Number(ing.thcPerUnit);
+      if (ing.isInfused && Number.isFinite(thc) && thc > 0 && !skipUnits.has(ing.unit) && !skipUnits.has(newUnit)) {
+        const totalMg = ing.amount * thc;
+        const bridge = toGrams(ing.amount, ing.unit, key);
+        const newAmount = convertGramsToRecipeUnit(bridge, newUnit, key);
+        if (Number.isFinite(newAmount) && newAmount > 0) {
+          updated[index] = {
+            ...ing,
+            unit: newUnit,
+            amount: newAmount,
+            thcPerUnit: parseFloat((totalMg / newAmount).toFixed(6)),
+          };
+          return updated;
+        }
+      }
+      updated[index] = { ...ing, unit: newUnit };
+      return updated;
+    });
   };
 
   // Helper function to format cups — only returns valid dropdown units
@@ -1551,8 +1724,9 @@ export function CreateRecipes() {
       if (Math.abs(delta) < 0.35) return null;
       const hard = Math.abs(delta) >= 0.9;
       const high = delta > 0;
+      const sauceOrDipMode = !hasStructuralBakingFlour(ingredients);
       return {
-        text: coachingDriftCopy(displayName, slotName, high, hard, servings),
+        text: coachingDriftCopy(displayName, slotName, high, hard, servings, sauceOrDipMode),
         color: hard ? "red" : "yellow",
         level: hard ? "hard" : "soft",
       };
@@ -1568,8 +1742,9 @@ export function CreateRecipes() {
 
     const high = ratio > 1;
     const severityHard = ratio <= 1 - hard || ratio >= 1 + hard;
+    const sauceOrDipMode = !hasStructuralBakingFlour(ingredients);
     return {
-      text: coachingDriftCopy(displayName, slotName, high, severityHard, servings),
+      text: coachingDriftCopy(displayName, slotName, high, severityHard, servings, sauceOrDipMode),
       color: severityHard ? "red" : "orange",
       level: severityHard ? "hard" : "soft",
     };
@@ -1598,7 +1773,7 @@ export function CreateRecipes() {
     const egg      = totals['egg']      ?? 0;
     const liquid   = totals['liquid']   ?? 0;
     const dairy    = totals['dairy']    ?? 0;
-    const leavener = totals['leavener'] ?? 0;
+    const leavener = leavenerGramsForFlourRatio();
     const totalMoisture = egg + liquid + dairy;
     const lowerNames = ingredients.map(i => i.name.toLowerCase());
     const isBrownieStyle =
@@ -1839,7 +2014,7 @@ export function CreateRecipes() {
     const egg      = totals['egg']      ?? 0;
     const liquid   = totals['liquid']   ?? 0;
     const dairy    = totals['dairy']    ?? 0;
-    const leavener = totals['leavener'] ?? 0;
+    const leavener = leavenerGramsForFlourRatio();
     const totalMoisture = egg + liquid + dairy;
     const hasInfused = ingredients.some(i => {
       if (i.isInfused) return true;
@@ -2077,35 +2252,6 @@ export function CreateRecipes() {
   const toggleMeasurementSystem = () => {
     const newSystem = measurementSystem === "metric" ? "imperial" : "metric";
 
-    // Grams per cup lookup - covers all ingredient names in the library
-    const gramsPerCup: Record<string, number> = {
-      // Flours
-      "All-Purpose Flour": 125, "Cake Flour": 114, "Bread Flour": 127,
-      "Whole Wheat Flour": 120, "Almond Flour": 96, "Oat Flour": 92,
-      "Rice Flour": 158, "Coconut Flour": 112, "Buckwheat Flour": 120,
-      "Cornstarch": 128, "Tapioca Starch": 152,
-      "Cocoa Powder (Natural)": 100, "Dutch Cocoa Powder": 100, "Cocoa Powder": 100,
-      "Espresso Powder": 85, "Matcha Powder": 85, "Graham Cracker Crumbs": 90, "Cornmeal": 157,
-      // Sugars
-      "Granulated Sugar": 200, "Sugar": 200,
-      "Brown Sugar (Light)": 220, "Brown Sugar (Dark)": 220, "Brown Sugar": 220,
-      "Powdered Sugar": 120, "Raw Turbinado Sugar": 200, "Coconut Sugar": 180,
-      "Monk Fruit Sweetener": 200,
-      // Fats (solid)
-      "Unsalted Butter": 227, "Salted Butter": 227, "Brown Butter": 227,
-      "Vegan Butter": 227, "Shortening": 190, "Butter (Regular)": 227,
-      "Cannabutter": 227,
-      // Leavening/other powders
-      "Baking Powder": 192, "Baking Soda": 220, "Cream of Tartar": 150,
-      "Instant Yeast": 150, "Gelatin (unflavored)": 150, "Gelatin": 150,
-      "Flavored Jello Mix": 85, "Xanthan Gum": 190, "Poppy Seeds": 145,
-      "Sprinkles": 190,
-      // Oats/grains
-      "Rolled Oats": 90, "Quinoa": 170, "Protein Powder": 120,
-      // Spices (per tsp, handled separately but fallback)
-      "Salt": 273, "Black Pepper": 100, "Cinnamon": 125, "Nutmeg": 100,
-    };
-
     /** Prefer cups when ¼-cup rounding is within ~6% of true grams; else tbsp or tsp so mass round-trips (avoids phantom template drift). */
     const imperialFromGramsPowder = (grams: number, gPerCup: number): { amount: number; unit: string } => {
       const cupsExact = grams / gPerCup;
@@ -2142,45 +2288,11 @@ export function CreateRecipes() {
       return roundToCommonMeasurement(cupsExact * 16, "tbsp");
     };
 
-    // Convert all ingredient amounts and units based on ingredient type
-    const convertedIngredients = ingredients.map(ing => {
+    const convertRowForSystem = (ing: Ingredient): Ingredient => {
       const lookupKey = ingredientLibraryKey(ing);
       const libraryItem = INGREDIENT_LIBRARY.find(i => i.name === lookupKey);
       const ingredientType = libraryItem?.type || ing.type || "solid";
-
-      // For infused ingredients: convert units BUT recalculate thcPerUnit to maintain same total THC
-      if (ing.isInfused) {
-        if (newSystem === "imperial") {
-          // g → tbsp (butter/fat infusions)
-          if (ing.unit === "g") {
-            const tbsp = ing.amount / 14.175;
-            const rounded = Math.round(tbsp * 2) / 2; // round to 0.5 tbsp
-            const newThcPerUnit = (ing.thcPerUnit || 0) * 14.175; // mg/g → mg/tbsp
-            return { ...ing, amount: rounded, unit: "tbsp", thcPerUnit: parseFloat(newThcPerUnit.toFixed(2)) };
-          }
-          // ml → tbsp (liquid infusions)
-          if (ing.unit === "ml") {
-            const tbsp = ing.amount / 14.787;
-            const rounded = Math.round(tbsp * 2) / 2;
-            const newThcPerUnit = (ing.thcPerUnit || 0) * 14.787;
-            return { ...ing, amount: rounded, unit: "tbsp", thcPerUnit: parseFloat(newThcPerUnit.toFixed(2)) };
-          }
-        } else {
-          // tbsp → g
-          if (ing.unit === "tbsp") {
-            const grams = ing.amount * 14.175;
-            const newThcPerUnit = (ing.thcPerUnit || 0) / 14.175;
-            return { ...ing, amount: parseFloat(grams.toFixed(1)), unit: "g", thcPerUnit: parseFloat(newThcPerUnit.toFixed(4)) };
-          }
-          // tbsp → ml (liquids)
-          if (ing.unit === "tbsp") {
-            const ml = ing.amount * 14.787;
-            const newThcPerUnit = (ing.thcPerUnit || 0) / 14.787;
-            return { ...ing, amount: parseFloat(ml.toFixed(1)), unit: "ml", thcPerUnit: parseFloat(newThcPerUnit.toFixed(4)) };
-          }
-        }
-        return ing;
-      }
+      const gPerCup = gramsPerCupForIngredient(lookupKey);
 
       // Skip only count / special pack units — NOT tsp, tbsp, cups: those are produced when
       // switching g/ml → imperial and must convert back on "Switch to g" or rows stay stuck.
@@ -2188,81 +2300,82 @@ export function CreateRecipes() {
       if (skipUnits.includes(ing.unit)) return ing;
 
       if (newSystem === "imperial") {
-        // METRIC TO IMPERIAL
         if (ing.unit === "g") {
           if (ingredientType === "powder") {
-            const gPerCup = gramsPerCup[lookupKey] || 120;
             const { amount, unit } = imperialFromGramsPowder(ing.amount, gPerCup);
             return { ...ing, amount, unit };
-          } else if (ingredientType === "fat") {
-            const gPerCup = gramsPerCup[lookupKey] || 227;
+          }
+          if (ingredientType === "fat") {
             const { amount, unit } = imperialFromGramsFat(ing.amount, gPerCup);
             return { ...ing, amount, unit };
-          } else {
-            // solid, semi-solid, count → oz
-            const oz = ing.amount * 0.035274;
-            const rounded = roundToCommonMeasurement(Math.max(oz, 0.5), "oz");
-            return { ...ing, amount: rounded.amount, unit: rounded.unit };
           }
+          const oz = ing.amount * 0.035274;
+          const rounded = roundToCommonMeasurement(Math.max(oz, 0.5), "oz");
+          return { ...ing, amount: rounded.amount, unit: rounded.unit };
         }
-        else if (ing.unit === "ml") {
+        if (ing.unit === "ml") {
           const flOz = ing.amount / 29.5735;
           if (flOz >= 8) {
             const cups = flOz / 8;
             const rounded = roundToCommonMeasurement(cups, "cups");
             return { ...ing, amount: rounded.amount, unit: rounded.unit };
-          } else if (flOz >= 2) {
+          }
+          if (flOz >= 2) {
             const rounded = roundToCommonMeasurement(flOz, "fl oz");
             return { ...ing, amount: rounded.amount, unit: rounded.unit };
-          } else if (ing.amount >= 15) {
+          }
+          if (ing.amount >= 15) {
             const tbsp = ing.amount / 14.7868;
             const rounded = roundToCommonMeasurement(tbsp, "tbsp");
             return { ...ing, amount: rounded.amount, unit: rounded.unit };
-          } else {
-            const tsp = ing.amount / 4.9289;
-            const rounded = roundToCommonMeasurement(Math.max(tsp, 0.25), "tsp");
-            return { ...ing, amount: rounded.amount, unit: rounded.unit };
           }
+          const tsp = ing.amount / 4.9289;
+          const rounded = roundToCommonMeasurement(Math.max(tsp, 0.25), "tsp");
+          return { ...ing, amount: rounded.amount, unit: rounded.unit };
         }
       } else {
-        // IMPERIAL TO METRIC
         if (ing.unit === "cups") {
           if (ingredientType === "powder" || ingredientType === "fat") {
-            const gPerCup = gramsPerCup[lookupKey] || 227;
             const grams = ing.amount * gPerCup;
             return { ...ing, amount: parseFloat(grams.toFixed(1)), unit: "g" };
-          } else {
-            return { ...ing, amount: parseFloat((ing.amount * 240).toFixed(1)), unit: "ml" };
           }
+          return { ...ing, amount: parseFloat((ing.amount * 240).toFixed(1)), unit: "ml" };
         }
-        else if (ing.unit === "tbsp") {
+        if (ing.unit === "tbsp") {
           if (ingredientType === "powder" || ingredientType === "fat") {
-            const gPerCup = gramsPerCup[lookupKey] || 120;
             const grams = ing.amount * (gPerCup / 16);
             return { ...ing, amount: parseFloat(grams.toFixed(1)), unit: "g" };
-          } else {
-            return { ...ing, amount: parseFloat((ing.amount * 14.7868).toFixed(1)), unit: "ml" };
           }
+          return { ...ing, amount: parseFloat((ing.amount * 14.7868).toFixed(1)), unit: "ml" };
         }
-        else if (ing.unit === "tsp") {
+        if (ing.unit === "tsp") {
           if (ingredientType === "powder") {
-            const gPerCup = gramsPerCup[lookupKey] || 120;
             const grams = ing.amount * (gPerCup / 48);
             return { ...ing, amount: parseFloat(grams.toFixed(1)), unit: "g" };
-          } else {
-            return { ...ing, amount: parseFloat((ing.amount * 4.9289).toFixed(1)), unit: "ml" };
           }
+          return { ...ing, amount: parseFloat((ing.amount * 4.9289).toFixed(1)), unit: "ml" };
         }
-        else if (ing.unit === "oz") {
+        if (ing.unit === "oz") {
           return { ...ing, amount: parseFloat((ing.amount / 0.035274).toFixed(1)), unit: "g" };
         }
-        else if (ing.unit === "fl oz") {
+        if (ing.unit === "fl oz") {
           return { ...ing, amount: parseFloat((ing.amount * 29.5735).toFixed(1)), unit: "ml" };
         }
       }
       return ing;
+    };
+
+    const convertedIngredients = ingredients.map((ing) => {
+      const base = convertRowForSystem(ing);
+      if (!ing.isInfused || !ing.thcPerUnit) return base;
+      const totalMg = ing.amount * ing.thcPerUnit;
+      if (base.unit === ing.unit && base.amount === ing.amount) return base;
+      if (!Number.isFinite(base.amount) || base.amount <= 0) {
+        return { ...base, thcPerUnit: ing.thcPerUnit };
+      }
+      return { ...base, thcPerUnit: parseFloat((totalMg / base.amount).toFixed(6)) };
     });
-    
+
     setIngredients(convertedIngredients);
     setMeasurementSystem(newSystem);
   };
@@ -3403,7 +3516,7 @@ export function CreateRecipes() {
                       <Input type="number" value={ing.amount}
                         onChange={(e) => updateIngredient(idx, "amount", parseFloat(e.target.value) || 0)}
                         className="w-20 text-gray-900 border-gray-200 h-9 text-sm" />
-                      <Select value={ing.unit} onValueChange={(v) => updateIngredient(idx, "unit", v)}>
+                      <Select value={ing.unit} onValueChange={(v) => handleIngredientUnitChange(idx, v)}>
                         <SelectTrigger className="w-24 h-9 text-gray-900 border-gray-200 text-sm">
                           <SelectValue />
                         </SelectTrigger>
@@ -3416,15 +3529,28 @@ export function CreateRecipes() {
                           {["large","medium","small","whole","pieces","cloves","pinch","squeeze","packet","dropper"].map(u => <SelectItem key={u} value={u} className="text-gray-900 text-sm">{u}</SelectItem>)}
                         </SelectContent>
                       </Select>
-                      {ing.isInfused && (
-                        <>
-                          <Badge className="bg-purple-100 text-purple-700 border-0 text-xs px-2 no-print">🧪 THC</Badge>
-                          <Input type="number" value={ing.thcPerUnit || 0}
-                            onChange={(e) => updateIngredient(idx, "thcPerUnit", parseFloat(e.target.value) || 0)}
-                            placeholder="mg/unit" className="w-20 bg-purple-50 border-purple-200 text-gray-900 h-9 text-sm no-print" />
-                          <span className="text-xs text-purple-600 no-print">mg/{ing.unit}</span>
-                        </>
-                      )}
+                      {ing.isInfused && (() => {
+                        const thcEquiv = infusedThcEquivalenceHint(ing);
+                        return (
+                          <div className="flex flex-col gap-0.5 min-w-0 max-w-[14rem] no-print">
+                            <div className="flex flex-wrap items-center gap-1">
+                              <Badge className="bg-purple-100 text-purple-700 border-0 text-xs px-2 shrink-0">🧪 THC</Badge>
+                              <Input type="number" value={ing.thcPerUnit || 0}
+                                onChange={(e) => updateIngredient(idx, "thcPerUnit", parseFloat(e.target.value) || 0)}
+                                placeholder="mg/unit" className="w-20 bg-purple-50 border-purple-200 text-gray-900 h-9 text-sm shrink-0" />
+                              <span className="text-xs text-purple-700 font-medium shrink-0">mg/{ing.unit}</span>
+                            </div>
+                            {thcEquiv ? (
+                              <span
+                                className="text-[10px] text-purple-600 leading-snug pl-0.5"
+                                title="Editable field is mg per your selected unit. The line below is the same strength as mg/g and mg/tbsp; total mg = amount × mg (your unit)."
+                              >
+                                {thcEquiv}
+                              </span>
+                            ) : null}
+                          </div>
+                        );
+                      })()}
                       <Button onClick={() => removeIngredient(idx)} variant="ghost" size="sm"
                         className="text-red-400 hover:text-red-600 hover:bg-red-50 h-9 w-9 p-0 no-print">
                         <Trash2 className="w-4 h-4" />
@@ -3602,6 +3728,9 @@ export function CreateRecipes() {
                     <div className="bg-white/10 rounded-2xl px-4 py-4 border border-white/20 text-center mb-3">
                       <div className="text-5xl font-black text-white leading-none">{thcPerServing.toFixed(1)}</div>
                       <div className="text-green-200 font-semibold text-sm mt-1">mg THC per serving</div>
+                      <p className="text-green-200/75 text-[10px] leading-snug mt-2 px-1">
+                        Infused rows list mg in your chosen unit plus an equivalent (e.g. mg/g ↔ mg/tbsp). Total batch mg stays the same when you switch units.
+                      </p>
                       <div className={`inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full border font-black text-xs ${dosingTier.bg} ${dosingTier.color}`}>
                         {dosingTier.label === "Microdose" ? "🔬" : dosingTier.label === "Low" ? "✅" : dosingTier.label === "Moderate" ? "⚡" : dosingTier.label === "High" ? "🔥" : "⚠️"}
                         {dosingTier.label.toUpperCase()}

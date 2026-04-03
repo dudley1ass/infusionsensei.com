@@ -34,7 +34,7 @@ export const coreIngredients = {
     thcDefault: 800 // mg per gram
   },
   "infused-oil": {
-    name: "Infused Oil",
+    name: "Cannabis Oil & Butter",
     emoji: "🧈",
     description: "Cannabutter, coconut oil, olive oil",
     bestFor: "Bulk cooking, baking",
@@ -481,7 +481,7 @@ export const recipeTemplatesByMethod: RecipeTemplateByMethod[] = [
   },
   {
     id: "tincture-mocktail",
-    name: "Cannabis-Infused Citrus Mocktail",
+    name: "Cannabis Citrus Mocktail",
     category: "beverages",
     coreIngredient: "tincture",
     recipeType: "liquid-based",

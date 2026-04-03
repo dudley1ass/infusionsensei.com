@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "audit:ingredients": "node scripts/audit-builder-ingredients.mjs"
+    "audit:ingredients": "node scripts/audit-builder-ingredients.mjs",
+    "download-recipe-images": "node scripts/download-recipe-images.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

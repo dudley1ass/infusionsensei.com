@@ -41,7 +41,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "peanut-butter-cookies",
-      name: "Infused Peanut Butter Cookies",
+      name: "Cannabis Peanut Butter Cookies",
       servings: 24,
       ingredients: ["Cannabutter","Peanut Butter","Granulated Sugar","Brown Sugar (Light)","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Baking Soda","Salt"],
       amounts: [85,200,100,100,2,10,280,6,3],
@@ -50,7 +50,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "oatmeal-raisin-cookies",
-      name: "Infused Oatmeal Raisin Cookies",
+      name: "Cannabis Oatmeal Raisin Cookies",
       servings: 24,
       ingredients: ["Cannabutter","Brown Sugar (Light)","Granulated Sugar","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Baking Soda","Cinnamon","Salt","Rolled Oats","Raisins"],
       amounts: [113,150,80,2,8,180,4,4,3,200,120],
@@ -59,7 +59,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "snickerdoodles",
-      name: "Infused Snickerdoodles",
+      name: "Cannabis Snickerdoodles",
       servings: 24,
       ingredients: ["Cannabutter","Granulated Sugar","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Cream of Tartar","Baking Soda","Salt","Cinnamon"],
       amounts: [113,350,2,10,340,8,4,3,10],
@@ -68,7 +68,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "double-chocolate-cookies",
-      name: "Infused Double Chocolate Cookies",
+      name: "Cannabis Double Chocolate Cookies",
       servings: 24,
       ingredients: ["Cannabutter","Granulated Sugar","Brown Sugar (Light)","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Cocoa Powder","Baking Soda","Salt","Dark Chocolate Chips"],
       amounts: [113,120,150,2,8,220,40,5,3,300],
@@ -77,7 +77,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "white-chocolate-macadamia-cookies",
-      name: "Infused White Chocolate Macadamia Cookies",
+      name: "Cannabis White Chocolate Macadamia Cookies",
       servings: 24,
       ingredients: ["Cannabutter","Brown Sugar (Light)","Granulated Sugar","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Baking Soda","Salt","White Chocolate Chips","Macadamia Nuts"],
       amounts: [113,180,100,2,8,280,4,3,200,120],
@@ -86,7 +86,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "shortbread-cookies",
-      name: "Infused Shortbread Cookies",
+      name: "Cannabis Shortbread Cookies",
       servings: 24,
       ingredients: ["Cannabutter","Powdered Sugar","All-Purpose Flour","Salt","Vanilla Extract"],
       amounts: [227,80,300,2,8],
@@ -95,7 +95,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "molasses-cookies",
-      name: "Infused Molasses Cookies",
+      name: "Cannabis Molasses Cookies",
       servings: 24,
       ingredients: ["Cannabutter","Granulated Sugar","Molasses","Whole Egg (large)","All-Purpose Flour","Baking Soda","Cinnamon","Ginger (ground)","Salt"],
       amounts: [113,200,80,1,340,8,6,4,3],
@@ -104,7 +104,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "gingerbread-cookies",
-      name: "Infused Gingerbread Cookies",
+      name: "Cannabis Gingerbread Cookies",
       servings: 24,
       ingredients: ["Cannabutter","Brown Sugar (Light)","Molasses","Whole Egg (large)","All-Purpose Flour","Baking Soda","Ginger (ground)","Cinnamon","Cloves","Salt"],
       amounts: [113,120,80,1,400,6,8,6,2,3],
@@ -113,7 +113,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "vanilla-layer-cake",
-      name: "Infused Vanilla Cake",
+      name: "Cannabis Vanilla Cake",
       servings: 12,
       ingredients: ["Cannabutter","Granulated Sugar","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Baking Powder","Salt","Whole Milk"],
       amounts: [227,400,4,15,400,12,4,360],
@@ -122,7 +122,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "chocolate-layer-cake",
-      name: "Infused Chocolate Cake",
+      name: "Cannabis Chocolate Cake",
       servings: 12,
       ingredients: ["Cannabutter","Granulated Sugar","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Cocoa Powder","Baking Powder","Baking Soda","Salt","Whole Milk"],
       amounts: [227,380,4,15,320,60,8,4,4,360],
@@ -131,7 +131,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "red-velvet-cake",
-      name: "Infused Red Velvet Cake",
+      name: "Cannabis Red Velvet Cake",
       servings: 12,
       ingredients: ["Cannabutter","Granulated Sugar","Whole Egg (large)","Cocoa Powder","Red Food Coloring","Vanilla Extract","Buttermilk","All-Purpose Flour","Baking Soda","Salt","White Vinegar"],
       amounts: [227,350,3,15,15,10,360,340,6,3,10],
@@ -140,7 +140,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "carrot-cake",
-      name: "Infused Carrot Cake",
+      name: "Cannabis Carrot Cake",
       servings: 12,
       ingredients: ["Cannabutter","Granulated Sugar","Brown Sugar (Light)","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Baking Powder","Baking Soda","Cinnamon","Salt","Carrot (grated)","Walnuts (chopped)"],
       amounts: [200,200,100,3,10,280,8,4,8,3,300,80],
@@ -149,7 +149,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "lemon-cake",
-      name: "Infused Lemon Cake",
+      name: "Cannabis Lemon Cake",
       servings: 12,
       ingredients: ["Cannabutter","Granulated Sugar","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Baking Powder","Salt","Lemon Juice","Lemon Zest","Whole Milk"],
       amounts: [200,350,4,10,340,12,3,45,10,180],
@@ -158,7 +158,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "pound-cake",
-      name: "Infused Pound Cake",
+      name: "Cannabis Pound Cake",
       servings: 12,
       ingredients: ["Cannabutter","Granulated Sugar","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Baking Powder","Salt","Sour Cream"],
       amounts: [227,400,5,15,340,6,3,120],
@@ -167,7 +167,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "coffee-cake",
-      name: "Infused Coffee Cake",
+      name: "Cannabis Coffee Cake",
       servings: 12,
       ingredients: ["Cannabutter","Granulated Sugar","Brown Sugar (Light)","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Baking Powder","Baking Soda","Salt","Whole Milk","Espresso Powder","Cinnamon"],
       amounts: [170,200,100,2,10,340,10,2,3,240,8,8],
@@ -176,7 +176,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "marble-cake",
-      name: "Infused Marble Cake",
+      name: "Cannabis Marble Cake",
       servings: 12,
       ingredients: ["Cannabutter","Granulated Sugar","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Baking Powder","Salt","Whole Milk","Cocoa Powder"],
       amounts: [227,380,4,15,380,12,4,300,35],
@@ -185,7 +185,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "funfetti-cake",
-      name: "Infused Funfetti Cake",
+      name: "Cannabis Funfetti Cake",
       servings: 12,
       ingredients: ["Cannabutter","Granulated Sugar","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Baking Powder","Salt","Whole Milk","Sprinkles"],
       amounts: [227,380,4,15,400,12,4,300,80],
@@ -194,7 +194,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "chocolate-cupcakes",
-      name: "Infused Chocolate Cupcakes",
+      name: "Cannabis Chocolate Cupcakes",
       servings: 24,
       ingredients: ["Cannabutter","Granulated Sugar","Brown Sugar (Light)","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Cocoa Powder","Baking Powder","Baking Soda","Salt","Whole Milk"],
       amounts: [170,200,100,3,10,260,45,8,4,3,240],
@@ -203,7 +203,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "peanut-butter-bars",
-      name: "Infused Peanut Butter Bars",
+      name: "Cannabis Peanut Butter Bars",
       servings: 16,
       ingredients: ["Cannabutter","Peanut Butter","Powdered Sugar","Graham Cracker Crumbs","Vanilla Extract","Salt"],
       amounts: [115,200,200,150,5,2],
@@ -212,7 +212,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "lemon-bars",
-      name: "Infused Lemon Bars",
+      name: "Cannabis Lemon Bars",
       servings: 16,
       ingredients: ["Cannabutter","Granulated Sugar","All-Purpose Flour","Salt","Whole Egg (large)","Lemon Juice","Powdered Sugar","Baking Powder"],
       amounts: [170,100,200,2,4,120,40,4],
@@ -221,7 +221,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "cheesecake-bars",
-      name: "Infused Cheesecake Bars",
+      name: "Cannabis Cheesecake Bars",
       servings: 16,
       ingredients: ["Cannabutter","Graham Cracker Crumbs","Granulated Sugar","Cream Cheese","Whole Egg (large)","Vanilla Extract","Salt"],
       amounts: [85,180,40,450,2,10,2],
@@ -230,7 +230,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "magic-cookie-bars",
-      name: "Infused Magic Cookie Bars (7-Layer)",
+      name: "Cannabis Magic Cookie Bars (7-Layer)",
       servings: 16,
       ingredients: ["Cannabutter","Graham Cracker Crumbs","Sweetened Condensed Milk","Dark Chocolate Chips","White Chocolate Chips","Shredded Coconut","Walnuts (chopped)"],
       amounts: [115,180,400,120,80,80,60],
@@ -239,7 +239,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "chocolate-chip-cookie-bars",
-      name: "Infused Chocolate Chip Cookie Bars",
+      name: "Cannabis Chocolate Chip Cookie Bars",
       servings: 16,
       ingredients: ["Cannabutter","Brown Sugar (Light)","Granulated Sugar","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Baking Soda","Salt","Dark Chocolate Chips"],
       amounts: [170,200,100,2,10,280,6,3,320],
@@ -248,7 +248,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "brownie-cheesecake-swirl-bars",
-      name: "Infused Brownie Cheesecake Swirl Bars",
+      name: "Cannabis Brownie Cheesecake Swirl Bars",
       servings: 16,
       ingredients: ["Cannabutter","Dark Chocolate Chips","Granulated Sugar","Whole Egg (large)","Cocoa Powder","All-Purpose Flour","Salt","Cream Cheese","Powdered Sugar","Vanilla Extract"],
       amounts: [85,170,200,3,30,80,2,200,40,5],
@@ -257,7 +257,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "smores-bars",
-      name: "Infused S'mores Bars",
+      name: "Cannabis S'mores Bars",
       servings: 16,
       ingredients: ["Cannabutter","Graham Cracker Crumbs","Granulated Sugar","Whole Egg (large)","All-Purpose Flour","Baking Powder","Salt","Milk Chocolate Chips","Marshmallows"],
       amounts: [115,200,100,1,120,4,2,200,150],
@@ -369,10 +369,10 @@ export const standardRecipes: Record<string, any[]> = {
       id: "honey-mustard-wings",
       name: "Honey Mustard Wings",
       servings: 4,
-      ingredients: ["Chicken Wings","Cannabis Coconut Oil","Garlic Powder","Salt","Black Pepper"],
-      amounts: [900,30,3,3,2],
-      units: ["g","ml","g","g","g"],
-      instructions: ["Cook wings your way. We're here for the sauce.","Whisk cannabis oil, honey, and dijon mustard together.","Toss hot wings in honey mustard sauce.","Serve with extra sauce on the side."],
+      ingredients: ["Chicken Wings","Cannabis Coconut Oil","Honey","Mustard (yellow)","Garlic Powder","Salt","Black Pepper"],
+      amounts: [900,30,45,35,3,3,2],
+      units: ["g","ml","g","ml","g","g","g"],
+      instructions: ["Cook wings your way. We're here for the sauce.","Whisk cannabis oil, honey, and mustard until smooth.","Toss hot wings in honey mustard sauce.","Serve with extra sauce on the side."],
     },
     {
       id: "sriracha-honey-wings",
@@ -450,7 +450,7 @@ export const standardRecipes: Record<string, any[]> = {
   "spreads-dips": [
     {
       id: "infused-peanut-butter-spread",
-      name: "Infused Peanut Butter",
+      name: "Cannabis Peanut Butter",
       servings: 16,
       ingredients: ["Peanut Butter","Cannabis Coconut Oil","Salt","Honey"],
       amounts: [240,15,2,12],
@@ -459,7 +459,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "infused-almond-butter-spread",
-      name: "Infused Almond Butter",
+      name: "Cannabis Almond Butter",
       servings: 16,
       ingredients: ["Almond Butter","Cannabis Coconut Oil","Salt","Cinnamon"],
       amounts: [240,15,2,1],
@@ -468,7 +468,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "infused-cream-cheese-whipped",
-      name: "Whipped Infused Cream Cheese",
+      name: "Whipped Cannabis Cream Cheese",
       servings: 8,
       ingredients: ["Cream Cheese","Cannabutter","Salt"],
       amounts: [226,28,2],
@@ -477,7 +477,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "sweet-honey-cream-cheese-spread-infused",
-      name: "Sweet Honey Cream Cheese (Infused)",
+      name: "Sweet Honey Cream Cheese (Cannabis)",
       servings: 10,
       ingredients: ["Cream Cheese","Cannabutter","Honey","Powdered Sugar","Vanilla Extract","Salt"],
       amounts: [200,30,35,40,5,1],
@@ -486,7 +486,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "herb-garlic-cream-cheese-spread-infused",
-      name: "Herb & Garlic Cream Cheese (Infused)",
+      name: "Herb & Garlic Cream Cheese (Cannabis)",
       servings: 8,
       ingredients: ["Cream Cheese","Cannabutter","Garlic Powder","Italian Seasoning","Salt","Black Pepper"],
       amounts: [226,32,3,4,2,1],
@@ -495,7 +495,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "queso-dip-infused",
-      name: "Infused Queso Dip",
+      name: "Cannabis Queso Dip",
       servings: 8,
       ingredients: ["Cheddar Cheese","Whole Milk","Cornstarch","Cannabutter","Salt","Garlic Powder"],
       amounts: [220,300,18,40,4,2],
@@ -504,7 +504,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "spinach-artichoke-dip-infused",
-      name: "Spinach Artichoke Dip (Infused)",
+      name: "Spinach Artichoke Dip (Cannabis)",
       servings: 8,
       ingredients: ["Cream Cheese","Sour Cream","Cannabutter","Spinach (frozen)","Artichoke Hearts","Garlic Powder","Parmesan Cheese","Salt","Black Pepper"],
       amounts: [220,140,40,150,200,3,50,3,2],
@@ -513,7 +513,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "buffalo-dip-infused",
-      name: "Buffalo Chicken Dip (Infused)",
+      name: "Buffalo Chicken Dip (Cannabis)",
       servings: 10,
       ingredients: ["Cream Cheese","Sour Cream","Hot Sauce","Cannabutter","Cheddar Cheese","Garlic Powder","Salt"],
       amounts: [200,120,80,35,120,2,2],
@@ -522,7 +522,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "ranch-dip-infused",
-      name: "Ranch Dip (Infused)",
+      name: "Ranch Dip (Cannabis)",
       servings: 8,
       ingredients: ["Sour Cream","Mayonnaise","Cannabis Olive Oil","Ranch Seasoning","Salt","Black Pepper"],
       amounts: [200,120,20,12,2,1],
@@ -531,7 +531,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "honey-mustard-dip-infused",
-      name: "Honey Mustard Dip (Infused)",
+      name: "Honey Mustard Dip (Cannabis)",
       servings: 8,
       ingredients: ["Honey","Mustard (yellow)","Mayonnaise","Cannabis Olive Oil","Salt"],
       amounts: [90,45,120,18,1],
@@ -540,7 +540,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "garlic-aioli-infused",
-      name: "Garlic Aioli (Infused)",
+      name: "Garlic Aioli (Cannabis)",
       servings: 6,
       ingredients: ["Mayonnaise","Garlic","Lemon Juice","Cannabis Olive Oil","Salt","Black Pepper"],
       amounts: [180,3,15,22,2,1],
@@ -549,7 +549,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "bbq-sauce-infused-party",
-      name: "BBQ Sauce (Infused)",
+      name: "BBQ Sauce (Cannabis)",
       servings: 12,
       ingredients: ["Ketchup","Brown Sugar (Light)","Apple Cider Vinegar","Cannabis Olive Oil","Garlic Powder","Salt","Black Pepper"],
       amounts: [240,80,30,25,4,4,2],
@@ -558,7 +558,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "sweet-chili-sauce-infused",
-      name: "Sweet Chili Sauce (Infused)",
+      name: "Sweet Chili Sauce (Cannabis)",
       servings: 10,
       ingredients: ["Water","Granulated Sugar","Rice Vinegar","Garlic Powder","Cayenne Pepper","Cannabis Olive Oil","Salt"],
       amounts: [120,150,45,3,2,20,2],
@@ -567,7 +567,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "cheese-sauce-infused",
-      name: "Cheese Sauce (Infused)",
+      name: "Cheese Sauce (Cannabis)",
       servings: 8,
       ingredients: ["Cheddar Cheese","Whole Milk","Cannabutter","Cornstarch","Salt"],
       amounts: [200,280,35,16,3],
@@ -623,7 +623,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "classic-jello-shots",
-      name: "Classic Infused Jello Shots",
+      name: "Classic Cannabis Jello Shots",
       servings: 24,
       ingredients: ["Flavored Jello Mix","Gelatin (unflavored)","Water","THC Tincture","Corn Syrup"],
       amounts: [85,14,360,24,30],
@@ -641,7 +641,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "layered-jello-shots",
-      name: "Layered Infused Jello",
+      name: "Layered Cannabis Jello",
       servings: 24,
       ingredients: ["Flavored Jello Mix","Gelatin (unflavored)","Water","Whole Milk","THC Tincture"],
       amounts: [85,14,320,80,24],
@@ -650,7 +650,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "sour-jello-bites",
-      name: "Sour Infused Jello Bites",
+      name: "Sour Cannabis Jello Bites",
       servings: 24,
       ingredients: ["Flavored Jello Mix","Gelatin (unflavored)","Water","THC Tincture","Corn Syrup"],
       amounts: [85,14,320,24,30],
@@ -659,7 +659,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "rice-krispie-treat-squares",
-      name: "Infused Rice Krispie Treat Squares",
+      name: "Cannabis Rice Krispie Treat Squares",
       servings: 16,
       ingredients: ["Cannabutter","Marshmallows","Rice Cereal","Vanilla Extract","Salt"],
       amounts: [42,283,168,5,1],
@@ -676,7 +676,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "infused-chocolate-fudge",
-      name: "Infused Chocolate Fudge (No-Bake)",
+      name: "Cannabis Chocolate Fudge (No-Bake)",
       servings: 25,
       ingredients: ["Sweetened Condensed Milk","Semi-Sweet Chips","Cannabutter","Unsalted Butter","Vanilla Extract","Salt"],
       amounts: [414,510,42,14,5,1],
@@ -691,7 +691,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "popcorn-balls",
-      name: "Infused Popcorn Balls",
+      name: "Cannabis Popcorn Balls",
       servings: 12,
       ingredients: ["Popcorn Kernels","Cannabutter","Corn Syrup","Granulated Sugar","Salt"],
       amounts: [120,42,120,100,2],
@@ -700,7 +700,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "chocolate-dipped-pretzels",
-      name: "Infused Chocolate-Dipped Pretzels",
+      name: "Cannabis Chocolate-Dipped Pretzels",
       servings: 20,
       ingredients: ["Dark Chocolate Chips","Cannabis Coconut Oil","Pretzels","Salt"],
       amounts: [170,15,20,1],
@@ -709,7 +709,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "mini-slider-sauce",
-      name: "Mini Sliders (Infused Sauce Method)",
+      name: "Mini Sliders (Cannabis Sauce Method)",
       servings: 12,
       ingredients: ["Cannabis Olive Oil","Mayonnaise","Granulated Sugar","Salt","Black Pepper"],
       amounts: [15,120,2,2,1],
@@ -727,7 +727,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "blondie-squares",
-      name: "Infused Blondie Squares",
+      name: "Cannabis Blondie Squares",
       servings: 16,
       ingredients: ["Cannabutter","Brown Sugar (Light)","Granulated Sugar","Whole Egg (large)","Vanilla Extract","All-Purpose Flour","Baking Powder","Salt"],
       amounts: [113,220,80,2,8,200,6,3],
@@ -736,7 +736,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "marshmallow-pops",
-      name: "Infused Marshmallow Pops",
+      name: "Cannabis Marshmallow Pops",
       servings: 12,
       ingredients: ["Marshmallows","Cannabutter","Dark Chocolate Chips","Cannabis Coconut Oil","Sprinkles"],
       amounts: [240,28,170,15,20],
@@ -745,7 +745,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "mini-cupcakes-infused-frosting",
-      name: "Mini Cupcakes (Infused Frosting)",
+      name: "Mini Cupcakes (Cannabis Frosting)",
       servings: 24,
       ingredients: ["All-Purpose Flour","Granulated Sugar","Baking Powder","Salt","Whole Egg (large)","Whole Milk","Unsalted Butter","Cream Cheese","Cannabutter","Powdered Sugar","Vanilla Extract"],
       amounts: [200,160,8,2,2,120,85,200,56,220,8],
@@ -754,7 +754,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "cookie-sandwiches-infused-filling",
-      name: "Cookie Sandwiches (Infused Filling)",
+      name: "Cookie Sandwiches (Cannabis Filling)",
       servings: 12,
       ingredients: ["All-Purpose Flour","Granulated Sugar","Unsalted Butter","Whole Egg (large)","Vanilla Extract","Baking Soda","Salt","Cannabutter","Powdered Sugar"],
       amounts: [250,180,115,1,8,5,3,56,140],
@@ -763,7 +763,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "churro-bites",
-      name: "Churro Bites (Infused Cinnamon Sugar)",
+      name: "Churro Bites (Cannabis Cinnamon Sugar)",
       servings: 20,
       ingredients: ["Water","Unsalted Butter","Granulated Sugar","Salt","All-Purpose Flour","Whole Egg (large)","Vegetable Oil","Cinnamon","Cannabis Coconut Oil"],
       amounts: [240,56,15,3,150,2,120,10,20],
@@ -781,7 +781,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "chex-mix-infused",
-      name: "Infused Chex Mix",
+      name: "Cannabis Chex Mix",
       servings: 10,
       ingredients: ["Chex Cereal","Pretzels","Mixed Nuts","Cannabutter","Worcestershire Sauce","Garlic Powder","Salt"],
       amounts: [200,15,80,60,30,4,3],
@@ -790,7 +790,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "infused-nuts",
-      name: "Infused Mixed Nuts",
+      name: "Cannabis Mixed Nuts",
       servings: 8,
       ingredients: ["Mixed Nuts","Cannabutter","Granulated Sugar","Salt","Cinnamon"],
       amounts: [200,45,20,2,2],
@@ -799,7 +799,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "kettle-corn-infused",
-      name: "Infused Kettle Corn",
+      name: "Cannabis Kettle Corn",
       servings: 8,
       ingredients: ["Popcorn Kernels","Cannabutter","Granulated Sugar","Salt"],
       amounts: [110,45,40,2],
@@ -817,7 +817,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "cheese-crackers-infused-dust",
-      name: "Cheese Crackers (Infused Dust)",
+      name: "Cheese Crackers (Cannabis Butter Dust)",
       servings: 10,
       ingredients: ["Cheese Crackers","Cannabutter","Parmesan Cheese","Garlic Powder","Salt"],
       amounts: [40,35,40,3,1],
@@ -835,7 +835,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "chicken-tenders-infused-dip",
-      name: "Chicken Tenders (Infused Dip)",
+      name: "Chicken Tenders (Cannabis Dip)",
       servings: 6,
       ingredients: ["Chicken Tenders","All-Purpose Flour","Whole Egg (large)","Panko Breadcrumbs","Salt","Black Pepper","Mayonnaise","Cannabis Olive Oil","Hot Sauce","Garlic Powder"],
       amounts: [600,80,2,120,4,2,150,20,40,2],
@@ -844,7 +844,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "meatballs-infused-glaze",
-      name: "Meatballs (Infused Glaze)",
+      name: "Meatballs (Cannabis Glaze)",
       servings: 24,
       ingredients: ["Ground Beef","Whole Egg (large)","Panko Breadcrumbs","Garlic","Italian Seasoning","Salt","Black Pepper","Ketchup","Brown Sugar (Light)","Cannabis Olive Oil"],
       amounts: [680,1,90,3,8,6,3,120,50,20],
@@ -853,7 +853,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "sausage-bites-honey-mustard",
-      name: "Sausage Bites (Infused Honey Mustard)",
+      name: "Sausage Bites (Cannabis Honey Mustard)",
       servings: 12,
       ingredients: ["Cocktail Sausages","Honey","Mustard (yellow)","Cannabis Olive Oil","Salt"],
       amounts: [24,50,40,15,1],
@@ -862,7 +862,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "mini-hot-dogs-infused-condiments",
-      name: "Mini Hot Dogs (Infused Ketchup / Mustard)",
+      name: "Mini Hot Dogs (Cannabis Ketchup / Mustard)",
       servings: 12,
       ingredients: ["Hot Dogs","Ketchup","Mustard (yellow)","Mayonnaise","Cannabis Olive Oil","Salt"],
       amounts: [12,80,40,60,18,1],
@@ -871,7 +871,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "queso-dip-infused",
-      name: "Infused Queso Dip",
+      name: "Cannabis Queso Dip",
       servings: 8,
       ingredients: ["Cheddar Cheese","Whole Milk","Cornstarch","Cannabutter","Salt","Garlic Powder"],
       amounts: [220,300,18,40,4,2],
@@ -880,7 +880,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "spinach-artichoke-dip-infused",
-      name: "Spinach Artichoke Dip (Infused)",
+      name: "Spinach Artichoke Dip (Cannabis)",
       servings: 8,
       ingredients: ["Cream Cheese","Sour Cream","Cannabutter","Spinach (frozen)","Artichoke Hearts","Garlic Powder","Parmesan Cheese","Salt","Black Pepper"],
       amounts: [220,140,40,150,200,3,50,3,2],
@@ -889,7 +889,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "buffalo-dip-infused",
-      name: "Buffalo Chicken Dip (Infused)",
+      name: "Buffalo Chicken Dip (Cannabis)",
       servings: 10,
       ingredients: ["Cream Cheese","Sour Cream","Hot Sauce","Cannabutter","Cheddar Cheese","Garlic Powder","Salt"],
       amounts: [200,120,80,35,120,2,2],
@@ -898,7 +898,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "ranch-dip-infused",
-      name: "Ranch Dip (Infused)",
+      name: "Ranch Dip (Cannabis)",
       servings: 8,
       ingredients: ["Sour Cream","Mayonnaise","Cannabis Olive Oil","Ranch Seasoning","Salt","Black Pepper"],
       amounts: [200,120,20,12,2,1],
@@ -907,7 +907,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "honey-mustard-dip-infused",
-      name: "Honey Mustard Dip (Infused)",
+      name: "Honey Mustard Dip (Cannabis)",
       servings: 8,
       ingredients: ["Honey","Mustard (yellow)","Mayonnaise","Cannabis Olive Oil","Salt"],
       amounts: [90,45,120,18,1],
@@ -916,7 +916,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "garlic-aioli-infused",
-      name: "Garlic Aioli (Infused)",
+      name: "Garlic Aioli (Cannabis)",
       servings: 6,
       ingredients: ["Mayonnaise","Garlic","Lemon Juice","Cannabis Olive Oil","Salt","Black Pepper"],
       amounts: [180,3,15,22,2,1],
@@ -925,7 +925,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "bbq-sauce-infused-party",
-      name: "BBQ Sauce (Infused)",
+      name: "BBQ Sauce (Cannabis)",
       servings: 12,
       ingredients: ["Ketchup","Brown Sugar (Light)","Apple Cider Vinegar","Cannabis Olive Oil","Garlic Powder","Salt","Black Pepper"],
       amounts: [240,80,30,25,4,4,2],
@@ -934,7 +934,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "sweet-chili-sauce-infused",
-      name: "Sweet Chili Sauce (Infused)",
+      name: "Sweet Chili Sauce (Cannabis)",
       servings: 10,
       ingredients: ["Water","Granulated Sugar","Rice Vinegar","Garlic Powder","Cayenne Pepper","Cannabis Olive Oil","Salt"],
       amounts: [120,150,45,3,2,20,2],
@@ -943,7 +943,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "cheese-sauce-infused",
-      name: "Cheese Sauce (Infused)",
+      name: "Cheese Sauce (Cannabis)",
       servings: 8,
       ingredients: ["Cheddar Cheese","Whole Milk","Cannabutter","Cornstarch","Salt"],
       amounts: [200,280,35,16,3],
@@ -952,7 +952,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "gummy-clusters",
-      name: "Infused Gummy Clusters",
+      name: "Cannabis Gummy Clusters",
       servings: 32,
       ingredients: ["THC Tincture","Gelatin (unflavored)","Flavored Jello Mix","Water","Corn Syrup","Dark Chocolate Chips","Cannabis Coconut Oil"],
       amounts: [18,18,85,120,30,100,15],
@@ -961,7 +961,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "chocolate-bark-infused",
-      name: "Infused Chocolate Bark",
+      name: "Cannabis Chocolate Bark",
       servings: 16,
       ingredients: ["Dark Chocolate Chips","Cannabis Coconut Oil","Salt","Sprinkles"],
       amounts: [300,22,2,25],
@@ -988,7 +988,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "classic-gummies",
-      name: "Classic Infused Gummies",
+      name: "Classic Cannabis Gummies",
       servings: 40,
       ingredients: ["THC Tincture","Gelatin (unflavored)","Flavored Jello Mix","Water","Corn Syrup"],
       amounts: [20,20,85,120,30],
@@ -1006,7 +1006,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "sour-gummies",
-      name: "Sour Infused Gummies",
+      name: "Sour Cannabis Gummies",
       servings: 40,
       ingredients: ["THC Tincture","Gelatin (unflavored)","Flavored Jello Mix","Water","Corn Syrup"],
       amounts: [20,20,85,120,30],
@@ -1015,7 +1015,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "protein-bites",
-      name: "Infused Protein Bites",
+      name: "Cannabis Protein Bites",
       servings: 12,
       ingredients: ["Protein Powder","Rolled Oats","Nut Butter","Cannabis Honey","Dark Chocolate Chips"],
       amounts: [60,100,120,60,60],
@@ -1044,7 +1044,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "cannabis-tea",
-      name: "Infused Cannabis Tea",
+      name: "Cannabis Tea",
       servings: 1,
       ingredients: ["Cannabis Coconut Oil","Whole Milk","Granulated Sugar"],
       amounts: [15,30,10],
@@ -1064,7 +1064,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "garlic-pasta",
-      name: "Garlic Infused Pasta",
+      name: "Cannabis Garlic Pasta",
       servings: 2,
       ingredients: ["Pasta (dry)","Cannabis Olive Oil","Olive Oil","Garlic","Salt","Black Pepper"],
       amounts: [170,15,15,3,3,1],
@@ -1084,7 +1084,7 @@ export const standardRecipes: Record<string, any[]> = {
   "ice-cream": [
     {
       id: "vanilla-ice-cream",
-      name: "Infused Vanilla Ice Cream",
+      name: "Cannabis Vanilla Ice Cream",
       servings: 6,
       ingredients: ["Heavy Cream","Whole Milk","Granulated Sugar","Vanilla Extract","Cannabis Coconut Oil"],
       amounts: [480,240,150,5,30],
@@ -1113,7 +1113,7 @@ export const standardRecipes: Record<string, any[]> = {
     },
     {
       id: "pancakes",
-      name: "Infused Pancakes",
+      name: "Cannabis Pancakes",
       servings: 4,
       ingredients: ["All-Purpose Flour","Granulated Sugar","Baking Powder","Whole Milk","Whole Egg (large)","Cannabutter"],
       amounts: [140,15,2,180,1,30],
