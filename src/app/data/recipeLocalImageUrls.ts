@@ -56,6 +56,33 @@ const POPCORN_HERO_AT_ROOT: Record<string, string> = {
   "candy-coated-popcorn": "candy_coated_popcorn.png",
 };
 
+/**
+ * Popcorn flavor slugs from `Popcorn.tsx` / `POPCORN_TO_BUILDER_RECIPE` — dedicated hero per flavor
+ * (canonical templates above still used when opening by template id).
+ */
+const POPCORN_FLAVOR_HERO_AT_ROOT: Record<string, string> = {
+  "garlic-butter": "garlic_butter_popcorn.png",
+  "parmesan-herb": "parmesan_herb_popcorn.png",
+  ranch: "ranch_popcorn.png",
+  truffle: "truffle_popcorn.png",
+  cheddar: "cheddar_popcorn.png",
+  buffalo: "buffalo_popcorn.png",
+  "chili-lime": "chili_lime_popcorn.png",
+  "cajun-spice": "cajun_spice_popcorn.png",
+  sriracha: "sriracha_popcorn.png",
+  "nashville-hot": "nashville_hot_popcorn.png",
+  caramel: "caramel_popcorn.png",
+  "honey-butter": "honey_butter_popcorn.png",
+  "cinnamon-sugar": "cinnamon_sugar_popcorn.png",
+  maple: "maple_popcorn.png",
+  "vanilla-bean": "vanilla_bean_popcorn.png",
+  "chocolate-drizzle": "chocolate_drizzle_popcorn.png",
+  "cookies-cream": "cookies_and_cream_popcorn.png",
+  "peanut-butter": "peanut_butter_popcorn.png",
+  smores: "chocolate_drizzle_popcorn.png",
+  "salted-caramel-choc": "salted_caramel_popcorn.png",
+};
+
 /** Spreads, dips, sauces, party snacks — PNG heroes (overrides JPG entries below). */
 const SPREADS_SNACKS_PNG_AT_ROOT: Record<string, string> = {
   "infused-almond-butter-spread": "almond_butter.png",
@@ -129,6 +156,7 @@ const ROOT_PNG_MARKETING_AT_ROOT: Record<string, string> = {
 const HERO_JPEG_AT_IMAGES_ROOT: Record<string, string> = {
   ...WING_HERO_JPEG,
   ...POPCORN_HERO_AT_ROOT,
+  ...POPCORN_FLAVOR_HERO_AT_ROOT,
 
   "brownies": "brownies.jpg",
   "blondie-squares": "blondiesquares.jpg",

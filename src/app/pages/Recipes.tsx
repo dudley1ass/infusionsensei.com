@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { recipes, Recipe } from "../data/recipes";
+import { recipeLocalImage } from "../data/recipeLocalImageUrls";
 import { RECIPES as spreadsDipsStyles } from "./SpreadsDips";
 import { isContentDbStrictMode, loadPublishedRecipesFromDb } from "../services/contentService";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
@@ -52,7 +52,7 @@ export function Recipes() {
     cookTime: 15,
     servings: Number(dip.servings.split(" ")[0]) || 8,
     thcPerServing: "~2-5mg",
-    image: PAGE_STOCK.spreads,
+    image: recipeLocalImage(dip.id),
     description: dip.profile,
     route: `/spreads-dips?recipe=${encodeURIComponent(dip.id)}`,
   }));

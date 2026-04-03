@@ -5,6 +5,7 @@ import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { PAGE_STOCK } from "../data/recipeStockImageUrls";
+import { recipeLocalImage } from "../data/recipeLocalImageUrls";
 import { trackEvent } from "../utils/analytics";
 import { loadShowcaseItemsFromDb } from "../services/contentService";
 
@@ -407,10 +408,18 @@ export function SpreadsDips() {
             key={recipe.id}
             type="button"
             onClick={() => setSelected(selected?.id === recipe.id ? null : recipe)}
-            className={`bg-white rounded-2xl border-2 p-4 text-left transition-all hover:shadow-md ${
+            className={`bg-white rounded-2xl border-2 overflow-hidden text-left transition-all hover:shadow-md ${
               selected?.id === recipe.id ? "border-green-400 shadow-lg" : "border-gray-200 hover:border-green-300"
             }`}
           >
+            <div className="relative h-36 w-full overflow-hidden bg-gray-100">
+              <img
+                src={recipeLocalImage(recipe.id)}
+                alt={recipe.name}
+                className="absolute inset-0 h-full w-full object-cover object-center"
+              />
+            </div>
+            <div className="p-4">
             <div className="flex items-start justify-between mb-2">
               <span className="text-3xl">{recipe.emoji}</span>
               <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${TYPE_COLORS[recipe.type] ?? "bg-gray-100"}`}>{recipe.type}</span>
@@ -462,6 +471,7 @@ export function SpreadsDips() {
                 </Link>
               </div>
             )}
+            </div>
           </button>
         ))}
       </div>

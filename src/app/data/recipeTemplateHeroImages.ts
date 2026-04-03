@@ -25,14 +25,12 @@ const DRINK_HERO_STEM_OVERRIDE: Record<string, string> = {
 export function resolveTemplateHeroImage(builderKey: string, id: string): string {
   // Popcorn shortcuts MUST only apply to snacks — wing aliases reuse ids like `nashville-hot` / `sriracha`.
   if (builderKey === "snacks") {
+    // Popcorn.tsx flavor slugs — each has dedicated art in `recipeLocalImageUrls` (see POPCORN_FLAVOR_HERO_AT_ROOT).
+    if (POPCORN_TO_BUILDER_RECIPE[id] !== undefined) {
+      return recipeLocalImage(id);
+    }
     const popcornDirect = POPCORN_STOCK_BY_ID[id];
     if (popcornDirect) return popcornDirect;
-
-    const popcornMappedBase = POPCORN_TO_BUILDER_RECIPE[id];
-    if (popcornMappedBase) {
-      const p = POPCORN_STOCK_BY_ID[popcornMappedBase];
-      if (p) return p;
-    }
   }
 
   if (

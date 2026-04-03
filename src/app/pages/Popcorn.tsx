@@ -6,6 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
 import { PAGE_STOCK } from "../data/recipeStockImageUrls";
+import { recipeLocalImage } from "../data/recipeLocalImageUrls";
 import { loadShowcaseItemsFromDb } from "../services/contentService";
 
 type PopcornFlavor = {
@@ -263,7 +264,7 @@ export function Popcorn() {
 
       {/* Hero */}
       <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{minHeight: "280px"}}>
-        <img src={PAGE_STOCK.popcorn} alt="Infused popcorn" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={PAGE_STOCK.popcorn} alt="Infused popcorn" className="absolute inset-0 w-full h-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
         <div className="relative z-10 px-6 py-14 text-center">
           <div className="text-6xl mb-3">🍿</div>
@@ -303,9 +304,17 @@ export function Popcorn() {
             {section.flavors.map(flavor => (
               <button key={flavor.id}
                 onClick={() => setSelectedFlavor(selectedFlavor?.id === flavor.id ? null : flavor)}
-                className={`bg-white rounded-2xl border-2 p-4 text-left transition-all hover:shadow-md ${
+                className={`bg-white rounded-2xl border-2 overflow-hidden text-left transition-all hover:shadow-md ${
                   selectedFlavor?.id === flavor.id ? "border-amber-400 shadow-lg shadow-amber-100" : "border-gray-200 hover:border-amber-300"
                 }`}>
+                <div className="relative h-36 w-full overflow-hidden bg-gray-100">
+                  <img
+                    src={recipeLocalImage(flavor.id)}
+                    alt={flavor.name}
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                  />
+                </div>
+                <div className="p-4">
                 <div className="flex items-start justify-between mb-2">
                   <span className="text-3xl">{flavor.emoji}</span>
                   <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${TYPE_COLORS[flavor.type]}`}>{flavor.type}</span>
@@ -352,6 +361,7 @@ export function Popcorn() {
                     </Link>
                   </div>
                 )}
+                </div>
               </button>
             ))}
           </div>
