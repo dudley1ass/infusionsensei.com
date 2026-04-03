@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { trackEvent } from "../utils/analytics";
 
 type JelloRecipe = {
@@ -83,7 +84,7 @@ export function Jello() {
       </Helmet>
 
       <div className="relative rounded-3xl overflow-hidden shadow-2xl min-h-[280px]">
-        <img src="/IMAGES/jello-shots.png" alt="Infused jello cubes" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={PAGE_STOCK.jello} alt="Infused jello cubes" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
         <div className="relative z-10 px-6 py-14 text-center text-white">
           <div className="text-6xl mb-3">🍬</div>

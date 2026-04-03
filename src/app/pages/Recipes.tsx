@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { recipes, Recipe } from "../data/recipes";
 import { RECIPES as spreadsDipsStyles } from "./SpreadsDips";
 import { isContentDbStrictMode, loadPublishedRecipesFromDb } from "../services/contentService";
@@ -50,7 +51,7 @@ export function Recipes() {
     cookTime: 15,
     servings: Number(dip.servings.split(" ")[0]) || 8,
     thcPerServing: "~2-5mg",
-    image: "/IMAGES/spreadsdips.jpg",
+    image: PAGE_STOCK.spreads,
     description: dip.profile,
     route: `/spreads-dips?recipe=${encodeURIComponent(dip.id)}`,
   }));

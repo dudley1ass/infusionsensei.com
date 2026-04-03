@@ -1,4 +1,5 @@
 import type { Recipe } from "../data/recipeTypes";
+import { DEFAULT_RECIPE_STOCK_IMAGE } from "../data/recipeStockImageUrls";
 
 type DbRecipeRow = {
   id: string;
@@ -38,7 +39,7 @@ function normalizeRecipe(row: DbRecipeRow): Recipe {
     cookTime: Number(row.cook_minutes) || 0,
     servings: Number(row.servings_default) || 1,
     thcPerServing: row.thc_per_serving_label || "~5-10mg",
-    image: row.image_url || "/IMAGES/cannabutter.jpg",
+    image: row.image_url || DEFAULT_RECIPE_STOCK_IMAGE,
     description: row.summary || "Cannabis recipe",
     ingredients: [],
     instructions: [],
@@ -148,7 +149,7 @@ export async function loadRecipeByIdFromDb(id: string): Promise<Recipe | null> {
       cookTime: Number(row.cook_minutes) || 0,
       servings: Number(row.servings_default) || 1,
       thcPerServing: row.thc_per_serving_label || "~5-10mg",
-      image: row.image_url || "/IMAGES/cannabutter.jpg",
+      image: row.image_url || DEFAULT_RECIPE_STOCK_IMAGE,
       description: row.summary || "Cannabis recipe",
       ingredients: ingredientsRows.map((ing) =>
         `${ing.amount ?? ""}${ing.unit ? ` ${ing.unit}` : ""} ${ing.ingredient_name}`.trim()

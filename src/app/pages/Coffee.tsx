@@ -5,6 +5,7 @@ import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
+import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { loadShowcaseItemsFromDb } from "../services/contentService";
 
 type Drink = { id:string; name:string; type:"Butter"|"Oil"|"Tincture"|"Syrup"|"Cream"; profile:string; build:string; tags:string[]; emoji:string; strength:0|1|2|3; sweetness:0|1|2|3; servings:string; ingredients:string[]; steps:string[]; note:string; };
@@ -90,7 +91,7 @@ export function Coffee() {
       </Helmet>
 
       <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{minHeight:"280px"}}>
-        <img src="/IMAGES/coffee.jpg" alt="Infused coffee" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={PAGE_STOCK.coffee} alt="Infused coffee" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         <div className="relative z-10 px-6 py-14 text-center">
           <div className="text-6xl mb-3">☕</div>

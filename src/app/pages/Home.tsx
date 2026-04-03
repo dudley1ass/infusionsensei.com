@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { recipes } from "../data/recipes";
+import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { trackEvent } from "../utils/analytics";
 
 export function Home() {
@@ -92,12 +93,12 @@ export function Home() {
           {/* What are you making today? */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-1.5 sm:mb-2">
             {[
-              { emoji: "🍗", label: "Wings", sub: "Start here", to: "/wings", img: "/IMAGES/chickenwings.jpg", highlight: false, mobilePriority: true },
-              { emoji: "🍿", label: "Popcorn", sub: "Start here", to: "/popcorn", img: "/IMAGES/popcorn.webp", highlight: false, mobilePriority: true },
-              { emoji: "☕", label: "Coffee", sub: "Start here", to: "/coffee", img: "/IMAGES/coffee.jpg", highlight: false, mobilePriority: true },
-              { emoji: "🍬", label: "Jello", sub: "Dose-controlled cubes", to: "/jello", img: "/IMAGES/jello-shots.png", highlight: true, mobilePriority: true },
-              { emoji: "🧸", label: "Gummies", sub: "Single-piece dosing", to: "/gummies", img: "/IMAGES/gummies.jpg", highlight: true },
-              { emoji: "🎉", label: "Party Snacks", sub: "Handheld + controllable", to: "/party-snacks", img: "/IMAGES/popcorn.webp", highlight: true },
+              { emoji: "🍗", label: "Wings", sub: "Start here", to: "/wings", img: PAGE_STOCK.wings, highlight: false, mobilePriority: true },
+              { emoji: "🍿", label: "Popcorn", sub: "Start here", to: "/popcorn", img: PAGE_STOCK.popcorn, highlight: false, mobilePriority: true },
+              { emoji: "☕", label: "Coffee", sub: "Start here", to: "/coffee", img: PAGE_STOCK.coffee, highlight: false, mobilePriority: true },
+              { emoji: "🍬", label: "Jello", sub: "Dose-controlled cubes", to: "/jello", img: PAGE_STOCK.jello, highlight: true, mobilePriority: true },
+              { emoji: "🧸", label: "Gummies", sub: "Single-piece dosing", to: "/gummies", img: PAGE_STOCK.gummies, highlight: true },
+              { emoji: "🎉", label: "Party Snacks", sub: "Handheld + controllable", to: "/party-snacks", img: PAGE_STOCK.partySnacks, highlight: true },
             ].map(({ emoji, label, sub, to, img, highlight, mobilePriority }) => (
               <Link
                 key={label}

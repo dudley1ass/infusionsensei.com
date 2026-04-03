@@ -5,6 +5,7 @@ import { ArrowRight, ChefHat, Flame, Star } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
+import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { loadShowcaseItemsFromDb } from "../services/contentService";
 
 type Sauce = {
@@ -165,7 +166,7 @@ export function WingSauces() {
 
       {/* Hero */}
       <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{minHeight: "280px"}}>
-        <img src="/IMAGES/chickenwings.jpg" alt="Infused chicken wings" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={PAGE_STOCK.wings} alt="Infused chicken wings" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
         <div className="relative z-10 px-6 py-14 text-center">
           <h1 className="text-4xl md:text-5xl font-black text-white mb-3">Infused Wing Sauces</h1>

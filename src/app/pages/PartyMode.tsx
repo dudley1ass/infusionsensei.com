@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { ArrowRight, Users, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 
 const BUNDLES = [
   {
@@ -16,7 +17,7 @@ const BUNDLES = [
     serves: "4–6 people",
     vibe: "Relaxed / Social",
     hero: true,
-    thumbnail: "/IMAGES/chickenwings.jpg",
+    thumbnail: PAGE_STOCK.wings,
     thumbnailAlt: "Game night wings and snacks",
     items: [
       { name: "Infused Buffalo Wings", dose: "2–3mg each", tip: "Make 2 sauces — 1 infused, 1 regular. Label clearly.", link: "/wings", emoji: "🍗" },
@@ -44,7 +45,7 @@ const BUNDLES = [
     serves: "1–2 people",
     vibe: "Mellow / Relaxing",
     hero: false,
-    thumbnail: "/IMAGES/popcorn.webp",
+    thumbnail: PAGE_STOCK.popcorn,
     thumbnailAlt: "Chill night popcorn and drink",
     items: [
       { name: "Garlic Butter Popcorn", dose: "2–5mg per bowl", tip: "The easiest infused snack. Hard to mess up.", link: "/popcorn", emoji: "🍿" },
@@ -72,7 +73,7 @@ const BUNDLES = [
     serves: "4–8 people",
     vibe: "Game Day / Social",
     hero: false,
-    thumbnail: "/IMAGES/popcorn.webp",
+    thumbnail: PAGE_STOCK.partySnacks,
     thumbnailAlt: "Final Four watch-party snacks",
     items: [
       { name: "Husky Northeast Maple Popcorn", dose: "2–3mg per handful", tip: "Melt butter + maple syrup, then fold in infused butter and toss with popcorn.", link: "/popcorn", emoji: "🟦" },
@@ -100,7 +101,7 @@ const BUNDLES = [
     serves: "4–8 people",
     vibe: "Indulgent / Social",
     hero: false,
-    thumbnail: "/IMAGES/brownies.jpg",
+    thumbnail: PAGE_STOCK.brownies,
     thumbnailAlt: "Dessert pack brownies",
     items: [
       { name: "Classic Cannabis Brownies", dose: "5–10mg each", tip: "Cut into smaller pieces for a dessert spread.", link: "/ingredients?category=baked-goods&recipe=brownies", emoji: "🍫" },
@@ -129,7 +130,7 @@ const BUNDLES = [
     serves: "4–8 people",
     vibe: "Savory / Social",
     hero: false,
-    thumbnail: "/IMAGES/pizzasauce.jpg",
+    thumbnail: PAGE_STOCK.pizza,
     thumbnailAlt: "Spaghetti and infused pizza sauce",
     items: [
       { name: "Garlic Infused Pasta", dose: "5–10mg per serving", tip: "Portion pasta before serving so every plate gets the same dose.", link: "/ingredients?category=savory-meals&recipe=garlic-pasta", emoji: "🍝" },
@@ -156,7 +157,7 @@ const BUNDLES = [
     serves: "Any size",
     vibe: "Social / Elegant",
     hero: false,
-    thumbnail: "/IMAGES/coffee.jpg",
+    thumbnail: PAGE_STOCK.coffee,
     thumbnailAlt: "Infused drinks",
     items: [
       { name: "Bulletproof THC Coffee", dose: "5–10mg per cup", tip: "Make a big batch, let guests serve themselves. Label the infused version.", link: "/coffee", emoji: "☕" },

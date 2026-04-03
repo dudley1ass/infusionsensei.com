@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { trackEvent } from "../utils/analytics";
 import { loadShowcaseItemsFromDb } from "../services/contentService";
 
@@ -284,7 +285,7 @@ const TYPE_COLORS: Record<string, string> = {
   Nutty: "bg-yellow-100 text-yellow-900",
 };
 
-const SPREADS_HERO_IMAGES = ["/IMAGES/spreadsdips.jpg", "/images/spreadsdips.jpg", "/IMAGES/fries.jpg"] as const;
+const SPREADS_HERO_IMAGES = [PAGE_STOCK.spreads, PAGE_STOCK.fries] as const;
 
 function Dots({ level, color }: { level: number; color: string }) {
   return (

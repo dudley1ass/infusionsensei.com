@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { ArrowRight, ChefHat, Clock, Users } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 
 const THIS_WEEK = {
   id: "steak-alfredo",
@@ -14,7 +15,7 @@ const THIS_WEEK = {
   servings: 2,
   difficulty: "Medium",
   why: "Heavy cream carries THC beautifully — smooth flavor, no weedy taste, and easy dose control per bowl.",
-  img: "/IMAGES/mac-and-cheese.jpg",
+  img: PAGE_STOCK.dinner,
   doses: [
     { label: "Light", mg: "5mg", who: "New to edibles or low tolerance" },
     { label: "Standard", mg: "10mg", who: "Regular users, recreational" },

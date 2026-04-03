@@ -5,6 +5,7 @@ import { ArrowRight, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
+import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { loadShowcaseItemsFromDb } from "../services/contentService";
 
 type PopcornFlavor = {
@@ -262,7 +263,7 @@ export function Popcorn() {
 
       {/* Hero */}
       <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{minHeight: "280px"}}>
-        <img src="/IMAGES/popcorn.webp" alt="Infused popcorn" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={PAGE_STOCK.popcorn} alt="Infused popcorn" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
         <div className="relative z-10 px-6 py-14 text-center">
           <div className="text-6xl mb-3">🍿</div>
