@@ -1,4 +1,5 @@
 import type { Recipe } from "./recipeTypes";
+import { resolveTemplateHeroImage } from "./recipeTemplateHeroImages";
 import { standardRecipes } from "./standardRecipes";
 
 type BuilderTemplate = {
@@ -20,17 +21,6 @@ const BUILDER_KEY_TO_CATEGORY: Record<string, Recipe["category"]> = {
   "savory-meals": "edibles",
   "ice-cream": "edibles",
   "breads-breakfast": "edibles",
-};
-
-const BUILDER_KEY_IMAGE: Record<string, string> = {
-  "baked-goods": "/IMAGES/brownies.jpg",
-  wings: "/IMAGES/wings.jpg",
-  "spreads-dips": "/IMAGES/spreadsdips.jpg",
-  snacks: "/IMAGES/popcorn.webp",
-  drinks: "/IMAGES/coffee.jpg",
-  "savory-meals": "/IMAGES/dinner.jpg",
-  "ice-cream": "/IMAGES/icecream.jpg",
-  "breads-breakfast": "/IMAGES/brownies.jpg",
 };
 
 function defaultPrepCook(builderKey: string): { prep: number; cook: number } {
@@ -65,29 +55,6 @@ function formatIngredientLine(name: string, amount: number, unit: string): strin
   return `${amtStr} ${u} ${name}`.trim();
 }
 
-function templateHeroImage(builderKey: string, id: string, name: string): string {
-  const blob = `${id} ${name}`.toLowerCase();
-  if (/brownie|blondie|bar|coffee cake|pound|layer cake|cupcake|muffin|pancake|banana bread/.test(blob)) {
-    return "/IMAGES/brownies.jpg";
-  }
-  if (/cookie|snickerdoodle|shortbread|gingerbread|oatmeal/.test(blob)) {
-    return "/IMAGES/chocolatechip.jpg";
-  }
-  if (/popcorn|pretzel|pretzel|chip|mix |chex|cracker|nut\b|fudge|marshmallow|krispie|gumm|jello|gel|churro|funnel/.test(blob)) {
-    return "/IMAGES/popcorn.webp";
-  }
-  if (/wing|buffalo|bbq|sauce|dip|queso|ranch|spread/i.test(blob)) {
-    return "/IMAGES/wings.jpg";
-  }
-  if (/coffee|latte|tea|drink|shake|smoothie|cocktail|jello shot/.test(blob)) {
-    return "/IMAGES/coffee.jpg";
-  }
-  if (/ice cream|frozen/.test(blob)) {
-    return "/IMAGES/icecream.jpg";
-  }
-  return BUILDER_KEY_IMAGE[builderKey] ?? "/IMAGES/cannabutter.jpg";
-}
-
 /** One Recipe card per builder template — manual `recipes.ts` entries win on duplicate ids */
 export function recipesDerivedFromStandardTemplates(): Recipe[] {
   const out: Recipe[] = [];
@@ -120,7 +87,7 @@ export function recipesDerivedFromStandardTemplates(): Recipe[] {
         cookTime: cook,
         servings: Math.max(1, raw.servings || 1),
         thcPerServing: "Use Start Here for your batch",
-        image: templateHeroImage(builderKey, raw.id, raw.name),
+        image: resolveTemplateHeroImage(builderKey, raw.id),
         description,
         ingredients,
         instructions: [...raw.instructions],
