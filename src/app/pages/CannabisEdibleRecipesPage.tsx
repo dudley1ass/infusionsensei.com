@@ -59,7 +59,7 @@ export function CannabisEdibleRecipesPage() {
           {featured.map(recipe => (
             <Link key={recipe.id} to={`/recipes/${recipe.id}`} className="bg-white rounded-2xl border-2 border-gray-200 hover:border-green-400 overflow-hidden group shadow-sm hover:shadow-md transition-all">
               <div className="h-40 overflow-hidden">
-                <img src={recipe.image} alt={cleanRecipeDisplayTitle(recipe.name)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <img src={recipe.image} alt={cleanRecipeDisplayTitle(recipe.name)} className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500" />
               </div>
               <div className="p-4">
                 <h3 className="font-black text-gray-900 mb-1">{cleanRecipeDisplayTitle(recipe.name)}</h3>

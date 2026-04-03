@@ -2839,7 +2839,7 @@ export function CreateRecipes() {
                       <img
                         src={resolveTemplateHeroImage(selectedCategory, recipe.id)}
                         alt={cleanRecipeDisplayTitle(recipe.name)}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover object-center"
                         loading="lazy"
                         decoding="async"
                       />

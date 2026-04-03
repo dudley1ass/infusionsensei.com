@@ -110,7 +110,7 @@ export function Home() {
                     <img
                       src={Array.isArray(img) ? img[0] : img}
                       alt={label}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="absolute inset-0 h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
                       onError={(event) => {
                         if (!Array.isArray(img)) return;
                         const currentSrc = event.currentTarget.getAttribute("src");
@@ -240,7 +240,7 @@ export function Home() {
               <Link key={recipe.id} to={`/recipes/${recipe.id}`}>
                 <Card className="bg-white border-2 border-green-100 hover:border-green-400 transition-all hover:-translate-y-1 overflow-hidden group shadow-md hover:shadow-xl h-full">
                   <div className="relative h-48 overflow-hidden">
-                    <img src={recipe.image} alt={cleanRecipeDisplayTitle(recipe.name)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={recipe.image} alt={cleanRecipeDisplayTitle(recipe.name)} className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                     <div className="absolute top-3 left-3">
                       <span className="bg-green-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-lg">✨ NEW</span>

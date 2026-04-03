@@ -2,35 +2,68 @@
  * Recipe card / detail heroes: default path `public/images/recipes/{id}.jpg`.
  *
  * Many art files live in `public/images/` with marketing-style names (no `recipes/` folder, often no
- * hyphens). Map **catalog or resolved template id** → filename in that root folder.
+ * hyphens). Values may be `.jpg` or `.png`. Map **catalog or resolved template id** → filename in that
+ * root folder.
  */
 
-/** Wing sauce templates share one kitchen hero (`chickenwings.jpg`). */
-const WING_TEMPLATE_IDS = [
-  "classic-buffalo-wings",
-  "garlic-parmesan-wings",
-  "honey-bbq-wings",
-  "teriyaki-wings",
-  "nashville-hot-wings",
-  "korean-gochujang-wings",
-  "lemon-pepper-wings",
-  "mango-habanero-wings",
-  "cajun-butter-wings",
-  "truffle-butter-wings",
-  "ranch-butter-wings",
-  "honey-mustard-wings",
-  "sriracha-honey-wings",
-  "chili-crisp-wings",
-  "maple-bacon-wings",
-  "brown-sugar-bourbon-wings",
-  "pineapple-ginger-wings",
-  "orange-glaze-wings",
-  "garlic-soy-umami-wings",
-  "chimichurri-wings",
-] as const;
+/** Popcorn snack templates (PNG heroes). */
+const POPCORN_HERO_AT_ROOT: Record<string, string> = {
+  "garlic-butter-popcorn": "garlic_butter_popcorn.png",
+  "caramel-popcorn": "caramel_popcorn.png",
+  "buffalo-popcorn": "buffalo_popcorn.png",
+  "chocolate-drizzle-popcorn": "chocolate_drizzle_popcorn.png",
+  "kettle-corn-infused": "kettle_corn.png",
+  "candy-coated-popcorn": "candy_coated_popcorn.png",
+};
+
+/** Spreads, dips, sauces, party snacks — PNG heroes (overrides JPG entries below). */
+const SPREADS_SNACKS_PNG_AT_ROOT: Record<string, string> = {
+  "infused-almond-butter-spread": "almond_butter.png",
+  "infused-peanut-butter-spread": "peanut_butter.png",
+  "infused-cream-cheese-whipped": "cream_cheese.png",
+  "sweet-honey-cream-cheese-spread-infused": "honey_cream_cheese.png",
+  "herb-garlic-cream-cheese-spread-infused": "cream_cheese.png",
+  "queso-dip-infused": "queso_dip.png",
+  "spinach-artichoke-dip-infused": "spinach_artichoke_dip.png",
+  "ranch-dip-infused": "ranch_dip.png",
+  "honey-mustard-dip-infused": "honey_mustard_dip.png",
+  "bbq-sauce-infused-party": "bbq_sauce.png",
+  "sweet-chili-sauce-infused": "sweet_chili_sauce.png",
+  "cheese-sauce-infused": "cheese_sauce.png",
+  "buffalo-dip-infused": "cheese_dip.png",
+  "chex-mix-infused": "chex_mix.png",
+  "infused-nuts": "mixed_nuts.png",
+  "snack-mix-party": "party_mix.png",
+  "chocolate-dipped-pretzels": "chocolate_pretzels.png",
+};
+
+/** Per-flavor wing heroes under `public/images/` (matches `standardRecipes.wings` template ids). */
+const WING_HERO_JPEG: Record<string, string> = {
+  "classic-buffalo-wings": "buffalowings.jpg",
+  "garlic-parmesan-wings": "garlicparmesanwings.jpg",
+  "honey-bbq-wings": "honeybbqwings.jpg",
+  "teriyaki-wings": "teriyakiwings.jpg",
+  "nashville-hot-wings": "nashvillehotwings.jpg",
+  "korean-gochujang-wings": "koreanfriedchicken.jpg",
+  "lemon-pepper-wings": "lemonpepper.jpg",
+  "mango-habanero-wings": "manoghabanerowings.jpg",
+  "cajun-butter-wings": "cajunwings.jpg",
+  "truffle-butter-wings": "trufflechicken.jpg",
+  "ranch-butter-wings": "ranchwings.jpg",
+  "honey-mustard-wings": "honeymustardchicken.jpg",
+  "sriracha-honey-wings": "srirachahoneywings.jpg",
+  "chili-crisp-wings": "chilicrispychicken.jpg",
+  "maple-bacon-wings": "maplebaconchicken.jpg",
+  "brown-sugar-bourbon-wings": "burbonglazedchicken.jpg",
+  "pineapple-ginger-wings": "pineapplechicken.jpg",
+  "orange-glaze-wings": "orangeglazed.jpg",
+  "garlic-soy-umami-wings": "soygarlicwings.jpg",
+  "chimichurri-wings": "chimichurrichicken.jpg",
+};
 
 const HERO_JPEG_AT_IMAGES_ROOT: Record<string, string> = {
-  ...Object.fromEntries(WING_TEMPLATE_IDS.map((id) => [id, "chickenwings.jpg"])),
+  ...WING_HERO_JPEG,
+  ...POPCORN_HERO_AT_ROOT,
 
   "brownies": "brownies.jpg",
   "blondie-squares": "blondiesquares.jpg",
@@ -62,10 +95,16 @@ const HERO_JPEG_AT_IMAGES_ROOT: Record<string, string> = {
   "smores-bars": "s'moresbars.jpg",
 
   "mint-ice-cream": "mint-ice-cream.jpg",
+  "vanilla-ice-cream": "vanillaicecream.jpg",
+  "banana-bread": "bananabread.jpg",
+  "pancakes": "pancakes.jpg",
+
   "cannabis-smoothie": "fruit-smoothie.jpg",
   "cannabis-tea": "tea.jpg",
   "bulletproof-coffee": "coffee.jpg",
-  "steak": "steakalfredo.jpg",
+  "alfredo": "alfredosauce.jpg",
+  "garlic-pasta": "garlicpasta.jpg",
+  "steak": "garlicsteak.jpg",
   "infused-pizza-sauce": "pizzasauce.jpg",
   "infused-mac-and-cheese": "mac-and-cheese.jpg",
 
@@ -80,8 +119,7 @@ const HERO_JPEG_AT_IMAGES_ROOT: Record<string, string> = {
   "fruit-juice-jello-cubes": "jellocube.jpg",
   "sour-jello-bites": "jellobites.jpg",
 
-  "popcorn-balls": "popcornballs.jpg",
-  "kettle-corn-infused": "kettlecorn.jpg",
+  "popcorn-balls": "popcorn_balls.png",
   "rice-krispie-treat-squares": "ricecrispytreats.jpg",
   "chocolate-dipped-pretzels": "chocolatedippedpretz.jpg",
   "mini-slider-sauce": "minisliders.jpg",
@@ -108,6 +146,8 @@ const HERO_JPEG_AT_IMAGES_ROOT: Record<string, string> = {
   "infused-cream-cheese-whipped": "cream cheese.jpg",
   "sweet-honey-cream-cheese-spread-infused": "cream cheese.jpg",
   "herb-garlic-cream-cheese-spread-infused": "cream cheese.jpg",
+
+  ...SPREADS_SNACKS_PNG_AT_ROOT,
 };
 
 /**

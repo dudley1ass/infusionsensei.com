@@ -169,7 +169,7 @@ export function Recipes() {
                   <img
                     src={recipe.image}
                     alt={cleanRecipeDisplayTitle(recipe.name)}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-300"
                   />
                   {/* NEW badge — top left */}
                   {recipe.isNew && (
