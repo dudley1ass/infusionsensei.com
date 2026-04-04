@@ -14,6 +14,7 @@ import { Input } from "../components/ui/input";
 import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
 import {
   getRecipeLibraryCategory,
+  getStartHereSortIndex,
   RECIPE_LIBRARY_TABS,
   recipeLibraryBadgeLabel,
 } from "../data/recipeLibraryCategory";
@@ -90,11 +91,11 @@ export function Recipes() {
     ...spreadsDipsDisplayRecipes,
   ];
 
-  // Sort: new recipes first, then rest
   const sortedRecipes = [...allDisplayRecipes].sort((a, b) => {
-    if (a.isNew && !b.isNew) return -1;
-    if (!a.isNew && b.isNew) return 1;
-    return 0;
+    const ia = getStartHereSortIndex(a.id);
+    const ib = getStartHereSortIndex(b.id);
+    if (ia !== ib) return ia - ib;
+    return cleanRecipeDisplayTitle(a.name).localeCompare(cleanRecipeDisplayTitle(b.name));
   });
 
   const filteredRecipes = sortedRecipes.filter((recipe) => {

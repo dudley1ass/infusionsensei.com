@@ -68,3 +68,56 @@ const LIBRARY_BADGE_LABEL: Record<string, string> = {
 export function recipeLibraryBadgeLabel(libraryKey: string): string {
   return LIBRARY_BADGE_LABEL[libraryKey] ?? libraryKey;
 }
+
+/** Same category order as CreateRecipes `recipeCategories`, then Basics & Infusions (Recipe Library tabs). */
+const START_HERE_CATEGORY_ORDER = [
+  "baked-goods",
+  "wings",
+  "spreads-dips",
+  "snacks",
+  "drinks",
+  "savory-meals",
+  "ice-cream",
+  "breads-breakfast",
+  "basics",
+  "infusions",
+] as const;
+
+const LIBRARY_FALLBACK_BASE = 2_000_000;
+const LIBRARY_FALLBACK_STRIDE = 50_000;
+
+let _startHereSortIndexMap: Map<string, number> | null = null;
+
+function buildStartHereSortIndexMap(): Map<string, number> {
+  const m = new Map<string, number>();
+  let i = 0;
+  for (const cat of START_HERE_CATEGORY_ORDER) {
+    const list = (standardRecipes as Record<string, { id: string }[] | undefined>)[cat];
+    if (!list) continue;
+    for (const row of list) {
+      if (row?.id) m.set(row.id, i++);
+    }
+  }
+  const spreads = standardRecipes["spreads-dips"];
+  if (spreads) {
+    for (const row of spreads) {
+      if (row?.id) m.set(`spreads-dips-${row.id}`, m.get(row.id)!);
+    }
+  }
+  return m;
+}
+
+/**
+ * Lower sorts earlier — matches Start Here: category order, then `standardRecipes` row order within category.
+ * Spreads web cards (`spreads-dips-*`) share the index of their template id. Recipes not in the map fall back
+ * to a stable bucket by library category, then tie-break by name in the caller.
+ */
+export function getStartHereSortIndex(recipeId: string): number {
+  if (!_startHereSortIndexMap) _startHereSortIndexMap = buildStartHereSortIndexMap();
+  const mapped = _startHereSortIndexMap.get(recipeId);
+  if (mapped !== undefined) return mapped;
+  const lib = getRecipeLibraryCategory(recipeId);
+  const bucket = START_HERE_CATEGORY_ORDER.indexOf(lib as (typeof START_HERE_CATEGORY_ORDER)[number]);
+  const b = bucket >= 0 ? bucket : START_HERE_CATEGORY_ORDER.length;
+  return LIBRARY_FALLBACK_BASE + b * LIBRARY_FALLBACK_STRIDE;
+}
