@@ -702,6 +702,28 @@ const BAR_TRAY_STANDARD_IDS = new Set<string>([
 ]);
 
 const CHOCOLATE_FUDGE_BUILDER_ID = "infused-chocolate-fudge";
+
+/**
+ * Savory builder templates that are never oven-baked batters (skillets, pasta, soup).
+ * Excludes `cheesy-garlic-pull-bread` — that one still uses flour + bake heuristics.
+ */
+const SAVORY_NO_OVEN_BAKE_RATIO_IDS = new Set<string>([
+  "alfredo",
+  "garlic-pasta",
+  "steak",
+  "lemon-garlic-chicken-pasta",
+  "beef-cheddar-skillet",
+  "creamy-beef-pasta",
+  "spinach-ricotta-pasta",
+  "loaded-potato-skillet",
+  "chicken-alfredo-pasta",
+  "garlic-butter-steak-bites",
+  "bacon-hash-skillet",
+  "lemon-parmesan-pasta",
+  "peanut-chicken-noodles",
+  "creamy-corn-chowder",
+]);
+
 /** Fudge template expects modest butter vs chocolate + condensed milk — sum these for a fat budget check */
 const FUDGE_TEMPLATE_FAT_NAMES = new Set([
   "Cannabutter",
@@ -1822,6 +1844,8 @@ export function CreateRecipes() {
       selectedStandardRecipe === "funnel-cake-bites" ||
       recipeName.toLowerCase().includes("churro") ||
       recipeName.toLowerCase().includes("funnel cake");
+    const isBreadsBreakfastCategory = selectedCategory === "breads-breakfast";
+    const cakeLikeMoistureForRatios = isCakeStyle || isBreadsBreakfastCategory;
 
     let warning = '';
     let color = '';
@@ -1867,6 +1891,20 @@ export function CreateRecipes() {
           }
         }
       }
+    }
+
+    // Frozen desserts & stovetop savories: flour/cocoa/cornmeal still triggers structural flour,
+    // but moisture rules are for churned bases or soups — not oven cookies/cakes.
+    if (
+      selectedCategory === "ice-cream" ||
+      (selectedCategory === "savory-meals" &&
+        selectedStandardRecipe &&
+        SAVORY_NO_OVEN_BAKE_RATIO_IDS.has(selectedStandardRecipe))
+    ) {
+      if (templateDrift?.level === "soft") {
+        return { warning: templateDrift.text, color: templateDrift.color };
+      }
+      return { warning, color };
     }
 
     // Only run baking-science warnings for structural flour (not cornstarch-thickened sauces)
@@ -1983,8 +2021,8 @@ export function CreateRecipes() {
       if (!isHighLiquidRecipe) {
         const liquidToFlour = totalMoisture / Math.max(flour, 1);
         // Layer cakes with milk + eggs are often ~1.45–1.55 moisture:flour — keep above that band.
-        const problemL = isBarStyle ? 3.6 : isCakeStyle ? 1.68 : 1.1;
-        const warnL = isBarStyle ? 3.0 : isCakeStyle ? 1.58 : 0.7;
+        const problemL = isBarStyle ? 3.6 : cakeLikeMoistureForRatios ? 1.68 : 1.1;
+        const warnL = isBarStyle ? 3.0 : cakeLikeMoistureForRatios ? 1.58 : 0.7;
         if (liquidToFlour > problemL) {
           warning = 'Way too much liquid — batter will not hold shape and won\'t bake properly.';
           color = 'red';
@@ -2073,6 +2111,8 @@ export function CreateRecipes() {
       recipeName.toLowerCase().includes("funnel cake");
     const isSavoryStyle = selectedCategory === "wings" || selectedCategory === "spreads-dips" || selectedCategory === "savory-meals";
     const isDrinkStyle = selectedCategory === "drinks";
+    const isBreadsBreakfastCategory = selectedCategory === "breads-breakfast";
+    const cakeLikeMoistureForRatios = isCakeStyle || isBreadsBreakfastCategory;
 
     const structuralFlour = hasStructuralBakingFlour(ingredients);
 
@@ -2081,6 +2121,32 @@ export function CreateRecipes() {
 
     const tags: { label: string; color: string }[] = [];
     if (hasInfused) tags.push({ label: '🧪 Cannabis Infused', color: 'purple' });
+
+    if (selectedCategory === "ice-cream") {
+      return {
+        headline: "🧊 Frozen dessert (not oven-baked)",
+        description:
+          "High liquid versus cocoa or crumbs is normal for ice cream and popsicles. Ignore oven-baking rules; focus on safe dosing and clear labels.",
+        tags: [...tags, { label: "Frozen", color: "blue" }],
+        severity: "good",
+        styleLabel: "Frozen",
+      };
+    }
+
+    if (
+      selectedCategory === "savory-meals" &&
+      selectedStandardRecipe &&
+      SAVORY_NO_OVEN_BAKE_RATIO_IDS.has(selectedStandardRecipe)
+    ) {
+      return {
+        headline: "🍳 Savory recipe (not cake ratios)",
+        description:
+          "Pastas, skillets, and soups are not cookie or cake batters. Flour or cornmeal here thickens or coats — not oven structure.",
+        tags: [...tags, { label: "Savory", color: "green" }],
+        severity: "good",
+        styleLabel: "Savory",
+      };
+    }
 
     // No structural baking flour — beverage / sauce / no-bake / starch-thickened cheese sauce
     if (!structuralFlour) {
@@ -2135,7 +2201,7 @@ export function CreateRecipes() {
     const issues: string[] = [];
     let severity: 'good' | 'warning' | 'problem' = 'good';
 
-    const moistureProblemThreshold = isBarStyle ? 3.6 : isCakeStyle ? 1.68 : 1.1;
+    const moistureProblemThreshold = isBarStyle ? 3.6 : cakeLikeMoistureForRatios ? 1.68 : 1.1;
     // Way too much liquid — bail early (but only if not an intentional batter or cake batter)
     if (moistureRatio > moistureProblemThreshold && !isHighLiquidRecipe && !isBrownieStyle) {
       return {
@@ -2186,7 +2252,7 @@ export function CreateRecipes() {
     if (eggRatio > eggProblemThreshold)          { issues.push('too many eggs for this flour — result will be very puffy and cakey'); tags.push({ label: 'Too many eggs', color: 'red' }); severity = 'problem'; }
     else if (eggRatio > eggWarningThreshold)     { issues.push('high egg ratio — will lean soft and cakey. Great for fudgy bakes'); tags.push({ label: 'High eggs', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
-    if (moistureRatio > 0.9 && !isHighLiquidRecipe && !isBrownieStyle && !isCakeStyle && !isBarStyle) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
+    if (moistureRatio > 0.9 && !isHighLiquidRecipe && !isBrownieStyle && !isCakeStyle && !isBarStyle && !isBreadsBreakfastCategory) { issues.push('liquid is high — dough will be very soft, needs chilling or more flour'); tags.push({ label: 'High moisture', color: 'yellow' }); if (severity === 'good') severity = 'warning'; }
 
     const leavenerWarnRatio = isCakeStyle ? 0.14 : 0.08;
     const leavenerProblemRatio = isCakeStyle ? 0.18 : 0.12;
