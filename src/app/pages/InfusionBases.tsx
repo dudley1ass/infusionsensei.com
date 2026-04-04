@@ -261,7 +261,7 @@ const infusionRecipes: InfusionRecipe[] = [
   // OIL RECIPES
   {
     id: "coconut-oil",
-    name: "Cannabis Coconut Oil",
+    name: "Coconut oil",
     baseType: "oil",
     baseRole: "cooking",
     temperature: "170-180°F (77-82°C)",
@@ -476,14 +476,14 @@ const infusionRecipes: InfusionRecipe[] = [
     terpeneRetention: 70,
     ingredients: [
       "200g (7oz) dark chocolate (60-70% cacao), chopped",
-      "2 tbsp cannabis coconut oil",
+      "2 tbsp coconut oil",
       "Pinch of flaky sea salt",
       "Silicone molds or parchment-lined tray"
     ],
     steps: [
-      "Make cannabis coconut oil first using your preferred infusion method",
+      "Make infused coconut oil first using your preferred infusion method",
       "Melt chocolate in double boiler — keep below 120°F to preserve THC",
-      "Remove from heat, stir in cannabis coconut oil completely",
+      "Remove from heat, stir in coconut oil completely",
       "Add sea salt and stir until smooth",
       "Pour into molds or spread on parchment",
       "Refrigerate 30-45 min until fully set",
@@ -503,14 +503,14 @@ const infusionRecipes: InfusionRecipe[] = [
     terpeneRetention: 65,
     ingredients: [
       "200g (7oz) milk chocolate chips or chopped bar",
-      "2 tbsp cannabis coconut oil",
+      "2 tbsp coconut oil",
       "Optional: 1 tsp vanilla extract"
     ],
     steps: [
-      "Make cannabis coconut oil first",
+      "Make infused coconut oil first",
       "Melt milk chocolate gently — it burns more easily than dark",
       "Keep temperature below 115°F throughout",
-      "Stir in cannabis coconut oil and vanilla if using",
+      "Stir in coconut oil and vanilla if using",
       "Pour into molds, top with toppings if desired",
       "Refrigerate 30 min until set"
     ],
@@ -528,14 +528,14 @@ const infusionRecipes: InfusionRecipe[] = [
     terpeneRetention: 60,
     ingredients: [
       "200g (7oz) white chocolate chips (use real cocoa butter, not coating)",
-      "2 tbsp cannabis coconut oil",
+      "2 tbsp coconut oil",
       "Pinch of salt"
     ],
     steps: [
-      "Make cannabis coconut oil first",
+      "Make infused coconut oil first",
       "White chocolate scorches easily — melt very gently below 110°F",
       "Stir constantly while melting",
-      "Add cannabis coconut oil and stir until smooth",
+      "Add coconut oil and stir until smooth",
       "Pour into molds immediately",
       "Refrigerate 30 min until set"
     ],
@@ -582,7 +582,7 @@ const infusionRecipes: InfusionRecipe[] = [
     terpeneRetention: 50,
     ingredients: [
       "2 cups (680g) runny honey",
-      "2-8g decarboxylated cannabis OR cannabis coconut oil stirred in",
+      "2-8g decarboxylated cannabis OR coconut oil stirred in",
       "Jar with tight lid, warm water bath"
     ],
     steps: [
@@ -607,7 +607,7 @@ const infusionRecipes: InfusionRecipe[] = [
     terpeneRetention: 50,
     ingredients: [
       "16 oz (452g) full-fat cream cheese, cubed",
-      "1-3 tbsp finished cannabis butter or MCT infusion (avoid grainy texture)",
+      "1-3 tbsp finished cannabutter or MCT infusion (avoid grainy texture)",
       "Stand mixer or food processor (optional)"
     ],
     steps: [
@@ -632,7 +632,7 @@ const infusionRecipes: InfusionRecipe[] = [
     terpeneRetention: 58,
     ingredients: [
       "1 cup chocolate-hazelnut spread or dark chocolate + hazelnut butter blend",
-      "2-4 tbsp cannabis coconut oil (measured, very warm but not smoking)",
+      "2-4 tbsp coconut oil (measured, very warm but not smoking)",
       "Pinch of salt, pinch of espresso powder (optional)"
     ],
     steps: [
@@ -646,7 +646,7 @@ const infusionRecipes: InfusionRecipe[] = [
   },
   {
     id: "infused-buttercream-frosting",
-    name: "Infused Buttercream / Frosting Base",
+    name: "Cannabutter buttercream / frosting base",
     baseType: "spread",
     baseRole: "both",
     preparationMode: "mix-in",
@@ -682,7 +682,7 @@ const infusionRecipes: InfusionRecipe[] = [
     ingredients: [
       "1 cup heavy cream",
       "1 cup sugar + 6 tbsp butter",
-      "Finished cannabis cream or small amount of infused butter whisked in off heat",
+      "Finished cannabis cream or small amount of cannabutter whisked in off heat",
       "Candy thermometer"
     ],
     steps: [

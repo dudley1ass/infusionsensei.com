@@ -53,7 +53,7 @@ export { standardRecipes };
 const INGREDIENT_LIBRARY = [
   // ── INFUSED (Cannabis) ──────────────────────────────────────────
   { name: "Cannabutter",                          category: "infused",    defaultAmount: 113, defaultUnit: "g",       thcPerUnit: 1,   calories: 717, carbs: 0,   protein: 1,   fat: 81,  type: "fat" },
-  { name: "Cannabis Coconut Oil",                 category: "infused",    defaultAmount: 60,  defaultUnit: "ml",      thcPerUnit: 1,   calories: 862, carbs: 0,   protein: 0,   fat: 100, type: "liquid" },
+  { name: "Coconut oil",                          category: "infused",    defaultAmount: 60,  defaultUnit: "ml",      thcPerUnit: 1,   calories: 862, carbs: 0,   protein: 0,   fat: 100, type: "liquid" },
   { name: "Cannabis Olive Oil",                   category: "infused",    defaultAmount: 60,  defaultUnit: "ml",      thcPerUnit: 1,   calories: 884, carbs: 0,   protein: 0,   fat: 100, type: "liquid" },
   { name: "THC Tincture",                         category: "infused",    defaultAmount: 1,   defaultUnit: "ml",      thcPerUnit: 25,  calories: 7,   carbs: 0,   protein: 0,   fat: 0,   type: "liquid" },
   { name: "Cannabis Honey",                       category: "infused",    defaultAmount: 15,  defaultUnit: "g",       thcPerUnit: 5,   calories: 304, carbs: 82,  protein: 0,   fat: 0,   type: "liquid" },
@@ -108,7 +108,7 @@ const INGREDIENT_LIBRARY = [
   { name: "Vegan Butter",           category: "fat",        defaultAmount: 115, defaultUnit: "g",     calories: 700, carbs: 1.0,  protein: 0.0,  fat: 78.0, type: "fat" },
   { name: "Shortening",             category: "fat",        defaultAmount: 100, defaultUnit: "g",     calories: 884, carbs: 0.0,  protein: 0.0,  fat: 100.0,type: "fat" },
   { name: "Vegetable Oil",          category: "fat",        defaultAmount: 120, defaultUnit: "ml",    calories: 884, carbs: 0.0,  protein: 0.0,  fat: 100.0,type: "liquid" },
-  { name: "Coconut Oil",            category: "fat",        defaultAmount: 100, defaultUnit: "ml",    calories: 862, carbs: 0.0,  protein: 0.0,  fat: 100.0,type: "liquid" },
+  { name: "Coconut oil (uninfused)", category: "fat",        defaultAmount: 100, defaultUnit: "ml",    calories: 862, carbs: 0.0,  protein: 0.0,  fat: 100.0,type: "liquid" },
   { name: "Olive Oil",              category: "fat",        defaultAmount: 100, defaultUnit: "ml",    calories: 884, carbs: 0.0,  protein: 0.0,  fat: 100.0,type: "liquid" },
   { name: "Avocado Oil",            category: "fat",        defaultAmount: 100, defaultUnit: "ml",    calories: 884, carbs: 0.0,  protein: 0.0,  fat: 100.0,type: "liquid" },
   { name: "Cream Cheese",           category: "fat",        defaultAmount: 200, defaultUnit: "g",     calories: 342, carbs: 2.9,  protein: 6.2,  fat: 34.2, type: "semi-solid" },
@@ -458,7 +458,7 @@ function libraryAnchorNameForInfusionBase(base: InfusionBase): string {
     case "coconut-oil":
     case "olive-oil":
     case "vegetable-oil":
-      return "Cannabis Coconut Oil";
+      return "Coconut oil";
     case "simple-syrup":
     case "agave-syrup":
       return "Cannabis Agave Syrup";

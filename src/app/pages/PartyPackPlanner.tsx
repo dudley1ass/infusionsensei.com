@@ -165,7 +165,7 @@ const PACKS: PackTemplate[] = [
         defaultMgEach: 5,
         perPersonQty: 1,
         unitLabel: "servings",
-        equivalentHint: "If using infused butter/oil, this is the easiest THC control point.",
+        equivalentHint: "If using cannabutter or coconut oil, this is the easiest THC control point.",
       },
       {
         id: "meal-pairing-drink",

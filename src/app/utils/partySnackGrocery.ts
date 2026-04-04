@@ -61,7 +61,7 @@ const GRAMS_PER_CUP: Record<string, number> = {
   "Unsalted Butter": 227,
   "Salted Butter": 227,
   Cannabutter: 227,
-  "Cannabis Coconut Oil": 218,
+  "Coconut oil": 218,
   "Peanut Butter": 258,
   "Almond Butter": 250,
   "Cream Cheese": 227,

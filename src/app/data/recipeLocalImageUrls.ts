@@ -133,11 +133,9 @@ const WING_HERO_JPEG: Record<string, string> = {
 const ROOT_PNG_MARKETING_AT_ROOT: Record<string, string> = {
   "brownies": "brownies.png",
   "blondie-squares": "blondiesquares.png",
-  "chocolate-chip-cookies": "chocolate_chip_cookies.png",
-  "sugar-cookies": "sugar_cookies.png",
-  "double-chocolate-cookies": "chocolate_chip_cookies.png",
+  "double-chocolate-cookies": "doublechocolatechipcookies.jpg",
   "classic-cannabutter": "cannabutter.png",
-  "cannabis-oil": "cannabis_oil.png",
+  "cannabis-oil": "coconutoil.jpg",
   "canna-honey": "cannabis_honey.png",
   "cannabis-smoothie": "protein_smoothie.png",
   "cannabis-tea": "tea.png",

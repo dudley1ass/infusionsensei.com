@@ -157,7 +157,7 @@ export const recipeTemplatesByMethod: RecipeTemplateByMethod[] = [
     ],
     instructions: [
       "Preheat oven to 350°F (175°C), grease 8x8 pan",
-      "Melt infused butter/oil and let cool slightly",
+      "Melt cannabutter or coconut oil and let cool slightly",
       "Beat sugar and eggs together until smooth",
       "Stir in melted infused fat",
       "Add cocoa powder, flour, salt, and vanilla",
@@ -443,7 +443,7 @@ export const recipeTemplatesByMethod: RecipeTemplateByMethod[] = [
     prepTime: "5 min",
     cookTime: "0 min",
     tips: [
-      "Infused butter/cream blends best when coffee is hot",
+      "Cannabutter or infused cream blends best when coffee is hot",
       "Use blender for smooth, frothy texture",
       "Start with low dose - effects take 30-90 min",
       "Can add flavored syrups or spices"

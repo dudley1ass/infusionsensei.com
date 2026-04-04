@@ -46,7 +46,7 @@ const SNACK_GROUPS: { title: string; items: SnackItem[] }[] = [
       { id: "chocolate-dipped-pretzels", name: "Chocolate-Dipped Pretzels", emoji: "🥨", desc: "Run infused and plain trays side-by-side." },
       { id: "marshmallow-pops", name: "Marshmallow Pops", emoji: "🍡", desc: "Stick + dip — great for displays." },
       { id: "mini-cupcakes-infused-frosting", name: "Mini Cupcakes (infused frosting)", emoji: "🧁", desc: "Infuse frosting only; keep cake straightforward." },
-      { id: "cookie-sandwiches-infused-filling", name: "Cookie Sandwiches (infused filling)", emoji: "🍪", desc: "Tiny sandwich cookies with infused buttercream." },
+      { id: "cookie-sandwiches-infused-filling", name: "Cookie Sandwiches (infused filling)", emoji: "🍪", desc: "Tiny sandwich cookies with buttercream made with cannabutter." },
       { id: "churro-bites", name: "Churro Bites (infused cinnamon sugar)", emoji: "🟤", desc: "Fry bites; toss in infused sugar." },
       { id: "funnel-cake-bites", name: "Funnel Cake Bites", emoji: "🎪", desc: "Fair-style bites + infused drizzle." },
     ],
@@ -60,7 +60,7 @@ const SNACK_GROUPS: { title: string; items: SnackItem[] }[] = [
       { id: "kettle-corn-infused", name: "Kettle Corn", emoji: "🍿", desc: "Sweet-salt popcorn finish." },
       { id: "snack-mix-party", name: "Snack Mix", emoji: "🧂", desc: "Pretzels + cereal + popcorn + nuts." },
       { id: "cheese-crackers-infused-dust", name: "Cheese Crackers (infused dust)", emoji: "🧀", desc: "Parmesan-garlic butter bake." },
-      { id: "garlic-parmesan-pretzels", name: "Garlic Parmesan Pretzels", emoji: "🥨", desc: "Warm pretzels, infused butter toss." },
+      { id: "garlic-parmesan-pretzels", name: "Garlic Parmesan Pretzels", emoji: "🥨", desc: "Warm pretzels, cannabutter toss." },
     ],
   },
   {
@@ -85,7 +85,7 @@ const SNACK_GROUPS: { title: string; items: SnackItem[] }[] = [
       { id: "garlic-aioli-infused", name: "Garlic Aioli", emoji: "🧄", desc: "Sandwich and slider spread." },
       { id: "bbq-sauce-infused-party", name: "BBQ Sauce", emoji: "🍖", desc: "Brush-on or dip — label jar." },
       { id: "sweet-chili-sauce-infused", name: "Sweet Chili Sauce", emoji: "🌶️", desc: "Sticky dip for fries and apps." },
-      { id: "cheese-sauce-infused", name: "Cheese Sauce", emoji: "🧀", desc: "Pourable cheddar for nachos and fries." },
+      { id: "cheese-sauce-infused", name: "Cheese Sauce", emoji: "🧀", desc: "Cheddar sauce for nachos and fries." },
     ],
   },
   {
@@ -593,7 +593,7 @@ export function PartySnacks() {
             <div className="rounded-xl border border-indigo-100 bg-indigo-50/80 p-4 space-y-3">
               <p className="text-xs font-bold text-indigo-900 uppercase tracking-wide">Combined shopping (deduplicated)</p>
               <p className="text-xs text-indigo-800">
-                If the same ingredient appears in multiple snacks, amounts are added. Buy infused butter / oil / tincture using
+                If the same ingredient appears in multiple snacks, amounts are added. Buy cannabutter, coconut oil, or tincture using
                 your builder targets — not only these gram totals. <strong>Store:</strong> lines below translate into typical
                 boxes (12 oz cereal), 10 oz marshmallow bags, butter sticks, etc. — round up at the store.
               </p>

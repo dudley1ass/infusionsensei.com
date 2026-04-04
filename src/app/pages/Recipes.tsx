@@ -18,6 +18,7 @@ import {
   RECIPE_LIBRARY_TABS,
   recipeLibraryBadgeLabel,
 } from "../data/recipeLibraryCategory";
+import { standardRecipes } from "../data/standardRecipes";
 
 function buildCustomizeLink(recipe: {
   id: string;
@@ -86,8 +87,16 @@ export function Recipes() {
   const strictDb = isContentDbStrictMode();
   const recipeSource = strictDb ? (dbRecipes ?? []) : dbRecipes && dbRecipes.length > 0 ? dbRecipes : recipes;
 
+  /** Spreads/dips are listed as `spreads-dips-*` cards; omit duplicate template rows. Omit `bulletproof` (alias of bulletproof-coffee). */
+  const spreadsDipTemplateIds = new Set(
+    (standardRecipes["spreads-dips"] ?? []).map((r: { id: string }) => r.id)
+  );
+  const recipeSourceDeduped = recipeSource.filter(
+    (r) => !spreadsDipTemplateIds.has(r.id) && r.id !== "bulletproof"
+  );
+
   const allDisplayRecipes: DisplayRecipe[] = [
-    ...recipeSource.map((r) => ({ ...r, route: `/recipes/${r.id}` })),
+    ...recipeSourceDeduped.map((r) => ({ ...r, route: `/recipes/${r.id}` })),
     ...spreadsDipsDisplayRecipes,
   ];
 

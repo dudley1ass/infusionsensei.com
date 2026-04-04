@@ -44,7 +44,7 @@ export function InfuseAnyFood() {
                 { dish:"Fries", fat:"Butter or oil for finishing", swap:"Toss finished fries in cannabutter or cannabis oil" },
                 { dish:"Coffee", fat:"Butter or cream", swap:"Use cannabutter in bulletproof style, or tincture drops" },
                 { dish:"Brownies", fat:"Butter", swap:"Full cannabutter replacement" },
-                { dish:"Smoothies", fat:"Nut butter or coconut oil", swap:"Add cannabis coconut oil to blender" },
+                { dish:"Smoothies", fat:"Nut butter or coconut oil", swap:"Add coconut oil to blender" },
                 { dish:"Popcorn", fat:"Butter for coating", swap:"Drizzle with melted cannabutter after popping" },
               ].map(({ dish, fat, swap }) => (
                 <div key={dish} className="flex gap-3 items-center bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">

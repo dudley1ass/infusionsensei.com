@@ -39,8 +39,8 @@ export function CannabisEdibleRecipesPage() {
         <div className="grid md:grid-cols-3 gap-5">
           {[
             { name:"Cannabutter", desc:"The foundation of cannabis cooking. Use in any recipe that calls for butter — brownies, cookies, sauces.", potency:"Typical: 5–15mg/tbsp", emoji:"🧈", to:"/infusions" },
-            { name:"Cannabis Coconut Oil", desc:"Absorbs more THC than butter. Great for dairy-free recipes, smoothies, and tropical flavors.", potency:"Typical: 10–20mg/tbsp", emoji:"🥥", to:"/infusions" },
-            { name:"Infused Chocolate", desc:"Melt chocolate with cannabis coconut oil. Use as a coating, drizzle, or ingredient in any dessert.", potency:"Typical: varies by recipe", emoji:"🍫", to:"/infusions" },
+            { name:"Coconut oil", desc:"Absorbs more THC than butter. Great for dairy-free recipes, smoothies, and tropical flavors.", potency:"Typical: 10–20mg/tbsp", emoji:"🥥", to:"/infusions" },
+            { name:"Infused Chocolate", desc:"Melt chocolate with coconut oil. Use as a coating, drizzle, or ingredient in any dessert.", potency:"Typical: varies by recipe", emoji:"🍫", to:"/infusions" },
           ].map(({ name, desc, potency, emoji, to }) => (
             <Link key={name} to={to} className="bg-green-50 rounded-2xl border border-green-200 p-5 hover:border-green-400 transition-all hover:shadow-md group">
               <div className="text-4xl mb-3">{emoji}</div>

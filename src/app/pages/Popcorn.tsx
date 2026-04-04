@@ -42,7 +42,7 @@ const FLAVORS: PopcornFlavor[] = [
   { id: "maple", name: "Maple Popcorn", type: "Caramel", profile: "Maple / Buttery", build: "Maple syrup + cannabutter → reduce → coat", tags: ["sweet"], emoji: "🍁", heat: 0, sweetness: 3 },
   { id: "vanilla-bean", name: "Vanilla Bean", type: "Butter", profile: "Delicate / Sweet", build: "Cannabutter + vanilla sugar + pinch of salt", tags: ["sweet", "fancy"], emoji: "🌸", heat: 0, sweetness: 2 },
   // Dessert / Hybrid
-  { id: "chocolate-drizzle", name: "Chocolate Drizzle", type: "Chocolate", profile: "Indulgent / Rich", build: "Melted chocolate + cannabis coconut oil drizzle", tags: ["sweet", "chocolate"], emoji: "🍫", heat: 0, sweetness: 3 },
+  { id: "chocolate-drizzle", name: "Chocolate Drizzle", type: "Chocolate", profile: "Indulgent / Rich", build: "Melted chocolate + coconut oil drizzle", tags: ["sweet", "chocolate"], emoji: "🍫", heat: 0, sweetness: 3 },
   { id: "cookies-cream", name: "Cookies & Cream", type: "Chocolate", profile: "Creamy / Sweet", build: "White chocolate + cannabis oil + crushed Oreos", tags: ["sweet", "chocolate", "creamy"], emoji: "🍪", heat: 0, sweetness: 3 },
   { id: "peanut-butter", name: "Peanut Butter", type: "Butter", profile: "Nutty / Sweet", build: "Warm PB + cannabutter + powdered sugar drizzle", tags: ["sweet", "creamy"], emoji: "🥜", heat: 0, sweetness: 2 },
   { id: "smores", name: "S'mores Popcorn", type: "Chocolate", profile: "Campfire / Sweet", build: "Cannabis oil chocolate drizzle + marshmallow + graham cracker", tags: ["sweet", "chocolate"], emoji: "🔥", heat: 0, sweetness: 3 },
@@ -130,7 +130,7 @@ const RECIPES: Record<string, { servings: string; ingredients: string[]; steps: 
   },
   "chili-lime": {
     servings: "8 cups popcorn",
-    ingredients: ["2 tbsp cannabis coconut oil", "1 tsp chili powder", "Zest of 1 lime + 1 tbsp lime juice", "½ tsp salt", "Pinch of cayenne"],
+    ingredients: ["2 tbsp coconut oil", "1 tsp chili powder", "Zest of 1 lime + 1 tbsp lime juice", "½ tsp salt", "Pinch of cayenne"],
     steps: ["Pop corn in cannabis oil or drizzle oil over air-popped corn.", "Mix chili powder, cayenne, and salt.", "Toss corn with lime zest and juice, then shake on spice blend."],
     note: "Add the lime zest last — it brightens the whole batch."
   },
@@ -184,13 +184,13 @@ const RECIPES: Record<string, { servings: string; ingredients: string[]; steps: 
   },
   "chocolate-drizzle": {
     servings: "8 cups popcorn",
-    ingredients: ["½ cup dark chocolate chips", "1 tbsp cannabis coconut oil", "Flaky salt", "Optional: sprinkles"],
-    steps: ["Melt chocolate and cannabis coconut oil together — microwave 30 sec intervals.", "Spread popcorn on parchment paper.", "Drizzle melted chocolate over popcorn. Add flaky salt. Let set 30 min."],
+    ingredients: ["½ cup dark chocolate chips", "1 tbsp coconut oil", "Flaky salt", "Optional: sprinkles"],
+    steps: ["Melt chocolate and coconut oil together — microwave 30 sec intervals.", "Spread popcorn on parchment paper.", "Drizzle melted chocolate over popcorn. Add flaky salt. Let set 30 min."],
     note: "Refrigerate for 15 min to speed up setting."
   },
   "cookies-cream": {
     servings: "8 cups popcorn",
-    ingredients: ["½ cup white chocolate chips", "1 tbsp cannabis coconut oil", "6 Oreo cookies (crushed)", "Pinch of salt"],
+    ingredients: ["½ cup white chocolate chips", "1 tbsp coconut oil", "6 Oreo cookies (crushed)", "Pinch of salt"],
     steps: ["Melt white chocolate and cannabis oil together.", "Drizzle over popcorn and toss.", "Immediately sprinkle crushed Oreos over top. Let set."],
     note: "Crush Oreos coarsely — you want chunks, not powder."
   },
@@ -377,7 +377,7 @@ export function Popcorn() {
             { type: "Butter Infusion", desc: "Best for savory flavors. Carries spices and powders evenly across every kernel.", emoji: "🧈", color: "bg-yellow-50 border-yellow-200" },
             { type: "Oil Mist", desc: "Light coating — perfect for powder-based flavors like ranch or chili lime.", emoji: "💧", color: "bg-green-50 border-green-200" },
             { type: "Caramel Coat", desc: "Sugar syrup + cannabutter baked on. Creates a crunchy shell that locks in THC.", emoji: "🍬", color: "bg-amber-50 border-amber-200" },
-            { type: "Chocolate Drizzle", desc: "Cannabis coconut oil melted with chocolate. Drizzle over, let set. Social media gold.", emoji: "🍫", color: "bg-purple-50 border-purple-200" },
+            { type: "Chocolate Drizzle", desc: "Coconut oil melted with chocolate. Drizzle over, let set. Social media gold.", emoji: "🍫", color: "bg-purple-50 border-purple-200" },
           ].map(({ type, desc, emoji, color }) => (
             <div key={type} className={`rounded-2xl border-2 p-4 ${color}`}>
               <div className="text-3xl mb-2">{emoji}</div>

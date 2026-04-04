@@ -43,6 +43,9 @@ const HERO_ZOOM_OUT_MARKETING_IDS = new Set([
   "chili-crisp",
   "brown-sugar-bourbon",
   "pineapple-ginger",
+  "blondie-squares",
+  "banana-bread",
+  "pancakes",
 ]);
 
 const ZOOM =

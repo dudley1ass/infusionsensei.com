@@ -23,7 +23,7 @@ export function InfusedDrinksPage() {
         <div className="grid md:grid-cols-2 gap-5">
           {[
             { name:"Infused Coffee", desc:"Bulletproof butter coffee, lattes, cold brew — 20 recipes with cannabutter or cannabis oil.", emoji:"☕", to:"/coffee", tag:"20 recipes" },
-            { name:"Smoothies & Juice", desc:"Cannabis coconut oil blends perfectly into smoothies. The fat carriers make it effective and tasty.", emoji:"🥤", to:"/ingredients?category=drinks&recipe=smoothie", tag:"Beginner friendly" },
+            { name:"Smoothies & Juice", desc:"Coconut oil blends perfectly into smoothies. The fat carriers make it effective and tasty.", emoji:"🥤", to:"/ingredients?category=drinks&recipe=smoothie", tag:"Beginner friendly" },
             { name:"Cannabis Tea", desc:"THC tincture in hot tea — simple, effective, customizable strength.", emoji:"🍵", to:"/ingredients?category=drinks&recipe=coffee", tag:"Easy" },
             { name:"Infused Lemonade", desc:"THC tincture in lemonade. Great for social occasions with controlled dosing.", emoji:"🍋", to:"/ingredients?category=drinks", tag:"Social" },
           ].map(({ name, desc, emoji, to, tag }) => (
@@ -46,7 +46,7 @@ export function InfusedDrinksPage() {
         <p className="text-gray-600 mb-6">Most infused drinks fail because THC doesn't dissolve in water. Here's what actually works:</p>
         <div className="space-y-4">
           {[
-            { method:"Fat-based (butter or oil)", how:"THC binds to fat. Blend cannabutter or cannabis coconut oil into any fat-containing drink — coffee, hot chocolate, smoothies with nut butter.", best:"Best for: Coffee, hot chocolate, smoothies", works:"✅ Works well", color:"bg-green-50 border-green-200" },
+            { method:"Fat-based (butter or oil)", how:"THC binds to fat. Blend cannabutter or coconut oil into any fat-containing drink — coffee, hot chocolate, smoothies with nut butter.", best:"Best for: Coffee, hot chocolate, smoothies", works:"✅ Works well", color:"bg-green-50 border-green-200" },
             { method:"Tincture (alcohol-based)", how:"Add a few drops of THC tincture directly to any drink. Mixes evenly because alcohol disperses in water. Most precise dosing method.", best:"Best for: Lemonade, tea, cold drinks, cocktails", works:"✅ Works well", color:"bg-green-50 border-green-200" },
             { method:"Pre-made cannabis beverages", how:"Select Squeeze, THC syrups, and similar products are specially formulated to disperse in water using emulsifiers.", best:"Best for: Any drink — simplest option", works:"✅ Works well", color:"bg-green-50 border-green-200" },
             { method:"Raw oil in water drinks", how:"Dropping cannabis oil into water or juice doesn't work — oil floats to the top and doses unevenly. Always blend with a fat-containing base.", best:"Avoid for: Plain water, juice, tea (without fat)", works:"❌ Doesn't work", color:"bg-red-50 border-red-200" },

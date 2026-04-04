@@ -69,7 +69,7 @@ export function InfusionComparison() {
                 linkText:"Full Cannabutter Guide →"
               },
               {
-                title:"💧 Cannabis Coconut Oil — The Versatile Workhorse",
+                title:"💧 Coconut oil — The Versatile Workhorse",
                 badge:"Best overall absorption",
                 color:"bg-green-50 border-green-200",
                 when:["Dairy-free or vegan recipes","Smoothies and blended drinks","Stir-fries and high-heat cooking","Tropical flavors — popcorn, chocolate, curries"],
@@ -117,13 +117,13 @@ export function InfusionComparison() {
                 { recipe:"Brownies & cookies", best:"Cannabutter", why:"Butter is already in the recipe — seamless swap" },
                 { recipe:"Wing sauces", best:"Cannabutter", why:"Fat carries flavor and infusion through sauce" },
                 { recipe:"Pasta & garlic bread", best:"Cannabutter or Cannabis Olive Oil", why:"Match what the original recipe uses" },
-                { recipe:"Smoothies", best:"Cannabis Coconut Oil", why:"Blends smooth, adds richness" },
+                { recipe:"Smoothies", best:"Coconut oil", why:"Blends smooth, adds richness" },
                 { recipe:"Bulletproof coffee", best:"Cannabutter + coconut oil", why:"Classic combination for maximum fat binding" },
                 { recipe:"Gummies & candy", best:"THC Tincture", why:"Precise dosing, no fat texture issues" },
                 { recipe:"Lemonade & tea", best:"THC Tincture", why:"Mixes into liquids without oil separation" },
-                { recipe:"Popcorn", best:"Cannabis Coconut Oil or Cannabutter", why:"Either works — coconut adds slight tropical note" },
+                { recipe:"Popcorn", best:"Coconut oil or cannabutter", why:"Either works — coconut adds slight tropical note" },
                 { recipe:"Fries & sauces", best:"Cannabis Olive Oil or Cannabutter", why:"High fat content holds the infusion well" },
-                { recipe:"Ice cream", best:"Cannabis Coconut Oil", why:"Stays smooth when frozen, doesn't crystallize" },
+                { recipe:"Ice cream", best:"Coconut oil", why:"Stays smooth when frozen, doesn't crystallize" },
               ].map(({ recipe, best, why }) => (
                 <div key={recipe} className="flex gap-3 items-center bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
                   <span className="text-gray-900 font-bold w-40 flex-shrink-0 text-sm">{recipe}</span>

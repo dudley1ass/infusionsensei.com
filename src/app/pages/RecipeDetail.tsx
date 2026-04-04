@@ -49,7 +49,6 @@ export function RecipeDetail() {
       "infused-protein-smoothie": { category: "drinks", recipe: "cannabis-smoothie" },
       "infused-mac-and-cheese": { category: "savory-meals", recipe: "alfredo" },
       "infused-pizza-sauce": { category: "savory-meals", recipe: "garlic-pasta" },
-      "infused-mint-ice-cream": { category: "ice-cream", recipe: "mint-ice-cream" },
       "classic-cannabutter": { category: "baked-goods", recipe: "brownies" },
       "cannabis-oil": { category: "drinks", recipe: "bulletproof-coffee" },
       "canna-honey": { category: "drinks", recipe: "cannabis-tea" },

@@ -30,7 +30,7 @@ export const infusionTemplates: InfusionTemplate[] = [
     id: "cannabutter-standard",
     name: "Cannabutter (Baseline Standard)",
     type: "butter",
-    description: "Classic cannabis-infused butter - the foundation of most edibles",
+    description: "Classic cannabutter — the foundation of most edibles",
     defaultCannabisAmount: 7,
     defaultCannabisUnit: "grams",
     defaultBaseAmount: 227,

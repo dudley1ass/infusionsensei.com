@@ -67,7 +67,7 @@ export function Home() {
               <p className="text-green-400 font-bold text-base">🍫 Chocolate Brownies</p>
               <p className="text-gray-300">→ <span className="text-green-400 font-bold">10mg THC</span> per serving</p>
               <p className="text-gray-300">→ <span className="text-green-400 font-bold">160mg total</span> batch</p>
-              <p className="text-gray-300">→ <span className="text-green-400 font-bold">1 cup</span> infused butter</p>
+              <p className="text-gray-300">→ <span className="text-green-400 font-bold">1 cup</span> cannabutter</p>
               <div className="border-t border-gray-700 mt-3 pt-3 space-y-1">
                 <p className="text-green-500">✔ Precise dosing</p>
                 <p className="text-green-500">✔ Consistent results</p>

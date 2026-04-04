@@ -29,8 +29,8 @@ export function SavoryCannabisPage() {
             { name:"Spreads & Dips", desc:"Nut butters, cream cheese spreads, queso, spinach-artichoke, ranch, buffalo dip, aioli, and more — open any style in the recipe builder with exact mg per serving.", emoji:"🥣", to:"/spreads-dips", count:"14 spreads & dips" },
             { name:"Infused Pizza Sauce", desc:"Cannabis olive oil in homemade pizza sauce. The secret is in the sauce — not the dough. THC disperses evenly through every slice.", emoji:"🍕", to:"/recipes/infused-pizza-sauce", count:"Classic recipe" },
             { name:"Infused Pasta", desc:"Garlic infused pasta and cannabis alfredo — two savory meals with exact THC per serving built into the recipe builder.", emoji:"🍝", to:"/ingredients?category=savory-meals&recipe=alfredo", count:"Builder ready" },
-            { name:"Infused Butter for Cooking", desc:"Cannabutter is the most versatile tool in cannabis cooking. Use it anywhere you'd use regular butter — finishing steaks, sautéing vegetables, making sauces.", emoji:"🧈", to:"/infusions", count:"Build yours" },
-            { name:"Cannabis Oils for Cooking", desc:"Drizzle cannabis olive oil over finished dishes, use cannabis coconut oil in stir-fries, or add to any recipe that calls for cooking oil.", emoji:"🫒", to:"/infusions", count:"Build yours" },
+            { name:"Cannabutter for cooking", desc:"Cannabutter is the most versatile tool in cannabis cooking. Use it anywhere you'd use regular butter — finishing steaks, sautéing vegetables, making sauces.", emoji:"🧈", to:"/infusions", count:"Build yours" },
+            { name:"Cannabis Oils for Cooking", desc:"Drizzle cannabis olive oil over finished dishes, use coconut oil in stir-fries, or add to any recipe that calls for cooking oil.", emoji:"🫒", to:"/infusions", count:"Build yours" },
           ].map(({ name, desc, emoji, to, count }) => (
             <Link key={name} to={to} className="bg-white rounded-2xl border-2 border-gray-200 hover:border-red-400 p-5 transition-all hover:shadow-md group flex gap-4 items-start">
               <div className="text-4xl flex-shrink-0">{emoji}</div>

@@ -291,7 +291,7 @@ function SauceRecipe({ sauce }: { sauce: Sauce }) {
     },
     "honey-bbq": {
       servings: "2 lbs wings",
-      ingredients: ["½ cup BBQ sauce", "3 tbsp honey", "1 tbsp cannabis coconut oil", "1 tsp smoked paprika"],
+      ingredients: ["½ cup BBQ sauce", "3 tbsp honey", "1 tbsp coconut oil", "1 tsp smoked paprika"],
       steps: ["Whisk all ingredients together in a bowl.", "Warm slightly to combine the oil.", "Toss hot wings to coat fully."],
       note: "Works great as a dipping sauce too."
     },
@@ -303,19 +303,19 @@ function SauceRecipe({ sauce }: { sauce: Sauce }) {
     },
     "teriyaki": {
       servings: "2 lbs wings",
-      ingredients: ["¼ cup soy sauce", "3 tbsp sugar", "1 tbsp cannabis coconut oil", "1 tsp fresh ginger (grated)", "1 tsp cornstarch + 1 tbsp water"],
+      ingredients: ["¼ cup soy sauce", "3 tbsp sugar", "1 tbsp coconut oil", "1 tsp fresh ginger (grated)", "1 tsp cornstarch + 1 tbsp water"],
       steps: ["Combine soy, sugar, oil, and ginger in a saucepan.", "Simmer 3-4 min until slightly thickened.", "Stir in cornstarch slurry and cook 1 min more. Toss wings."],
       note: "Glaze gets stickier as it cools."
     },
     "mango-habanero": {
       servings: "2 lbs wings",
-      ingredients: ["1 cup mango (fresh or frozen)", "1 habanero (seeded for less heat)", "2 tbsp cannabis coconut oil", "2 tbsp apple cider vinegar", "1 tbsp honey", "Salt to taste"],
+      ingredients: ["1 cup mango (fresh or frozen)", "1 habanero (seeded for less heat)", "2 tbsp coconut oil", "2 tbsp apple cider vinegar", "1 tbsp honey", "Salt to taste"],
       steps: ["Blend mango, habanero, vinegar, and honey until smooth.", "Heat cannabis oil in saucepan, pour in blended sauce.", "Simmer 5 min. Blend again for silky texture. Toss wings."],
       note: "Wear gloves when handling habanero."
     },
     "nashville-hot": {
       servings: "2 lbs wings",
-      ingredients: ["¼ cup cannabis coconut oil", "2 tbsp cayenne pepper", "1 tbsp smoked paprika", "1 tbsp brown sugar", "1 tsp garlic powder", "Salt to taste"],
+      ingredients: ["¼ cup coconut oil", "2 tbsp cayenne pepper", "1 tbsp smoked paprika", "1 tbsp brown sugar", "1 tsp garlic powder", "Salt to taste"],
       steps: ["Heat cannabis oil to 300°F — do not boil.", "Whisk in all spices and brown sugar.", "Brush or toss hot wings immediately after frying."],
       note: "Serve over white bread with pickles."
     },
@@ -333,13 +333,13 @@ function SauceRecipe({ sauce }: { sauce: Sauce }) {
     },
     "sriracha-honey": {
       servings: "2 lbs wings",
-      ingredients: ["3 tbsp cannabis honey or regular honey + cannabis coconut oil", "2 tbsp sriracha", "Juice of 1 lime", "1 tsp soy sauce"],
-      steps: ["Whisk honey, sriracha, lime juice, and soy together.", "Warm gently if using solid cannabis coconut oil.", "Toss wings thoroughly — sauce should coat every inch."],
+      ingredients: ["3 tbsp cannabis honey or regular honey + coconut oil", "2 tbsp sriracha", "Juice of 1 lime", "1 tsp soy sauce"],
+      steps: ["Whisk honey, sriracha, lime juice, and soy together.", "Warm gently if using solid coconut oil.", "Toss wings thoroughly — sauce should coat every inch."],
       note: "Add more sriracha to increase heat."
     },
     "maple-bacon": {
       servings: "2 lbs wings",
-      ingredients: ["3 tbsp pure maple syrup", "2 tbsp bacon fat (from cooked bacon)", "1 tbsp cannabis coconut oil", "1 tsp black pepper", "Pinch of salt"],
+      ingredients: ["3 tbsp pure maple syrup", "2 tbsp bacon fat (from cooked bacon)", "1 tbsp coconut oil", "1 tsp black pepper", "Pinch of salt"],
       steps: ["Combine maple syrup, bacon fat, and cannabis oil.", "Warm over low heat until combined.", "Toss wings and top with crumbled bacon."],
       note: "Cook bacon first and use that fat."
     },
@@ -351,25 +351,25 @@ function SauceRecipe({ sauce }: { sauce: Sauce }) {
     },
     "pineapple-ginger": {
       servings: "2 lbs wings",
-      ingredients: ["½ cup pineapple juice", "1 tbsp cannabis coconut oil", "1 tbsp soy sauce", "1 tsp fresh ginger (grated)", "1 tsp cornstarch + 1 tbsp water"],
+      ingredients: ["½ cup pineapple juice", "1 tbsp coconut oil", "1 tbsp soy sauce", "1 tsp fresh ginger (grated)", "1 tsp cornstarch + 1 tbsp water"],
       steps: ["Combine pineapple juice, oil, soy, and ginger in pan.", "Bring to simmer and cook 3 min.", "Stir in cornstarch slurry, cook 1 min until glossy. Toss wings."],
       note: "Fresh pineapple juice works best."
     },
     "honey-mustard": {
       servings: "2 lbs wings",
-      ingredients: ["3 tbsp honey", "2 tbsp Dijon mustard", "1 tbsp cannabis coconut oil", "1 tsp apple cider vinegar", "Salt & pepper"],
+      ingredients: ["3 tbsp honey", "2 tbsp Dijon mustard", "1 tbsp coconut oil", "1 tsp apple cider vinegar", "Salt & pepper"],
       steps: ["Whisk all ingredients together until emulsified.", "Warm slightly to melt the cannabis oil.", "Toss wings and serve extra as a dip."],
       note: "For a creamier version, add 1 tbsp mayo."
     },
     "orange-glaze": {
       servings: "2 lbs wings",
-      ingredients: ["½ cup orange juice (fresh)", "2 tbsp sugar", "1 tbsp soy sauce", "1 tbsp cannabis coconut oil", "1 tsp orange zest", "1 tsp cornstarch"],
+      ingredients: ["½ cup orange juice (fresh)", "2 tbsp sugar", "1 tbsp soy sauce", "1 tbsp coconut oil", "1 tsp orange zest", "1 tsp cornstarch"],
       steps: ["Combine OJ, sugar, soy, and oil in saucepan.", "Simmer 5 min until reduced by half.", "Add cornstarch slurry, cook 1 min. Stir in zest. Toss wings."],
       note: "Fresh orange juice makes a big difference."
     },
     "korean-gochujang": {
       servings: "2 lbs wings",
-      ingredients: ["2 tbsp gochujang paste", "2 tbsp honey", "1 tbsp soy sauce", "1 tbsp cannabis coconut oil", "3 cloves garlic (minced)", "1 tsp sesame oil"],
+      ingredients: ["2 tbsp gochujang paste", "2 tbsp honey", "1 tbsp soy sauce", "1 tbsp coconut oil", "3 cloves garlic (minced)", "1 tsp sesame oil"],
       steps: ["Whisk gochujang, honey, soy, garlic, and oils together.", "Warm over low heat 2 min until smooth.", "Toss wings and top with sesame seeds and scallions."],
       note: "Gochujang is found in the Asian section of most grocery stores."
     },
