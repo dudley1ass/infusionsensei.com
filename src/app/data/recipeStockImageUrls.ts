@@ -26,7 +26,7 @@ export const PAGE_STOCK = {
   coffee: rootMarketingImage("latte.png"),
   jello: rootMarketingImage("jello-shots.png"),
   gummies: pageLocalImage("gummies"),
-  partySnacks: rootMarketingImage("nachos.png"),
+  partySnacks: rootMarketingImage("partysnacks.jpg"),
   spreads: rootMarketingImage("guacamole.png"),
   fries: rootMarketingImage("onion_rings.png"),
   pizza: rootMarketingImage("pizza_sauce.png"),
