@@ -19,6 +19,7 @@ import {
   recipeLibraryBadgeLabel,
 } from "../data/recipeLibraryCategory";
 import { standardRecipes } from "../data/standardRecipes";
+import { UtmShareLinks } from "../components/UtmShareLinks";
 
 function buildCustomizeLink(recipe: {
   id: string;
@@ -192,6 +193,8 @@ export function Recipes() {
           ))}
         </TabsList>
       </Tabs>
+
+      <UtmShareLinks placement="recipes-library" />
 
       {/* Recipe Grid */}
       {filteredRecipes.length > 0 ? (

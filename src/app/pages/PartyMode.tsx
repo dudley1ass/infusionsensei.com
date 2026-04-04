@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { ArrowRight, Users, ChefHat } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { UtmShareLinks } from "../components/UtmShareLinks";
 import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 
 const BUNDLES = [
@@ -215,6 +216,8 @@ export function PartyMode() {
           </div>
         </div>
       </div>
+
+      <UtmShareLinks placement="party-mode" />
 
       {/* Bundles */}
       <div className="space-y-8">

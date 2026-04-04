@@ -112,6 +112,150 @@ export function RecipeDetail() {
       title: "THC Caramel Popcorn (Controlled Dosing Per Serving)",
       description: "Bake infused caramel popcorn with predictable dosing and simple mg-per-serving planning for party snacks.",
     },
+    "strawberry-swirl-ice-cream": {
+      title: "THC Strawberry Swirl Ice Cream (mg-Accurate Scoops)",
+      description: "Make cannabis strawberry swirl ice cream with fat-based THC, clear churn steps, and portion labels for predictable mg per scoop.",
+    },
+    "cookies-cream-ice-cream": {
+      title: "THC Cookies & Cream Ice Cream (Infused Frozen Dessert)",
+      description: "Build cookies-and-cream ice cream with cannabinoids carried in cream and coconut oil — batch math and freezer-safe labeling.",
+    },
+    "coffee-chip-ice-cream": {
+      title: "THC Coffee Chip Ice Cream (Espresso & Dosing Guide)",
+      description: "Cannabis coffee ice cream recipe with espresso notes, infusion in the dairy base, and scoop-by-scoop THC planning.",
+    },
+    "salted-caramel-ice-cream": {
+      title: "THC Salted Caramel Ice Cream (Sweet-Salty Infused)",
+      description: "Salted caramel cannabis ice cream with brown sugar, cannabinoid fat incorporation, and clear serving guidance.",
+    },
+    "matcha-green-tea-ice-cream": {
+      title: "THC Matcha Ice Cream (Green Tea Cannabis Dessert)",
+      description: "Matcha cannabis ice cream with smooth fat infusion, chill-and-churn workflow, and mg per scoop estimates.",
+    },
+    "double-chocolate-ice-cream": {
+      title: "THC Double Chocolate Ice Cream (Cocoa & Chips)",
+      description: "Double chocolate THC ice cream with cocoa and chips, infusion-friendly dairy steps, and freezer labeling tips.",
+    },
+    "peanut-butter-swirl-ice-cream": {
+      title: "THC Peanut Butter Swirl Ice Cream (Nutty Infused)",
+      description: "Peanut butter swirl cannabis ice cream combining nut fat with infused cream base for even THC distribution.",
+    },
+    "lemon-custard-ice-cream": {
+      title: "THC Lemon Ice Cream (Bright Citrus, Dosed)",
+      description: "Lemon cannabis ice cream with zest and juice, infusion off heat, and portion control for frozen servings.",
+    },
+    "tropical-fruit-pops": {
+      title: "THC Tropical Fruit Popsicles (mg Per Pop)",
+      description: "Cannabis tropical popsicles from juice and gelatin-style mix — mold, freeze, and label THC per stick.",
+    },
+    "berry-yogurt-pops": {
+      title: "THC Berry Yogurt Popsicles (Protein + Infusion)",
+      description: "Berry yogurt cannabis pops with jam and coconut oil — smooth freeze texture and clear per-pop dosing.",
+    },
+    "creamsicle-pops": {
+      title: "THC Creamsicle Popsicles (Creamsicle Cannabis Ice Pops)",
+      description: "Creamsicle-style THC pops with milk, cream, and juice — emulsify infusion fat and label each pop.",
+    },
+    "chocolate-fudge-pops": {
+      title: "THC Chocolate Fudge Popsicles (Frozen Cocoa Dose)",
+      description: "Chocolate fudge cannabis pops from cocoa and milk — freezer workflow and mg planning per pop.",
+    },
+    "lemon-poppy-muffins": {
+      title: "THC Lemon Poppy Muffins (Breakfast Cannabis Edibles)",
+      description: "Cannabis lemon poppy muffins with cannabutter, bakery-style rise, and mg per muffin math.",
+    },
+    "strawberry-muffins": {
+      title: "THC Strawberry Jam Muffins (Infused Morning Bakes)",
+      description: "Strawberry jam cannabis muffins with predictable batch THC and cooling tips before serving.",
+    },
+    "sweet-potato-bread-loaf": {
+      title: "THC Sweet Potato Quick Bread (Loaf Dosing)",
+      description: "Sweet potato cannabis bread with warm spices, slice-based THC estimates, and storage labeling.",
+    },
+    "honey-cornbread-muffins": {
+      title: "THC Honey Cornbread Muffins (Savory-Sweet Infused)",
+      description: "Honey cornbread cannabis muffins with cannabutter — portion by muffin for consistent mg.",
+    },
+    "cheddar-garlic-scones": {
+      title: "THC Cheddar Garlic Scones (Savory Cannabis Breakfast)",
+      description: "Cheesy garlic cannabis scones baked with infused fat — reheat tips and per-wedge dosing notes.",
+    },
+    "cinnamon-streusel-muffins": {
+      title: "THC Cinnamon Streusel Muffins (Crumb-Topped Edibles)",
+      description: "Cinnamon streusel cannabis muffins with brown sugar topping and batch THC guidance.",
+    },
+    "apple-cinnamon-muffins": {
+      title: "THC Apple Cinnamon Muffins (Grated Apple Infused)",
+      description: "Apple cinnamon cannabis muffins with grated apple and cannabutter — kid-free labeling reminders.",
+    },
+    "oat-maple-pancakes": {
+      title: "THC Oat Maple Pancakes (Fiber-Rich Cannabis Breakfast)",
+      description: "Oat flour maple cannabis pancakes with stack-friendly dosing and syrup pairing tips.",
+    },
+    "bacon-egg-breakfast-bites": {
+      title: "THC Bacon Egg Breakfast Bites (Cup-Sized Dose)",
+      description: "Bacon egg cannabis breakfast bites in muffin tins — protein-forward infusion with per-cup THC notes.",
+    },
+    "ricotta-lemon-pancakes": {
+      title: "THC Ricotta Lemon Pancakes (Fluffy Infused Cakes)",
+      description: "Ricotta lemon cannabis pancakes with zest-forward flavor and cannabutter in the batter.",
+    },
+    "whole-wheat-banana-muffins": {
+      title: "THC Whole Wheat Banana Muffins (Whole-Grain Edibles)",
+      description: "Whole wheat banana cannabis muffins with natural sweetness and mg per muffin planning.",
+    },
+    "morning-chocolate-chip-loaf": {
+      title: "THC Chocolate Chip Morning Loaf (Sliceable Cannabis Bread)",
+      description: "Chocolate chip cannabis breakfast loaf — slice thickness affects dose; label the batch clearly.",
+    },
+    "lemon-garlic-chicken-pasta": {
+      title: "THC Lemon Garlic Chicken Pasta (Savory Cannabis Dinner)",
+      description: "Lemon garlic chicken pasta with cannabis olive oil in the sauce — plate portions for predictable THC.",
+    },
+    "beef-cheddar-skillet": {
+      title: "THC Beef Cheddar Skillet (One-Pan Infused Meal)",
+      description: "Ground beef cheddar cannabis skillet with cannabutter finish — scoop servings and mg per scoop.",
+    },
+    "creamy-beef-pasta": {
+      title: "THC Creamy Beef Pasta (Cannabis Cream Sauce)",
+      description: "Creamy beef cannabis pasta with parmesan and infused fat — toss thoroughly for even dosing.",
+    },
+    "spinach-ricotta-pasta": {
+      title: "THC Spinach Ricotta Pasta (Baked-Pasta Style)",
+      description: "Spinach ricotta cannabis pasta with olive oil infusion — vegetarian-friendly savory edibles workflow.",
+    },
+    "loaded-potato-skillet": {
+      title: "THC Loaded Potato Skillet (Bacon & Cheese Infused)",
+      description: "Loaded potato cannabis skillet with sour cream and bacon — hot service, clear skillet labels.",
+    },
+    "chicken-alfredo-pasta": {
+      title: "THC Chicken Alfredo Pasta (Cream Sauce Cannabis Meal)",
+      description: "Chicken alfredo cannabis pasta with parmesan cream — infusion in butter and cream with portion guidance.",
+    },
+    "garlic-butter-steak-bites": {
+      title: "THC Garlic Butter Steak Bites (Seared Cannabis Steak)",
+      description: "Garlic butter steak bites with cannabis oil and cannabutter — sear hot, rest, and dose by weight.",
+    },
+    "bacon-hash-skillet": {
+      title: "THC Bacon Hash Skillet (Breakfast-for-Dinner Edibles)",
+      description: "Bacon potato hash cannabis skillet with eggs — brunch-style THC with skillet-to-plate tips.",
+    },
+    "lemon-parmesan-pasta": {
+      title: "THC Lemon Parmesan Pasta (Light Citrus Savory)",
+      description: "Lemon parmesan cannabis pasta with olive oil — bright sauce and cheese-forward infusion balance.",
+    },
+    "peanut-chicken-noodles": {
+      title: "THC Peanut Chicken Noodles (Nutty Savory Cannabis)",
+      description: "Peanut chicken cannabis noodles with honey and vinegar — whisk infusion oil into the sauce evenly.",
+    },
+    "cheesy-garlic-pull-bread": {
+      title: "THC Cheesy Garlic Pull-Apart Bread (Shareable Infused)",
+      description: "Cheesy garlic pull-apart cannabis bread — tear pieces and label mg per piece for groups.",
+    },
+    "creamy-corn-chowder": {
+      title: "THC Creamy Corn Chowder (Bacon Potato Soup)",
+      description: "Creamy corn cannabis chowder with bacon and potato — bowl portions and reheating notes for THC stability.",
+    },
   };
   const displayName = cleanRecipeDisplayTitle(recipe.name);
   const pageTitle = recipeSeo[recipe.id]?.title ?? `${displayName} | Infusion Sensei`;
