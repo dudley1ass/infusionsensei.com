@@ -20,8 +20,8 @@ type ProductPreset = {
 const PRODUCT_PRESETS: ProductPreset[] = [
   { id: "cookies", label: "Cookies", emoji: "🍪", baseInfusionTbsp: 12, baseServings: 24, servingUnit: "1 cookie", category: "baked-goods", recipeHint: "chocolate-chip-cookies" },
   { id: "brownies", label: "Brownies", emoji: "🍫", baseInfusionTbsp: 8, baseServings: 16, servingUnit: "1 brownie", category: "baked-goods", recipeHint: "brownies" },
-  { id: "popcorn", label: "Popcorn", emoji: "🍿", baseInfusionTbsp: 4, baseServings: 12, servingUnit: "1 cup popcorn", category: "snacks", recipeHint: "garlic-butter-popcorn" },
-  { id: "wings", label: "Wings", emoji: "🍗", baseInfusionTbsp: 4, baseServings: 32, servingUnit: "1 wing", category: "wings", recipeHint: "classic-buffalo-wings" },
+  { id: "popcorn", label: "Popcorn", emoji: "🍿", baseInfusionTbsp: 4, baseServings: 12, servingUnit: "1 cup popcorn", category: "snacks", recipeHint: "garlic-butter" },
+  { id: "wings", label: "Wings", emoji: "🍗", baseInfusionTbsp: 4, baseServings: 32, servingUnit: "1 wing", category: "wings", recipeHint: "classic-buffalo" },
   { id: "coffee", label: "Coffee", emoji: "☕", baseInfusionTbsp: 2, baseServings: 4, servingUnit: "1 cup coffee", category: "drinks", recipeHint: "bulletproof-coffee" },
 ];
 

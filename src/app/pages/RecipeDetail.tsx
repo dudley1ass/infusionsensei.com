@@ -109,7 +109,7 @@ export function RecipeDetail() {
       title: "THC Popcorn Recipe (Easy, Light, Controlled Dosing)",
       description: "Make infused popcorn with easy batch dosing and consistent per-serving THC estimates for snackable control.",
     },
-    "caramel-popcorn": {
+    caramel: {
       title: "THC Caramel Popcorn (Controlled Dosing Per Serving)",
       description: "Bake infused caramel popcorn with predictable dosing and simple mg-per-serving planning for party snacks.",
     },

@@ -66,7 +66,7 @@ export function recipesDerivedFromStandardTemplates(): Recipe[] {
     for (const raw of list as BuilderTemplate[]) {
       let prep = baseTimes.prep;
       let cook = baseTimes.cook;
-      if (raw.id === "caramel-popcorn") {
+      if (raw.id === "caramel") {
         cook = 70;
       }
       const ingredients = raw.ingredients.map((name, idx) => {
@@ -99,7 +99,7 @@ export function recipesDerivedFromStandardTemplates(): Recipe[] {
         tips: [
           "Open this recipe in Start Here (/ingredients) to match template amounts, scale servings, and tie in your saved infusion THC.",
         ],
-        ...(raw.id === "caramel-popcorn" ? { cookMethod: "bake" } : {}),
+        ...(raw.id === "caramel" ? { cookMethod: "bake" } : {}),
       });
     }
   }

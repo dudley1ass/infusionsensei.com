@@ -85,10 +85,10 @@ const PAGE_PHOTOS = {
 };
 
 const POPCANON = {
-  "garlic-butter-popcorn": "photo-1578849278619-e73505e9610f",
-  "caramel-popcorn": "photo-1588196749597-9ff075ee6b5b",
-  "buffalo-popcorn": "photo-1501339847302-ac426a4a7cbb",
-  "chocolate-drizzle-popcorn": "photo-1606313564200-e75d5e30476c",
+  "garlic-butter": "photo-1578849278619-e73505e9610f",
+  caramel: "photo-1588196749597-9ff075ee6b5b",
+  buffalo: "photo-1501339847302-ac426a4a7cbb",
+  "chocolate-drizzle": "photo-1606313564200-e75d5e30476c",
 };
 
 /** Editorial overrides for `recipes.ts` manual rows (id → Unsplash slug). Update when adding recipes. */
@@ -120,7 +120,13 @@ async function main() {
     if (!photoById[id]) photoById[id] = DEFAULT_PHOTO;
   }
 
-  const wingIds = standardIds.filter((id) => /-wings$/.test(id));
+  const wingIds = standardIds.filter(
+    (id) =>
+      /-wings$/.test(id) ||
+      /^(classic-buffalo|garlic-parmesan|honey-bbq|lemon-pepper|teriyaki|mango-habanero|korean-gochujang|cajun-butter|truffle-butter|ranch-butter|honey-mustard|sriracha-honey|chili-crisp|maple-bacon|brown-sugar-bourbon|pineapple-ginger|orange-glaze|garlic-soy-umami|chimichurri)$/.test(
+        id
+      )
+  );
   for (const id of wingIds) {
     photoById[id] = WING_PHOTOS[hash32(id) % WING_PHOTOS.length];
   }

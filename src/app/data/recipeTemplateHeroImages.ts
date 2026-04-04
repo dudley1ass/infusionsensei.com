@@ -19,8 +19,8 @@ const DRINK_HERO_STEM_OVERRIDE: Record<string, string> = {
 };
 
 /**
- * Hero image URL for a builder template. Popcorn flavors map to canonical bases; wing sauce
- * aliases map to `*-wings` ids; coffee builds map to shared drink templates.
+ * Hero image URL for a builder template. Popcorn flavors map to canonical bases; wing sauce slugs
+ * match `standardRecipes.wings` ids (legacy `*-wings` urls strip the suffix); coffee builds map to shared templates.
  */
 export function resolveTemplateHeroImage(builderKey: string, id: string): string {
   // Popcorn shortcuts MUST only apply to snacks — wing aliases reuse ids like `nashville-hot` / `sriracha`.
@@ -35,10 +35,14 @@ export function resolveTemplateHeroImage(builderKey: string, id: string): string
 
   if (
     builderKey === "wings" ||
-    WING_SAUCE_TO_BUILDER_RECIPE[id] ||
+    WING_SAUCE_TO_BUILDER_RECIPE[id] !== undefined ||
     id.endsWith("-wings")
   ) {
-    const canonical = WING_SAUCE_TO_BUILDER_RECIPE[id] ?? id;
+    const wingHeroId = id === "nashville-hot" ? "nashville-hot-wings" : id;
+    const mapped = WING_SAUCE_TO_BUILDER_RECIPE[wingHeroId];
+    const canonical =
+      mapped ??
+      (id.endsWith("-wings") ? id.slice(0, -"-wings".length) : wingHeroId);
     return recipeLocalImage(canonical);
   }
 

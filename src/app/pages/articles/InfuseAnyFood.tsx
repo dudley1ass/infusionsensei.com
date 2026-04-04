@@ -88,7 +88,7 @@ export function InfuseAnyFood() {
                 title:"🍗 Wings & Proteins",
                 color:"bg-orange-50 border-orange-200",
                 tip:"The sauce is the infusion vehicle. Cook wings normally — apply infused sauce at the end so THC isn't exposed to high heat.",
-                recipes:[{ name:"20 Infused Wing Sauces", path:"/wings" },{ name:"Classic Buffalo Wings", path:"/ingredients?category=wings&recipe=classic-buffalo-wings" }],
+                recipes:[{ name:"20 Infused Wing Sauces", path:"/wings" },{ name:"Classic Buffalo Wings", path:"/ingredients?category=wings&recipe=classic-buffalo" }],
                 best:"Cannabutter",
                 add:"Melt into sauce off heat, toss wings right before serving",
               },

@@ -11,10 +11,10 @@ export function stock(photoFile: string): string {
 }
 
 export const POPCORN_STOCK_BY_ID: Record<string, string> = {
-  "garlic-butter-popcorn": recipeLocalImage("garlic-butter-popcorn"),
-  "caramel-popcorn": recipeLocalImage("caramel-popcorn"),
-  "buffalo-popcorn": recipeLocalImage("buffalo-popcorn"),
-  "chocolate-drizzle-popcorn": recipeLocalImage("chocolate-drizzle-popcorn"),
+  "garlic-butter": recipeLocalImage("garlic-butter"),
+  caramel: recipeLocalImage("caramel"),
+  buffalo: recipeLocalImage("buffalo"),
+  "chocolate-drizzle": recipeLocalImage("chocolate-drizzle"),
 };
 
 export const DEFAULT_RECIPE_STOCK_IMAGE = recipeLocalImage("default");
@@ -22,7 +22,7 @@ export const DEFAULT_RECIPE_STOCK_IMAGE = recipeLocalImage("default");
 /** Static heroes for marketing / category pages */
 export const PAGE_STOCK = {
   wings: pageLocalImage("wings"),
-  popcorn: POPCORN_STOCK_BY_ID["garlic-butter-popcorn"]!,
+  popcorn: POPCORN_STOCK_BY_ID["garlic-butter"]!,
   coffee: rootMarketingImage("latte.png"),
   jello: rootMarketingImage("jello-shots.png"),
   gummies: pageLocalImage("gummies"),

@@ -942,7 +942,7 @@ export function CreateRecipes() {
   const [selectedInfusionType, setSelectedInfusionType] = useState<string>("none");
   const [availableRecipes, setAvailableRecipes] = useState<any[]>([]);
 
-  // Auto-load recipe from URL params: /ingredients?category=savory-meals&recipe=classic-buffalo-wings
+  // Auto-load recipe from URL params: /ingredients?category=wings&recipe=classic-buffalo
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -1166,9 +1166,9 @@ export function CreateRecipes() {
       const resolvedRecipeId = resolveRecipeIdForCategory(selectedCategory, selectedStandardRecipe);
       const directRecipe = standardRecipes[selectedCategory]?.find(r => r.id === resolvedRecipeId);
       const fallbackByCategory: Record<string, string> = {
-        wings: "classic-buffalo-wings",
+        wings: "classic-buffalo",
         "spreads-dips": "spinach-artichoke-dip-infused",
-        snacks: "garlic-butter-popcorn",
+        snacks: "garlic-butter",
         drinks: "bulletproof-coffee",
       };
       const fallbackId = fallbackByCategory[selectedCategory];

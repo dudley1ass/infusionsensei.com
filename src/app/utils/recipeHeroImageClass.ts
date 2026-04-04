@@ -1,14 +1,37 @@
 import type { Recipe } from "../data/recipeTypes";
 import { POPCORN_TO_BUILDER_RECIPE, WING_SAUCE_TO_BUILDER_RECIPE } from "../data/builderRecipeMaps";
 
-/** Tighter marketing crops — show more of the frame with contain + backing */
-const SPREAD_SNACK_ZOOM_OUT_IDS = new Set([
+/**
+ * Marketing heroes that read better with `object-contain` (dips/sauces, selected baked goods, wings).
+ * Also check `canonicalSpreadSnackId` for `spreads-dips-*` aliases.
+ */
+const HERO_ZOOM_OUT_MARKETING_IDS = new Set([
   "ranch-dip-infused",
   "honey-mustard-dip-infused",
   "garlic-aioli-infused",
   "queso-dip-infused",
   "spinach-artichoke-dip-infused",
   "chex-mix-infused",
+  "bbq-sauce-infused-party",
+  "sweet-chili-sauce-infused",
+  "cheese-sauce-infused",
+  "white-chocolate-macadamia-cookies",
+  "classic-cannabutter",
+  "gingerbread-cookies",
+  "coffee-cake",
+  "chocolate-cupcakes",
+  "lemon-bars",
+  "smores-bars",
+  "classic-buffalo",
+  "nashville-hot-wings",
+  "nashville-hot",
+  "truffle-butter",
+  "ranch-butter",
+  "honey-mustard",
+  "honey-bbq",
+  "chili-crisp",
+  "brown-sugar-bourbon",
+  "pineapple-ginger",
 ]);
 
 const ZOOM =
@@ -37,7 +60,8 @@ function isPopcornHeroZoomById(recipeId: string): boolean {
 export function recipeHeroUsesZoomOut(recipeId: string, category?: Recipe["category"] | string): boolean {
   if (category === "drinks") return true;
   if (category === "snacks" && POPCORN_TO_BUILDER_RECIPE[recipeId] !== undefined) return true;
-  if (SPREAD_SNACK_ZOOM_OUT_IDS.has(canonicalSpreadSnackId(recipeId))) return true;
+  const canonical = canonicalSpreadSnackId(recipeId);
+  if (HERO_ZOOM_OUT_MARKETING_IDS.has(recipeId) || HERO_ZOOM_OUT_MARKETING_IDS.has(canonical)) return true;
   if (isPopcornHeroZoomById(recipeId)) return true;
   return false;
 }
@@ -51,6 +75,7 @@ export function recipeHeroImgClass(recipeId: string, category?: Recipe["category
 export function recipeHeroImgClassForPicker(recipeId: string, selectedCategory: string | undefined): string {
   if (selectedCategory === "drinks") return ZOOM;
   if (selectedCategory === "snacks" && POPCORN_TO_BUILDER_RECIPE[recipeId] !== undefined) return ZOOM;
-  if (SPREAD_SNACK_ZOOM_OUT_IDS.has(recipeId)) return ZOOM;
+  const canonical = canonicalSpreadSnackId(recipeId);
+  if (HERO_ZOOM_OUT_MARKETING_IDS.has(recipeId) || HERO_ZOOM_OUT_MARKETING_IDS.has(canonical)) return ZOOM;
   return COVER;
 }

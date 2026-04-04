@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Canonical builder recipe templates (Start Here / ingredients flow).
  * Category keys match recipe picker IDs. Aliases are injected at module load
  * so deep links and popcorn/wing flavor maps resolve without duplicating rows.
@@ -267,7 +267,7 @@ export const standardRecipes: Record<string, any[]> = {
   ],
   "wings": [
     {
-      id: "classic-buffalo-wings",
+      id: "classic-buffalo",
       name: "Classic Buffalo Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabutter","Hot Sauce","Garlic Powder","Salt","Black Pepper"],
@@ -276,7 +276,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook your wings however you like — oven (425°F/45 min), air fryer (400°F/20 min), or grill. We're here for the sauce.","While wings cook, melt cannabutter in a saucepan over low heat.","Whisk in hot sauce and garlic powder — don't let it boil.","Taste and adjust heat with more hot sauce if desired.","Toss hot wings in the infused buffalo sauce immediately before serving.","Serve with celery sticks and blue cheese or ranch."],
     },
     {
-      id: "garlic-parmesan-wings",
+      id: "garlic-parmesan",
       name: "Garlic Parmesan Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabutter","Garlic","Parmesan Cheese","Italian Seasoning","Salt"],
@@ -285,7 +285,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way — oven (425°F/45 min), air fryer (400°F/20 min), or grill until crispy. We're here for the sauce.","Melt cannabutter in a pan over medium-low heat.","Add minced garlic and sauté 1-2 minutes until fragrant — don't let it brown.","Remove from heat and stir in Italian seasoning.","Toss wings in the garlic butter until fully coated.","Plate and finish with a generous shower of grated parmesan."],
     },
     {
-      id: "honey-bbq-wings",
+      id: "honey-bbq",
       name: "Honey BBQ Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabutter","Hot Sauce","Granulated Sugar","Garlic Powder","Salt"],
@@ -294,7 +294,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way. We're here for the sauce.","Melt cannabutter in saucepan over low heat.","Whisk in hot sauce, sugar, and garlic powder until smooth.","Simmer 2 minutes until slightly thickened.","Toss hot wings in honey BBQ sauce.","Serve immediately."],
     },
     {
-      id: "teriyaki-wings",
+      id: "teriyaki",
       name: "Teriyaki Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabis Coconut Oil","Soy Sauce","Granulated Sugar","Garlic","Salt","Black Pepper"],
@@ -312,7 +312,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way until very crispy. We're here for the sauce.","Warm cannabis coconut oil in saucepan over low heat.","Whisk in cayenne, garlic powder, and brown sugar.","Toss hot wings in Nashville hot oil immediately.","Serve over white bread with pickles."],
     },
     {
-      id: "korean-gochujang-wings",
+      id: "korean-gochujang",
       name: "Korean Gochujang Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabis Coconut Oil","Gochujang","Honey","Soy Sauce","Garlic Powder","Salt","Black Pepper"],
@@ -321,7 +321,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way. We're here for the sauce.","Whisk gochujang, honey, soy sauce, and garlic powder with cannabis coconut oil in a small pan over low heat until smooth.","Simmer gently 1–2 minutes; taste and adjust heat or sweetness.","Toss hot wings in the glaze.","Top with sesame seeds and scallions if desired."],
     },
     {
-      id: "lemon-pepper-wings",
+      id: "lemon-pepper",
       name: "Lemon Pepper Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabutter","Garlic Powder","Salt","Black Pepper"],
@@ -330,7 +330,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way until very crispy. We're here for the sauce.","Melt cannabutter in saucepan over low heat.","Stir in garlic powder and cracked black pepper.","Toss wings in lemon butter.","Finish with fresh lemon zest."],
     },
     {
-      id: "mango-habanero-wings",
+      id: "mango-habanero",
       name: "Mango Habanero Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabis Coconut Oil","Mango (diced)","Habanero Pepper","Apple Cider Vinegar","Granulated Sugar","Garlic Powder","Salt","Black Pepper"],
@@ -339,7 +339,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way. We're here for the sauce.","Blend mango, habanero, vinegar, and sugar into a smooth sauce.","Stir cannabis coconut oil into the sauce.","Toss hot wings in mango habanero sauce.","Garnish with cilantro and lime."],
     },
     {
-      id: "cajun-butter-wings",
+      id: "cajun-butter",
       name: "Cajun Butter Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabutter","Cajun Seasoning","Garlic Powder","Salt"],
@@ -348,7 +348,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way. We're here for the sauce.","Melt cannabutter in saucepan over low heat.","Whisk in Cajun seasoning and garlic powder.","Toss hot wings in Cajun butter immediately.","Serve with ranch dipping sauce."],
     },
     {
-      id: "truffle-butter-wings",
+      id: "truffle-butter",
       name: "Truffle Butter Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabutter","Parmesan Cheese","Garlic Powder","Salt","Black Pepper"],
@@ -357,7 +357,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way until crispy. We're here for the sauce.","Melt cannabutter over low heat.","Stir in garlic powder.","Toss wings in garlic cannabutter.","Finish with parmesan and a drizzle of truffle oil if available."],
     },
     {
-      id: "ranch-butter-wings",
+      id: "ranch-butter",
       name: "Ranch Butter Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabutter","Garlic Powder","Salt","Black Pepper"],
@@ -366,7 +366,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way. We're here for the sauce.","Melt cannabutter over low heat.","Stir in ranch seasoning packet.","Toss hot wings in ranch butter.","Serve with extra ranch dipping sauce."],
     },
     {
-      id: "honey-mustard-wings",
+      id: "honey-mustard",
       name: "Honey Mustard Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabis Coconut Oil","Honey","Mustard (yellow)","Garlic Powder","Salt","Black Pepper"],
@@ -375,7 +375,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way. We're here for the sauce.","Whisk cannabis oil, honey, and mustard until smooth.","Toss hot wings in honey mustard sauce.","Serve with extra sauce on the side."],
     },
     {
-      id: "sriracha-honey-wings",
+      id: "sriracha-honey",
       name: "Sriracha Honey Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabis Coconut Oil","Sriracha","Honey","Lime Juice","Garlic Powder","Salt","Black Pepper"],
@@ -384,7 +384,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way. We're here for the sauce.","Mix cannabis oil, sriracha, honey, and lime juice together.","Toss hot wings in sriracha honey sauce.","Garnish with sesame seeds."],
     },
     {
-      id: "chili-crisp-wings",
+      id: "chili-crisp",
       name: "Chili Crisp Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabis Coconut Oil","Chili Crisp","Garlic","Garlic Powder","Salt","Black Pepper"],
@@ -393,7 +393,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way until crispy. We're here for the sauce.","Warm cannabis coconut oil over low heat.","Stir in minced garlic, chili crisp, and a pinch of garlic powder.","Toss hot wings in the chili crisp oil.","Finish with scallions and sesame if desired."],
     },
     {
-      id: "maple-bacon-wings",
+      id: "maple-bacon",
       name: "Maple Bacon Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabutter","Maple Syrup","Bacon","Brown Sugar (Light)","Garlic Powder","Salt","Black Pepper"],
@@ -402,7 +402,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way until crispy. We're here for the sauce.","Cook bacon until crisp; crumble.","Melt cannabutter over low heat.","Whisk in maple syrup and brown sugar until glossy.","Add garlic powder, bacon, and a pinch of pepper.","Toss hot wings in maple-bacon glaze and serve."],
     },
     {
-      id: "brown-sugar-bourbon-wings",
+      id: "brown-sugar-bourbon",
       name: "Brown Sugar Bourbon Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabutter","Brown Sugar (Light)","Bourbon Whiskey","Garlic Powder","Salt","Black Pepper"],
@@ -411,7 +411,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way. We're here for the sauce.","Melt cannabutter on low heat.","Add brown sugar and simmer until dissolved.","Stir in bourbon and garlic powder; simmer 1 minute more (alcohol cooks down slightly).","Toss wings in the glaze and serve immediately."],
     },
     {
-      id: "pineapple-ginger-wings",
+      id: "pineapple-ginger",
       name: "Pineapple Ginger Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabis Coconut Oil","Pineapple Juice","Ginger (fresh)","Granulated Sugar","Garlic","Salt","Black Pepper"],
@@ -420,7 +420,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way until crisp. We're here for the sauce.","Mix pineapple juice, grated ginger, and sugar in a pan over low heat.","Reduce until slightly syrupy, then whisk in cannabis coconut oil.","Toss hot wings in pineapple-ginger glaze.","Serve with lime and scallions if desired."],
     },
     {
-      id: "orange-glaze-wings",
+      id: "orange-glaze",
       name: "Orange Glaze Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabis Coconut Oil","Orange Juice","Granulated Sugar","Garlic Powder","Salt","Black Pepper"],
@@ -429,7 +429,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way. We're here for the sauce.","Simmer orange juice and sugar until slightly thickened.","Whisk in cannabis coconut oil and garlic powder.","Toss hot wings in orange glaze.","Finish with orange zest and cracked pepper."],
     },
     {
-      id: "garlic-soy-umami-wings",
+      id: "garlic-soy-umami",
       name: "Garlic Soy Umami Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabis Coconut Oil","Soy Sauce","Granulated Sugar","Garlic","Garlic Powder","Salt","Black Pepper"],
@@ -438,7 +438,7 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Cook wings your way until crispy. We're here for the sauce.","Warm cannabis coconut oil and add minced garlic.","Stir in soy sauce, a touch of sugar, and black pepper.","Toss hot wings in garlic-soy glaze.","Top with scallions and sesame seeds if desired."],
     },
     {
-      id: "chimichurri-wings",
+      id: "chimichurri",
       name: "Chimichurri Wings",
       servings: 4,
       ingredients: ["Chicken Wings","Cannabis Olive Oil","Parsley","Red Wine Vinegar","Garlic","Salt","Black Pepper","Italian Seasoning"],
@@ -577,8 +577,8 @@ export const standardRecipes: Record<string, any[]> = {
   ],
   "snacks": [
     {
-      id: "garlic-butter-popcorn",
-      name: "Garlic Butter Popcorn",
+      id: "garlic-butter",
+      name: "Garlic Butter - Popcorn, Chex Mix, or Nuts (you chose what to coat)",
       servings: 4,
       ingredients: ["Popcorn Kernels","Cannabutter","Garlic Powder","Salt"],
       amounts: [100,42,3,2],
@@ -586,8 +586,8 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Pop popcorn using your preferred method — stovetop, air popper, or microwave.","Transfer popped corn to a large bowl.","Melt cannabutter in a small saucepan over low heat.","Stir garlic powder into the melted butter.","Drizzle butter over popcorn while tossing continuously.","Season with salt and toss until every kernel is coated."],
     },
     {
-      id: "caramel-popcorn",
-      name: "Caramel Popcorn",
+      id: "caramel",
+      name: "Caramel - Popcorn, Chex Mix, or Nuts (you chose what to coat)",
       servings: 6,
       ingredients: ["Popcorn Kernels","Cannabutter","Brown Sugar (Light)","Corn Syrup","Baking Soda","Vanilla Extract"],
       amounts: [120,56,220,60,1,5],
@@ -595,8 +595,8 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Pop popcorn and spread on a parchment-lined baking sheet. Preheat oven to 250°F.","Melt cannabutter, add brown sugar and corn syrup. Boil 5 minutes without stirring.","Remove from heat, stir in baking soda and vanilla — it will foam.","Pour caramel over popcorn and toss quickly.","Bake 1 hour, stirring every 15 minutes.","Cool completely before breaking apart."],
     },
     {
-      id: "buffalo-popcorn",
-      name: "Buffalo Popcorn",
+      id: "buffalo",
+      name: "Buffalo - Popcorn, Chex Mix, or Nuts (you chose what to coat)",
       servings: 4,
       ingredients: ["Popcorn Kernels","Cannabutter","Hot Sauce","Garlic Powder","Salt"],
       amounts: [100,42,30,2,2],
@@ -604,8 +604,8 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Pop popcorn and transfer to a large bowl.","Melt cannabutter and whisk in hot sauce and garlic powder.","Drizzle buffalo butter over popcorn while tossing.","Season with salt and serve immediately."],
     },
     {
-      id: "chocolate-drizzle-popcorn",
-      name: "Chocolate Drizzle Popcorn",
+      id: "chocolate-drizzle",
+      name: "Chocolate Drizzle - Popcorn, Chex Mix, or Nuts (you chose what to coat)",
       servings: 4,
       ingredients: ["Popcorn Kernels","Dark Chocolate Chips","Cannabis Coconut Oil","Salt"],
       amounts: [100,100,15,2],
@@ -870,87 +870,6 @@ export const standardRecipes: Record<string, any[]> = {
       instructions: ["Warm hot dogs.","Split condiments: mix cannabis olive oil into ONE labeled infused sauce trio (or single infused base).","Build dogs for infused batch only; label."],
     },
     {
-      id: "queso-dip-infused",
-      name: "Cannabis Queso Dip",
-      servings: 8,
-      ingredients: ["Cheddar Cheese","Whole Milk","Cornstarch","Cannabutter","Salt","Garlic Powder"],
-      amounts: [220,300,18,40,4,2],
-      units: ["g","ml","g","g","g","g"],
-      instructions: ["Toss cheese with cornstarch.","Heat milk with cannabutter; add cheese gradually whisking until smooth.","Season; keep warm; label mg per oz."],
-    },
-    {
-      id: "spinach-artichoke-dip-infused",
-      name: "Spinach Artichoke Dip (Cannabis)",
-      servings: 8,
-      ingredients: ["Cream Cheese","Sour Cream","Cannabutter","Spinach (frozen)","Artichoke Hearts","Garlic Powder","Parmesan Cheese","Salt","Black Pepper"],
-      amounts: [220,140,40,150,200,3,50,3,2],
-      units: ["g","g","g","g","g","g","g","g","g"],
-      instructions: ["Warm cream cheese, sour cream, and cannabutter until smooth.","Stir in spinach, artichokes, garlic, parmesan, salt, and pepper.","Bake at 375°F 20 minutes until bubbly. Label serving spoon."],
-    },
-    {
-      id: "buffalo-dip-infused",
-      name: "Buffalo Chicken Dip (Cannabis)",
-      servings: 10,
-      ingredients: ["Cream Cheese","Sour Cream","Hot Sauce","Cannabutter","Cheddar Cheese","Garlic Powder","Salt"],
-      amounts: [200,120,80,35,120,2,2],
-      units: ["g","g","ml","g","g","g","g"],
-      instructions: ["Combine all ingredients in oven-safe dish.","Bake at 375°F until melted and bubbly; stir.","Serve with labeled chips/crackers on separate tray."],
-    },
-    {
-      id: "ranch-dip-infused",
-      name: "Ranch Dip (Cannabis)",
-      servings: 8,
-      ingredients: ["Sour Cream","Mayonnaise","Cannabis Olive Oil","Ranch Seasoning","Salt","Black Pepper"],
-      amounts: [200,120,20,12,2,1],
-      units: ["g","g","ml","g","g","g"],
-      instructions: ["Whisk all ingredients until smooth.","Chill 30 minutes for flavor. Label bowl clearly."],
-    },
-    {
-      id: "honey-mustard-dip-infused",
-      name: "Honey Mustard Dip (Cannabis)",
-      servings: 8,
-      ingredients: ["Honey","Mustard (yellow)","Mayonnaise","Cannabis Olive Oil","Salt"],
-      amounts: [90,45,120,18,1],
-      units: ["g","ml","g","ml","g"],
-      instructions: ["Whisk until emulsified.","Taste and adjust sweetness. Label infused dip."],
-    },
-    {
-      id: "garlic-aioli-infused",
-      name: "Garlic Aioli (Cannabis)",
-      servings: 6,
-      ingredients: ["Mayonnaise","Garlic","Lemon Juice","Cannabis Olive Oil","Salt","Black Pepper"],
-      amounts: [180,3,15,22,2,1],
-      units: ["g","cloves","ml","ml","g","g"],
-      instructions: ["Whisk finely minced garlic with mayonnaise and lemon.","Slowly whisk in cannabis olive oil until smooth. Chill and label."],
-    },
-    {
-      id: "bbq-sauce-infused-party",
-      name: "BBQ Sauce (Cannabis)",
-      servings: 12,
-      ingredients: ["Ketchup","Brown Sugar (Light)","Apple Cider Vinegar","Cannabis Olive Oil","Garlic Powder","Salt","Black Pepper"],
-      amounts: [240,80,30,25,4,4,2],
-      units: ["ml","g","ml","ml","g","g","g"],
-      instructions: ["Simmer all ingredients 10 minutes until slightly thickened. Cool.","Brush on proteins after cooking or serve as labeled dip."],
-    },
-    {
-      id: "sweet-chili-sauce-infused",
-      name: "Sweet Chili Sauce (Cannabis)",
-      servings: 10,
-      ingredients: ["Water","Granulated Sugar","Rice Vinegar","Garlic Powder","Cayenne Pepper","Cannabis Olive Oil","Salt"],
-      amounts: [120,150,45,3,2,20,2],
-      units: ["ml","g","ml","g","g","ml","g"],
-      instructions: ["Simmer water and sugar until dissolved.","Add vinegar, garlic, cayenne, and salt; simmer 5 minutes.","Off heat, whisk in cannabis olive oil. Label."],
-    },
-    {
-      id: "cheese-sauce-infused",
-      name: "Cheese Sauce (Cannabis)",
-      servings: 8,
-      ingredients: ["Cheddar Cheese","Whole Milk","Cannabutter","Cornstarch","Salt"],
-      amounts: [200,280,35,16,3],
-      units: ["g","ml","g","g","g"],
-      instructions: ["Toss cheese with cornstarch.","Warm milk and cannabutter; add cheese slowly whisking.","Use immediately on fries or nachos; label."],
-    },
-    {
       id: "gummy-clusters",
       name: "Cannabis Gummy Clusters",
       servings: 32,
@@ -1164,8 +1083,8 @@ const ensureAliasTemplates = (
   standardRecipes[categoryId] = categoryRecipes;
 };
 
-// Ensure Create Recipe lists all routable IDs used by pages.
-ensureAliasTemplates("wings", WING_SAUCE_TO_BUILDER_RECIPE, "classic-buffalo-wings");
-ensureAliasTemplates("snacks", POPCORN_TO_BUILDER_RECIPE, "garlic-butter-popcorn", formatSnackAliasName);
+// Ensure Create Recipe lists all routable IDs used by pages. Snacks before wings so shared slug `nashville-hot` becomes the popcorn alias first.
+ensureAliasTemplates("snacks", POPCORN_TO_BUILDER_RECIPE, "garlic-butter", formatSnackAliasName);
+ensureAliasTemplates("wings", WING_SAUCE_TO_BUILDER_RECIPE, "classic-buffalo");
 ensureAliasTemplates("drinks", COFFEE_TO_BUILDER_RECIPE, "bulletproof-coffee");
 ensureAliasTemplates("spreads-dips", SPREADS_DIPS_TO_BUILDER_RECIPE, "spinach-artichoke-dip-infused");

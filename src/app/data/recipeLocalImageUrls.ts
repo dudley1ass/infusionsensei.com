@@ -46,12 +46,12 @@ export function drinkShowcaseHeroImage(slugOrTemplateId: string): string | undef
   return f ? rootMarketingImage(f) : undefined;
 }
 
-/** Popcorn snack templates (PNG heroes). */
+/** Popcorn snack templates (PNG heroes). Ids match `standardRecipes.snacks` builder bases (no `*-popcorn` suffix). */
 const POPCORN_HERO_AT_ROOT: Record<string, string> = {
-  "garlic-butter-popcorn": "garlic_butter_popcorn.png",
-  "caramel-popcorn": "caramel_popcorn.png",
-  "buffalo-popcorn": "buffalo_popcorn.png",
-  "chocolate-drizzle-popcorn": "chocolate_drizzle_popcorn.png",
+  "garlic-butter": "garlic_butter_popcorn.png",
+  caramel: "caramel_popcorn.png",
+  buffalo: "buffalo_popcorn.png",
+  "chocolate-drizzle": "chocolate_drizzle_popcorn.png",
   "kettle-corn-infused": "kettle_corn.png",
   "candy-coated-popcorn": "candy_coated_popcorn.png",
 };
@@ -105,28 +105,28 @@ const SPREADS_SNACKS_PNG_AT_ROOT: Record<string, string> = {
   "chocolate-dipped-pretzels": "chocolate_pretzels.png",
 };
 
-/** Per-flavor wing heroes under `public/images/` (matches `standardRecipes.wings` template ids). */
+/** Per-flavor wing heroes under `public/images/` (ids = sauce slugs in `standardRecipes.wings`). */
 const WING_HERO_JPEG: Record<string, string> = {
-  "classic-buffalo-wings": "buffalowings.jpg",
-  "garlic-parmesan-wings": "garlicparmesanwings.jpg",
-  "honey-bbq-wings": "honeybbqwings.jpg",
-  "teriyaki-wings": "teriyakiwings.jpg",
+  "classic-buffalo": "buffalowings.jpg",
+  "garlic-parmesan": "garlicparmesanwings.jpg",
+  "honey-bbq": "honeybbqwings.jpg",
+  teriyaki: "teriyakiwings.jpg",
   "nashville-hot-wings": "nashvillehotwings.jpg",
-  "korean-gochujang-wings": "koreanfriedchicken.jpg",
-  "lemon-pepper-wings": "lemonpepper.jpg",
-  "mango-habanero-wings": "manoghabanerowings.jpg",
-  "cajun-butter-wings": "cajunwings.jpg",
-  "truffle-butter-wings": "trufflechicken.jpg",
-  "ranch-butter-wings": "ranchwings.jpg",
-  "honey-mustard-wings": "honeymustardchicken.jpg",
-  "sriracha-honey-wings": "srirachahoneywings.jpg",
-  "chili-crisp-wings": "chilicrispychicken.jpg",
-  "maple-bacon-wings": "maplebaconchicken.jpg",
-  "brown-sugar-bourbon-wings": "burbonglazedchicken.jpg",
-  "pineapple-ginger-wings": "pineapplechicken.jpg",
-  "orange-glaze-wings": "orangeglazed.jpg",
-  "garlic-soy-umami-wings": "soygarlicwings.jpg",
-  "chimichurri-wings": "chimichurrichicken.jpg",
+  "korean-gochujang": "koreanfriedchicken.jpg",
+  "lemon-pepper": "lemonpepper.jpg",
+  "mango-habanero": "manoghabanerowings.jpg",
+  "cajun-butter": "cajunwings.jpg",
+  "truffle-butter": "trufflechicken.jpg",
+  "ranch-butter": "ranchwings.jpg",
+  "honey-mustard": "honeymustardchicken.jpg",
+  "sriracha-honey": "srirachahoneywings.jpg",
+  "chili-crisp": "chilicrispychicken.jpg",
+  "maple-bacon": "maplebaconchicken.jpg",
+  "brown-sugar-bourbon": "burbonglazedchicken.jpg",
+  "pineapple-ginger": "pineapplechicken.jpg",
+  "orange-glaze": "orangeglazed.jpg",
+  "garlic-soy-umami": "soygarlicwings.jpg",
+  chimichurri: "chimichurrichicken.jpg",
 };
 
 /** New root PNGs — spread late so they override earlier JPG lines in `HERO_JPEG_AT_IMAGES_ROOT`. */
@@ -254,6 +254,29 @@ const RECIPE_LOCAL_IMAGE_ALIASES: Record<string, string> = {
   "canna-gummies": "classic-gummies",
   /** Template id `gummies` uses `gummies.jpg` (classic-gummies is a different snack variant in photo tooling). */
   "classic-brownies": "brownies",
+  "garlic-butter-popcorn": "garlic-butter",
+  "caramel-popcorn": "caramel",
+  "buffalo-popcorn": "buffalo",
+  "chocolate-drizzle-popcorn": "chocolate-drizzle",
+  "classic-buffalo-wings": "classic-buffalo",
+  "garlic-parmesan-wings": "garlic-parmesan",
+  "honey-bbq-wings": "honey-bbq",
+  "teriyaki-wings": "teriyaki",
+  "korean-gochujang-wings": "korean-gochujang",
+  "lemon-pepper-wings": "lemon-pepper",
+  "mango-habanero-wings": "mango-habanero",
+  "cajun-butter-wings": "cajun-butter",
+  "truffle-butter-wings": "truffle-butter",
+  "ranch-butter-wings": "ranch-butter",
+  "honey-mustard-wings": "honey-mustard",
+  "sriracha-honey-wings": "sriracha-honey",
+  "chili-crisp-wings": "chili-crisp",
+  "maple-bacon-wings": "maple-bacon",
+  "brown-sugar-bourbon-wings": "brown-sugar-bourbon",
+  "pineapple-ginger-wings": "pineapple-ginger",
+  "orange-glaze-wings": "orange-glaze",
+  "garlic-soy-umami-wings": "garlic-soy-umami",
+  "chimichurri-wings": "chimichurri",
 };
 
 export function recipeLocalImage(recipeId: string): string {

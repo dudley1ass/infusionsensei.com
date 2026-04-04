@@ -37,7 +37,7 @@ function parseRoute(route: string): { category: string | null; recipe: string | 
 /** Default builder templates for showcase routes with no ?recipe= param */
 const ROUTE_HINT_TO_TEMPLATE: Record<string, { category: string; id: string }> = {
   "/spreads-dips": { category: "spreads-dips", id: "spinach-artichoke-dip-infused" },
-  "/popcorn": { category: "snacks", id: "caramel-popcorn" },
+  "/popcorn": { category: "snacks", id: "caramel" },
 };
 
 export function findStandardTemplate(route: string): StandardTemplate | null {

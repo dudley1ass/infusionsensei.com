@@ -56,7 +56,7 @@ const SNACK_GROUPS: { title: string; items: SnackItem[] }[] = [
     items: [
       { id: "chex-mix-infused", name: "Chex Mix", emoji: "🥣", desc: "Baked cereal mix with cannabutter." },
       { id: "infused-nuts", name: "Infused Nuts", emoji: "🥜", desc: "Roasted glazed nut mix." },
-      { id: "caramel-popcorn", name: "Caramel Corn", emoji: "🍯", desc: "Baked caramel corn (builder template)." },
+      { id: "caramel", name: "Caramel Corn", emoji: "🍯", desc: "Baked caramel corn (builder template)." },
       { id: "kettle-corn-infused", name: "Kettle Corn", emoji: "🍿", desc: "Sweet-salt popcorn finish." },
       { id: "snack-mix-party", name: "Snack Mix", emoji: "🧂", desc: "Pretzels + cereal + popcorn + nuts." },
       { id: "cheese-crackers-infused-dust", name: "Cheese Crackers (infused dust)", emoji: "🧀", desc: "Parmesan-garlic butter bake." },
@@ -68,7 +68,7 @@ const SNACK_GROUPS: { title: string; items: SnackItem[] }[] = [
     items: [
       { id: "mini-slider-sauce", name: "Mini Sliders (infused sauce)", emoji: "🍔", desc: "Sauce-only infusion for mixed parties." },
       { id: "chicken-tenders-infused-dip", name: "Chicken Tenders (infused dip)", emoji: "🍗", desc: "Breaded tenders + labeled dip bowl." },
-      { id: "classic-buffalo-wings", name: "Wings (Buffalo starter)", emoji: "🍗", desc: "Opens wing builder — add flavors from Wings too.", builderCategory: "wings" },
+      { id: "classic-buffalo", name: "Wings (Buffalo starter)", emoji: "🍗", desc: "Opens wing builder — add flavors from Wings too.", builderCategory: "wings" },
       { id: "meatballs-infused-glaze", name: "Meatballs (infused glaze)", emoji: "🍖", desc: "Bake balls; toss in infused glaze." },
       { id: "sausage-bites-honey-mustard", name: "Sausage Bites (infused honey mustard)", emoji: "🌭", desc: "Cocktail links + labeled sauce." },
       { id: "mini-hot-dogs-infused-condiments", name: "Mini Hot Dogs (infused ketchup/mustard)", emoji: "🌭", desc: "Infuse condiments, not the franks." },
