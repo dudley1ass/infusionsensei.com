@@ -7,7 +7,7 @@ export const UTM_MEDIUM_SOCIAL = "social" as const;
 export type UtmSource = "tiktok" | "pinterest" | "reddit";
 
 /** Stable campaign buckets — do not rename weekly (use `utm_content` for variants). */
-export type UtmCampaign = "calculator" | "brownies" | "popcorn" | "party" | "recipes";
+export type UtmCampaign = "calculator" | "brownies" | "popcorn" | "party" | "recipes" | "launch";
 
 export type TrackedDestination = {
   path: string;
@@ -32,6 +32,7 @@ export const UTM_CAMPAIGN_OPTIONS: { value: UtmCampaign; label: string }[] = [
   { value: "popcorn", label: "popcorn" },
   { value: "party", label: "party" },
   { value: "recipes", label: "recipes" },
+  { value: "launch", label: "launch" },
 ];
 
 /**

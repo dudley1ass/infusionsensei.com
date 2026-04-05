@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { Helmet } from "react-helmet-async";
-import { ChefHat, Clock, ArrowRight, TrendingUp, Zap } from "lucide-react";
+import { ChefHat, Clock, ArrowRight, TrendingUp, Zap, BookOpen } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -9,6 +9,7 @@ import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
 import { recipeHeroImgClass } from "../utils/recipeHeroImageClass";
 import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { trackEvent } from "../utils/analytics";
+import { UtmShareLinks } from "../components/UtmShareLinks";
 
 export function Home() {
   const featuredRecipes = recipes.filter(r => r.isNew).slice(0, 3);
@@ -39,8 +40,31 @@ export function Home() {
             <p className="hidden sm:block text-green-400 text-xs sm:text-sm mb-1.5">Start by building your infused base, then use it in recipes.</p>
           </div>
 
-          <p className="text-center text-green-200 text-xs font-bold uppercase tracking-wide mb-2">Pick your path</p>
+          <p className="text-center text-green-200 text-xs font-bold uppercase tracking-wide mb-2">Main funnel — calculator, recipe builder, party mode</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mb-2 max-w-3xl mx-auto">
+            <Link
+              to="/edibles-calculator"
+              onClick={() => {
+                trackEvent("homepage_forced_path", { path: "calculator" });
+                trackEvent("homepage_primary_cta_click", { location: "hero_three", target: "edibles-calculator" });
+              }}
+            >
+              <Button size="lg" className="w-full bg-white text-green-800 hover:bg-green-50 font-black text-sm py-5 shadow-xl rounded-xl flex items-center justify-center gap-1.5 ring-2 ring-white/40">
+                THC Calculator <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link
+              to="/ingredients"
+              state={{ resetStartHere: true }}
+              onClick={() => {
+                trackEvent("homepage_forced_path", { path: "ingredients" });
+                trackEvent("homepage_primary_cta_click", { location: "hero_three", target: "ingredients" });
+              }}
+            >
+              <Button size="lg" className="w-full bg-green-900/80 text-white hover:bg-green-900 font-black text-sm py-5 shadow-lg rounded-xl border-2 border-white/25 flex items-center justify-center gap-1.5">
+                Recipe builder <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
             <Link
               to="/party-mode"
               onClick={() => {
@@ -49,29 +73,7 @@ export function Home() {
               }}
             >
               <Button size="lg" className="w-full bg-amber-400 text-gray-900 hover:bg-amber-300 font-black text-sm py-5 shadow-lg rounded-xl border-2 border-amber-200/80 flex items-center justify-center gap-1.5">
-                Build Party Pack <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
-            <Link
-              to="/edibles-calculator"
-              onClick={() => {
-                trackEvent("homepage_forced_path", { path: "calculator" });
-                trackEvent("homepage_primary_cta_click", { location: "hero_three", target: "edibles-calculator" });
-              }}
-            >
-              <Button size="lg" className="w-full bg-white text-green-800 hover:bg-green-50 font-black text-sm py-5 shadow-xl rounded-xl flex items-center justify-center gap-1.5">
-                THC Calculator <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
-            <Link
-              to="/wings"
-              onClick={() => {
-                trackEvent("homepage_forced_path", { path: "wings" });
-                trackEvent("homepage_primary_cta_click", { location: "hero_three", target: "wings" });
-              }}
-            >
-              <Button size="lg" className="w-full bg-green-900/80 text-white hover:bg-green-900 font-black text-sm py-5 shadow-lg rounded-xl border-2 border-white/25 flex items-center justify-center gap-1.5">
-                Start with Wings <ArrowRight className="w-4 h-4" />
+                Party mode <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           </div>
@@ -147,6 +149,8 @@ export function Home() {
         </div>
       </section>
 
+      <UtmShareLinks placement="homepage" />
+
       <section>
         <div className="bg-white border-2 border-green-300 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -172,6 +176,66 @@ export function Home() {
               </Button>
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* SEO guides — high-intent searches */}
+      <section>
+        <div className="flex items-end justify-between mb-4 gap-4 flex-wrap">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-1">Learn</p>
+            <h2 className="text-2xl font-black text-gray-900">Essential guides</h2>
+            <p className="text-sm text-gray-600 mt-1">Foundational articles for search and for new visitors.</p>
+          </div>
+          <Link
+            to="/learn"
+            onClick={() => trackEvent("homepage_cta_click", { location: "essential_guides", target: "learn" })}
+            className="text-green-700 font-bold text-sm hover:underline"
+          >
+            All articles →
+          </Link>
+        </div>
+        <div className="grid md:grid-cols-3 gap-4">
+          {[
+            {
+              to: "/learn/articles/decarboxylation-guide",
+              title: "How to decarb weed",
+              sub: "Temperature, time, and why it matters for potency.",
+              id: "decarboxylation-guide",
+            },
+            {
+              to: "/learn/articles/how-to-make-cannabutter",
+              title: "How to make cannabutter",
+              sub: "Step-by-step infused butter with predictable THC.",
+              id: "how-to-make-cannabutter",
+            },
+            {
+              to: "/learn/articles/how-strong-are-homemade-edibles",
+              title: "How strong are homemade edibles?",
+              sub: "Why doses feel different and how to stay in control.",
+              id: "how-strong-are-homemade-edibles",
+            },
+          ].map((a) => (
+            <Link
+              key={a.id}
+              to={a.to}
+              onClick={() => trackEvent("homepage_article_cta_click", { location: "essential_guides", target: a.id })}
+              className="group bg-white border-2 border-green-100 rounded-2xl p-5 shadow-sm hover:border-green-400 hover:shadow-md transition-all"
+            >
+              <div className="flex items-start gap-3">
+                <div className="rounded-full bg-green-100 p-2 shrink-0 group-hover:bg-green-200 transition-colors">
+                  <BookOpen className="w-5 h-5 text-green-800" />
+                </div>
+                <div>
+                  <h3 className="font-black text-gray-900 group-hover:text-green-800 leading-snug">{a.title}</h3>
+                  <p className="text-sm text-gray-600 mt-1">{a.sub}</p>
+                  <span className="inline-flex items-center gap-1 text-green-700 font-bold text-sm mt-2">
+                    Read <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -283,11 +347,33 @@ export function Home() {
               <span className="text-green-200">in Under 60 Seconds</span>
             </h2>
             <p className="text-green-100 text-lg mb-8">Try it now — it's free. No account. No setup.</p>
-            <Link to="/infusions">
-              <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-xl px-12 py-7 rounded-xl shadow-2xl transition-transform hover:scale-105">
-                Start My Infusion — Free <ArrowRight className="w-6 h-6 ml-2" />
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3">
+              <Link
+                to="/edibles-calculator"
+                onClick={() => trackEvent("homepage_primary_cta_click", { location: "footer_cta_band", target: "edibles-calculator" })}
+              >
+                <Button size="lg" className="bg-white text-green-800 hover:bg-green-50 font-black text-lg px-8 py-6 rounded-xl shadow-2xl w-full sm:w-auto">
+                  THC Calculator <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link
+                to="/ingredients"
+                state={{ resetStartHere: true }}
+                onClick={() => trackEvent("homepage_primary_cta_click", { location: "footer_cta_band", target: "ingredients" })}
+              >
+                <Button size="lg" variant="outline" className="border-2 border-white/80 text-white hover:bg-white/10 font-black text-lg px-8 py-6 rounded-xl w-full sm:w-auto">
+                  Recipe builder
+                </Button>
+              </Link>
+              <Link
+                to="/party-mode"
+                onClick={() => trackEvent("homepage_primary_cta_click", { location: "footer_cta_band", target: "party_mode" })}
+              >
+                <Button size="lg" variant="outline" className="border-2 border-amber-300/90 text-amber-100 hover:bg-amber-500/20 font-black text-lg px-8 py-6 rounded-xl w-full sm:w-auto">
+                  Party mode
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
