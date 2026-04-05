@@ -97,6 +97,38 @@ export function InfusedFudgeRecipe() {
             </p>
           </div>
 
+          <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-bold text-gray-900">Why fudge is a dosing-friendly format</h2>
+            <p>
+              Fudge sets into a slab you can slice with a ruler and a sharp knife. That beats loose sauces or spooned spreads
+              where “one spoonful” is subjective. Chocolate also masks grassy flavors better than lightly sweetened baked goods,
+              which helps guests focus on portion size instead of taste surprises.
+            </p>
+            <p>
+              Use a straight-sided pan and line it so the slab lifts out cleanly. Uneven pans or rounded silicone corners make
+              equal squares harder — and equal squares are what make your milligram math honest.
+            </p>
+          </div>
+
+          <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-bold text-gray-900">Texture tips and troubleshooting</h2>
+            <p>
+              If you crank the heat while melting chocolate, you risk scorching and a grainy finish. If you skip chilling
+              time, you will get soft slabs that smear when cut — and smeared cuts make portion sizes lie. If fudge is too soft
+              after chilling, it often needs more time in the fridge or a slightly firmer ratio next time; do not “fix” it by
+              randomly adding more infused fat without re-running the calculator.
+            </p>
+          </div>
+
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 space-y-2">
+            <h3 className="font-black text-amber-900">Storage and labeling</h3>
+            <p className="text-sm text-gray-700">
+              Store cut squares in a single layer or with parchment between layers so they do not weld together. Label the
+              container with mg per piece and the date. Fudge looks like regular candy on a counter — treat it like anything
+              else you would not leave unmarked around kids or pets.
+            </p>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               to="/edibles-calculator"

@@ -701,6 +701,13 @@ const BAR_TRAY_STANDARD_IDS = new Set<string>([
   "smores-bars",
 ]);
 
+/** Brownie + cheesecake layer bars: lots of cream cheese counts as `dairy`, not `fat` — plain fat÷flour misfires. */
+const LAYERED_CHEESECAKE_BAR_TEMPLATE_IDS = new Set<string>(["brownie-cheesecake-swirl-bars", "cheesecake-bars"]);
+
+function flourDenominatorForLayeredCheesecakeBar(flourG: number, dairyG: number): number {
+  return Math.max(flourG + dairyG * 0.45, 1);
+}
+
 const CHOCOLATE_FUDGE_BUILDER_ID = "infused-chocolate-fudge";
 
 /**
@@ -1822,6 +1829,8 @@ export function CreateRecipes() {
     const leavener = leavenerGramsForFlourRatio();
     const totalMoisture = egg + liquid + dairy;
     const lowerNames = ingredients.map(i => i.name.toLowerCase());
+    const isLayeredCheesecakeBar =
+      !!selectedStandardRecipe && LAYERED_CHEESECAKE_BAR_TEMPLATE_IDS.has(selectedStandardRecipe);
     const isBrownieStyle =
       selectedStandardRecipe === "brownies" ||
       selectedStandardRecipe === "mini-brownie-bites" ||
@@ -1940,7 +1949,9 @@ export function CreateRecipes() {
     // Churro / funnel-cake templates list fry oil and finish oil as ingredients — they are not
     // "dough fat" like cookies. Dough sugar is also often low; sweetness is from coating/dust.
     if (cat === 'fat' && !isFriedDoughStyle) {
-      const fatToFlour = fat / Math.max(flour, 1);
+      const fatDen =
+        isLayeredCheesecakeBar ? flourDenominatorForLayeredCheesecakeBar(flour, dairy) : Math.max(flour, 1);
+      const fatToFlour = fat / fatDen;
       const fatProblemThreshold =
         isBrownieStyle || isBarStyle ? 1.8 : isCakeStyle ? 1.15 : isCookieStyle ? 1.0 : 0.85;
       const fatWarningThreshold =
@@ -2104,6 +2115,8 @@ export function CreateRecipes() {
     const isCookieStyle = isCookieTemplateRecipe(recipeName, selectedStandardRecipe);
     const isCakeStyle = isCakeBatterStyleRecipe(recipeName, selectedStandardRecipe);
     const isBarStyle = isBarTrayBakeRecipe(recipeName, selectedStandardRecipe);
+    const isLayeredCheesecakeBarSummary =
+      !!selectedStandardRecipe && LAYERED_CHEESECAKE_BAR_TEMPLATE_IDS.has(selectedStandardRecipe);
     const isPancakeStyle =
       recipeName.toLowerCase().includes("pancake") ||
       recipeName.toLowerCase().includes("waffle") ||
@@ -2202,7 +2215,10 @@ export function CreateRecipes() {
     }, 0);
     const eggRatio = egg / Math.max(realFlourOnly || flour, 1);
 
-    const fatRatio      = fat      / flour;
+    const fatDenominatorForSummary = isLayeredCheesecakeBarSummary
+      ? flourDenominatorForLayeredCheesecakeBar(flour, dairy)
+      : Math.max(flour, 1);
+    const fatRatio = fat / fatDenominatorForSummary;
     const sugarRatio    = sugarBalanced / flour;
     const moistureRatio = totalMoisture / flour;
     const leavenerRatio = leavener / flour;

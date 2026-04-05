@@ -9,7 +9,6 @@ import { cleanRecipeDisplayTitle } from "../utils/recipeDisplayTitle";
 import { recipeHeroImgClass } from "../utils/recipeHeroImageClass";
 import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { trackEvent } from "../utils/analytics";
-import { UtmShareLinks } from "../components/UtmShareLinks";
 import { appendInternalUtmToPath } from "../utils/utmLinks";
 
 export function Home() {
@@ -157,8 +156,6 @@ export function Home() {
           </p>
         </div>
       </section>
-
-      <UtmShareLinks placement="homepage" />
 
       <section>
         <div className="bg-white border-2 border-green-300 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">

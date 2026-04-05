@@ -68,6 +68,37 @@ export function CannabisWingsDosingGuide() {
             </p>
           </div>
 
+          <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-bold text-gray-900">Bake style: air fryer, oven, or grill</h2>
+            <p>
+              The sauce-last rule still applies. Crisp the wings however you like — just finish them plain, then toss in a
+              bowl with your metered sauce. Grills can add flare-up heat; if you are brushing sauce on the grate, you are no
+              longer controlling fat the same way as a bowl toss. For consistency, sauce off the heat, toss thoroughly, and
+              serve immediately.
+            </p>
+          </div>
+
+          <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-bold text-gray-900">Leftovers and reheating</h2>
+            <p>
+              Refrigerated wings can stiffen the sauce. Reheat gently and expect a little THC to stay stuck to the container —
+              scraping every gram into the math is not always worth it; label leftovers as “infused” and assume potency is
+              uneven after a microwave zap. When in doubt, share the conservative number.
+            </p>
+          </div>
+
+          <div className="border border-gray-200 rounded-2xl p-5 bg-gray-50 space-y-2">
+            <h3 className="font-black text-gray-900">Quick FAQ</h3>
+            <p className="text-sm">
+              <strong>Can I double the sauce?</strong> Yes — scale cannabutter and other ingredients together, then re-run the
+              calculator with the new total sauce weight and wing count.
+            </p>
+            <p className="text-sm">
+              <strong>Do bone-in vs boneless change the dose?</strong> They change weight per piece, not THC per gram of
+              sauce. Count wings or weigh meat; do not guess “about ten pieces.”
+            </p>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-3">
             <Link to="/wings" className="inline-flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-black px-6 py-3 rounded-xl">
               Browse wing sauces <ArrowRight className="w-4 h-4" />

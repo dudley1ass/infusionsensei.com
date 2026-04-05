@@ -69,6 +69,43 @@ export function MgThcPerServingPartyEdibles() {
             <p className="text-gray-700">
               If wings are infused <em>and</em> the dip is infused, guests can double dose without realizing. Pick <strong>one hero infusion per plate</strong> or keep one lane completely non-infused.
             </p>
+            <p className="text-gray-700">
+              Stacking also happens when people graze: a few crackers, a second pass at the snack table, and a drink they forgot
+              was infused. Time zones blur after the first hour. That is why predictable mg numbers per <strong>labeled</strong>{" "}
+              serving matter more at parties than at solo sessions.
+            </p>
+          </div>
+
+          <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-bold text-gray-900">How to explain doses without being a buzzkill</h2>
+            <p>
+              Guests do not need a chemistry lecture — they need clear guardrails. A simple script works: “Each wing is about X
+              mg; start with one and wait two hours before more.” If someone pushes for a stronger experience, you can still
+              hold the line by offering a second serving after a real waiting period rather than doubling up immediately.
+            </p>
+            <p>
+              Keep non-infused snacks abundant and obvious. Hunger and alcohol can nudge people toward “just one more” without
+              thinking. Water and plain food belong on the same table as the fun stuff.
+            </p>
+          </div>
+
+          <div className="space-y-3 text-gray-700">
+            <h2 className="text-2xl font-bold text-gray-900">Kids, pets, and overnight guests</h2>
+            <p>
+              Treat infused platters like any serious allergen: height, signage, and a default assumption that children will
+              grab whatever looks like dessert. Pets are not immune — chocolate and THC do not mix for dogs. When the party
+              winds down, walk the kitchen once for stray toothpicks, unlabeled containers, and half-finished plates before
+              people pack leftovers.
+            </p>
+          </div>
+
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5">
+            <h3 className="font-black text-emerald-900 mb-2">Why the table matters as much as the recipe</h3>
+            <p className="text-sm text-emerald-900/90">
+              The safest batch is still risky if portions are vague. A written mg target per guest for the hero item — multiplied
+              by headcount — gives you a budget before you cook. Party Mode helps you stay inside that budget so you are not
+              doing mental math with a timer on the oven.
+            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">

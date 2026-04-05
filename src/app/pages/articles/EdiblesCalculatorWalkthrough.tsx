@@ -75,6 +75,40 @@ export function EdiblesCalculatorWalkthrough() {
             <p className="text-white text-lg font-black">If mg per serving looks “too fun,” cut infused fat with plain fat and re-run the numbers.</p>
           </div>
 
+          <div className="space-y-4 text-gray-700">
+            <h2 className="text-2xl font-bold text-gray-900">Why order of operations matters</h2>
+            <p>
+              If you enter servings before you know how much infused fat is in the bowl, you are designing a fantasy batch.
+              Lock the material first (flower or finished oil), then map how that fat appears in the recipe, then divide by the
+              cuts you will actually make. Swapping steps is how “about 10 mg” turns into “I am not sure why this was
+              different.”
+            </p>
+            <p>
+              The calculator is a tool for honesty — not optimism. If you are unsure about an input, enter a worse-case value
+              and see whether the output still looks safe. You can always tighten numbers after a test night with a single
+              portion.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h2 className="text-2xl font-bold text-gray-900">Common “I did everything right” mistakes</h2>
+            <ul className="list-disc pl-5 space-y-2 text-gray-700 text-sm">
+              <li>Using THC% from memory instead of the jar label you actually used.</li>
+              <li>Forgetting that one stick of butter in the recipe was plain while the other was infused.</li>
+              <li>Baking two trays but only one tray was infused — guests grab from both.</li>
+              <li>Switching pan sizes without changing cut counts (same area, different thickness).</li>
+            </ul>
+          </div>
+
+          <div className="border border-blue-200 bg-blue-50 rounded-2xl p-5">
+            <h3 className="font-black text-blue-900 mb-2">After you calculate</h3>
+            <p className="text-sm text-blue-900/90">
+              Write the result on tape on the storage container and in your notes app with the date. Future-you will not
+              remember whether this batch used the “strong butter” or the “test butter” unless it is labeled the moment it
+              cools.
+            </p>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-3">
             <Link to="/edibles-calculator" className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-black px-6 py-3 rounded-xl">
               Open calculator <ArrowRight className="w-4 h-4" />

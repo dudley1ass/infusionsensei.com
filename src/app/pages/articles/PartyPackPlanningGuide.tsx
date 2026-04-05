@@ -57,6 +57,45 @@ export function PartyPackPlanningGuide() {
             ))}
           </div>
 
+          <div className="space-y-4 text-gray-700">
+            <h2 className="text-2xl font-bold text-gray-900">Why one hero dish beats a fully infused buffet</h2>
+            <p>
+              When every chip, dip, and drink carries THC, guests cannot keep track of how much they have taken — and neither
+              can you. A single spotlight recipe (often something saucy like wings or a popcorn coating) gives you one clear
+              infusion point to calculate, one label to read, and one place to say “this is the infused tray.” Everything else
+              can stay delicious and non-infused so people can eat normally without stacking doses by accident.
+            </p>
+            <p>
+              That approach also makes grocery shopping simpler: you buy the real quantities for the hero recipe once, then fill
+              out sides with ordinary ingredients. Party Mode’s lists are built around that idea — fewer mystery substitutions
+              at the store, fewer “I forgot the foil” moments at home.
+            </p>
+          </div>
+
+          <div className="space-y-4 text-gray-700">
+            <h2 className="text-2xl font-bold text-gray-900">Labeling and timing that hosts forget</h2>
+            <p>
+              Write milligrams per serving on a tent card next to the infused platter, not just “strong.” If someone asks
+              whether the ranch is infused, you should be able to answer in one sentence without checking your phone. Serve
+              the infused food after people have had a chance to eat regular food if you are expecting guests who are new to
+              edibles — an empty stomach is not a kindness for first-timers.
+            </p>
+            <p>
+              If alcohol is in the mix, be blunt about interaction: cannabis and booze together amplify clumsiness and can
+              make people feel more impaired than they expected. Many hosts keep infused food away from the main bar and steer
+              cocktails toward a separate window of the evening.
+            </p>
+          </div>
+
+          <div className="bg-violet-50 border border-violet-200 rounded-2xl p-5 space-y-2">
+            <h3 className="font-black text-violet-900">After the party</h3>
+            <p className="text-sm text-violet-900/90">
+              Leftovers should go home in clearly marked containers or get tossed if you cannot guarantee labeling. Infused
+              food in a plain takeout box looks identical to non-infused food two days later. When in doubt, prioritize
+              safety over thrift.
+            </p>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-3">
             <Link to="/party-mode" className="inline-flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white font-black px-6 py-3 rounded-xl">
               Open Party Mode <ArrowRight className="w-4 h-4" />

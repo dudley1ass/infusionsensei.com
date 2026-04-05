@@ -33,7 +33,12 @@ export function HowToMakeCannabutter() {
             <ChefHat className="w-10 h-10 text-emerald-600" />
           </div>
         </CardHeader>
-        <CardContent className="space-y-6 text-gray-700">
+        <CardContent className="space-y-8 text-gray-700">
+          <p>
+            Cannabutter is the backbone of home edibles because most baking recipes already expect butter. The process is
+            simple on paper — decarb, infuse at low heat, strain, cool — but consistency comes from temperature discipline and
+            honest labeling. This guide sticks to a stove-top method that works in most kitchens without specialized gear.
+          </p>
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
             <p className="font-semibold text-emerald-900 mb-1">Simple baseline ratio</p>
             <p>1 cup butter + 1 cup water + 7g decarbed flower (for medium strength).</p>
@@ -53,13 +58,53 @@ export function HowToMakeCannabutter() {
             ))}
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <div className="space-y-3">
+            <h2 className="text-xl font-bold text-gray-900">Why temperature matters more than Instagram timing</h2>
+            <p>
+              THC degrades with enough heat and time. A rolling boil or a dry pan that spikes above your target range is how
+              batches end up sleepy or uneven. Keep the mixture <strong>under a gentle simmer</strong>; small bubbles at the
+              edge of the pot are fine, aggressive churning is not. If you smell burning plant, you have already gone too far —
+              start over with fresh fat rather than serving questionable butter.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h2 className="text-xl font-bold text-gray-900">Straining and cleanup</h2>
+            <p>
+              Squeeze cheesecloth gently — wringing like a dishrag pushes more chlorophyll into the fat, which can taste harsh.
+              Let gravity do most of the work. Pour into a glass container, cool until the butter solidifies on top of the
+              water, then poke a hole and drain the water. Pat the bottom of the butter puck dry before storage.
+            </p>
+          </div>
+
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">
             <p className="font-semibold text-amber-900 mb-1">Dosing note</p>
             <p>
               Potency varies by flower THC% and efficiency. Always run your numbers in the calculator
               before serving.
             </p>
+            <p className="text-sm text-amber-900/90">
+              Write total mg THC (or mg per gram of butter) on the lid while you still remember which batch it is. Frozen
+              cannabutter looks identical to plain butter after a month.
+            </p>
           </div>
+
+          <div className="space-y-2 text-sm border border-gray-200 rounded-xl p-4 bg-gray-50">
+            <p className="font-semibold text-gray-900">If something goes wrong</p>
+            <ul className="list-disc pl-5 space-y-1 text-gray-700">
+              <li>Water boiled off: add more hot water and bring back to a gentle simmer — do not leave the pot dry.</li>
+              <li>Butter smells like lawn: you may have overheated or over-squeezed; label it weak and use in savory dishes with strong flavors.</li>
+              <li>Effects feel weak: confirm decarb first, then revisit efficiency in the calculator before increasing flower.</li>
+            </ul>
+          </div>
+
+          <p className="text-sm text-gray-600">
+            New to decarbing? Read the{" "}
+            <Link to="/learn/articles/decarboxylation-guide" className="text-green-700 font-semibold hover:underline">
+              decarboxylation guide
+            </Link>{" "}
+            before changing your infusion times.
+          </p>
 
           <div className="flex flex-wrap gap-3">
             <Link to="/edibles-calculator" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl">

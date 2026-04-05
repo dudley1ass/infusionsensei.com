@@ -26,10 +26,16 @@ export function HowStrongAreHomemadeEdibles() {
           <CardTitle className="text-3xl text-gray-900">How Strong Are Homemade Edibles?</CardTitle>
           <p className="text-gray-600">Short answer: usually stronger than people expect.</p>
         </CardHeader>
-        <CardContent className="space-y-6 text-gray-700">
+        <CardContent className="space-y-8 text-gray-700">
           <p>
             A common first batch lands anywhere from <strong>10mg to 60mg THC per serving</strong>, depending
             on flower strength, efficiency, and how servings are cut.
+          </p>
+          <p>
+            Dispensary edibles are tested in labs and (where regulations require it) labeled within a tolerance window.
+            Homemade edibles are only as accurate as your notebook. That does not mean home cooking is “wrong” — it means you
+            should expect <strong>wider variance</strong> unless you standardize decarb, infusion, and portioning the same way
+            every time.
           </p>
           <div className="grid sm:grid-cols-3 gap-3">
             <div className="border rounded-xl p-3 bg-green-50"><p className="font-bold">Low</p><p>2.5-5mg</p></div>
@@ -43,9 +49,31 @@ export function HowStrongAreHomemadeEdibles() {
             <li>Uneven mixing and inaccurate serving cuts change dose per piece</li>
           </ul>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="space-y-3">
+            <h2 className="text-xl font-bold text-gray-900">What “per serving” actually means</h2>
+            <p>
+              A pan of brownies does not dose itself. If you eyeball twelve pieces and one end is twice as thick as the other,
+              those two bites are not the same milligrams. The same problem hits sauces: the last wing in the bowl can sit in
+              pooled fat. For firmer numbers, weigh the finished batch, divide by the number of portions, or measure sauce per
+              wing with a scale. It feels fussy until you host someone with a lower tolerance than yours.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h2 className="text-xl font-bold text-gray-900">Why smoking tolerance misleads people</h2>
+            <p>
+              Inhaled THC skips first-pass liver metabolism. Swallowed THC does not. People who smoke daily can still be
+              floored by a modest edible because the pharmacokinetics differ. Strength is not a contest — it is a match between
+              dose, timing, and your body that day (sleep, food, alcohol, hydration).
+            </p>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-2">
             <p className="text-blue-900 font-semibold">Best move:</p>
-            <p className="text-blue-800 text-sm">Calculate first, then portion by weight or equal-size cuts.</p>
+            <p className="text-blue-800 text-sm">
+              Calculate first, then portion by weight or equal-size cuts. Reuse the same recipe and infusion notes so you are
+              comparing apples to apples on batch two.
+            </p>
           </div>
 
           <div className="flex flex-wrap gap-3">

@@ -87,6 +87,36 @@ export function BestEdibleBasesBeginners() {
 
           <Separator />
 
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold text-gray-900">Questions beginners actually ask</h2>
+            <div className="space-y-4 text-gray-700">
+              <div>
+                <p className="font-semibold text-gray-900">Can I mix butter and oil in one recipe?</p>
+                <p>
+                  Sometimes — but only if the recipe already expects both. What you should not do is randomly swap carriers
+                  without checking how much of each is infused. If half the fat is plain and half is infused, only the infused
+                  half contributes THC, and your calculator needs to reflect that split.
+                </p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">Which base is “strongest”?</p>
+                <p>
+                  Strength comes from concentration, not from butter being magically stronger than oil. A small batch of
+                  coconut oil made with the same grams of flower as a large batch of butter will feel stronger per teaspoon
+                  because there is less total fat diluting the cannabinoids.
+                </p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">Do I need every infusion type?</p>
+                <p>
+                  No. Master one base, learn its real potency in your kitchen, then branch out when a recipe truly needs a
+                  different carrier. Buying five half-finished jars in the fridge is how people lose track of what is safe to
+                  serve friends.
+                </p>
+              </div>
+            </div>
+          </section>
+
           <div className="bg-green-50 border border-green-200 rounded-xl p-5">
             <h3 className="font-bold text-green-900 mb-2">Turn this into a system</h3>
             <ol className="list-decimal list-inside space-y-2 text-gray-800">
