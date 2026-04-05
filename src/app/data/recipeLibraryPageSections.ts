@@ -1,9 +1,16 @@
-import { RECIPE_LIBRARY_TABS } from "./recipeLibraryCategory";
-
-/** Main Recipe Library tabs: New first, then category tabs (no “All”). */
+/** Main Recipe Library tabs: New first, then categories (plain labels — recipe-box style, no emoji row). */
 export const RECIPE_PAGE_MAIN_TABS: { id: string; label: string }[] = [
-  { id: "new", label: "✨ New" },
-  ...RECIPE_LIBRARY_TABS.filter((t) => t.id !== "all"),
+  { id: "new", label: "New" },
+  { id: "baked-goods", label: "Baked goods" },
+  { id: "wings", label: "Wings" },
+  { id: "spreads-dips", label: "Spreads & dips" },
+  { id: "snacks", label: "Snacks & candy" },
+  { id: "drinks", label: "Drinks & coffee" },
+  { id: "savory-meals", label: "Savory & meals" },
+  { id: "ice-cream", label: "Ice cream & frozen" },
+  { id: "breads-breakfast", label: "Breads & breakfast" },
+  { id: "basics", label: "Basics" },
+  { id: "infusions", label: "Infusions" },
 ];
 
 export type RecipeSubsectionDef = {

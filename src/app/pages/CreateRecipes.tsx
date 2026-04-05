@@ -922,6 +922,21 @@ const INGREDIENT_GRAMS_PER_CUP: Record<string, number> = {
   "Rolled Oats": 90,
   Quinoa: 170,
   "Protein Powder": 120,
+  /** Chocolate chips / baking — volume baking cups (~6 oz) */
+  "Dark Chocolate Chips": 170,
+  "Milk Chocolate Chips": 170,
+  "White Chocolate Chips": 170,
+  "Semi-Sweet Chips": 170,
+  "Caramel Chips": 170,
+  "Butterscotch Chips": 170,
+  "Peanut Butter Chips": 170,
+  "Cinnamon Chips": 170,
+  "Cacao Nibs": 130,
+  "Dark Chocolate Bar": 170,
+  "Milk Chocolate Bar": 170,
+  Nutella: 312,
+  /** Spreadable dairy — US recipes use cups/oz */
+  "Cream Cheese": 232,
   Salt: 273,
   "Black Pepper": 100,
   "Garlic Powder": 125,
@@ -2422,7 +2437,19 @@ export function CreateRecipes() {
       const lookupKey = ingredientLibraryKey(ing);
       const libraryItem = INGREDIENT_LIBRARY.find(i => i.name === lookupKey);
       const ingredientType = libraryItem?.type || ing.type || "solid";
+      const libCategory = libraryItem?.category ?? "";
       const gPerCup = gramsPerCupForIngredient(lookupKey);
+      /** Chips / bars measure like dry goods (cups/tbsp), not random oz weights */
+      const isChocolateMass = libCategory === "chocolate";
+      /** Cream cheese, peanut butter, Nutella — use fat-style cups/tbsp, not raw oz with a high floor */
+      const useFatStyleImperial = ingredientType === "fat" || ingredientType === "semi-solid";
+      const usePowderStyleImperial = ingredientType === "powder" || (ingredientType === "solid" && isChocolateMass);
+      /** Any row that should round-trip cups/tbsp/tsp ↔ grams (not ml) when switching back to metric */
+      const massFromVolumeUnits =
+        ingredientType === "powder" ||
+        ingredientType === "fat" ||
+        ingredientType === "semi-solid" ||
+        (ingredientType === "solid" && isChocolateMass);
 
       // Skip only count / special pack units — NOT tsp, tbsp, cups: those are produced when
       // switching g/ml → imperial and must convert back on "Switch to g" or rows stay stuck.
@@ -2431,16 +2458,16 @@ export function CreateRecipes() {
 
       if (newSystem === "imperial") {
         if (ing.unit === "g") {
-          if (ingredientType === "powder") {
+          if (usePowderStyleImperial) {
             const { amount, unit } = imperialFromGramsPowder(ing.amount, gPerCup);
             return { ...ing, amount, unit };
           }
-          if (ingredientType === "fat") {
+          if (useFatStyleImperial) {
             const { amount, unit } = imperialFromGramsFat(ing.amount, gPerCup);
             return { ...ing, amount, unit };
           }
           const oz = ing.amount * 0.035274;
-          const rounded = roundToCommonMeasurement(Math.max(oz, 0.5), "oz");
+          const rounded = roundToCommonMeasurement(Math.max(oz, 1 / 32), "oz");
           return { ...ing, amount: rounded.amount, unit: rounded.unit };
         }
         if (ing.unit === "ml") {
@@ -2465,21 +2492,21 @@ export function CreateRecipes() {
         }
       } else {
         if (ing.unit === "cups") {
-          if (ingredientType === "powder" || ingredientType === "fat") {
+          if (massFromVolumeUnits) {
             const grams = ing.amount * gPerCup;
             return { ...ing, amount: parseFloat(grams.toFixed(1)), unit: "g" };
           }
           return { ...ing, amount: parseFloat((ing.amount * 240).toFixed(1)), unit: "ml" };
         }
         if (ing.unit === "tbsp") {
-          if (ingredientType === "powder" || ingredientType === "fat") {
+          if (massFromVolumeUnits) {
             const grams = ing.amount * (gPerCup / 16);
             return { ...ing, amount: parseFloat(grams.toFixed(1)), unit: "g" };
           }
           return { ...ing, amount: parseFloat((ing.amount * 14.7868).toFixed(1)), unit: "ml" };
         }
         if (ing.unit === "tsp") {
-          if (ingredientType === "powder") {
+          if (massFromVolumeUnits) {
             const grams = ing.amount * (gPerCup / 48);
             return { ...ing, amount: parseFloat(grams.toFixed(1)), unit: "g" };
           }

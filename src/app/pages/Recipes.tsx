@@ -22,7 +22,6 @@ import {
   RECIPE_PAGE_MAIN_TABS,
 } from "../data/recipeLibraryPageSections";
 import { standardRecipes } from "../data/standardRecipes";
-import { UtmShareLinks } from "../components/UtmShareLinks";
 import { appendInternalUtmToPath } from "../utils/utmLinks";
 
 function buildCustomizeLink(recipe: {
@@ -266,25 +265,31 @@ export function Recipes() {
         />
       </div>
 
-      {/* Category Tabs */}
-      <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-        <TabsList className="bg-white border-2 border-green-200 shadow-sm flex-wrap h-auto gap-1 p-1 max-w-full justify-start">
-          {libraryTabCounts.map((tab) => (
-            <TabsTrigger
-              key={tab.id}
-              value={tab.id}
-              className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-xs sm:text-sm"
-            >
-              <span className="whitespace-nowrap">{tab.label}</span>
-              <Badge variant="secondary" className="ml-1.5 sm:ml-2 bg-green-100 text-green-700 shrink-0">
-                {tab.count}
-              </Badge>
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-
-      <UtmShareLinks placement="recipes-library" />
+      {/* Category tabs — recipe box (index-card) style */}
+      <div className="rounded-xl border-2 border-amber-900/20 bg-gradient-to-b from-[#ebe4d6] to-[#f4efe4] shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] overflow-hidden">
+        <div className="border-b border-amber-900/15 bg-[#e0d8c8]/90 px-3 sm:px-4 py-2">
+          <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-amber-900/55 mb-2">
+            Recipe box — pick a category
+          </p>
+          <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
+            <TabsList className="w-full bg-transparent p-0 h-auto flex flex-wrap gap-1 justify-start rounded-none border-0 shadow-none">
+              {libraryTabCounts.map((tab) => (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className="group rounded-t-lg border border-b-0 border-amber-900/25 bg-stone-400/25 px-2.5 py-2 sm:px-3 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-700 shadow-none data-[state=active]:bg-white data-[state=active]:text-green-900 data-[state=active]:border-amber-900/30 data-[state=active]:shadow-sm data-[state=active]:-mb-px data-[state=active]:relative data-[state=active]:z-10 data-[state=inactive]:hover:bg-stone-300/40"
+                >
+                  <span className="whitespace-nowrap">{tab.label}</span>
+                  <span className="ml-1.5 tabular-nums rounded-md bg-white/60 px-1.5 py-0.5 text-[10px] sm:text-xs text-stone-800 group-data-[state=active]:bg-green-100 group-data-[state=active]:text-green-900">
+                    {tab.count}
+                  </span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+        <div className="h-px bg-white/40" aria-hidden />
+      </div>
 
       {/* Recipe Grid — New tab: flat; categories with subsections: grouped; else flat */}
       {filteredRecipes.length > 0 ? (

@@ -6,7 +6,6 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { trackEvent } from "../utils/analytics";
 import { appendInternalUtmToPath } from "../utils/utmLinks";
-import { UtmShareLinks } from "../components/UtmShareLinks";
 
 type ProductPreset = {
   id: "cookies" | "brownies" | "popcorn" | "wings" | "coffee";
@@ -252,8 +251,6 @@ export function THCCalculatorPage() {
           </div>
         </div>
       </section>
-
-      <UtmShareLinks placement="edibles-calculator" />
 
       <section className="bg-gradient-to-br from-green-600 to-green-800 rounded-3xl p-8 text-center text-white shadow-2xl">
         <Calculator className="w-10 h-10 mx-auto mb-3 text-green-300" />
