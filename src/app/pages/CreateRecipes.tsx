@@ -111,7 +111,7 @@ const INGREDIENT_LIBRARY = [
   { name: "Coconut oil (uninfused)", category: "fat",        defaultAmount: 100, defaultUnit: "ml",    calories: 862, carbs: 0.0,  protein: 0.0,  fat: 100.0,type: "liquid" },
   { name: "Olive Oil",              category: "fat",        defaultAmount: 100, defaultUnit: "ml",    calories: 884, carbs: 0.0,  protein: 0.0,  fat: 100.0,type: "liquid" },
   { name: "Avocado Oil",            category: "fat",        defaultAmount: 100, defaultUnit: "ml",    calories: 884, carbs: 0.0,  protein: 0.0,  fat: 100.0,type: "liquid" },
-  { name: "Cream Cheese",           category: "fat",        defaultAmount: 200, defaultUnit: "g",     calories: 342, carbs: 2.9,  protein: 6.2,  fat: 34.2, type: "semi-solid" },
+  { name: "Cream Cheese",           category: "dairy",      defaultAmount: 200, defaultUnit: "g",     calories: 342, carbs: 2.9,  protein: 6.2,  fat: 34.2, type: "semi-solid" },
 
   // ── EGGS ────────────────────────────────────────────────────────
   { name: "Whole Egg (large)",      category: "egg",        defaultAmount: 1,   defaultUnit: "large", calories: 143, carbs: 0.7,  protein: 12.6, fat: 9.5,  type: "count" },
@@ -2049,7 +2049,9 @@ export function CreateRecipes() {
       // Skip liquid warnings for batter-style recipes (pancakes, waffles, crepes)
       // where high liquid is intentional — identified by leavening + dairy + no fat-heavy mix
       // Cake/cupcake batters are legitimately wetter than cookie dough (~1.0–1.3 moisture vs flour).
-      if (!isHighLiquidRecipe) {
+      // Brownie + cheesecake layer bars: lots of egg + cream cheese vs flour only in the brownie layer —
+      // bar moisture caps misfire (same reason we use flour+dairy for fat ratio).
+      if (!isHighLiquidRecipe && !isLayeredCheesecakeBar) {
         const liquidToFlour = totalMoisture / Math.max(flour, 1);
         // Layer cakes with milk + eggs are often ~1.45–1.55 moisture:flour — keep above that band.
         const problemL = isBarStyle ? 3.6 : cakeLikeMoistureForRatios ? 1.68 : 1.1;

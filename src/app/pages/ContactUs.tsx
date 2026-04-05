@@ -1,5 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { Mail, Send } from "lucide-react";
+import { FORMSUBMIT_CONTACT_ACTION } from "../constants/contact";
 import { Button } from "../components/ui/button";
 
 export function ContactUs() {
@@ -23,7 +24,7 @@ export function ContactUs() {
         </p>
 
         <form
-          action="https://formsubmit.co/senseiselector@gmail.com"
+          action={FORMSUBMIT_CONTACT_ACTION}
           method="POST"
           className="space-y-4"
         >

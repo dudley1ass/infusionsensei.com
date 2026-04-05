@@ -6,25 +6,14 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { trackEvent } from "../utils/analytics";
 import { appendInternalUtmToPath } from "../utils/utmLinks";
-
-type ProductPreset = {
-  id: "cookies" | "brownies" | "popcorn" | "wings" | "coffee";
-  label: string;
-  emoji: string;
-  baseInfusionTbsp: number;
-  baseServings: number;
-  servingUnit: string;
-  category: string;
-  recipeHint: string;
-};
-
-const PRODUCT_PRESETS: ProductPreset[] = [
-  { id: "cookies", label: "Cookies", emoji: "🍪", baseInfusionTbsp: 12, baseServings: 24, servingUnit: "1 cookie", category: "baked-goods", recipeHint: "chocolate-chip-cookies" },
-  { id: "brownies", label: "Brownies", emoji: "🍫", baseInfusionTbsp: 8, baseServings: 16, servingUnit: "1 brownie", category: "baked-goods", recipeHint: "brownies" },
-  { id: "popcorn", label: "Popcorn", emoji: "🍿", baseInfusionTbsp: 4, baseServings: 12, servingUnit: "1 cup popcorn", category: "snacks", recipeHint: "garlic-butter" },
-  { id: "wings", label: "Wings", emoji: "🍗", baseInfusionTbsp: 4, baseServings: 32, servingUnit: "1 wing", category: "wings", recipeHint: "classic-buffalo" },
-  { id: "coffee", label: "Coffee", emoji: "☕", baseInfusionTbsp: 2, baseServings: 4, servingUnit: "1 cup coffee", category: "drinks", recipeHint: "bulletproof-coffee" },
-];
+import {
+  carrierMismatchMessage,
+  getAllCalculatorRecipeOptions,
+  groupCalculatorRecipesForSelect,
+  parseRecipeKey,
+  recipeKey,
+  userCarrierFromInfusionPresetId,
+} from "../utils/calculatorRecipeRoutes";
 
 const INFUSION_PRESETS = [
   { id: "butter", label: "Butter (70%)", efficiency: 70 },
@@ -41,7 +30,15 @@ const BASE_UNITS = [
 ];
 
 export function THCCalculatorPage() {
-  const [productId, setProductId] = useState<ProductPreset["id"]>("cookies");
+  const allRecipeOptions = useMemo(() => getAllCalculatorRecipeOptions(), []);
+  const recipeGroups = useMemo(() => groupCalculatorRecipesForSelect(), []);
+
+  const [selectedRecipeKey, setSelectedRecipeKey] = useState(() => {
+    const all = getAllCalculatorRecipeOptions();
+    const d = all.find((r) => r.id === "chocolate-chip-cookies") ?? all[0];
+    return recipeKey(d.category, d.id);
+  });
+
   const [thcPct, setThcPct] = useState(20);
   const [grams, setGrams] = useState(7);
   const [efficiency, setEfficiency] = useState(70);
@@ -51,8 +48,25 @@ export function THCCalculatorPage() {
   const [batchServings, setBatchServings] = useState(16);
   const [recipeServings, setRecipeServings] = useState(24);
 
-  const selectedProduct = PRODUCT_PRESETS.find((p) => p.id === productId) ?? PRODUCT_PRESETS[0];
-  const selectedPreset = INFUSION_PRESETS.find((p) => p.efficiency === efficiency);
+  const selectedRecipe = useMemo(() => {
+    const parsed = parseRecipeKey(selectedRecipeKey);
+    if (!parsed) return allRecipeOptions[0];
+    return (
+      allRecipeOptions.find((r) => r.category === parsed.category && r.id === parsed.id) ?? allRecipeOptions[0]
+    );
+  }, [selectedRecipeKey, allRecipeOptions]);
+
+  const selectedPreset = useMemo(() => {
+    const exact = INFUSION_PRESETS.find((p) => p.efficiency === efficiency);
+    if (exact) return exact;
+    return INFUSION_PRESETS.reduce((a, b) =>
+      Math.abs(a.efficiency - efficiency) <= Math.abs(b.efficiency - efficiency) ? a : b
+    );
+  }, [efficiency]);
+
+  const userCarrierKind = userCarrierFromInfusionPresetId(selectedPreset.id);
+  const carrierWarning =
+    selectedRecipe ? carrierMismatchMessage(userCarrierKind, selectedRecipe.carrierKind) : null;
 
   const totalInfusionMg = grams * (thcPct / 100) * 1000 * (efficiency / 100);
   const selectedBaseUnit = BASE_UNITS.find((u) => u.id === baseUnit) ?? BASE_UNITS[0];
@@ -84,7 +98,7 @@ export function THCCalculatorPage() {
 
   const doseScalePct = Math.min(100, (mgPerServing / 50) * 100);
   const builderLink = appendInternalUtmToPath(
-    `/ingredients?category=${encodeURIComponent(selectedProduct.category)}&recipe=${encodeURIComponent(selectedProduct.recipeHint)}&servings=${encodeURIComponent(recipeServings)}&targetMgPerServing=${encodeURIComponent(mgPerServing.toFixed(4))}&calcInfusedTbsp=${encodeURIComponent(usedInfusionTbsp.toFixed(4))}&calcMgPerTbsp=${encodeURIComponent(mgPerTbsp.toFixed(4))}&calcSource=edibles-calculator`,
+    `/ingredients?category=${encodeURIComponent(selectedRecipe.category)}&recipe=${encodeURIComponent(selectedRecipe.id)}&servings=${encodeURIComponent(recipeServings)}&targetMgPerServing=${encodeURIComponent(mgPerServing.toFixed(4))}&calcInfusedTbsp=${encodeURIComponent(usedInfusionTbsp.toFixed(4))}&calcMgPerTbsp=${encodeURIComponent(mgPerTbsp.toFixed(4))}&calcSource=edibles-calculator`,
     { content: "calc_to_builder" }
   );
 
@@ -196,55 +210,98 @@ export function THCCalculatorPage() {
 
         <div className="rounded-2xl border border-gray-200 p-5 bg-gray-50">
           <p className="font-black text-gray-900 mb-3">Would you like to use this in a recipe?</p>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1">Recipe</label>
               <select
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white"
-                value={productId}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white max-h-[min(50vh,280px)] overflow-y-auto"
+                value={selectedRecipeKey}
                 onChange={(e) => {
-                  const next = PRODUCT_PRESETS.find((p) => p.id === e.target.value);
-                  setProductId(e.target.value as ProductPreset["id"]);
-                  if (next) {
-                    setRecipeServings(next.baseServings);
-                    setUsedInfusionTbsp(next.baseInfusionTbsp);
+                  const key = e.target.value;
+                  setSelectedRecipeKey(key);
+                  const parsed = parseRecipeKey(key);
+                  if (parsed) {
+                    const opt = allRecipeOptions.find(
+                      (r) => r.category === parsed.category && r.id === parsed.id
+                    );
+                    if (opt) {
+                      setRecipeServings(opt.servings);
+                      setUsedInfusionTbsp(8);
+                    }
                   }
                 }}
               >
-                {PRODUCT_PRESETS.map((p) => (
-                  <option key={p.id} value={p.id}>{p.emoji} {p.label}</option>
+                {recipeGroups.map((g) => (
+                  <optgroup key={g.category} label={g.label}>
+                    {g.recipes.map((r) => (
+                      <option key={`${r.category}|${r.id}`} value={recipeKey(r.category, r.id)}>
+                        {r.name}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
+              <p className="text-xs text-gray-500 mt-1">Opens the builder with your mg/tbsp from this calculator.</p>
             </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Infused Base Used (tbsp)</label>
-              <Input type="number" min={0} step={0.1} value={usedInfusionTbsp} onChange={(e) => setUsedInfusionTbsp(Math.max(0, Number(e.target.value) || 0))} />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Recipe Servings</label>
-              <Input type="number" min={1} step={1} value={recipeServings} onChange={(e) => setRecipeServings(Math.max(1, Number(e.target.value) || 1))} />
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Infused base used (tbsp)</label>
+                <Input
+                  type="number"
+                  min={0}
+                  step={0.1}
+                  value={usedInfusionTbsp}
+                  onChange={(e) => setUsedInfusionTbsp(Math.max(0, Number(e.target.value) || 0))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Recipe servings</label>
+                <Input
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={recipeServings}
+                  onChange={(e) => setRecipeServings(Math.max(1, Number(e.target.value) || 1))}
+                />
+              </div>
             </div>
           </div>
           <p className="text-sm text-gray-700 mt-3">
-            Recipe output: <strong>{recipeMg.toFixed(0)}mg total</strong> from infused base, about <strong>{mgPerServing.toFixed(1)}mg per {selectedProduct.servingUnit}</strong>.
+            Recipe output: <strong>{recipeMg.toFixed(0)}mg total</strong> from infused base, about{" "}
+            <strong>
+              {mgPerServing.toFixed(1)}mg per serving
+            </strong>{" "}
+            ({selectedRecipe.name}).
           </p>
           <p className="text-xs text-gray-500 mt-1">Infused base per serving: {infusionTbspPerServing.toFixed(3)} tbsp</p>
+          {carrierWarning && (
+            <div className="mt-3 rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+              <p className="font-bold text-amber-900 mb-1">Base type doesn&apos;t match this recipe</p>
+              <p>{carrierWarning}</p>
+            </div>
+          )}
           <div className="mt-4">
-            <Link
-              to={builderLink}
-              onClick={() =>
-                trackEvent("calculator_completed", {
-                  product: selectedProduct.id,
-                  recipe_servings: recipeServings,
-                  infused_tbsp: Number(usedInfusionTbsp.toFixed(2)),
-                  mg_per_serving: Number(mgPerServing.toFixed(2)),
-                })
-              }
-            >
-              <Button className="bg-green-600 hover:bg-green-700 text-white font-bold">
-                <FlaskConical className="w-4 h-4 mr-2" /> Move to {selectedProduct.label} Recipe
+            {carrierWarning ? (
+              <Button type="button" disabled className="bg-gray-300 text-gray-600 font-bold cursor-not-allowed">
+                <FlaskConical className="w-4 h-4 mr-2" /> Open in recipe builder
               </Button>
-            </Link>
+            ) : (
+              <Link
+                to={builderLink}
+                onClick={() =>
+                  trackEvent("calculator_completed", {
+                    product: selectedRecipe.id,
+                    recipe_servings: recipeServings,
+                    infused_tbsp: Number(usedInfusionTbsp.toFixed(2)),
+                    mg_per_serving: Number(mgPerServing.toFixed(2)),
+                  })
+                }
+              >
+                <Button className="bg-green-600 hover:bg-green-700 text-white font-bold">
+                  <FlaskConical className="w-4 h-4 mr-2" /> Open in recipe builder
+                </Button>
+              </Link>
+            )}
             <p className="text-xs text-amber-700 mt-2">
               Note: if infused amount is very high, the recipe builder may show a warning.
             </p>

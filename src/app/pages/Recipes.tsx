@@ -37,9 +37,10 @@ function buildCustomizeLink(recipe: {
   if (lib === "basics" || lib === "infusions") {
     return { to: "/ingredients", state: { resetStartHere: true } };
   }
+  // Do not pass resetStartHere with category+recipe — CreateRecipes strips URL params when reset is true,
+  // which dropped users on Start Here instead of this template.
   return {
     to: `/ingredients?category=${encodeURIComponent(lib)}&recipe=${encodeURIComponent(baseRecipeId)}`,
-    state: { resetStartHere: true },
   };
 }
 
@@ -235,7 +236,7 @@ export function Recipes() {
             Browse recipes — then customize the THC dose to match exactly what you want.
           </p>
         </div>
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex flex-wrap items-center gap-3 flex-shrink-0 justify-end">
           {newCount > 0 && (
             <div className="flex items-center gap-2 bg-green-50 border-2 border-green-400 rounded-xl px-4 py-2">
               <Sparkles className="w-5 h-5 text-green-600" />

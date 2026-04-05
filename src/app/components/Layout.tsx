@@ -1,12 +1,14 @@
 import { Outlet, Link, useLocation } from "react-router";
-import { Leaf, BookOpen, FlaskConical, Home, Menu, Package, Calculator } from "lucide-react";
+import { Leaf, BookOpen, FlaskConical, Home, Menu, Package, Calculator, Lightbulb } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { captureSessionLanding, captureUtmFromUrl, markSessionOnce, trackPageView } from "../utils/analytics";
+import { RecipeIdeaDialog } from "./RecipeIdeaDialog";
 
 export function Layout() {
   const location = useLocation();
+  const [recipeIdeaOpen, setRecipeIdeaOpen] = useState(false);
 
   // Scroll to top on route change
   useEffect(() => {
@@ -21,14 +23,14 @@ export function Layout() {
     trackPageView(`${location.pathname}${location.search}`);
   }, [location.pathname, location.search]);
 
-  const navItems = [
+  const navLeading = [
     { path: "/", label: "Home", icon: Home },
     { path: "/recipes", label: "Recipes", icon: BookOpen },
     { path: "/infusions", label: "My Infusions", icon: FlaskConical },
     { path: "/ingredients", label: "Start Here", icon: Package },
     { path: "/learn", label: "Learn", icon: Leaf },
-    { path: "/edibles-calculator", label: "Calculator", icon: Calculator },
   ];
+  const navTrailing = [{ path: "/edibles-calculator", label: "Calculator", icon: Calculator }];
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -39,9 +41,15 @@ export function Layout() {
 
   const startHereState = { resetStartHere: true as const };
 
-  const NavLinks = ({ mobile = false, compact = false }: { mobile?: boolean; compact?: boolean }) => (
+  const NavLinks = ({
+    mobile = false,
+    compact = false,
+  }: {
+    mobile?: boolean;
+    compact?: boolean;
+  }) => (
     <>
-      {navItems.map((item) => (
+      {navLeading.map((item) => (
         <Link
           key={item.path}
           to={item.path}
@@ -54,8 +62,50 @@ export function Layout() {
             isActive(item.path)
               ? "bg-green-600 text-white shadow-sm"
               : mobile
-              ? "text-gray-900 bg-gray-50 hover:bg-green-100 hover:text-green-800 border border-gray-200"
-              : "text-gray-800 hover:bg-green-100 hover:text-green-700"
+                ? "text-gray-900 bg-gray-50 hover:bg-green-100 hover:text-green-800 border border-gray-200"
+                : "text-gray-800 hover:bg-green-100 hover:text-green-700"
+          } ${mobile ? "w-full text-base" : ""}`}
+        >
+          <item.icon
+            className={`${mobile ? "w-5 h-5" : compact ? "w-4 h-4" : "w-5 h-5"} ${
+              isActive(item.path) ? "text-white" : mobile ? "text-green-700" : "text-green-600"
+            }`}
+          />
+          <span>{item.label}</span>
+        </Link>
+      ))}
+      <button
+        type="button"
+        onClick={() => setRecipeIdeaOpen(true)}
+        className={`flex items-center rounded-lg transition-colors font-medium ${
+          compact && !mobile ? "gap-1.5 px-2.5 py-1.5 text-sm" : "gap-2 px-4 py-3"
+        } ${
+          mobile
+            ? "w-full text-base text-gray-900 bg-gray-50 hover:bg-amber-50 hover:text-amber-950 border border-amber-200/80"
+            : "text-amber-950 hover:bg-amber-50 border border-transparent hover:border-amber-200/80"
+        }`}
+      >
+        <Lightbulb
+          className={`${mobile ? "w-5 h-5" : compact ? "w-4 h-4" : "w-5 h-5"} ${
+            mobile ? "text-amber-700" : "text-amber-700"
+          }`}
+        />
+        <span className="whitespace-nowrap">Recipe idea</span>
+      </button>
+      {navTrailing.map((item) => (
+        <Link
+          key={item.path}
+          to={item.path}
+          className={`flex items-center rounded-lg transition-colors font-medium ${
+            compact && !mobile
+              ? "gap-1.5 px-2.5 py-1.5 text-sm"
+              : "gap-2 px-4 py-3"
+          } ${
+            isActive(item.path)
+              ? "bg-green-600 text-white shadow-sm"
+              : mobile
+                ? "text-gray-900 bg-gray-50 hover:bg-green-100 hover:text-green-800 border border-gray-200"
+                : "text-gray-800 hover:bg-green-100 hover:text-green-700"
           } ${mobile ? "w-full text-base" : ""}`}
         >
           <item.icon
@@ -71,6 +121,7 @@ export function Layout() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50">
+      <RecipeIdeaDialog open={recipeIdeaOpen} onOpenChange={setRecipeIdeaOpen} />
       {/* Header — single compact row (~half the previous stacked layout) */}
       <header className="app-print-hide sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-green-200 shadow-sm">
         <div className="container mx-auto px-3 sm:px-4 py-2">

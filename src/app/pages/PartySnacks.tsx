@@ -104,6 +104,122 @@ const ALL_PARTY_SNACK_ITEMS = SNACK_GROUPS.flatMap((g) => g.items);
 
 const GROCERY_MODE_STORAGE_KEY = "party-snack-grocery-measure";
 
+/**
+ * Matches recipe builder buffet tent labels (`CreateRecipes` print → table tents).
+ * Used for browser print and the “Print snack labels” popup.
+ */
+const BUFFET_TENT_LABEL_CSS = `
+  .print-buffet-sheet {
+    font-family: system-ui, "Segoe UI", Arial, Helvetica, sans-serif !important;
+    padding: 0 !important;
+  }
+  .print-buffet-intro {
+    font-size: 9pt !important;
+    color: #444 !important;
+    margin-bottom: 10pt !important;
+    text-align: center !important;
+    page-break-after: avoid !important;
+  }
+  .print-buffet-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.18in !important;
+  }
+  .buffet-tent {
+    border: 1.5pt solid #111 !important;
+    border-radius: 2pt !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    background: #fff !important;
+  }
+  .buffet-tent-panel {
+    padding: 0.14in 0.16in 0.12in 0.16in !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    min-height: 1.05in !important;
+  }
+  .buffet-fold {
+    border-top: 0.75pt dashed #888 !important;
+    font-size: 6.5pt !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    color: #666 !important;
+    padding: 2pt 4pt !important;
+    text-align: center !important;
+    background: #fafafa !important;
+  }
+  .buffet-title {
+    font-size: 12.5pt !important;
+    font-weight: 900 !important;
+    line-height: 1.15 !important;
+    color: #000 !important;
+  }
+  .buffet-dose {
+    font-size: 20pt !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    margin-top: 5pt !important;
+    color: #000 !important;
+  }
+  .buffet-dose-sub {
+    font-size: 8pt !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    margin-top: 2pt !important;
+  }
+  .buffet-batch {
+    font-size: 7.5pt !important;
+    color: #555 !important;
+    margin-top: 5pt !important;
+  }
+  .buffet-warn {
+    font-size: 8.5pt !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+    margin-top: 6pt !important;
+    color: #111 !important;
+    max-width: 2.6in !important;
+  }
+  .buffet-brand {
+    font-size: 6.5pt !important;
+    letter-spacing: 0.04em !important;
+    color: #777 !important;
+    margin-top: 7pt !important;
+  }
+`;
+
+function escapeHtmlForLabel(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function buffetTentMarkup(
+  escapedTitle: string,
+  mgPerServing: number,
+  servings: number,
+  totalBatchMg: number
+): string {
+  const batchLine = `${servings} serving${servings === 1 ? "" : "s"} · ${totalBatchMg.toFixed(0)} mg total batch`;
+  const dose = `${mgPerServing.toFixed(1)} mg`;
+  const panel = `
+    <div class="buffet-tent-panel">
+      <div class="buffet-title">${escapedTitle}</div>
+      <div class="buffet-dose">${dose}</div>
+      <div class="buffet-dose-sub">THC per serving</div>
+      <div class="buffet-batch">${batchLine}</div>
+      <div class="buffet-warn">Infused food — contains cannabis. Eat wisely.</div>
+      <div class="buffet-brand">Infusion Sensei</div>
+    </div>`;
+  return `
+    <div class="buffet-tent">
+      ${panel}
+      <div class="buffet-fold">Fold here — same text on both sides</div>
+      ${panel}
+    </div>`;
+}
+
 /** Print: store-aisle order for quick shop */
 const GROCERY_PRINT_SECTION_ORDER: string[] = [
   "Meat & proteins",
@@ -315,20 +431,9 @@ export function PartySnacks() {
     if (!showPrintSheet) return;
     const labelRows = uniqueInfusedIds
       .map((id) => {
-        const name = (snackNameById.get(id) ?? id)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
+        const title = snackNameById.get(id) ?? id;
         const totalThc = mgEachTarget * guestCount;
-        return `
-          <div class="label-card">
-            <h2>${name}</h2>
-            <p><strong>mg per serving:</strong> ${mgEachTarget.toFixed(1)}mg</p>
-            <p><strong>Total servings:</strong> ${guestCount}</p>
-            <p><strong>Total THC:</strong> ${totalThc.toFixed(1)}mg</p>
-            <p class="foot">Infusion Sensei</p>
-          </div>
-        `;
+        return buffetTentMarkup(escapeHtmlForLabel(title), mgEachTarget, guestCount, totalThc);
       })
       .join("");
 
@@ -338,25 +443,20 @@ export function PartySnacks() {
       <!doctype html>
       <html>
         <head>
-          <title>Party Snack Labels</title>
+          <title>Buffet tent labels — Party snacks</title>
           <style>
-            @page { margin: 0.5in; size: letter; }
-            body { font-family: Arial, sans-serif; margin: 0; color: #111; }
-            .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-            .label-card {
-              border: 2px solid #111;
-              border-radius: 10px;
-              padding: 12px;
-              break-inside: avoid;
-              page-break-inside: avoid;
-            }
-            h2 { margin: 0 0 8px; font-size: 20px; line-height: 1.2; }
-            p { margin: 4px 0; font-size: 15px; }
-            .foot { margin-top: 10px; font-size: 12px; color: #555; }
+            @page { margin: 0.5in 0.75in; size: letter; }
+            body { margin: 0; color: #111; background: #fff; }
+            ${BUFFET_TENT_LABEL_CSS}
           </style>
         </head>
         <body>
-          <div class="grid">${labelRows}</div>
+          <div class="print-buffet-sheet">
+            <p class="print-buffet-intro">
+              Cut out each card along the border, fold on the dashed line so both sides show the same message, and place at the buffet.
+            </p>
+            <div class="print-buffet-grid">${labelRows}</div>
+          </div>
           <script>
             window.onload = function () {
               window.print();
@@ -732,14 +832,8 @@ export function PartySnacks() {
             @media print {
               .snacks-print-root { font-size: 11pt !important; color: #000 !important; }
               .snacks-print-quick li { font-size: 13pt !important; line-height: 1.45 !important; margin: 0.35em 0 !important; }
-              .snacks-print-label-card {
-                border: 3px solid #000 !important;
-                padding: 14pt !important;
-                min-height: 120pt !important;
-                break-inside: avoid !important;
-                page-break-inside: avoid !important;
-              }
               .snacks-print-break { break-before: page !important; page-break-before: always !important; }
+              ${BUFFET_TENT_LABEL_CSS}
             }
           `}</style>
           <div
@@ -775,24 +869,44 @@ export function PartySnacks() {
               </section>
             )}
 
-            {/* Labels — new page */}
+            {/* Labels — new page (same table-tent layout as recipe builder buffet print) */}
             <section className="snacks-print-break mt-8 pt-4">
-              <h2 className="text-xl font-black border-b-2 border-black pb-2 mb-3">Buffet labels (cut & fold)</h2>
-              <p className="text-xs text-gray-800 mb-4">
-                One card per infused snack — set by the tray. Fold so the dose shows on both sides if you like.
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                {uniqueInfusedIds.map((id) => (
-                  <div key={`snack-label-${id}`} className="snacks-print-label-card rounded-md">
-                    <p className="text-base font-black leading-tight">{snackNameById.get(id) ?? id}</p>
-                    <p className="text-3xl font-black mt-2 tabular-nums">{mgEachTarget.toFixed(1)} mg THC</p>
-                    <p className="text-xs mt-1">per portion</p>
-                    <p className="text-sm font-bold mt-4 pt-3 border-t-2 border-black">
-                      Infused — eat wisely.
-                    </p>
-                    <p className="text-[10px] mt-2 font-semibold">Infusion Sensei</p>
-                  </div>
-                ))}
+              <div className="print-buffet-sheet">
+                <p className="print-buffet-intro">
+                  Cut out each card along the border, fold on the dashed line so both sides show the same message, and place
+                  at the buffet.
+                </p>
+                <div className="print-buffet-grid">
+                  {uniqueInfusedIds.map((id) => {
+                    const title = snackNameById.get(id) ?? id;
+                    const totalBatchMg = mgEachTarget * guestCount;
+                    return (
+                      <div key={`snack-label-${id}`} className="buffet-tent">
+                        <div className="buffet-tent-panel">
+                          <div className="buffet-title">{title}</div>
+                          <div className="buffet-dose">{mgEachTarget.toFixed(1)} mg</div>
+                          <div className="buffet-dose-sub">THC per serving</div>
+                          <div className="buffet-batch">
+                            {guestCount} serving{guestCount === 1 ? "" : "s"} · {totalBatchMg.toFixed(0)} mg total batch
+                          </div>
+                          <div className="buffet-warn">Infused food — contains cannabis. Eat wisely.</div>
+                          <div className="buffet-brand">Infusion Sensei</div>
+                        </div>
+                        <div className="buffet-fold">Fold here — same text on both sides</div>
+                        <div className="buffet-tent-panel">
+                          <div className="buffet-title">{title}</div>
+                          <div className="buffet-dose">{mgEachTarget.toFixed(1)} mg</div>
+                          <div className="buffet-dose-sub">THC per serving</div>
+                          <div className="buffet-batch">
+                            {guestCount} serving{guestCount === 1 ? "" : "s"} · {totalBatchMg.toFixed(0)} mg total batch
+                          </div>
+                          <div className="buffet-warn">Infused food — contains cannabis. Eat wisely.</div>
+                          <div className="buffet-brand">Infusion Sensei</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </section>
 
