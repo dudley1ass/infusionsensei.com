@@ -20,6 +20,7 @@ import {
 } from "../data/recipeLibraryCategory";
 import { standardRecipes } from "../data/standardRecipes";
 import { UtmShareLinks } from "../components/UtmShareLinks";
+import { appendInternalUtmToPath } from "../utils/utmLinks";
 
 function buildCustomizeLink(recipe: {
   id: string;
@@ -156,7 +157,10 @@ export function Recipes() {
               <span className="text-green-800 font-bold">{newCount} New Recipes Added!</span>
             </div>
           )}
-          <Link to="/ingredients" state={{ resetStartHere: true }}>
+          <Link
+            to={appendInternalUtmToPath("/ingredients", { content: "recipes_library_header" })}
+            state={{ resetStartHere: true }}
+          >
             <Button className="bg-green-600 hover:bg-green-700 gap-2 font-bold">
               <Calculator className="w-4 h-4" /> Build Custom Recipe
             </Button>

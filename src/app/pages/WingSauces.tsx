@@ -5,6 +5,7 @@ import { ArrowRight, ChefHat, Flame, Star } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { trackEvent } from "../utils/analytics";
+import { appendInternalUtmToPath } from "../utils/utmLinks";
 import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { loadShowcaseItemsFromDb } from "../services/contentService";
 
@@ -245,7 +246,10 @@ export function WingSauces() {
                     </div>
                     <SauceRecipe sauce={sauce} />
                     <Link
-                      to={`/ingredients?category=wings&recipe=${encodeURIComponent(sauce.id)}${servingsQuery}${returnQuery}`}
+                      to={appendInternalUtmToPath(
+                        `/ingredients?category=wings&recipe=${encodeURIComponent(sauce.id)}${servingsQuery}${returnQuery}`,
+                        { content: `wings_to_builder_${sauce.id}` }
+                      )}
                       className="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
                       onClick={e => { e.stopPropagation(); trackEvent("move_to_builder",{source_page:"wings",recipe_id:sauce.id}); }}
                     >
@@ -264,7 +268,7 @@ export function WingSauces() {
         <div className="text-4xl mb-3">🧮</div>
         <h2 className="text-2xl font-black mb-2">Know Your Exact THC Per Wing</h2>
         <p className="text-green-200 mb-6 max-w-lg mx-auto">Enter your cannabutter or cannabis oil potency and the tool calculates exact milligrams per wing automatically.</p>
-        <Link to="/infusions">
+        <Link to={appendInternalUtmToPath("/infusions", { content: "wings_bottom_infusions" })}>
           <Button className="bg-white text-green-800 hover:bg-green-50 font-black text-base px-8 py-3">
             Open Recipe Builder <ArrowRight className="w-4 h-4 ml-2" />
           </Button>

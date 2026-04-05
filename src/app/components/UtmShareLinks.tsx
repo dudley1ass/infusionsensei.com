@@ -6,6 +6,7 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import {
   buildTrackedUrl,
+  campaignForSocialPlatform,
   TRACKED_DESTINATIONS,
   UTM_CAMPAIGN_OPTIONS,
   type UtmCampaign,
@@ -26,7 +27,7 @@ type Props = {
 
 export function UtmShareLinks({ placement = "edibles-calculator" }: Props) {
   const [destIndex, setDestIndex] = useState(0);
-  const [campaign, setCampaign] = useState<UtmCampaign>(TRACKED_DESTINATIONS[0].defaultCampaign);
+  const [campaign, setCampaign] = useState<UtmCampaign>(TRACKED_DESTINATIONS[0].defaultCampaign ?? "launch");
   const [content, setContent] = useState("");
   const [lastCopied, setLastCopied] = useState<UtmSource | null>(null);
 
@@ -38,16 +39,29 @@ export function UtmShareLinks({ placement = "edibles-calculator" }: Props) {
   };
 
   const urls = useMemo(() => {
-    const base = { campaign, content: content || undefined };
+    const c = content.trim() || undefined;
     return {
-      tiktok: buildTrackedUrl(dest.path, { ...base, source: "tiktok" }),
-      pinterest: buildTrackedUrl(dest.path, { ...base, source: "pinterest" }),
-      reddit: buildTrackedUrl(dest.path, { ...base, source: "reddit" }),
+      tiktok: buildTrackedUrl(dest.path, {
+        source: "tiktok",
+        campaign: campaignForSocialPlatform("tiktok", campaign),
+        content: c,
+      }),
+      pinterest: buildTrackedUrl(dest.path, {
+        source: "pinterest",
+        campaign: campaignForSocialPlatform("pinterest", campaign),
+        content: c,
+      }),
+      reddit: buildTrackedUrl(dest.path, {
+        source: "reddit",
+        campaign: campaignForSocialPlatform("reddit", campaign),
+        content: c,
+      }),
     };
   }, [dest.path, campaign, content]);
 
   const copy = async (source: UtmSource) => {
     const text = urls[source];
+    const effectiveCampaign = campaignForSocialPlatform(source, campaign);
     try {
       await navigator.clipboard.writeText(text);
       setLastCopied(source);
@@ -56,8 +70,9 @@ export function UtmShareLinks({ placement = "edibles-calculator" }: Props) {
       trackEvent("utm_link_copied", {
         placement,
         utm_source: source,
-        utm_campaign: campaign,
-        utm_content: content || undefined,
+        utm_campaign: effectiveCampaign,
+        utm_campaign_selected: campaign,
+        utm_content: content.trim() || undefined,
         destination_path: dest.path,
       });
     } catch {
@@ -74,10 +89,13 @@ export function UtmShareLinks({ placement = "edibles-calculator" }: Props) {
         <div>
           <h2 className="text-lg font-black text-gray-900">Share with tracking (UTM)</h2>
           <p className="text-sm text-gray-600 mt-1">
-            In-app browsers (especially TikTok) often hide referrer. Use these links on posts and bios so GA4 can
-            attribute traffic. Keep <strong className="text-gray-800">campaign</strong> names stable — use{" "}
-            <strong className="text-gray-800">content</strong> for video variants (e.g. <code className="text-xs bg-white px-1 rounded">v1</code>,{" "}
-            <code className="text-xs bg-white px-1 rounded">hook1</code>).
+            <strong className="text-gray-800">Strict format:</strong> TikTok &amp; Reddit copy uses{" "}
+            <code className="text-xs bg-white px-1 rounded">utm_medium=social</code> +{" "}
+            <code className="text-xs bg-white px-1 rounded">utm_campaign=launch</code>. Pinterest copy uses{" "}
+            <code className="text-xs bg-white px-1 rounded">utm_campaign=recipes</code> (unless you pick a test campaign
+            below). In-app browsers often strip referrer — UTMs are the reliable signal. Use{" "}
+            <strong className="text-gray-800">content</strong> for post variants (e.g.{" "}
+            <code className="text-xs bg-white px-1 rounded">v1</code>).
           </p>
         </div>
       </div>
@@ -102,7 +120,7 @@ export function UtmShareLinks({ placement = "edibles-calculator" }: Props) {
           </select>
         </div>
         <div>
-          <Label className="text-xs font-bold text-gray-700">utm_campaign (fixed buckets)</Label>
+          <Label className="text-xs font-bold text-gray-700">utm_campaign (override — TT/Reddit default launch, Pinterest default recipes)</Label>
           <select
             className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
             value={campaign}
@@ -149,9 +167,11 @@ export function UtmShareLinks({ placement = "edibles-calculator" }: Props) {
         ))}
       </div>
 
-      <p className="text-xs text-gray-500 mt-3 font-mono break-all">
-        Preview: {urls.tiktok}
-      </p>
+      <div className="text-xs text-gray-500 mt-3 space-y-1 font-mono break-all">
+        <p>TikTok: {urls.tiktok}</p>
+        <p>Pinterest: {urls.pinterest}</p>
+        <p>Reddit: {urls.reddit}</p>
+      </div>
     </section>
   );
 }

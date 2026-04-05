@@ -7,7 +7,20 @@ export const UTM_MEDIUM_SOCIAL = "social" as const;
 export type UtmSource = "tiktok" | "pinterest" | "reddit";
 
 /** Stable campaign buckets — do not rename weekly (use `utm_content` for variants). */
-export type UtmCampaign = "calculator" | "brownies" | "popcorn" | "party" | "recipes" | "launch";
+export type UtmCampaign =
+  | "calculator"
+  | "brownies"
+  | "popcorn"
+  | "party"
+  | "recipes"
+  | "launch"
+  /** Granular tests — use with matching platform (see `campaignForSocialPlatform`). */
+  | "reddit_wings_post"
+  | "reddit_party_post"
+  | "pinterest_popcorn";
+
+/** Internal navigation: GA4 reads these on the next page load (source / medium / campaign). */
+export type InternalUtmCampaign = "builder" | "recipes";
 
 export type TrackedDestination = {
   path: string;
@@ -18,8 +31,8 @@ export type TrackedDestination = {
 
 /** High-intent landing pages — match post hook to destination to reduce bounce. */
 export const TRACKED_DESTINATIONS: TrackedDestination[] = [
-  { path: "/edibles-calculator", label: "Edibles calculator", defaultCampaign: "calculator" },
-  { path: "/ingredients", label: "Start Here (ingredients)", defaultCampaign: "calculator" },
+  { path: "/edibles-calculator", label: "Edibles calculator", defaultCampaign: "launch" },
+  { path: "/ingredients", label: "Start Here (ingredients)", defaultCampaign: "launch" },
   { path: "/recipes", label: "Recipe library", defaultCampaign: "recipes" },
   { path: "/recipes/brownies", label: "Brownies (recipe page)", defaultCampaign: "brownies" },
   { path: "/popcorn", label: "Popcorn builder", defaultCampaign: "popcorn" },
@@ -27,13 +40,45 @@ export const TRACKED_DESTINATIONS: TrackedDestination[] = [
 ];
 
 export const UTM_CAMPAIGN_OPTIONS: { value: UtmCampaign; label: string }[] = [
+  { value: "launch", label: "launch (TikTok + Reddit default)" },
+  { value: "recipes", label: "recipes (Pinterest default)" },
   { value: "calculator", label: "calculator" },
   { value: "brownies", label: "brownies" },
   { value: "popcorn", label: "popcorn" },
   { value: "party", label: "party" },
-  { value: "recipes", label: "recipes" },
-  { value: "launch", label: "launch" },
+  { value: "reddit_wings_post", label: "reddit_wings_post" },
+  { value: "reddit_party_post", label: "reddit_party_post" },
+  { value: "pinterest_popcorn", label: "pinterest_popcorn" },
 ];
+
+/**
+ * Strict social defaults: Reddit + TikTok → `launch`, Pinterest → `recipes`.
+ * User-selected granular test campaigns pass through unchanged.
+ */
+export function campaignForSocialPlatform(source: UtmSource, selected: UtmCampaign): UtmCampaign {
+  const granular: UtmCampaign[] = ["reddit_wings_post", "reddit_party_post", "pinterest_popcorn"];
+  if (granular.includes(selected)) return selected;
+  if (source === "pinterest") return "recipes";
+  return "launch";
+}
+
+/**
+ * Append internal attribution for in-app CTAs (`utm_source=internal`, `utm_medium=cta`).
+ * Use `campaign=builder` for recipe builder / infusions; `recipes` for library navigation.
+ */
+export function appendInternalUtmToPath(
+  pathWithSearch: string,
+  opts?: { campaign?: InternalUtmCampaign; content?: string }
+): string {
+  const raw = pathWithSearch.startsWith("/") ? pathWithSearch : `/${pathWithSearch}`;
+  const u = new URL(raw, SITE_ORIGIN);
+  u.searchParams.set("utm_source", "internal");
+  u.searchParams.set("utm_medium", "cta");
+  u.searchParams.set("utm_campaign", opts?.campaign ?? "builder");
+  const c = opts?.content?.trim();
+  if (c) u.searchParams.set("utm_content", c);
+  return u.pathname + u.search;
+}
 
 /**
  * Build a full HTTPS URL with UTM params. Always use for TikTok / Pinterest / Reddit bio & posts

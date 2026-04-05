@@ -10,9 +10,12 @@ import { recipeHeroImgClass } from "../utils/recipeHeroImageClass";
 import { PAGE_STOCK } from "../data/recipeStockImageUrls";
 import { trackEvent } from "../utils/analytics";
 import { UtmShareLinks } from "../components/UtmShareLinks";
+import { appendInternalUtmToPath } from "../utils/utmLinks";
 
 export function Home() {
   const featuredRecipes = recipes.filter(r => r.isNew).slice(0, 3);
+  const toBuilder = (content: string) => appendInternalUtmToPath("/ingredients", { content });
+  const toInfusions = (content: string) => appendInternalUtmToPath("/infusions", { content });
 
   return (
     <div className="space-y-14">
@@ -54,7 +57,7 @@ export function Home() {
               </Button>
             </Link>
             <Link
-              to="/ingredients"
+              to={toBuilder("home_hero")}
               state={{ resetStartHere: true }}
               onClick={() => {
                 trackEvent("homepage_forced_path", { path: "ingredients" });
@@ -79,7 +82,7 @@ export function Home() {
           </div>
           <p className="text-center text-green-200 text-xs sm:text-sm mb-2">
             <Link
-              to="/ingredients"
+              to={toBuilder("home_secondary")}
               state={{ resetStartHere: true }}
               onClick={() => {
                 trackEvent("homepage_cta_click", { location: "hero_secondary", target: "ingredients" });
@@ -89,7 +92,13 @@ export function Home() {
               Recipe builder (all categories)
             </Link>
             {" "}&middot;{" "}
-            <Link to="/recipes" onClick={() => trackEvent("homepage_cta_click", { location: "hero_secondary", target: "recipes" })} className="hover:text-white font-semibold">Browse recipes</Link>
+            <Link
+              to={appendInternalUtmToPath("/recipes", { campaign: "recipes", content: "home_browse_recipes" })}
+              onClick={() => trackEvent("homepage_cta_click", { location: "hero_secondary", target: "recipes" })}
+              className="hover:text-white font-semibold"
+            >
+              Browse recipes
+            </Link>
           </p>
 
           {/* What are you making today? */}
@@ -160,7 +169,7 @@ export function Home() {
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
             <Link
-              to="/infusions"
+              to={toInfusions("home_start_here_module")}
               onClick={() => trackEvent("homepage_start_here_cta_click", { location: "start_here_module", target: "infusions" })}
             >
               <Button className="bg-green-600 hover:bg-green-700 font-bold">
@@ -357,7 +366,7 @@ export function Home() {
                 </Button>
               </Link>
               <Link
-                to="/ingredients"
+                to={toBuilder("home_footer")}
                 state={{ resetStartHere: true }}
                 onClick={() => trackEvent("homepage_primary_cta_click", { location: "footer_cta_band", target: "ingredients" })}
               >

@@ -5,6 +5,7 @@ import { ArrowRight, Calculator, FlaskConical } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { trackEvent } from "../utils/analytics";
+import { appendInternalUtmToPath } from "../utils/utmLinks";
 import { UtmShareLinks } from "../components/UtmShareLinks";
 
 type ProductPreset = {
@@ -83,7 +84,10 @@ export function THCCalculatorPage() {
     { label: "Very Strong", color: "text-red-600", bg: "bg-red-50 border-red-200" };
 
   const doseScalePct = Math.min(100, (mgPerServing / 50) * 100);
-  const builderLink = `/ingredients?category=${encodeURIComponent(selectedProduct.category)}&recipe=${encodeURIComponent(selectedProduct.recipeHint)}&servings=${encodeURIComponent(recipeServings)}&targetMgPerServing=${encodeURIComponent(mgPerServing.toFixed(4))}&calcInfusedTbsp=${encodeURIComponent(usedInfusionTbsp.toFixed(4))}&calcMgPerTbsp=${encodeURIComponent(mgPerTbsp.toFixed(4))}&calcSource=edibles-calculator`;
+  const builderLink = appendInternalUtmToPath(
+    `/ingredients?category=${encodeURIComponent(selectedProduct.category)}&recipe=${encodeURIComponent(selectedProduct.recipeHint)}&servings=${encodeURIComponent(recipeServings)}&targetMgPerServing=${encodeURIComponent(mgPerServing.toFixed(4))}&calcInfusedTbsp=${encodeURIComponent(usedInfusionTbsp.toFixed(4))}&calcMgPerTbsp=${encodeURIComponent(mgPerTbsp.toFixed(4))}&calcSource=edibles-calculator`,
+    { content: "calc_to_builder" }
+  );
 
   useEffect(() => {
     trackEvent("calculator_started", {
