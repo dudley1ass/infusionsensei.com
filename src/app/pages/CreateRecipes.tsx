@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, Fragment } from "react";
 import { flushSync } from "react-dom";
 import { useSearchParams, useNavigate, useLocation, Link } from "react-router";
+import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -47,6 +48,21 @@ import { resolveTemplateHeroImage } from "../data/recipeTemplateHeroImages";
 import { recipeHeroImgClassForPicker } from "../utils/recipeHeroImageClass";
 
 export { standardRecipes };
+
+const BUILDER_FAQS = [
+  {
+    q: "How do I move my calculator potency into a recipe?",
+    a: "Open the recipe from the calculator link. The builder receives your mg per tablespoon and target mg per serving, then scales infused rows so total batch dose lines up with your target servings.",
+  },
+  {
+    q: "Why does the builder warn about recipe balance?",
+    a: "Warnings are ratio checks for flour, fat, sugar, eggs, moisture, and leavening. They help catch greasy, dry, or unstable formulas before baking and can prevent potency hotspots from overusing infused fat.",
+  },
+  {
+    q: "Can I swap butter, oil, tincture, or honey in any recipe?",
+    a: "Not always. Some templates are built for specific infusion carriers. If you switch carrier type, use equivalent chemistry for that recipe style and verify structure and flavor before serving.",
+  },
+] as const;
 
 
 // Common ingredient library
@@ -2584,6 +2600,25 @@ export function CreateRecipes() {
   if (!selectedCategory) {
     return (
       <div className="max-w-6xl mx-auto space-y-2 sm:space-y-3">
+        <Helmet>
+          <title>THC Recipe Builder | Infusion Sensei</title>
+          <meta
+            name="description"
+            content="Build cannabis recipes with exact mg per serving. Start from templates, customize ingredients, and keep dosing consistent across batches."
+          />
+          <link rel="canonical" href="https://infusionsensei.com/ingredients" />
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: BUILDER_FAQS.map((f) => ({
+                "@type": "Question",
+                name: f.q,
+                acceptedAnswer: { "@type": "Answer", text: f.a },
+              })),
+            })}
+          </script>
+        </Helmet>
         <InfusionFunnelProgressBar activeStep={2} compact />
 
         <div className="rounded-xl border border-green-200 bg-white px-3 py-2 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-3">
@@ -2620,6 +2655,18 @@ export function CreateRecipes() {
         <p className="text-sm font-black text-gray-900">
           Step 2 — Choose your recipe <span className="font-semibold text-gray-500">· choose a category below</span>
         </p>
+
+        <section className="rounded-xl border border-green-200 bg-green-50/60 p-4 text-sm text-gray-800 leading-relaxed">
+          <h2 className="text-base font-black text-gray-900 mb-2">Recipe builder with exact THC dosing</h2>
+          <p>
+            Pick a template, then adjust servings and infused rows to dial in your target mg per serving. This flow is
+            designed to keep total batch potency stable while you tweak flavor and texture.
+          </p>
+          <p className="mt-2">
+            If you came from the calculator, your potency inputs carry forward automatically so you can move from math to
+            recipe execution without re-entering values.
+          </p>
+        </section>
 
         {showWhatCanIMake && (
           <Card className="bg-white border-2 border-purple-300 shadow-lg">

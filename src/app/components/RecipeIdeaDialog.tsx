@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { FORMSUBMIT_CONTACT_ACTION } from "../constants/contact";
+import { trackEvent } from "../utils/analytics";
 
 type RecipeIdeaDialogProps = {
   open: boolean;
@@ -23,7 +24,12 @@ export function RecipeIdeaDialog({ open, onOpenChange }: RecipeIdeaDialogProps) 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-white text-gray-900 shadow-2xl border-green-200/80">
-        <form action={FORMSUBMIT_CONTACT_ACTION} method="POST" className="space-y-4">
+        <form
+          action={FORMSUBMIT_CONTACT_ACTION}
+          method="POST"
+          className="space-y-4"
+          onSubmit={() => trackEvent("recipe_idea_submitted", { location: "header_dialog" })}
+        >
           <input type="hidden" name="_captcha" value="false" />
           <input type="hidden" name="_subject" value="Recipe suggestion — Infusion Sensei" />
           <DialogHeader>

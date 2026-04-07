@@ -29,6 +29,25 @@ const BASE_UNITS = [
   { id: "ml", label: "ml", toTbsp: 1 / 14.7868 },
 ];
 
+const CALCULATOR_FAQS = [
+  {
+    q: "How do I calculate THC per serving in homemade edibles?",
+    a: "Estimate total infused THC from flower grams, THC percent, and infusion efficiency. Then divide by total infused-base volume for mg per tablespoon, multiply by the amount used in your recipe, and divide by servings.",
+  },
+  {
+    q: "What infusion efficiency should I use for butter or oil?",
+    a: "Most home infusions land around 60-80% depending on decarb quality, temperature control, and straining losses. Start conservative and validate with your own results over a few batches.",
+  },
+  {
+    q: "Can I use a butter calculation in a tincture recipe?",
+    a: "Not as a 1:1 swap. Recipes are built around specific infusion carriers. If the selected recipe expects tincture, cannabis honey, or cannabis sugar, use that same base type for reliable texture and dosing.",
+  },
+  {
+    q: "Why does mg per serving change when I edit servings?",
+    a: "Total THC in the infused amount stays the same, but you are dividing it into a different number of portions. More servings lowers mg each; fewer servings raises mg each.",
+  },
+] as const;
+
 export function THCCalculatorPage() {
   const allRecipeOptions = useMemo(() => getAllCalculatorRecipeOptions(), []);
   const recipeGroups = useMemo(() => groupCalculatorRecipesForSelect(), []);
@@ -122,6 +141,20 @@ export function THCCalculatorPage() {
         <meta property="og:description" content="Free THC calculator for homemade edibles. Get mg per serving for butter, oil, and full batches in seconds." />
         <meta property="og:url" content="https://infusionsensei.com/edibles-calculator" />
         <meta property="og:type" content="website" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: CALCULATOR_FAQS.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: f.a,
+              },
+            })),
+          })}
+        </script>
       </Helmet>
 
       <section id="calculator" className="bg-white rounded-3xl border-2 border-green-200 p-8 shadow-xl space-y-6">
@@ -289,12 +322,23 @@ export function THCCalculatorPage() {
               <Link
                 to={builderLink}
                 onClick={() =>
-                  trackEvent("calculator_completed", {
-                    product: selectedRecipe.id,
-                    recipe_servings: recipeServings,
-                    infused_tbsp: Number(usedInfusionTbsp.toFixed(2)),
-                    mg_per_serving: Number(mgPerServing.toFixed(2)),
-                  })
+                  {
+                    trackEvent("calculator_completed", {
+                      product: selectedRecipe.id,
+                      recipe_servings: recipeServings,
+                      infused_tbsp: Number(usedInfusionTbsp.toFixed(2)),
+                      mg_per_serving: Number(mgPerServing.toFixed(2)),
+                    });
+                    trackEvent("calculator_open_builder", {
+                      recipe_id: selectedRecipe.id,
+                      recipe_category: selectedRecipe.category,
+                      base_type: selectedPreset.id,
+                      recipe_servings: recipeServings,
+                      infused_tbsp: Number(usedInfusionTbsp.toFixed(2)),
+                      mg_per_tbsp: Number(mgPerTbsp.toFixed(2)),
+                      mg_per_serving: Number(mgPerServing.toFixed(2)),
+                    });
+                  }
                 }
               >
                 <Button className="bg-green-600 hover:bg-green-700 text-white font-bold">
@@ -306,6 +350,29 @@ export function THCCalculatorPage() {
               Note: if infused amount is very high, the recipe builder may show a warning.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="bg-white rounded-3xl border border-green-200 p-8 shadow-sm space-y-5">
+        <h2 className="text-2xl font-black text-gray-900">How to use this THC calculator correctly</h2>
+        <p className="text-gray-700">
+          Use this page as your dosing source of truth: first estimate potency of your infused base, then map that into
+          a real recipe by entering how much infused base you actually used and how many portions you are serving. For
+          best consistency, keep your unit choices stable (tbsp or grams) and avoid switching base types mid-flow.
+        </p>
+        <p className="text-gray-700">
+          If you are sharing with a mixed-tolerance group, start with lower target mg per serving and increase in small
+          steps. The builder link carries your current mg-per-tablespoon and target mg-per-serving values into the recipe
+          workflow so you can scale ingredients without losing potency math.
+        </p>
+        <div className="space-y-3">
+          <h3 className="text-lg font-black text-gray-900">FAQ</h3>
+          {CALCULATOR_FAQS.map((f) => (
+            <div key={f.q} className="rounded-xl border border-gray-200 p-4 bg-gray-50">
+              <p className="font-bold text-gray-900">{f.q}</p>
+              <p className="text-sm text-gray-700 mt-1">{f.a}</p>
+            </div>
+          ))}
         </div>
       </section>
 
